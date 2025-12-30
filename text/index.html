@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tempo OS | 链上信息管理系统</title>
+    <!-- 引入解析库 -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .view-section { display: none; }
+        .view-active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-link-active { background: #4f46e5; color: white !important; }
+        .share-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 12px 24px; border-radius: 12px; display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        
+        /* Markdown 样式与图片渲染 */
+        .prose img { border-radius: 1.5rem; margin: 2rem auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); max-height: 600px; object-fit: contain; border: 4px solid white; }
+        .prose a { color: #4f46e5; text-decoration: underline; }
+        .prose code { background: #f1f5f9; padding: 2px 5px; border-radius: 4px; font-size: 0.9em; }
+        .prose pre { background: #1e293b; color: #f8fafc; padding: 1.5rem; border-radius: 1rem; overflow-x: auto; margin: 1.5rem 0; }
+        .prose blockquote { border-left: 4px solid #e2e8f0; padding-left: 1rem; color: #64748b; font-style: italic; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-900 font-sans">
+
+    <div id="toast" class="share-toast font-bold shadow-2xl">✅ 链接已复制！</div>
+
+    <!-- 顶部导航 -->
+    <nav class="bg-white border-b sticky top-0 z-50 px-6 py-3">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="goHome()">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black shadow-lg shadow-indigo-100">T</div>
+                <span class="font-black text-xl tracking-tight">Tempo OS</span>
+            </div>
+
+            <!-- 菜单排列：首页 -> 发布 -> 我的记录 -> 管理用户 -> 项目文档 -->
+            <div id="navMenu" class="flex items-center bg-slate-100 p-1 rounded-2xl">
+                <button onclick="goHome()" id="nav-dashboard" class="px-5 py-2 rounded-xl text-sm font-bold text-slate-500 hover:text-indigo-600 transition">首页大厅</button>
+                <button onclick="showView('create')" id="nav-create" class="px-5 py-2 rounded-xl text-sm font-bold text-slate-500 hover:text-indigo-600 transition">发布存证</button>
+                <button onclick="showView('history')" id="nav-history" class="hidden px-5 py-2 rounded-xl text-sm font-bold text-slate-500 hover:text-indigo-600 transition">我的记录</button>
+                <button onclick="showView('admin')" id="nav-admin" class="hidden px-5 py-2 rounded-xl text-sm font-bold text-slate-500 hover:text-indigo-600 transition">管理用户</button>
+                <a href="./readme.md" target="_blank" class="px-5 py-2 rounded-xl text-sm font-bold text-slate-400 hover:text-indigo-600 transition flex items-center gap-1">
+                    项目文档 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                </a>
+            </div>
+
+            <div id="authStatus">
+                <button id="connectBtn" onclick="connect()" class="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-indigo-700 shadow-md transition active:scale-95">连接钱包</button>
+                <div id="userInfo" class="hidden flex items-center gap-3 bg-white border p-1 pr-4 rounded-2xl shadow-sm">
+                    <div id="userAvatar" class="w-8 h-8 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">?</div>
+                    <div class="text-left leading-none">
+                        <p id="userName" class="text-xs font-black text-indigo-600 mb-1"></p>
+                        <p id="userAddr" class="text-[9px] font-mono text-slate-400"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto max-w-4xl px-4 py-10">
+        
+        <!-- 首页大厅 -->
+        <div id="view-dashboard" class="view-section space-y-8">
+            <div class="flex justify-between items-end border-b pb-4">
+                <h2 class="text-2xl font-black text-slate-800">全网最新存证</h2>
+                <button onclick="loadGlobalFeed()" class="text-xs font-bold text-indigo-600 hover:underline">刷新大厅</button>
+            </div>
+            <div id="globalFeed" class="grid gap-6"></div>
+        </div>
+
+        <!-- 发布存证 -->
+        <div id="view-create" class="view-section">
+            <div id="regArea" class="hidden bg-indigo-600 rounded-[2.5rem] p-10 text-white shadow-2xl">
+                <h2 class="text-3xl font-black mb-3">激活链上身份</h2>
+                <p class="opacity-80 mb-8">首次发布前，请先设置您的唯一昵称。</p>
+                <div class="flex gap-4">
+                    <input type="text" id="regInput" placeholder="输入昵称..." class="flex-1 p-5 rounded-2xl text-slate-900 font-bold outline-none">
+                    <button onclick="handleRegister()" class="bg-white text-indigo-600 px-10 py-5 rounded-2xl font-black">注册</button>
+                </div>
+            </div>
+            <div id="createArea" class="bg-white rounded-[2.5rem] border p-10 shadow-sm">
+                <h3 class="text-2xl font-black mb-8">撰写新存证</h3>
+                <div class="space-y-6">
+                    <input type="text" id="postTitle" placeholder="存证标题..." class="w-full p-5 rounded-2xl bg-slate-50 border-none ring-1 ring-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none font-bold">
+                    <textarea id="postContent" placeholder="支持 Markdown ![图片描述](URL)" class="w-full p-5 rounded-2xl bg-slate-50 border-none ring-1 ring-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none h-64 font-medium"></textarea>
+                    <div id="loginNotice" class="text-center py-6 border border-dashed text-slate-400 font-bold">请先连接钱包以进行链上同步</div>
+                    <button id="postBtn" onclick="handlePost()" class="hidden w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-xl hover:bg-indigo-600 transition shadow-xl">确认同步到区块链</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分享详情页 -->
+        <div id="view-post" class="view-section">
+            <div id="singlePostContainer" class="bg-white rounded-[3rem] border p-8 md:p-12 shadow-sm relative overflow-hidden"></div>
+            <div class="text-center mt-10"><button onclick="goHome()" class="text-slate-400 font-bold hover:text-indigo-600 transition">← 返回首页大厅</button></div>
+        </div>
+
+        <!-- 我的记录 -->
+        <div id="view-history" class="view-section space-y-6">
+            <h2 class="text-2xl font-black text-slate-800 border-b pb-4">我的个人存证</h2>
+            <div id="historyList" class="space-y-4"></div>
+        </div>
+
+        <!-- 管理用户 -->
+        <div id="view-admin" class="view-section">
+            <div class="bg-amber-50 border border-amber-100 rounded-3xl p-8">
+                <h2 class="text-2xl font-black text-amber-900 mb-4">管理用户状态</h2>
+                <div class="flex gap-3">
+                    <input type="text" id="adminTargetAddr" placeholder="0x..." class="flex-1 p-4 rounded-xl ring-1 ring-slate-200">
+                    <button onclick="handleBan(true)" class="bg-rose-500 text-white px-6 py-4 rounded-xl font-bold">封禁</button>
+                    <button onclick="handleBan(false)" class="bg-emerald-500 text-white px-6 py-4 rounded-xl font-bold">解封</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const CONTRACT_ADDR = "0x2472848352Dc8c5DA3817CB17445A6B26A81Ea75";
+        const RPC_URL = "https://rpc.testnet.tempo.xyz";
+        const ABI = [
+            "function admin() view returns (address)",
+            "function users(address) view returns (string username, bool isBanned, bool isRegistered)",
+            "function register(string _username) public",
+            "function createPost(string _title, string _content) public",
+            "function updatePost(uint256 _id, string _newTitle, string _newContent) public",
+            "function deletePost(uint256 _id) public",
+            "function setBannedStatus(address _userAddress, bool _status) public",
+            "function allPostIds(uint256) view returns (uint256)",
+            "function getPostIdsByAddress(address _user) view returns (uint256[])",
+            "function getPost(uint256 _id) view returns (string title, string content, string authorName, uint256 timestamp, bool exists)"
+        ];
+
+        let provider, signer, contract, userAddr;
+
+        window.onload = async () => {
+            provider = new ethers.JsonRpcProvider(RPC_URL);
+            contract = new ethers.Contract(CONTRACT_ADDR, ABI, provider);
+            const urlParams = new URLSearchParams(window.location.search);
+            const pid = urlParams.get('id');
+            if (pid) { showView('post'); loadSinglePost(pid); } else { showView('dashboard'); loadGlobalFeed(); }
+            if (window.ethereum) {
+                const acc = await window.ethereum.request({ method: 'eth_accounts' });
+                if (acc.length > 0) connect();
+            }
+        };
+
+        async function connect() {
+            if (!window.ethereum) return;
+            try {
+                const webProvider = new ethers.BrowserProvider(window.ethereum);
+                signer = await webProvider.getSigner();
+                userAddr = await signer.getAddress();
+                contract = new ethers.Contract(CONTRACT_ADDR, ABI, signer);
+                await syncAuthState();
+                document.getElementById('nav-history').classList.remove('hidden');
+                document.getElementById('loginNotice').classList.add('hidden');
+                document.getElementById('postBtn').classList.remove('hidden');
+            } catch (e) { console.error("连接失败", e); }
+        }
+
+        async function syncAuthState() {
+            const info = await contract.users(userAddr);
+            document.getElementById('connectBtn').classList.add('hidden');
+            document.getElementById('userInfo').classList.remove('hidden');
+            document.getElementById('userName').innerText = info.isRegistered ? "@" + info.username : "未注册";
+            document.getElementById('userAddr').innerText = `${userAddr.slice(0,6)}...${userAddr.slice(-4)}`;
+            if (info.isRegistered) {
+                document.getElementById('regArea').classList.add('hidden');
+                document.getElementById('createArea').classList.remove('hidden');
+            } else {
+                document.getElementById('regArea').classList.remove('hidden');
+                document.getElementById('createArea').classList.add('hidden');
+            }
+            const adm = await contract.admin();
+            if(userAddr.toLowerCase() === adm.toLowerCase()) document.getElementById('nav-admin').classList.remove('hidden');
+        }
+
+        async function loadGlobalFeed() {
+            const container = document.getElementById('globalFeed');
+            container.innerHTML = `<div class="p-10 text-center text-slate-400 animate-pulse">索引中...</div>`;
+            try {
+                let ids = [];
+                for(let i=0; i<500; i++) { 
+                    try { ids.push(Number(await contract.allPostIds(i))); } catch(e) { break; }
+                }
+                const latest = ids.reverse().slice(0, 10);
+                let html = "";
+                for(let id of latest) {
+                    const p = await contract.getPost(id);
+                    if(p.exists) html += renderCard(id, p, false);
+                }
+                container.innerHTML = html || `<div class="p-20 text-center text-slate-300">暂无存证</div>`;
+            } catch(e) { container.innerHTML = "大厅加载失败"; }
+        }
+
+        // --- 修复后的“我的记录”逻辑 ---
+        async function loadMyHistory() {
+            const container = document.getElementById('historyList');
+            if (!userAddr) {
+                container.innerHTML = `<p class="text-center p-10">请先连接钱包</p>`;
+                return;
+            }
+            container.innerHTML = `<p class="text-center p-10 animate-pulse">检索中...</p>`;
+            try {
+                // Ethers v6 返回的 Result 需要确保能正确转换为数组
+                const rawIds = await contract.getPostIdsByAddress(userAddr);
+                const ids = Array.from(rawIds); 
+                
+                let html = "";
+                for (let id of ids.reverse()) {
+                    const p = await contract.getPost(id);
+                    if (p.exists) html += renderCard(Number(id), p, true);
+                }
+                container.innerHTML = html || `<p class="text-center py-20 text-slate-300">无存证记录</p>`;
+            } catch (e) { 
+                console.error(e);
+                container.innerHTML = `<p class="text-center p-10 text-rose-500 font-bold">索引失败：请确保网络已连接到 Tempo</p>`; 
+            }
+        }
+
+        async function loadSinglePost(id) {
+            const container = document.getElementById('singlePostContainer');
+            container.innerHTML = `<div class="p-20 text-center">同步中...</div>`;
+            try {
+                const p = await contract.getPost(id);
+                if (!p.exists) { container.innerHTML = "已抹除"; return; }
+                const renderedContent = marked.parse(p.content);
+                container.innerHTML = `
+                    <div class="flex justify-between items-start mb-8">
+                        <span class="bg-indigo-600 text-white px-4 py-1 rounded-full text-[10px] font-black uppercase">ID #${id}</span>
+                        <button onclick="copyLink(${id})" class="text-slate-400 hover:text-indigo-600 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6a3 3 0 100-2.684m0 2.684l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg></button>
+                    </div>
+                    <h1 class="text-4xl font-black mb-6">${p.title}</h1>
+                    <div class="prose max-w-none text-slate-700 mb-12">${renderedContent}</div>
+                    <div class="bg-slate-50 rounded-2xl p-6 border flex justify-between text-xs">
+                        <div>发布者：<span class="text-indigo-600 font-bold">@${p.authorName}</span></div>
+                        <div class="text-slate-400">${new Date(Number(p.timestamp)*1000).toLocaleString()}</div>
+                    </div>
+                `;
+            } catch (e) { container.innerHTML = "加载失败"; }
+        }
+
+        function renderCard(id, p, isMine) {
+            return `<div class="bg-white border rounded-[2rem] p-6 hover:shadow-lg transition">
+                <div class="flex justify-between items-start mb-3">
+                    <span class="text-[10px] font-black bg-slate-100 text-slate-400 px-2 py-1 rounded">#${id}</span>
+                </div>
+                <h3 class="text-xl font-black mb-2">${p.title}</h3>
+                <div class="flex justify-between items-center border-t pt-4">
+                    <span class="text-xs font-black text-indigo-500">@${p.authorName}</span>
+                    <div class="flex gap-4">
+                        <button onclick="goDetail(${id})" class="text-xs font-black text-indigo-600 hover:underline">查看全文</button>
+                        ${isMine ? `<button onclick="handleDelete(${id})" class="text-xs font-black text-rose-400">删除</button>` : ''}
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function goHome() { window.history.pushState({}, '', window.location.pathname); showView('dashboard'); loadGlobalFeed(); }
+        function goDetail(id) { window.history.pushState({}, '', `?id=${id}`); showView('post'); loadSinglePost(id); }
+        function copyLink(id) {
+            const url = window.location.origin + window.location.pathname + "?id=" + id;
+            navigator.clipboard.writeText(url).then(() => {
+                const t = document.getElementById('toast');
+                t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000);
+            });
+        }
+
+        function showView(viewName) {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('view-active'));
+            document.querySelectorAll('#navMenu button').forEach(b => b.classList.remove('nav-link-active'));
+            document.getElementById(`view-${viewName}`).classList.add('view-active');
+            const navBtn = document.getElementById(`nav-${viewName}`);
+            if (navBtn) navBtn.classList.add('nav-link-active');
+            if (viewName === 'history') loadMyHistory();
+        }
+
+        async function handlePost() {
+            const t = document.getElementById('postTitle').value;
+            const c = document.getElementById('postContent').value;
+            if(!t || !c) return;
+            try { await (await contract.createPost(t, c)).wait(); goHome(); } catch(e) { alert("发布失败"); }
+        }
+
+        async function handleRegister() {
+            const n = document.getElementById('regInput').value;
+            if(!n) return;
+            try { await (await contract.register(n)).wait(); syncAuthState(); } catch(e) { alert("注册失败"); }
+        }
+
+        async function handleDelete(id) {
+            if(!confirm("确定删除？")) return;
+            try { await (await contract.deletePost(id)).wait(); loadMyHistory(); } catch(e) { alert("失败"); }
+        }
+
+        async function handleBan(s) {
+            const a = document.getElementById('adminTargetAddr').value;
+            try { await (await contract.setBannedStatus(a, s)).wait(); alert("成功"); } catch(e) { alert("失败"); }
+        }
+    </script>
+</body>
+</html>
