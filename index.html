@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO 基础 -->
+    <title>XS | Blockchain Artist & Coder - 120.show 官方作品集</title>
+    <meta name="description" content="XS | Blockchain Artist & Coder。探索区块链技术、数字艺术与开源工具。提供 Z-Library 账号共享、轻小说下载及在线祈福空间，致力于构建自由开放的数字世界。">
+    <meta name="keywords" content="XS, 区块链, 程序员, 艺术家, Z-Library账号共享, 轻小说下载, 在线祈福, 120.show">
+    <link rel="canonical" href="https://120.show/" />
+
+    <!-- Open Graph (Facebook/Discord/WeChat) -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://120.show/">
+    <meta property="og:title" content="XS | Blockchain Artist & Coder">
+    <meta property="og:description" content="探索区块链技术与艺术的交汇点。集成 ZLib 账号共享、轻小说下载等多个实用开源工具。">
+    <meta property="og:image" content="https://gnfd-testnet-sp1.nodereal.io/view/abc/tw.png">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@btc_xs">
+    <meta name="twitter:title" content="XS | Blockchain Artist & Coder">
+    <meta name="twitter:description" content="热爱代码的逻辑，也迷恋艺术的感性。在区块链世界探索自由。">
+    <meta name="twitter:image" content="https://gnfd-testnet-sp1.nodereal.io/view/abc/tw.png">
+
+    <!-- 图标 (Favicon & Apple Touch Icon) -->
+    <link rel="icon" href="https://gnfd-testnet-sp1.nodereal.io/view/abc/tw.png">
+    <link rel="apple-touch-icon" href="https://gnfd-testnet-sp1.nodereal.io/view/abc/tw.png">
+
+    <!-- Schema.org JSON-LD 结构化数据 -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "XS",
+      "url": "https://120.show",
+      "image": "https://gnfd-testnet-sp1.nodereal.io/view/abc/tw.png",
+      "sameAs": [
+        "https://twitter.com/btc_xs",
+        "https://github.com/xsbtc",
+        "https://blog.120.show"
+      ],
+      "jobTitle": "Blockchain Developer & Artist",
+      "description": "热爱代码的逻辑，也迷恋艺术的感性。在区块链世界探索自由。"
+    }
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #050505; --text-primary: #ffffff; --text-secondary: #a1a1aa;
+            --accent-pink: #FD52AA; --accent-cyan: #00f2ea; --accent-purple: #9d50bb;
+            --card-bg: rgba(20, 20, 20, 0.6); --card-border: rgba(255, 255, 255, 0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-color); color: var(--text-primary);
+            line-height: 1.6; overflow-x: hidden;
+        }
+        .container { width: 100%; max-width: 1100px; padding: 80px 40px; margin: 0 auto; }
+        .hero { display: flex; align-items: center; gap: 80px; margin-bottom: 80px; }
+        .avatar { width: 200px; border-radius: 40px; border: 2px solid rgba(255,255,255,0.1); background: #1a1a1a; }
+        
+        /* 标题层级 H1 */
+        h1 { font-size: 4rem; background: linear-gradient(to right, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* 标题层级 H2 */
+        h2 { font-size: 1.8rem; color: var(--accent-cyan); margin-bottom: 25px; }
+
+        .about-section { margin-bottom: 80px; padding: 40px; background: rgba(255, 255, 255, 0.02); border-radius: 24px; border: 1px solid var(--card-border); }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
+        
+        .card { 
+            background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border); 
+            border-radius: 24px; padding: 40px; text-decoration: none; position: relative; display: block;
+            min-height: 280px; transition: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .card:hover { transform: translateY(-8px); border-color: rgba(255,255,255,0.3); }
+        
+        /* 标题层级 H3 (卡片标题) */
+        h3 { font-size: 1.8rem; color: #fff; margin-bottom: 10px; }
+        
+        .card p { color: #999; font-size: 1rem; }
+        .social-bar { display: flex; gap: 15px; margin-top: 25px; }
+        .social-btn { font-size: 1.5rem; color: var(--text-secondary); text-decoration: none; transition: 0.3s; }
+        .social-btn:hover { color: var(--accent-pink); }
+        
+        .internal-links { margin-top: 20px; display: flex; gap: 20px; flex-wrap: wrap; }
+        .internal-links a { color: var(--accent-pink); text-decoration: none; border-bottom: 1px solid transparent; }
+        .internal-links a:hover { border-bottom-color: var(--accent-pink); }
+
+        @media (max-width: 850px) { .hero { flex-direction: column; text-align: center; } .grid { grid-template-columns: 1fr; } h1 { font-size: 3rem; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- H1: 页面主标题 -->
+        <header class="hero">
+            <img src="https://gnfd-testnet-sp1.nodereal.io/view/abc/tw.png" alt="XS Avatar" class="avatar">
+            <div class="bio">
+                <span style="color: var(--accent-pink); font-weight: 600;">PORTFOLIO</span>
+                <h1>I'm XS.</h1>
+                <p style="color: var(--text-secondary); font-size: 1.2rem;">区块链开发者 / 数字艺术家 / 开源爱好者</p>
+                <div class="social-bar">
+                    <a href="https://github.com/xsbtc" target="_blank" class="social-btn"><i class="fa-brands fa-github"></i></a>
+                    <a href="https://twitter.com/btc_xs" target="_blank" class="social-btn"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="https://blog.120.show" target="_blank" class="social-btn"><i class="fa-solid fa-rss"></i></a>
+                </div>
+            </div>
+        </header>
+
+        <!-- H2: 关键内容区域标题 -->
+        <section class="about-section">
+            <h2>关于 120.show / About Project</h2>
+            <p>
+                这里是 XS 的个人数字实验室。在信息碎片化的时代，我坚持构建<strong>简洁、实用、无广告</strong>的开源工具。
+                从突破限制的知识获取到温情的人文祈愿，每一个项目都承载着对自由互联网的追求。
+            </p>
+            <div class="internal-links">
+                <a href="./zlib/index.html">ZLib 共享</a>
+                <a href="./qing/index.html">轻小说下载</a>
+                <a href="./qifu/index.html">在线祈福</a>
+                <a href="https://blog.120.show">技术博客</a>
+            </div>
+        </section>
+
+        <!-- H2: 项目列表标题 -->
+        <section>
+            <h2 style="margin-bottom: 40px; text-align: center; font-size: 1.2rem; opacity: 0.6; color: #fff;">Featured Toolsets</h2>
+            <div class="grid">
+                <!-- 项目：ZLib - 相对地址 -->
+                <a href="./zlib/index.html" class="card">
+                    <h3 style="color: var(--accent-purple);">Z-Library 助手</h3>
+                    <p>知识共享，打破壁垒。每日更新可用高级账号，助你探索书籍海洋。</p>
+                </a>
+
+                <!-- 项目：祈福 - 相对地址 -->
+                <a href="./qifu/index.html" class="card">
+                    <h3 style="color: var(--accent-pink);">在线祈福空间</h3>
+                    <p>寻求保佑，见证幸福。一个纯粹的数字祈愿空间，记录每一份温暖的期待。</p>
+                </a>
+
+                <!-- 项目：轻小说 - 相对地址 -->
+                <a href="./qing/index.html" class="card">
+                    <h3 style="color: var(--accent-cyan);">轻小说下载站</h3>
+                    <p>极简至上。国内直连，EPUB 格式免费下载，回归最纯粹的阅读乐趣。</p>
+                </a>
+            </div>
+        </section>
+    </div>
+
+</body>
+</html>
