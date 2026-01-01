@@ -1,0 +1,14 @@
+Tempo Testnet:
+ERC1967Proxy:0xba0c4539deb136356Ac63A4F58772B3BFe772883
+RPC:https://rpc.testnet.tempo.xyz
+ChianId:42429
+
+Somnia Testnet:
+ERC1967Proxy:0xDcB858D6A338d0fe3Cf7E724d95d6ED0f622702c
+RPC:https://dream-rpc.somnia.network
+ChianId:50312
+
+Sepolia:
+ERC1967Proxy:0x0255d9E3432A39DC3a5F5bC3F05459C7D5c2a25e
+RPC:https://sepolia.drpc.org
+ChianId:11155111
