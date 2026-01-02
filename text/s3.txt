@@ -34,14 +34,21 @@ RPC:https://rpc.testnet.arc.network
 ChianId:5042002
 ChainIdHex:0x4cef52
 
-Giwa Sepolia:
+Giwa Sepolia Testnet:
 ERC1967Proxy:0x86f62014d0e422D4A1B069068852D123A0FF5259
 RPC:https://sepolia-rpc.giwa.io
 ChianId:91342
 ChainIdHex:0x164ce
 
-Base Sepolia:
+Base Sepolia Testnet:
 ERC1967Proxy:0x964B8C91f8650296089fe5bF4B39d6c16b5E2580
 RPC:https://base-sepolia-rpc.publicnode.com
 ChianId:84532
 ChainIdHex:0x14a34
+
+
+Gnosis(xDai) Mainnet:
+ERC1967Proxy:0xA09A09ffB2AB4831cc502F11E2b2418a1dCa0D73
+RPC:https://gnosis-rpc.publicnode.com
+ChianId:100
+ChainIdHex:0x64

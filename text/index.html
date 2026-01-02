@@ -72,7 +72,7 @@
         window.onload = async () => {
             marked.setOptions({ breaks: true, gfm: true });
             Object.keys(NETWORKS).forEach((id, index) => { NETWORKS[id].theme = THEMES[index % THEMES.length]; });
-            activeFilters = ['0xaa36a7', '0xa5bd', '0xc488']; 
+            activeFilters = ['0x64','0xaa36a7', '0xa5bd', '0xc488']; 
             renderFilterUI();
             renderNetworkSwitcher();
             const urlParams = new URLSearchParams(window.location.search);
