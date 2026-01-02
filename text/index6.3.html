@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OmniVerse Protocol | 跨链存证中心 v6.4 (Patched)</title>
+    <title>OmniVerse Protocol | 跨链存证中心 v6.3</title>
     <script src="config.js"></script> 
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -78,45 +78,23 @@
             const urlParams = new URLSearchParams(window.location.search);
             const netId = urlParams.get('netId'), postId = urlParams.get('postId');
             if (netId && postId && NETWORKS[netId]) { goDetail(netId, postId); } else { showView('dashboard'); }
-            
             if (window.ethereum) {
-                // --- 修复点 1: 增加账户切换的监听 ---
-                // 当用户在MetaMask钱包里切换账户时，自动刷新页面来应用新账户
-                window.ethereum.on('accountsChanged', () => window.location.reload());
-                
-                // 保留原有的网络切换监听
-                window.ethereum.on('chainChanged', () => window.location.reload()); 
-                
-                // 检查之前是否已经连接过网站
                 const acc = await window.ethereum.request({ method: 'eth_accounts' });
-                if (acc.length > 0) {
-                    // 如果连接过，调用我们修改后的connect()函数。
-                    // 这个新函数会弹出钱包让用户确认，从而给用户切换到新账户的机会。
-                    connect();
-                }
+                if (acc.length > 0) connect();
+                window.ethereum.on('chainChanged', () => window.location.reload()); 
             }
         };
 
-        // --- 修复点 2: 修改 connect 函数，强制弹出钱包让用户选择账户 ---
         async function connect() {
             if (!window.ethereum) return alert("请安装MetaMask等兼容钱包！");
-            try {
-                // 使用 eth_requestAccounts 会强制弹出钱包，允许用户选择或切换账户。
-                // 这是解决您问题的关键！
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-                const webProvider = new ethers.BrowserProvider(window.ethereum);
-                const signer = await webProvider.getSigner();
-                userAddr = await signer.getAddress();
-                const net = await webProvider.getNetwork();
-                currentChainId = "0x" + net.chainId.toString(16).toLowerCase();
-                document.getElementById('netSwitcher').value = currentChainId;
-                updateUI();
-                checkNetStatus();
-            } catch (error) {
-                console.error("Connection failed:", error);
-                alert("连接钱包失败。用户取消了授权或发生了错误。");
-            }
+            const webProvider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await webProvider.getSigner();
+            userAddr = await signer.getAddress();
+            const net = await webProvider.getNetwork();
+            currentChainId = "0x" + net.chainId.toString(16).toLowerCase();
+            document.getElementById('netSwitcher').value = currentChainId;
+            updateUI();
+            checkNetStatus();
         }
 
         function showView(name) {
