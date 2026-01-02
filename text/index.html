@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OmniVerse Protocol | 跨链存证中心 v5.4</title>
+    <title>OmniVerse Protocol | 跨链存证中心 v5.7</title>
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -82,10 +82,22 @@
                 <button id="postBtn" onclick="handlePost()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black">广播存证</button>
             </div>
         </div>
+        
+        <!-- 编辑视图 -->
+        <div id="view-edit" class="view-section max-w-xl mx-auto">
+            <div class="bg-white border p-8 rounded-3xl shadow-sm">
+                <h2 class="text-2xl font-black mb-6">编辑帖子</h2>
+                <input type="hidden" id="editPostId">
+                <input type="hidden" id="editPostNetId">
+                <input type="text" id="editTitle" placeholder="存证标题" class="w-full p-4 bg-slate-50 rounded-xl mb-4 font-bold outline-none">
+                <textarea id="editContent" placeholder="Markdown 内容..." class="w-full p-4 bg-slate-50 rounded-xl h-48 mb-6 font-medium outline-none"></textarea>
+                <button id="updateBtn" onclick="handleUpdate()" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-black">更新存证</button>
+            </div>
+        </div>
 
         <!-- 我的记录 -->
         <div id="view-history" class="view-section space-y-6">
-            <h2 class="text-2xl font-black border-b pb-4 italic">My Footprints</h2>
+            <h2 class="text-2xl font-black border-b pb-4 italic">My Footprints (当前链)</h2>
             <div id="historyList" class="grid gap-4 md:grid-cols-2"></div>
             <div id="history-pagination" class="flex justify-center gap-3 pt-10"></div>
         </div>
@@ -101,7 +113,7 @@
                 </div>
             </div>
             <div class="bg-white border rounded-[2rem] p-8">
-                <h4 class="font-black mb-6">已注册用户列表</h4>
+                <h4 class="font-black mb-6">已注册用户列表 (当前链)</h4>
                 <div id="userList" class="overflow-x-auto"></div>
             </div>
         </div>
@@ -123,6 +135,8 @@
         const ABI = [
             "function register(string _username) public",
             "function createPost(string _title, string _content) public",
+            "function updatePost(uint256 _id, string _newTitle, string _newContent) public",
+            "function deletePost(uint256 _id) public",
             "function getPostCount() view returns (uint256)",
             "function getPaginatedPosts(uint256 _page, uint256 _pageSize) view returns (tuple(uint256 id, string title, string content, address author, string authorName, uint256 createdAt, uint256 updatedAt, string chainLabel, bool exists)[])",
             "function users(address) view returns (string username, bool isBanned, bool isRegistered, address userAddress)",
@@ -155,10 +169,23 @@
             } catch (e) { return null; }
         }
 
+        // (已更新) 页面加载逻辑
         window.onload = async () => {
             marked.setOptions({ breaks: true, gfm: true });
             renderFilterUI();
-            showView('dashboard'); // 默认进入大厅
+
+            // 检查URL中是否有分享参数 (netId, postId)
+            const urlParams = new URLSearchParams(window.location.search);
+            const netId = urlParams.get('netId');
+            const postId = urlParams.get('postId');
+
+            if (netId && postId && NETWORKS[netId]) {
+                // 如果有，直接显示帖子详情
+                goDetail(netId, postId);
+            } else {
+                // 否则，显示默认大厅
+                showView('dashboard');
+            }
 
             if (window.ethereum) {
                 const acc = await window.ethereum.request({ method: 'eth_accounts' });
@@ -179,17 +206,16 @@
         }
 
         function showView(name) {
-            // 隐藏所有
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('view-active'));
             document.querySelectorAll('#navMenu button').forEach(b => b.classList.remove('nav-link-active'));
             
-            // 显示选定
             const targetView = document.getElementById(`view-${name}`);
             const targetBtn = document.getElementById(`nav-${name}`);
             
             if (targetView) targetView.classList.add('view-active');
             if (targetBtn) targetBtn.classList.add('nav-link-active');
 
+            // 路由逻辑
             if (name === 'dashboard') loadAggregatedFeed(1);
             if (name === 'history') loadMyHistory(1);
             if (name === 'admin') loadAdminPanel();
@@ -204,7 +230,7 @@
                 try {
                     const provider = new ethers.JsonRpcProvider(NETWORKS[id].rpc);
                     const contract = new ethers.Contract(NETWORKS[id].proxy, ABI, provider);
-                    const posts = await contract.getPaginatedPosts(1, page * PAGE_SIZE);
+                    const posts = await contract.getPaginatedPosts(1, page * PAGE_SIZE); 
                     return posts.map(rp => parsePost(rp, id));
                 } catch (e) { return []; }
             });
@@ -243,33 +269,124 @@
             container.innerHTML = "解析中...";
             const net = NETWORKS[netId];
             try {
-                const contract = new ethers.Contract(net.proxy, ABI, new ethers.JsonRpcProvider(net.rpc));
+                const provider = new ethers.JsonRpcProvider(net.rpc);
+                const contract = new ethers.Contract(net.proxy, ABI, provider);
                 const p = await contract.posts(id);
                 const post = parsePost(p, netId);
                 
                 const created = new Date(post.createdAt * 1000).toLocaleString();
                 const updated = new Date(post.updatedAt * 1000).toLocaleString();
                 const isEdited = post.updatedAt > post.createdAt;
+                
+                const isAuthor = userAddr && userAddr.toLowerCase() === post.author.toLowerCase();
 
                 container.innerHTML = `
-                    <div class="mb-6"><span class="tag-${net.color} px-3 py-1 rounded-lg font-black text-[10px] uppercase">${net.name} NETWORK</span></div>
+                    <div class="mb-6 flex justify-between items-center">
+                        <span class="tag-${net.color} px-3 py-1 rounded-lg font-black text-[10px] uppercase">${net.name} NETWORK</span>
+                        <div class="flex items-center gap-2">
+                            <button onclick="handleShare('${netId}', ${id})" class="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-lg font-bold text-xs">分享</button>
+                            ${isAuthor ? `<button onclick="goEdit('${netId}', ${id})" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-xs">编辑</button>` : ''}
+                            ${isAuthor ? `<button onclick="handleDelete('${netId}', ${id})" class="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-lg font-bold text-xs">删除</button>` : ''}
+                        </div>
+                    </div>
                     <h1 class="text-4xl font-black mb-8 leading-tight">${post.title}</h1>
                     <div class="prose max-w-none text-slate-700 mb-12">${marked.parse(post.content)}</div>
                     <div class="border-t pt-8 space-y-4">
                         <div class="flex justify-between items-center">
                             <span class="font-black text-2xl text-${net.color}">@${post.authorName}</span>
                             <div class="text-right text-[10px] font-bold text-slate-400">
-                                <div>发布时间: ${created}</div>
-                                ${isEdited ? `<div class="text-amber-500">修改时间: ${updated}</div>` : ''}
+                                <div>发布于: ${created}</div>
+                                ${isEdited ? `<div class="text-amber-500">更新于: ${updated}</div>` : ''}
                             </div>
                         </div>
-                        <div class="text-[10px] font-mono text-slate-300">存证作者地址: ${post.author}</div>
+                        <div class="text-[10px] font-mono text-slate-300">作者地址: ${post.author}</div>
+                        <div class="text-[10px] font-mono text-slate-300">帖子 ID: ${post.id}</div>
                     </div>
                 `;
-            } catch (e) { container.innerHTML = "读取失败"; }
+            } catch (e) { container.innerHTML = "读取失败"; console.error(e); }
         }
 
-        // --- 管理逻辑 ---
+        // (新增) 分享功能
+        function handleShare(netId, postId) {
+            const url = `${window.location.origin}${window.location.pathname}?netId=${netId}&postId=${postId}`;
+            navigator.clipboard.writeText(url).then(() => {
+                alert("分享链接已复制到剪贴板！");
+            }, () => {
+                alert("复制失败，请手动复制链接。");
+            });
+        }
+
+        async function goEdit(netId, postId) {
+            showView('edit');
+            const net = NETWORKS[netId];
+            try {
+                const provider = new ethers.JsonRpcProvider(net.rpc);
+                const contract = new ethers.Contract(net.proxy, ABI, provider);
+                const p = await contract.posts(postId);
+                
+                document.getElementById('editPostId').value = postId;
+                document.getElementById('editPostNetId').value = netId;
+                document.getElementById('editTitle').value = p.title;
+                document.getElementById('editContent').value = p.content;
+            } catch (e) {
+                alert("加载帖子内容失败!");
+                goHome();
+            }
+        }
+
+        async function handleUpdate() {
+            const postId = document.getElementById('editPostId').value;
+            const netId = document.getElementById('editPostNetId').value;
+            const title = document.getElementById('editTitle').value;
+            const content = document.getElementById('editContent').value;
+            
+            const net = NETWORKS[netId];
+            if (currentChainId !== netId) {
+                alert(`请将钱包切换到 ${net.name} 网络来更新这个帖子。`);
+                return;
+            }
+
+            try {
+                const webProvider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await webProvider.getSigner();
+                const contract = new ethers.Contract(net.proxy, ABI, signer);
+                
+                const tx = await contract.updatePost(postId, title, content);
+                await tx.wait();
+                
+                alert("帖子更新成功!");
+                goDetail(netId, postId);
+            } catch (e) {
+                console.error("Update failed:", e);
+                alert("更新失败。可能原因：您没有权限或网络发生错误。");
+            }
+        }
+        
+        async function handleDelete(netId, postId) {
+            if (!confirm("确定要删除这个帖子吗？此操作无法撤销。")) return;
+
+            const net = NETWORKS[netId];
+            if (currentChainId !== netId) {
+                alert(`请先将钱包切换到 ${net.name} 网络再执行删除操作。`);
+                return;
+            }
+
+            try {
+                const webProvider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await webProvider.getSigner();
+                const contract = new ethers.Contract(net.proxy, ABI, signer);
+                
+                const tx = await contract.deletePost(postId);
+                await tx.wait();
+                
+                alert("帖子已成功删除！");
+                goHome();
+            } catch (e) {
+                console.error("Delete failed:", e);
+                alert("删除失败。可能原因：您没有权限或网络发生错误。");
+            }
+        }
+
         async function loadAdminPanel() {
             const container = document.getElementById('userList');
             container.innerHTML = "正在检索节点用户...";
@@ -293,6 +410,7 @@
 
         async function handleBan(status) {
             const addr = document.getElementById('targetAddr').value;
+            if (!ethers.isAddress(addr)) return alert("无效的地址");
             const net = NETWORKS[currentChainId];
             try {
                 const webProvider = new ethers.BrowserProvider(window.ethereum);
@@ -302,7 +420,6 @@
             } catch(e) { alert("失败：无权限或网络错误"); }
         }
 
-        // --- 基础辅助 ---
         function renderPagination(containerId, current, hasNext, callback) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -313,28 +430,53 @@
             `;
         }
 
+        // 兼容v4旧数据的 '我的记录' 加载逻辑
         async function loadMyHistory(page) {
             const list = document.getElementById('historyList');
-            list.innerHTML = `<div class="col-span-full py-10 text-center animate-pulse text-indigo-500">检索中...</div>`;
-            let myPool = [];
-            for (let id in NETWORKS) {
-                try {
-                    const provider = new ethers.JsonRpcProvider(NETWORKS[id].rpc);
-                    const contract = new ethers.Contract(NETWORKS[id].proxy, ABI, provider);
-                    const ids = await contract.getPostIdsByAddress(userAddr);
-                    for (let pid of ids) {
-                        const p = await contract.posts(pid);
-                        const parsed = parsePost(p, id);
-                        if (parsed && parsed.exists) myPool.push(parsed);
-                    }
-                } catch(e) {}
+            list.innerHTML = `<div class="col-span-full py-10 text-center animate-pulse text-indigo-500">正在从当前链检索您的记录...</div>`;
+            const net = NETWORKS[currentChainId];
+
+            if (!net || !userAddr) {
+                list.innerHTML = "请先连接钱包并确保在支持的网络上。";
+                return;
             }
+
+            let myPool = [];
+            try {
+                const provider = new ethers.JsonRpcProvider(net.rpc);
+                const contract = new ethers.Contract(net.proxy, ABI, provider);
+                
+                const totalCount = await contract.getPostCount();
+                if (totalCount === 0n) {
+                    list.innerHTML = "您在当前链上还没有发布任何记录。";
+                    renderPagination('history-pagination', 1, false, loadMyHistory);
+                    return;
+                }
+
+                // 一次性获取当前链的所有帖子
+                const allPostsOnChain = await contract.getPaginatedPosts(1, totalCount);
+
+                // 在前端进行筛选
+                allPostsOnChain.forEach(p => {
+                    const parsed = parsePost(p, currentChainId);
+                    if (parsed && parsed.exists && parsed.author.toLowerCase() === userAddr.toLowerCase()) {
+                        myPool.push(parsed);
+                    }
+                });
+            } catch(e) {
+                console.error("加载个人记录失败:", e);
+                list.innerHTML = "加载个人记录失败，请检查网络连接或稍后重试。";
+                return;
+            }
+
             myPool.sort((a, b) => b.createdAt - a.createdAt);
+            
             const start = (page - 1) * PAGE_SIZE;
             const final = myPool.slice(start, start + PAGE_SIZE);
+            
             let html = "";
             final.forEach(p => html += renderCard(p));
-            list.innerHTML = html || "无记录";
+            list.innerHTML = html || "您在当前链上还没有发布任何记录。";
             renderPagination('history-pagination', page, myPool.length > start + PAGE_SIZE, loadMyHistory);
         }
 
@@ -343,44 +485,66 @@
             const net = NETWORKS[currentChainId];
             if (net) {
                 alert.className = `mb-4 p-4 rounded-xl text-center text-xs font-black tag-${net.color}`;
-                alert.innerText = `接入点：${net.name}`;
+                alert.innerText = `当前接入点：${net.name}`;
                 syncStatus(net);
             } else {
                 alert.className = "mb-4 p-4 rounded-xl text-center text-xs font-black bg-rose-100 text-rose-600";
-                alert.innerText = "⚠️ 请切换至支持的网络";
+                alert.innerText = "⚠️ 请切换至支持的网络 (Tempo, Somnia, or Sepolia)";
+                document.getElementById('createArea').classList.add('hidden');
             }
         }
 
         async function syncStatus(net) {
-            const webProvider = new ethers.BrowserProvider(window.ethereum);
-            const contract = new ethers.Contract(net.proxy, ABI, await webProvider.getSigner());
-            const user = await contract.users(userAddr);
-            const owner = await contract.owner();
-            document.getElementById('userName').innerText = user.isRegistered ? "@" + user.username : "未注册";
-            document.getElementById('userAvatar').innerText = user.isRegistered ? user.username.charAt(0).toUpperCase() : '?';
-            if (user.isRegistered) { document.getElementById('regArea').classList.add('hidden'); document.getElementById('createArea').classList.remove('hidden'); }
-            else { document.getElementById('regArea').classList.remove('hidden'); document.getElementById('createArea').classList.add('hidden'); }
-            if (userAddr.toLowerCase() === owner.toLowerCase()) document.getElementById('nav-admin').classList.remove('hidden');
+            try {
+                const webProvider = new ethers.BrowserProvider(window.ethereum);
+                const contract = new ethers.Contract(net.proxy, ABI, await webProvider.getSigner());
+                const user = await contract.users(userAddr);
+                const owner = await contract.owner();
+                document.getElementById('userName').innerText = user.isRegistered ? "@" + user.username : "未注册";
+                document.getElementById('userAvatar').innerText = user.isRegistered ? user.username.charAt(0).toUpperCase() : '?';
+                if (user.isRegistered) { 
+                    document.getElementById('regArea').classList.add('hidden'); 
+                    document.getElementById('createArea').classList.remove('hidden'); 
+                } else { 
+                    document.getElementById('regArea').classList.remove('hidden'); 
+                    document.getElementById('createArea').classList.add('hidden'); 
+                }
+                document.getElementById('nav-admin').classList.toggle('hidden', userAddr.toLowerCase() !== owner.toLowerCase());
+            } catch (e) {
+                console.error("Status sync failed", e);
+            }
         }
 
         function switchNetwork(id) { if (id && window.ethereum) window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: id }] }); }
         async function handleRegister() {
             const n = document.getElementById('regInput').value;
-            try { await (await new ethers.Contract(NETWORKS[currentChainId].proxy, ABI, await (new ethers.BrowserProvider(window.ethereum)).getSigner()).register(n)).wait(); connect(); } catch(e) { alert("失败"); }
+            if (!n) return alert("昵称不能为空");
+            try { await (await new ethers.Contract(NETWORKS[currentChainId].proxy, ABI, await (new ethers.BrowserProvider(window.ethereum)).getSigner()).register(n)).wait(); connect(); } catch(e) { alert("注册失败，昵称可能已被占用或发生网络错误。"); }
         }
         async function handlePost() {
             const t = document.getElementById('postTitle').value; const c = document.getElementById('postContent').value;
-            try { await (await new ethers.Contract(NETWORKS[currentChainId].proxy, ABI, await (new ethers.BrowserProvider(window.ethereum)).getSigner()).createPost(t, c)).wait(); goHome(); } catch(e) { alert("失败"); }
+            if (!t || !c) return alert("标题和内容均不能为空");
+            try { await (await new ethers.Contract(NETWORKS[currentChainId].proxy, ABI, await (new ethers.BrowserProvider(window.ethereum)).getSigner()).createPost(t, c)).wait(); goHome(); } catch(e) { alert("发布失败，请检查您是否已被封禁或发生网络错误。"); }
         }
         function renderFilterUI() {
             document.getElementById('filterTags').innerHTML = Object.keys(NETWORKS).map(id => `<button onclick="toggleFilter('${id}')" id="tag-${NETWORKS[id].color}" class="text-[9px] font-black px-3 py-1 rounded-lg tag-${NETWORKS[id].color} border">${NETWORKS[id].name}</button>`).join('');
         }
         function toggleFilter(id) {
-            if (activeFilters.includes(id)) { activeFilters = activeFilters.filter(i => i !== id); document.getElementById(`tag-${NETWORKS[id].color}`).style.opacity = "0.3"; }
-            else { activeFilters.push(id); document.getElementById(`tag-${NETWORKS[id].color}`).style.opacity = "1"; }
+            const btn = document.getElementById(`tag-${NETWORKS[id].color}`);
+            if (activeFilters.includes(id)) { 
+                activeFilters = activeFilters.filter(i => i !== id); 
+                btn.style.opacity = "0.3";
+            } else { 
+                activeFilters.push(id); 
+                btn.style.opacity = "1";
+            }
             loadAggregatedFeed(1);
         }
-        function goHome() { showView('dashboard'); }
+        function goHome() { 
+            // 修改goHome以清除URL参数
+            window.history.pushState({}, document.title, window.location.pathname);
+            showView('dashboard'); 
+        }
         function updateUI() { document.getElementById('connectBtn').classList.add('hidden'); document.getElementById('userInfo').classList.remove('hidden'); document.getElementById('nav-history').classList.remove('hidden'); }
     </script>
 </body>
