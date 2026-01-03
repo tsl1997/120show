@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniVerse Protocol | 跨链存证中心 v6.4 (Patched)</title>
+    <script src="config.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .view-section { display: none; }
+        .view-active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-link-active { background: #4f46e5 !important; color: white !important; }
+        .pagination-btn { background: white; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 12px; }
+        .pagination-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .tag-theme-1 { background:#eef2ff; color:#4338ca; border:1px solid #c7d2fe; } .text-theme-1 { color:#4338ca; } .card-theme-1 { border-left:5px solid #4338ca; }
+        .tag-theme-2 { background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; } .text-theme-2 { color:#059669; } .card-theme-2 { border-left:5px solid #059669; }
+        .tag-theme-3 { background:#fffbeb; color:#d97706; border:1px solid #fde68a; } .text-theme-3 { color:#d97706; } .card-theme-3 { border-left:5px solid #d97706; }
+        .tag-theme-4 { background:#fef2f2; color:#dc2626; border:1px solid #fecaca; } .text-theme-4 { color:#dc2626; } .card-theme-4 { border-left:5px solid #dc2626; }
+        .tag-theme-5 { background:#f3e8ff; color:#8b5cf6; border:1px solid #ddd6fe; } .text-theme-5 { color:#8b5cf6; } .card-theme-5 { border-left:5px solid #8b5cf6; }
+        .tag-theme-6 { background:#fff5e6; color:#f97316; border:1px solid #fed7aa; } .text-theme-6 { color:#f97316; } .card-theme-6 { border-left:5px solid #f97316; }
+        .tag-theme-7 { background:#f0f9ff; color:#0ea5e9; border:1px solid #bae6fd; } .text-theme-7 { color:#0ea5e9; } .card-theme-7 { border-left:5px solid #0ea5e9; }
+        .tag-theme-8 { background:#f0fdfa; color:#0d9488; border:1px solid #99f6e4; } .text-theme-8 { color:#0d9488; } .card-theme-8 { border-left:5px solid #0d9488; }
+        .tag-theme-9 { background:#fefce8; color:#ca8a04; border:1px solid #fef08a; } .text-theme-9 { color:#ca8a04; } .card-theme-9 { border-left:5px solid #ca8a04; }
+        .tag-theme-10 { background:#faf5ff; color:#9333ea; border:1px solid #e9d5ff; } .text-theme-10 { color:#9333ea; } .card-theme-10 { border-left:5px solid #9333ea; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-900">
+
+    <nav class="bg-white border-b sticky top-0 z-50 px-4 py-3 shadow-sm">
+        <div class="container mx-auto flex flex-wrap justify-between items-center gap-y-3">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="goHome()">
+                <div class="w-8 h-8 md:w-10 md:h-10 bg-indigo-600 rounded-lg md:rounded-xl flex items-center justify-center text-white font-black text-lg md:text-xl">Ω</div>
+                <h1 class="font-black text-lg md:text-xl tracking-tighter">OmniVerse <span class="text-indigo-600">OVP</span></h1>
+            </div>
+            <div class="flex items-center gap-2 lg:order-3">
+                <select id="netSwitcher" onchange="switchNetwork(this.value)" class="bg-slate-50 border rounded-lg px-2 py-2 text-xs font-bold outline-none"></select>
+                <button id="connectBtn" onclick="connect()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-xs md:text-sm whitespace-nowrap">连接钱包</button>
+                <div id="userInfo" class="hidden flex items-center gap-2 bg-white border p-1 pr-3 rounded-lg">
+                    <div id="userAvatar" class="w-7 h-7 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 font-black">?</div>
+                    <span id="userName" class="text-xs font-bold whitespace-nowrap"></span>
+                </div>
+            </div>
+            <div class="w-full lg:w-auto lg:flex-1 lg:order-2">
+                 <div id="navMenu" class="flex items-center bg-slate-100 p-1 rounded-xl w-full justify-around">
+                    <button onclick="showView('dashboard')" id="nav-dashboard" class="px-4 py-1.5 md:px-5 md:py-2 rounded-lg text-xs md:text-sm font-bold text-slate-500 flex-1">大厅</button>
+                    <button onclick="showView('create')" id="nav-create" class="px-4 py-1.5 md:px-5 md:py-2 rounded-lg text-xs md:text-sm font-bold text-slate-500 flex-1">发布</button>
+                    <button onclick="showView('history')" id="nav-history" class="hidden px-4 py-1.5 md:px-5 md:py-2 rounded-lg text-xs md:text-sm font-bold text-slate-500 flex-1">记录</button>
+                    <button onclick="showView('admin')" id="nav-admin" class="hidden px-4 py-1.5 md:px-5 md:py-2 rounded-lg text-xs md:text-sm font-bold text-slate-500 text-rose-600 flex-1">管理</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto max-w-5xl px-4 py-8">
+        <div id="view-dashboard" class="view-section space-y-6"><div class="flex justify-between items-center border-b pb-4"><h2 class="text-2xl font-black italic">Consensus Lobby</h2><div id="filterTags" class="flex gap-2 flex-wrap justify-end max-w-[60%]"></div></div><div id="globalFeed" class="grid gap-6 md:grid-cols-2"></div><div id="dashboard-pagination" class="flex justify-center gap-3 pt-10"></div></div>
+        <div id="view-create" class="view-section max-w-xl mx-auto"><div id="netAlert" class="mb-4 p-4 rounded-xl text-center text-xs font-black"></div><div id="regArea" class="hidden bg-indigo-600 p-8 rounded-3xl text-white mb-6"><h2 class="text-2xl font-black mb-4">Register Identity</h2><input type="text" id="regInput" placeholder="输入当前链昵称..." class="w-full p-4 rounded-xl text-slate-900 font-bold mb-4 outline-none"><button onclick="handleRegister()" class="w-full bg-white text-indigo-600 py-4 rounded-xl font-black">立即激活</button></div><div id="createArea" class="bg-white border p-8 rounded-3xl shadow-sm"><input type="text" id="postTitle" placeholder="存证标题" class="w-full p-4 bg-slate-50 rounded-xl mb-4 font-bold outline-none"><textarea id="postContent" placeholder="Markdown 内容..." class="w-full p-4 bg-slate-50 rounded-xl h-48 mb-6 font-medium outline-none"></textarea><button id="postBtn" onclick="handlePost()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black">广播存证</button></div></div>
+        <div id="view-edit" class="view-section max-w-xl mx-auto"><div class="bg-white border p-8 rounded-3xl shadow-sm"><h2 class="text-2xl font-black mb-6">编辑帖子</h2><input type="hidden" id="editPostId"><input type="hidden" id="editPostNetId"><input type="text" id="editTitle" placeholder="存证标题" class="w-full p-4 bg-slate-50 rounded-xl mb-4 font-bold outline-none"><textarea id="editContent" placeholder="Markdown 内容..." class="w-full p-4 bg-slate-50 rounded-xl h-48 mb-6 font-medium outline-none"></textarea><button id="updateBtn" onclick="handleUpdate()" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-black">更新存证</button></div></div>
+        <div id="view-history" class="view-section space-y-6"><h2 class="text-2xl font-black border-b pb-4 italic">My Footprints (当前链)</h2><div id="historyList" class="grid gap-4 md:grid-cols-2"></div><div id="history-pagination" class="flex justify-center gap-3 pt-10"></div></div>
+        <div id="view-admin" class="view-section space-y-6"><div class="bg-amber-50 p-8 rounded-[2rem] border border-amber-100"><h3 class="text-xl font-black text-amber-900 mb-4">用户权限管理</h3><div class="flex gap-2"><input type="text" id="targetAddr" placeholder="0x..." class="flex-1 p-4 rounded-xl outline-none border font-mono text-sm"><button onclick="handleBan(true)" class="bg-rose-500 text-white px-6 py-2 rounded-xl font-bold">封禁</button><button onclick="handleBan(false)" class="bg-emerald-500 text-white px-6 py-2 rounded-xl font-bold">解封</button></div></div><div class="bg-white border rounded-[2rem] p-8"><h4 class="font-black mb-6">已注册用户列表 (当前链)</h4><div id="userList" class="overflow-x-auto"></div></div></div>
+        <div id="view-post" class="view-section"><div id="detailContainer" class="bg-white border p-8 md:p-12 rounded-[3rem] shadow-sm"></div><button onclick="goHome()" class="mt-10 text-slate-400 font-bold block mx-auto hover:text-indigo-600">← 返回大厅</button></div>
+    </main>
+
+    <script>
+        let activeFilters = [];
+        let userAddr, currentChainId;
+        const PAGE_SIZE = 10;
+        const THEMES = ['theme-1', 'theme-2', 'theme-3', 'theme-4', 'theme-5', 'theme-6', 'theme-7', 'theme-8', 'theme-9', 'theme-10'];
+
+        window.onload = async () => {
+            marked.setOptions({ breaks: true, gfm: true });
+            Object.keys(NETWORKS).forEach((id, index) => { NETWORKS[id].theme = THEMES[index % THEMES.length]; });
+            activeFilters = ['0x64','0xcc','0xaa36a7', '0xa5bd', '0xc488']; 
+            renderFilterUI();
+            renderNetworkSwitcher();
+            const urlParams = new URLSearchParams(window.location.search);
+            const netId = urlParams.get('netId'), postId = urlParams.get('postId');
+            if (netId && postId && NETWORKS[netId]) { goDetail(netId, postId); } else { showView('dashboard'); }
+            
+            if (window.ethereum) {
+                // --- 修复点 1: 增加账户切换的监听 ---
+                // 当用户在MetaMask钱包里切换账户时，自动刷新页面来应用新账户
+                window.ethereum.on('accountsChanged', () => window.location.reload());
+                
+                // 保留原有的网络切换监听
+                window.ethereum.on('chainChanged', () => window.location.reload()); 
+                
+                // 检查之前是否已经连接过网站
+                const acc = await window.ethereum.request({ method: 'eth_accounts' });
+                if (acc.length > 0) {
+                    // 如果连接过，调用我们修改后的connect()函数。
+                    // 这个新函数会弹出钱包让用户确认，从而给用户切换到新账户的机会。
+                    connect();
+                }
+            }
+        };
+
+        // --- 修复点 2: 修改 connect 函数，强制弹出钱包让用户选择账户 ---
+        async function connect() {
+            if (!window.ethereum) return alert("请安装MetaMask等兼容钱包！");
+            try {
+                // 使用 eth_requestAccounts 会强制弹出钱包，允许用户选择或切换账户。
+                // 这是解决您问题的关键！
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                const webProvider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await webProvider.getSigner();
+                userAddr = await signer.getAddress();
+                const net = await webProvider.getNetwork();
+                currentChainId = "0x" + net.chainId.toString(16).toLowerCase();
+                document.getElementById('netSwitcher').value = currentChainId;
+                updateUI();
+                checkNetStatus();
+            } catch (error) {
+                console.error("Connection failed:", error);
+                alert("连接钱包失败。用户取消了授权或发生了错误。");
+            }
+        }
+
+        function showView(name) {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('view-active'));
+            document.querySelectorAll('#navMenu button').forEach(b => b.classList.remove('nav-link-active'));
+            const targetView = document.getElementById(`view-${name}`);
+            const targetBtn = document.getElementById(`nav-${name}`);
+            if (targetView) targetView.classList.add('view-active');
+            if (targetBtn) targetBtn.classList.add('nav-link-active');
+            if (name === 'dashboard') loadAggregatedFeed(1);
+            if (name === 'history') loadMyHistory(1);
+            if (name === 'admin') loadAdminPanel();
+        }
+        
+        async function goDetail(netId, id) {
+            showView('post');
+            const container = document.getElementById('detailContainer');
+            container.innerHTML = "解析中...";
+            const net = NETWORKS[netId];
+            if (!net) { container.innerHTML = "错误：未知的网络ID。"; return; }
+            try {
+                const provider = new ethers.JsonRpcProvider(net.rpc);
+                const contract = new ethers.Contract(net.proxy, ABI, provider);
+                const p = await contract.posts(id);
+                const post = parsePost(p, netId);
+                const created = new Date(post.createdAt * 1000).toLocaleString();
+                const updated = new Date(post.updatedAt * 1000).toLocaleString();
+                const isAuthor = userAddr && userAddr.toLowerCase() === post.author.toLowerCase();
+                container.innerHTML = `<div class="mb-6 flex justify-between items-center"><span class="tag-${net.theme} px-3 py-1 rounded-lg font-black text-[10px] uppercase">${net.name}</span><div class="flex items-center gap-2"><button onclick="handleShare('${netId}', ${id})" class="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-lg font-bold text-xs">分享</button>${isAuthor ? `<button onclick="goEdit('${netId}', ${id})" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-xs">编辑</button>` : ''}${isAuthor ? `<button onclick="handleDelete('${netId}', ${id})" class="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-lg font-bold text-xs">删除</button>` : ''}</div></div><h1 class="text-3xl md:text-4xl font-black mb-8 leading-tight">${post.title}</h1><div class="prose max-w-none text-slate-700 mb-12">${marked.parse(post.content)}</div><div class="border-t pt-8 space-y-4"><div class="flex justify-between items-center"><span class="font-black text-xl md:text-2xl text-${net.theme}">@${post.authorName}</span><div class="text-right text-[10px] font-bold text-slate-400"><div>发布于: ${created}</div>${post.updatedAt > post.createdAt ? `<div class="text-amber-500">更新于: ${updated}</div>` : ''}</div></div><div class="text-[10px] font-mono text-slate-300 break-all">作者地址: ${post.author}</div><div class="text-[10px] font-mono text-slate-300">帖子 ID: ${post.id}</div></div>`;
+            } catch (e) { container.innerHTML = "读取帖子失败，请检查该网络是否正常。"; console.error(e); }
+        }
+
+        function renderFilterUI() {
+            document.getElementById('filterTags').innerHTML = Object.keys(NETWORKS).map(id => `<button onclick="toggleFilter('${id}')" id="tag-${NETWORKS[id].theme}" class="text-[9px] font-black px-3 py-1 rounded-lg tag-${NETWORKS[id].theme} border" style="opacity: ${activeFilters.includes(id) ? '1' : '0.3'}">${NETWORKS[id].name}</button>`).join('');
+        }
+        
+        function renderNetworkSwitcher() {
+            const switcher = document.getElementById('netSwitcher');
+            let options = '<option value="">网络切换...</option>';
+            for (const id in NETWORKS) { options += `<option value="${id}">${NETWORKS[id].name}</option>`; }
+            switcher.innerHTML = options;
+        }
+
+        function renderCard(p) {
+             const net = NETWORKS[p.sourceId];
+             if (!net) return '';
+             return `<div class="bg-white border rounded-2xl p-6 hover:shadow-lg transition card-${net.theme}"><div class="flex justify-between items-start mb-3"><span class="text-[9px] font-black px-2 py-0.5 rounded tag-${net.theme}">${net.name} #${p.id}</span></div><h3 class="text-lg font-black mb-4 line-clamp-1">${p.title}</h3><div class="flex justify-between items-center pt-4 border-t"><span class="text-xs font-black text-${net.theme}">@${p.authorName}</span><button onclick="goDetail('${p.sourceId}', ${p.id})" class="text-xs font-bold text-indigo-600">详情 →</button></div></div>`;
+        }
+        
+        async function handlePost() {
+            const t = document.getElementById('postTitle').value, c = document.getElementById('postContent').value;
+            if (!t || !c) return alert("标题和内容均不能为空");
+            const postBtn = document.getElementById('postBtn');
+            postBtn.disabled = true; postBtn.innerText = "广播中...";
+            try {
+                const contract = new ethers.Contract(NETWORKS[currentChainId].proxy, ABI, await (new ethers.BrowserProvider(window.ethereum)).getSigner());
+                const tx = await contract.createPost(t, c);
+                await tx.wait();
+                alert("发布成功！");
+                showView('history'); 
+            } catch(e) { 
+                alert("发布失败，请检查您是否已被封禁或发生网络错误。"); console.error(e);
+            } finally {
+                postBtn.disabled = false; postBtn.innerText = "广播存证";
+            }
+        }
+        
+        async function switchNetwork(id) {
+            if (!id || !window.ethereum) return;
+            const networkData = NETWORKS[id];
+            if (!networkData) {
+                alert("错误: 配置文件中未找到该网络。");
+                return;
+            }
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: id }],
+                });
+            } catch (switchError) {
+                if (switchError.code === 4902) {
+                    const msg = `您的钱包当前未配置此网络，或配置信息有误。\n\n网络: ${networkData.name}\nChainID: ${parseInt(id, 16)}\n\n是否为您自动添加/更新此网络配置？`;
+                    if (confirm(msg)) {
+                        try {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: id,
+                                    chainName: networkData.name,
+                                    nativeCurrency: networkData.nativeCurrency,
+                                    rpcUrls: [networkData.rpc],
+                                    blockExplorerUrls: networkData.blockExplorerUrls,
+                                }],
+                            });
+                        } catch (addError) {
+                            console.error("Failed to add network:", addError);
+                            alert("添加新网络配置失败。");
+                        }
+                    }
+                } else if (switchError.code === 4001) {
+                     alert("您已取消网络切换请求。");
+                } else {
+                    console.error("Failed to switch network:", switchError);
+                    alert("网络切换失败，发生未知错误。");
+                }
+            }
+        }
+
+        function toggleFilter(id) {
+            const btn = document.getElementById(`tag-${NETWORKS[id].theme}`);
+            const index = activeFilters.indexOf(id);
+            if (index > -1) { activeFilters.splice(index, 1); btn.style.opacity = "0.3"; } else { activeFilters.push(id); btn.style.opacity = "1"; }
+            loadAggregatedFeed(1);
+        }
+        
+        function goHome() { window.history.pushState({}, document.title, window.location.pathname); showView('dashboard'); }
+        function updateUI() { document.getElementById('connectBtn').classList.add('hidden'); document.getElementById('userInfo').classList.remove('hidden'); document.getElementById('nav-history').classList.remove('hidden'); }
+        function checkNetStatus() { const alertEl = document.getElementById('netAlert'); const net = NETWORKS[currentChainId]; if (net) { alertEl.className = `mb-4 p-4 rounded-xl text-center text-xs font-black tag-${net.theme}`; alertEl.innerText = `当前接入点：${net.name}`; syncStatus(net); } else { alertEl.className = "mb-4 p-4 rounded-xl text-center text-xs font-black bg-rose-100 text-rose-600"; alertEl.innerText = `⚠️ 请切换至支持的网络`; document.getElementById('createArea').classList.add('hidden'); document.getElementById('regArea').classList.add('hidden'); } }
+        function parsePost(p, chainId) { try { return { id: p.id || p[0], title: p.title || p[1], content: p.content || p[2], author: p.author || p[3], authorName: p.authorName || p[4], createdAt: Number(p.createdAt || p[5]), updatedAt: Number(p.updatedAt || p[6]), chainLabel: p.chainLabel || p[7], exists: p.exists !== undefined ? p.exists : p[8], sourceId: chainId }; } catch (e) { console.error("Parse post error:", e); return null; } }
+        async function loadAggregatedFeed(page) { const container = document.getElementById('globalFeed'); container.innerHTML = `<div class="col-span-full py-10 text-center animate-pulse font-bold text-slate-400">跨链数据同步中...</div>`; let pool = []; const tasks = activeFilters.map(async (id) => { if (!NETWORKS[id] || !NETWORKS[id].proxy.startsWith('0x')) return []; try { const provider = new ethers.JsonRpcProvider(NETWORKS[id].rpc); const contract = new ethers.Contract(NETWORKS[id].proxy, ABI, provider); const posts = await contract.getPaginatedPosts(1, 100); return posts.map(rp => parsePost(rp, id)); } catch (e) { console.error(`Failed to fetch from ${NETWORKS[id].name}:`, e); return []; } }); const results = await Promise.all(tasks); results.forEach(list => pool = pool.concat(list.filter(p => p && p.exists))); pool.sort((a, b) => b.createdAt - a.createdAt); const start = (page - 1) * PAGE_SIZE; const final = pool.slice(start, start + PAGE_SIZE); container.innerHTML = final.map(p => renderCard(p)).join('') || "暂无内容或所选网络无数据。"; renderPagination('dashboard-pagination', page, pool.length > start + PAGE_SIZE, loadAggregatedFeed); }
+        async function loadMyHistory(page) { const list = document.getElementById('historyList'); list.innerHTML = `<div class="col-span-full py-10 text-center animate-pulse text-indigo-500">正在从当前链检索您的记录...</div>`; const net = NETWORKS[currentChainId]; if (!net || !userAddr) { list.innerHTML = "请先连接钱包并确保在支持的网络上。"; return; } let myPool = []; try { const provider = new ethers.JsonRpcProvider(net.rpc); const contract = new ethers.Contract(net.proxy, ABI, provider); const totalCount = await contract.getPostCount(); if (totalCount === 0n) { list.innerHTML = "您在当前链上还没有发布任何记录。"; renderPagination('history-pagination', 1, false, loadMyHistory); return; } const allPostsOnChain = await contract.getPaginatedPosts(1, totalCount); myPool = allPostsOnChain.map(p => parsePost(p, currentChainId)).filter(p => p && p.exists && p.author.toLowerCase() === userAddr.toLowerCase()); } catch(e) { list.innerHTML = "加载个人记录失败，请检查网络连接或稍后重试。"; return; } myPool.sort((a, b) => b.createdAt - a.createdAt); const start = (page - 1) * PAGE_SIZE; const final = myPool.slice(start, start + PAGE_SIZE); list.innerHTML = final.map(p => renderCard(p)).join('') || "您在当前链上还没有发布任何记录。"; renderPagination('history-pagination', page, myPool.length > start + PAGE_SIZE, loadMyHistory); }
+        async function loadAdminPanel() { const container = document.getElementById('userList'); container.innerHTML = "正在检索节点用户..."; const net = NETWORKS[currentChainId]; if (!net) return container.innerHTML = "请先切换至受支持的网络"; try { const webProvider = new ethers.BrowserProvider(window.ethereum); const contract = new ethers.Contract(net.proxy, ABI, await webProvider.getSigner()); const count = await contract.getUserCount(); let html = `<table class="w-full text-left text-xs"><thead><tr class="text-slate-400 border-b"><th class="pb-4">昵称</th><th class="pb-4">地址</th><th class="pb-4">操作状态</th></tr></thead><tbody>`; for(let i = 0; i < count; i++) { const addr = await contract.allRegisteredUsers(i); const user = await contract.users(addr); html += `<tr class="border-b"><td class="py-4 font-bold">@${user.username}</td><td class="py-4 font-mono text-slate-400 break-all">${addr}</td><td>${user.isBanned?'🔴 已封禁':'🟢 正常'}</td></tr>`; } container.innerHTML = html + "</tbody></table>"; } catch(e) { container.innerHTML = "无权限或读取失败"; } }
+        function handleShare(netId, postId) { const url = `${window.location.origin}${window.location.pathname}?netId=${netId}&postId=${postId}`; navigator.clipboard.writeText(url).then(() => { alert("分享链接已复制到剪贴板！"); }, () => { alert("复制失败，请手动复制链接。"); }); }
+        async function handleRegister() { const n = document.getElementById('regInput').value; if (!n) return alert("昵称不能为空"); try { await (await new ethers.Contract(NETWORKS[currentChainId].proxy, ABI, await (new ethers.BrowserProvider(window.ethereum)).getSigner()).register(n)).wait(); connect(); } catch(e) { alert("注册失败，昵称可能已被占用或发生网络错误。"); } }
+        async function handleUpdate() { const postId = document.getElementById('editPostId').value, netId = document.getElementById('editPostNetId').value; const title = document.getElementById('editTitle').value, content = document.getElementById('editContent').value; if (currentChainId !== netId) return alert(`请将钱包切换到 ${NETWORKS[netId].name} 网络来更新这个帖子。`); try { const contract = new ethers.Contract(NETWORKS[netId].proxy, ABI, await (new ethers.BrowserProvider(window.ethereum)).getSigner()); await (await contract.updatePost(postId, title, content)).wait(); alert("帖子更新成功!"); goDetail(netId, postId); } catch (e) { alert("更新失败。可能原因：您没有权限或网络发生错误。"); } }
+        async function handleDelete(netId, postId) { if (!confirm("确定要删除这个帖子吗？此操作无法撤销。")) return; if (currentChainId !== netId) return alert(`请先将钱包切换到 ${NETWORKS[netId].name} 网络再执行删除操作。`); try { const contract = new ethers.Contract(NETWORKS[netId].proxy, ABI, await (new ethers.BrowserProvider(window.ethereum)).getSigner()); await (await contract.deletePost(postId)).wait(); alert("帖子已成功删除！"); goHome(); } catch (e) { alert("删除失败。可能原因：您没有权限或网络发生错误。"); } }
+        async function handleBan(status) { const addr = document.getElementById('targetAddr').value; if (!ethers.isAddress(addr)) return alert("无效的地址"); const net = NETWORKS[currentChainId]; try { const contract = new ethers.Contract(net.proxy, ABI, await (new ethers.BrowserProvider(window.ethereum)).getSigner()); await (await contract.setBannedStatus(addr, status)).wait(); alert("权限已同步！"); loadAdminPanel(); } catch(e) { alert("失败：无权限或网络错误"); } }
+        async function syncStatus(net) { try { const webProvider = new ethers.BrowserProvider(window.ethereum); const signer = await webProvider.getSigner(); const contract = new ethers.Contract(net.proxy, ABI, signer); const user = await contract.users(userAddr); const owner = await contract.owner(); document.getElementById('userName').innerText = user.isRegistered ? "@" + user.username : "未注册"; document.getElementById('userAvatar').innerText = user.isRegistered ? user.username.charAt(0).toUpperCase() : '?'; document.getElementById('regArea').classList.toggle('hidden', user.isRegistered); document.getElementById('createArea').classList.toggle('hidden', !user.isRegistered); document.getElementById('nav-admin').classList.toggle('hidden', userAddr.toLowerCase() !== owner.toLowerCase()); } catch (e) { console.error("Status sync failed", e); } }
+        async function goEdit(netId, postId) { showView('edit'); const net = NETWORKS[netId]; try { const provider = new ethers.JsonRpcProvider(net.rpc); const contract = new ethers.Contract(net.proxy, ABI, provider); const p = await contract.posts(postId); document.getElementById('editPostId').value = postId; document.getElementById('editPostNetId').value = netId; document.getElementById('editTitle').value = p.title; document.getElementById('editContent').value = p.content; } catch (e) { alert("加载帖子内容失败!"); goHome(); } }
+        function renderPagination(containerId, current, hasNext, callback) { const container = document.getElementById(containerId); if (!container) return; container.innerHTML = `<button onclick="${callback.name}(${current - 1})" ${current === 1 ? 'disabled' : ''} class="pagination-btn">←</button><span class="text-xs font-black text-slate-400 self-center">PAGE ${current}</span><button onclick="${callback.name}(${current + 1})" ${!hasNext ? 'disabled' : ''} class="pagination-btn">→</button>`; }
+    </script>
+</body>
+</html>
