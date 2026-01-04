@@ -107,6 +107,8 @@
         .card.qifu:hover h3 { color: var(--accent-pink); }
         .card.qing:hover h3 { color: var(--accent-cyan); }
         .card.tempo:hover h3 { color: var(--accent-orange); }
+        /* 新增 Hoodi 卡片悬停色 */
+        .card.hoodi:hover h3 { color: #00f2ea; }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
@@ -128,7 +130,8 @@
         <header class="hero">
             <img src="https://gnfd-testnet-sp1.nodereal.io/view/abc/tw.png" alt="XS Avatar" class="avatar">
             <div class="bio">
-                <span style="color: var(--accent-pink); font-weight: 800; letter-spacing: 2px; font-size: 0.8rem;">EST. 2024 / PORTFOLIO</span>
+                <!-- 更新时间为 2026 -->
+                <span style="color: var(--accent-pink); font-weight: 800; letter-spacing: 2px; font-size: 0.8rem;">EST. 2026 / PORTFOLIO</span>
                 <h1>I'm XS.</h1>
                 <p class="bio-text">区块链开发者 / 数字艺术家 / 开源爱好者</p>
                 <div class="social-bar">
@@ -151,6 +154,7 @@
                 <a href="./zlib/index.html" target="_blank">ZLib 共享</a>
                 <a href="./qing/index.html" target="_blank">轻小说下载</a>
                 <a href="./qifu/index.html" target="_blank">在线祈福</a>
+                <a href="./airdrop/hoodi.html" target="_blank">Hoodi 检测</a> <!-- 新增链接 -->
                 <a href="https://blog.120.show" target="_blank">技术博客</a>
             </div>
         </section>
@@ -160,7 +164,13 @@
             <h2 style="margin-bottom: 40px; text-align: center; font-size: 0.8rem; color: #475569;">Featured Toolsets / 精选项目列表</h2>
             <div class="grid">
                 
-                <!-- 新增项目：Tempo 链上存证 -->
+                <!-- 新增项目：Hoodi 检测器 -->
+                <a href="./airdrop/hoodi.html" target="_blank" class="card hoodi">
+                    <h3 style="color: #fff;">Hoodi 余额检测</h3>
+                    <p>Web3 极客工具。批量检测 Hoodi 链上钱包余额，支持 1000+ 地址并发查询与数据导出，可视化资产看板。</p>
+                </a>
+
+                <!-- 项目：Tempo 链上存证 -->
                 <a href="./text/index.html" target="_blank" class="card tempo">
                     <h3 style="color: #fff;">链上存证</h3>
                     <p>去中心化信息保险箱。支持 Markdown 渲染与图片存证，数据永久存储于区块链，不可篡改且全网可查。</p>
