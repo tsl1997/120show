@@ -1,243 +1,120 @@
-没问题，这个功能非常关键！在去中心化应用中，能够快速索引特定用户的内容是用户体验的核心。
+# 🌌 OmniVerse Protocol (V13)
 
-为了实现“按地址”和“按用户名”查询，我引入了两个新的辅助映射：
-1.  **`_userPostIds`**: 记录每个地址关联的所有帖子 ID。
-2.  **`_nameToAddress`**: 建立用户名到钱包地址的索引，这样我们就能通过名字找到地址，进而找到帖子。
+# 全链去中心化存证与内容发布协议
 
-以下是优化后的合约代码和更新后的文档。
+Decentralized Full-Chain Content Registry & Publishing Platform
+OmniVerse 是一个基于 Web3 的无后端、纯前端去中心化应用 (DApp)。它允许用户在多个与 EVM 兼容的区块链（Gnosis, opBNB, Tempo, Sepolia, Somnia 等）上发布不可篡改、永久存储的内容。
+本项目采用 Vue 3 + Tailwind CSS + Ethers.js v6 构建，无需编译，即开即用，展现了极简代码架构下的高级 UI 交互体验。
 
----
+## ✨ 核心特性 (Features)
 
-### 🛠️ 完善后的智能合约 (Solidity)
+### 🌐 全链聚合大厅 (Multi-Chain Explore)
 
-```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+自动并发抓取多个区块链网络（Mainnet & Testnet）上的最新数据。
+支持动态筛选：一键过滤特定网络的内容流。
+颜色编码：不同网络拥有独立的主题色（如 Gnosis 为绿色，Tempo 为粉色）。
 
-/**
- * @title OnChainInfoSystem
- * @dev 完善版：支持按地址和用户名查询用户所有帖子
- */
-contract OnChainInfoSystem {
-    
-    struct User {
-        string username;
-        bool isBanned;
-        bool isRegistered;
-    }
+### 🌸 V6 增强协议 (Tempo Visuals)
 
-    struct Post {
-        uint256 id;
-        string title;
-        string content;
-        address author;
-        string authorName;
-        uint256 timestamp;
-        bool exists;
-    }
+针对 Tempo Network 部署了升级版 V6 合约。
+支持 封面图 (Cover Image) 和 图片数量统计。
+专属的沉浸式瀑布流画廊视图。
 
-    address public admin;
-    uint256 private _postIdCounter;
-    
-    mapping(address => User) public users;
-    mapping(string => bool) private _takenNames;
-    mapping(string => address) private _nameToAddress; // 新增：用户名到地址的映射
-    mapping(uint256 => Post) public posts;
-    
-    // 索引增强
-    mapping(address => uint256[]) private _userPostIds; // 新增：存储每个用户的所有帖子ID
-    uint256[] public allPostIds;
+### 📝 沉浸式阅读与创作
 
-    event UserRegistered(address indexed userAddress, string username);
-    event UserBannedStatusChanged(address indexed userAddress, bool isBanned);
-    event PostCreated(uint256 indexed postId, address indexed author, string title);
-    event PostUpdated(uint256 indexed postId, string newTitle);
-    event PostDeleted(uint256 indexed postId, address indexed deletedBy);
+所见即所得：支持 Markdown 语法的编辑器，实时预览。
+沉浸式页面：详情页采用大字体、宽布局的杂志风格排版。
+Deep Linking：支持生成分享链接（如 ?chain=0x..&id=10），访客无需连接钱包即可通过 RPC 读取内容。
 
-    modifier onlyAdmin() {
-        require(msg.sender == admin, "Only admin can perform this action");
-        _;
-    }
+### 🛡️ 权限与管理
 
-    modifier onlyActiveUser() {
-        require(users[msg.sender].isRegistered, "User not registered.");
-        require(!users[msg.sender].isBanned, "User is banned.");
-        _;
-    }
+身份系统：用户必须先在链上注册昵称才能发布。
+所有权控制：只有发布者可以编辑或删除（逻辑删除）自己的帖子。
+管理员后台：合约部署者拥有封禁/解封用户的权限，管理入口仅对管理员可见。
 
-    modifier postOwnerOrAdmin(uint256 _postId) {
-        require(posts[_postId].exists, "Post does not exist.");
-        require(msg.sender == posts[_postId].author || msg.sender == admin, "No permission.");
-        _;
-    }
+### ⚡ 极速与稳健
 
-    constructor() {
-        admin = msg.sender;
-    }
+Zero Build：不需要 npm install 或 npm run build，纯静态 HTML/JS 运行。
+Auto Connect：智能识别钱包状态，刷新页面自动保持登录。
+Anti-Crash：静态 CSS 映射解决 CDN 渲染卡顿问题，多链读取采用 Promise.all 并发容错。
 
-    // --- 用户管理 ---
+### 🛠️ 技术栈 (Tech Stack)
 
-    function register(string memory _username) public {
-        require(!users[msg.sender].isRegistered, "Already registered.");
-        require(bytes(_username).length > 0, "Empty username.");
-        require(!_takenNames[_username], "Username taken.");
+Core: Vue.js 3 (Composition API, global build)
+Styling: Tailwind CSS (CDN runtime)
+Web3: Ethers.js v6
+Markdown: Marked.js
+Icons/Font: Inter Font, Native Emojis
 
-        users[msg.sender] = User({
-            username: _username,
-            isBanned: false,
-            isRegistered: true
-        });
+## 🚀 快速开始 (Quick Start)
 
-        _takenNames[_username] = true;
-        _nameToAddress[_username] = msg.sender; // 记录用户名对应的地址
+### 部署 (Deployment)
 
-        emit UserRegistered(msg.sender, _username);
-    }
+由于本项目是纯静态文件，您可以直接将其部署到任何静态托管服务，例如：
+GitHub Pages (推荐)
+Vercel
+Netlify
+AWS S3
+只需上传以下三个文件即可：
+index.html
+logic.js
+config.js
 
-    function setBannedStatus(address _userAddress, bool _status) public onlyAdmin {
-        require(users[_userAddress].isRegistered, "User not found.");
-        users[_userAddress].isBanned = _status;
-        emit UserBannedStatusChanged(_userAddress, _status);
-    }
+### 本地运行 (Local Development)
 
-    // --- 帖子管理 ---
+为了避免浏览器的 CORS 跨域限制或文件协议安全策略，建议使用本地服务器运行。
+使用 VS Code Live Server 插件 (推荐):
+右键点击 index.html。
+选择 Open with Live Server。
+或者使用 Python:
+code
+Bash
+python3 -m http.server 8000
+然后在浏览器访问 http://localhost:8000。
 
-    function createPost(string memory _title, string memory _content) public onlyActiveUser {
-        _postIdCounter++;
-        
-        posts[_postIdCounter] = Post({
-            id: _postIdCounter,
-            title: _title,
-            content: _content,
-            author: msg.sender,
-            authorName: users[msg.sender].username,
-            timestamp: block.timestamp,
-            exists: true
-        });
+### ⚙️ 配置文件说明 (Configuration)
 
-        allPostIds.push(_postIdCounter);
-        _userPostIds[msg.sender].push(_postIdCounter); // 将帖子ID存入用户的个人列表
+所有的网络配置都在 config.js 中，无需修改核心代码即可添加新链。
 
-        emit PostCreated(_postIdCounter, msg.sender, _title);
-    }
-
-    function updatePost(uint256 _id, string memory _newTitle, string memory _newContent) 
-        public 
-        postOwnerOrAdmin(_id) 
-    {
-        if (msg.sender != admin) {
-            require(!users[msg.sender].isBanned, "Banned.");
-        }
-        posts[_id].title = _newTitle;
-        posts[_id].content = _newContent;
-        emit PostUpdated(_id, _newTitle);
-    }
-
-    function deletePost(uint256 _id) public postOwnerOrAdmin(_id) {
-        posts[_id].exists = false;
-        emit PostDeleted(_id, msg.sender);
-    }
-
-    // --- 🔍 新增：查询功能 ---
-
-    /**
-     * @dev 根据用户钱包地址获取其所有帖子的ID列表
-     */
-    function getPostIdsByAddress(address _user) public view returns (uint256[] memory) {
-        return _userPostIds[_user];
-    }
-
-    /**
-     * @dev 根据用户名获取其所有帖子的ID列表
-     */
-    function getPostIdsByUsername(string memory _username) public view returns (uint256[] memory) {
-        address userAddr = _nameToAddress[_username];
-        require(userAddr != address(0), "Username does not exist.");
-        return _userPostIds[userAddr];
-    }
-
-    /**
-     * @dev 基础查询：获取单条帖子详情
-     */
-    function getPost(uint256 _id) public view returns (
-        string memory title, 
-        string memory content, 
-        string memory authorName, 
-        uint256 timestamp,
-        bool exists
-    ) {
-        Post storage p = posts[_id];
-        return (p.title, p.content, p.authorName, p.timestamp, p.exists);
-    }
-}
+```javascript
+window.NETWORKS = {
+ "0xChainID": { 
+     name: "Network Name", 
+     proxy: "0xContractAddress...", // V5 或 V6 代理合约地址
+     rpc: "https://rpc-url...",     // 公共 RPC 节点
+     type: "mainnet",               // 'mainnet' 或 'testnet'
+     isV6: true,                    // 是否支持封面图合约 (V6)
+     color: "emerald",              // UI 主题色 (emerald, pink, amber...)
+     default: true                  // 是否在大厅默认选中
+ },
+ // ...
+};
 ```
 
----
+### 📄 智能合约架构 (Smart Contracts)
 
-### 📖 更新版使用文档 (Markdown)
+本项目兼容两种合约版本：
+V5 (Standard):
+基础的 title, content 存储。
+适用于大部分网络 (Gnosis, opBNB, Sepolia, etc.)。
+V6 (Enhanced):
+新增 coverImageUrl (字符串) 和 imageCount (uint8)。
+仅在 Tempo Testnet 上启用，用于驱动“画廊”视图。
+前端 logic.js 会根据 config.js 中的 isV6 字段自动切换 ABI (应用二进制接口) 进行交互。
 
----
+### 📸 界面预览 (Screenshots)
 
-# 🔗 链上信息存储系统 (On-Chain Storage System) v2.0
+首页: 极简、大字体的不对称网格设计 (Bento Grid)。
+大厅: 根据链ID动态着色的多链信息流。
+画廊: 暗黑风格的图片瀑布流。
+阅读: 纯净的文章详情页。
 
-本系统不仅支持基础的增删改查，还提供了强大的**索引功能**，允许通过用户地址或用户名快速检索内容。
+### ⚠️ 注意事项
 
----
+CDN 依赖: 这里的 Tailwind 和 Vue 通过 CDN 加载。在生产环境中虽然方便，但极少数情况下可能会受到 CDN 网络波动影响。
+Browser Security: 请务必通过 http:// 或 https:// 协议访问，不要直接双击 index.html (file://)，否则无法连接 Metamask。
 
-## 🚀 新增检索功能说明
+### 📄 License
 
-在 v2.0 版本中，我们增强了数据的可读性和检索效率：
-
-| 功能 | 接口名 | 输入参数 | 返回值 |
-|---|---|---|---|
-| **按地址查询** | `getPostIdsByAddress` | 钱包地址 (`address`) | 包含该用户所有帖子 ID 的数组 |
-| **按用户名查询** | `getPostIdsByUsername` | 用户名 (`string`) | 包含该用户所有帖子 ID 的数组 |
-
-> **提示**：获取 ID 列表后，前端可以循环调用 `getPost(id)` 来渲染完整的帖子详情页面。
-
----
-
-## 🛠️ 核心操作手册
-
-### 1. 身份初始化
-*   **操作**：调用 `register("你的用户名")`。
-*   **规则**：
-    *   每个地址只能注册一次。
-    *   用户名在全网具有唯一性。
-    *   **不可更改性**：一旦注册，用户名即永久绑定，确保了链上身份的连贯性。
-
-### 2. 发布与内容管理
-*   **发布**：使用 `createPost` 提交标题和内容。系统会自动关联你的用户名。
-*   **修改/删除**：
-    *   **用户**：仅能操作自己的帖子。
-    *   **管理员**：拥有全平台监管权限。
-    *   **注意**：`Publisher` (发布者) 和 `Timestamp` (时间戳) 是系统的底层元数据，**禁止任何人修改**。
-
-### 3. 管理员权限 (封禁系统)
-*   **封禁**：`setBannedStatus(用户地址, true)`。
-*   **影响**：被封禁用户将无法发布新帖子，也无法修改已有帖子，直到管理员解封。
-
----
-
-## 📊 数据结构预览
-
-### 帖子对象 (Post)
-| 字段 | 类型 | 说明 |
-|---|---|---|
-| `id` | uint256 | 唯一序列号 |
-| `title` | string | 帖子标题 (可变) |
-| `content` | string | 帖子正文 (可变) |
-| `authorName` | string | 发布者用户名 (**不可变**) |
-| `timestamp` | uint256 | 区块存证时间 (**不可变**) |
-| `exists` | bool | 逻辑存在状态 |
-
----
-
-## 💡 开发建议
-
-*   **前端展示**：当用户访问 `domain.com/user/alice` 时，前端应先调用 `getPostIdsByUsername("alice")`，获取 ID 数组后，并发请求 `getPost` 获取具体内容。
-*   **Gas 优化**：我们在合规中使用 `uint256[]` 存储 ID，这比在前端遍历全网帖子要节省极大的资源。
-
----
-
-这个版本现在非常完整了！它不仅是一个存储器，更像是一个拥有**身份系统**的小型社交后端。如果你需要我提供如何用 `ethers.js` 调用这些接口的前端代码示例，尽管开口！😊
+MIT License.
+Build freely, Fork freely.

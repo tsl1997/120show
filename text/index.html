@@ -3,824 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OmniVerse Protocol | 跨链存证中心 v6.8</title>
-    <!-- 配置文件 (必须存在 config.js) -->
-    <script src="config.js"></script> 
+    <title>OmniVerse V6全链存证协议</title>
+    <!-- Basic CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https: http:; connect-src *;">
     
-    <!-- 国内 CDN 加速 -->
-    <script src="https://cdn.staticfile.org/ethers/6.7.0/ethers.umd.min.js"></script>
-    <script src="https://cdn.staticfile.org/marked/9.1.2/marked.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
-    <style>
-        /* 基础动画与样式 */
-        .view-section { display: none; }
-        .view-active { display: block; animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* 导航栏激活状态 - 增强版 */
-        .nav-link-active { 
-            background-color: #4f46e5 !important; 
-            color: white !important; 
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
-            transform: translateY(-1px);
-        }
-        
-        /* 紧凑型网络标签 (保持上一版要求) */
-        .chain-checkbox:checked + div {
-            background-color: #4f46e5;
-            border-color: #4f46e5;
-            color: white;
-            font-weight: 700;
-            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3);
-        }
-        .chain-pill {
-            transition: all 0.2s;
-            font-size: 11px;
-        }
-        .chain-pill:hover { border-color: #a5b4fc; }
-
-        /* 卡片主题色 */
-        .tag-theme-1 { background:#eef2ff; color:#4338ca; border:1px solid #c7d2fe; }
-        .tag-theme-2 { background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; } 
-        /* ...更多主题色省略，CSS会自动匹配... */
-        .card-theme-1 { border-left: 4px solid #4338ca; }
-        .card-theme-2 { border-left: 4px solid #059669; }
-
-        /* 看图模式卡片 (福利兔风格) */
-        .gallery-card {
-            position: relative; overflow: hidden; border-radius: 12px;
-            background: #f1f5f9; aspect-ratio: 3/4; cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .gallery-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
-        .gallery-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-        .gallery-card:hover .gallery-img { transform: scale(1.05); }
-        .gallery-overlay {
-            position: absolute; inset: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 60%);
-            opacity: 0; transition: opacity 0.3s ease;
-            display: flex; flex-direction: column; justify-content: flex-end; padding: 16px;
-        }
-        @media (max-width: 767px) { .gallery-overlay { opacity: 1; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 50%); } }
-        @media (min-width: 768px) { .gallery-card:hover .gallery-overlay { opacity: 1; } }
-
-        .gallery-title {
-            color: white; font-weight: 900; font-size: 1rem; line-height: 1.4; margin-bottom: 6px;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-        }
-        .gallery-meta {
-            color: rgba(255,255,255,0.9); font-size: 0.75rem; font-weight: 700;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .gallery-badge {
-            background: #4f46e5; color: white; padding: 2px 8px; border-radius: 6px;
-            font-size: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        .pagination-btn { 
-            background: white; border: 1px solid #e2e8f0; padding: 8px 24px; 
-            border-radius: 12px; font-weight: bold; font-size: 14px; 
-            transition: all 0.2s; color: #475569;
-        }
-        .pagination-btn:hover:not(:disabled) { background: #f8fafc; border-color: #cbd5e1; color: #0f172a; }
-        .pagination-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    </style>
-</head>
-<body class="bg-slate-50 min-h-screen text-slate-900 font-sans">
-
-    <!-- 导航栏 -->
-    <nav class="bg-white border-b sticky top-0 z-50 px-4 py-4 shadow-sm backdrop-blur-md bg-white/90">
-        <div class="container mx-auto flex flex-wrap justify-between items-center gap-y-4">
-            
-            <!-- Logo -->
-            <div class="flex items-center gap-3 cursor-pointer" onclick="goHome()">
-                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md">Ω</div>
-                <div class="flex flex-col">
-                    <h1 class="font-black text-xl tracking-tighter leading-none">OmniVerse</h1>
-                    <span class="text-indigo-600 text-[10px] font-bold tracking-widest uppercase">Protocol v6.8</span>
-                </div>
-            </div>
-            
-            <!-- 钱包 & 网络 -->
-            <div class="flex items-center gap-3 lg:order-3">
-                <select id="netSwitcher" onchange="switchNetwork(this.value)" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold outline-none max-w-[140px] shadow-sm focus:border-indigo-500"></select>
-                <button id="connectBtn" onclick="connect()" class="bg-indigo-600 text-white px-5 py-2 rounded-xl font-bold text-xs shadow-md hover:bg-indigo-700 transition active:scale-95">连接钱包</button>
-                <div id="userInfo" class="hidden flex items-center gap-2 bg-white border p-1.5 pr-4 rounded-xl shadow-sm">
-                    <div id="userAvatar" class="w-7 h-7 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 font-black text-xs">?</div>
-                    <span id="userName" class="text-xs font-bold whitespace-nowrap text-slate-700"></span>
-                </div>
-            </div>
-
-            <!-- 菜单 (修正：增大间距，优化点击区域) -->
-            <div class="w-full lg:w-auto lg:flex-1 lg:order-2 flex justify-center">
-                 <div id="navMenu" class="flex items-center bg-slate-100/80 p-1.5 rounded-2xl gap-2 md:gap-4 overflow-x-auto shadow-inner">
-                    <button onclick="showView('dashboard')" id="nav-dashboard" class="px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:text-indigo-600 hover:bg-white transition-all whitespace-nowrap">大厅</button>
-                    <button onclick="showView('gallery')" id="nav-gallery" class="px-6 py-2.5 rounded-xl text-sm font-bold text-pink-500 hover:text-pink-600 hover:bg-white transition-all whitespace-nowrap">看图</button>
-                    <button onclick="showView('create')" id="nav-create" class="px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:text-indigo-600 hover:bg-white transition-all whitespace-nowrap">发布</button>
-                    <button onclick="showView('history')" id="nav-history" class="hidden px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:text-indigo-600 hover:bg-white transition-all whitespace-nowrap">记录</button>
-                    <button onclick="showView('admin')" id="nav-admin" class="hidden px-6 py-2.5 rounded-xl text-sm font-bold text-rose-500 hover:text-rose-600 hover:bg-white transition-all whitespace-nowrap">管理</button>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <main class="container mx-auto max-w-6xl px-4 py-8">
-        
-        <!-- 1. 大厅 View -->
-        <div id="view-dashboard" class="view-section space-y-8">
-            <!-- 标签栏 (紧凑设计) -->
-            <div class="bg-white px-5 py-4 rounded-2xl border shadow-sm flex flex-wrap items-center gap-y-3">
-                <div class="flex items-center gap-3 mr-6">
-                    <div class="w-2 h-2 rounded-full bg-indigo-500"></div>
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Mainnet</span>
-                    <div id="mainnet-filters" class="flex flex-wrap gap-2"></div>
-                </div>
-                <div class="w-px h-6 bg-slate-200 hidden md:block mx-2"></div> 
-                <div class="flex items-center gap-3">
-                    <div class="w-2 h-2 rounded-full bg-slate-300"></div>
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Testnet</span>
-                    <div id="testnet-filters" class="flex flex-wrap gap-2"></div>
-                </div>
-            </div>
-
-            <div id="globalFeed" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
-            
-            <div class="flex justify-center items-center gap-6 pt-8 pb-12">
-                <button onclick="changePage(-1)" id="prevBtn" class="pagination-btn shadow-sm" disabled>← 上一页</button>
-                <span id="pageIndicator" class="text-sm font-black text-slate-400 tracking-widest">PAGE 1</span>
-                <button onclick="changePage(1)" id="nextBtn" class="pagination-btn shadow-sm">下一页 →</button>
-            </div>
-        </div>
-
-        <!-- 2. 看图 View -->
-        <div id="view-gallery" class="view-section">
-            <div class="flex justify-between items-end mb-8 border-b pb-4">
-                <div>
-                    <h2 class="text-3xl font-black italic text-pink-600 flex items-center gap-3">
-                        Visual Gallery 
-                        <span class="text-xs bg-pink-50 text-pink-600 px-3 py-1 rounded-lg not-italic border border-pink-100 shadow-sm font-bold">Tempo Network</span>
-                    </h2>
-                    <p class="text-xs text-slate-400 mt-2 font-bold ml-1">极速模式：直连 Tempo 节点</p>
-                </div>
-            </div>
-            <div id="galleryFeed" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
-            <div class="flex justify-center items-center gap-6 pt-12 pb-12">
-                <button onclick="changeGalleryPage(-1)" id="galPrevBtn" class="pagination-btn shadow-sm" disabled>← 上一页</button>
-                <span id="galPageIndicator" class="text-sm font-black text-slate-400 tracking-widest">PAGE 1</span>
-                <button onclick="changeGalleryPage(1)" id="galNextBtn" class="pagination-btn shadow-sm">下一页 →</button>
-            </div>
-        </div>
-
-        <!-- 3. 发布 View -->
-        <div id="view-create" class="view-section max-w-xl mx-auto">
-            <div id="netAlert" class="mb-6 p-4 rounded-2xl text-center text-xs font-black shadow-sm"></div>
-            
-            <div id="regArea" class="hidden bg-indigo-600 p-8 rounded-3xl text-white mb-8 shadow-xl">
-                <h2 class="text-2xl font-black mb-2">注册链上身份</h2>
-                <p class="text-indigo-200 text-xs mb-6">在当前网络注册一个唯一的昵称，开始您的创作之旅。</p>
-                <input type="text" id="regInput" placeholder="输入昵称 (例如: Alice)..." class="w-full p-4 rounded-xl text-slate-900 font-bold mb-4 outline-none border-4 border-transparent focus:border-indigo-400 transition">
-                <button onclick="handleRegister()" class="w-full bg-white text-indigo-600 py-4 rounded-xl font-black hover:bg-indigo-50 transition shadow-lg">立即激活</button>
-            </div>
-
-            <div id="createArea" class="bg-white border p-8 rounded-3xl shadow-sm">
-                <h3 class="text-xl font-black mb-6 text-slate-800">发布新存证</h3>
-                <input type="text" id="postTitle" placeholder="标题" class="w-full p-4 bg-slate-50 rounded-xl mb-4 font-bold outline-none border focus:border-indigo-500 focus:bg-white transition">
-                
-                <!-- V6 特性 -->
-                <div id="v6-fields" class="hidden mb-4 p-5 bg-pink-50 rounded-xl border border-pink-100">
-                    <label class="block text-xs font-bold text-pink-600 mb-2 uppercase tracking-wide">封面 URL (V6 特性)</label>
-                    <input type="text" id="coverUrl" placeholder="https://..." class="w-full p-3 bg-white rounded-lg text-sm outline-none border border-pink-200 focus:border-pink-400 transition">
-                    <p class="text-[10px] text-pink-400 mt-2 font-bold opacity-70">* 留空则自动从内容中抓取第一张图</p>
-                </div>
-
-                <textarea id="postContent" placeholder="Markdown 内容 (支持图片: ![desc](url))..." class="w-full p-4 bg-slate-50 rounded-xl h-48 mb-6 font-medium outline-none border focus:border-indigo-500 focus:bg-white transition"></textarea>
-                <button id="postBtn" onclick="handlePost()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black hover:bg-slate-800 transition shadow-lg active:scale-[0.98]">广播上链</button>
-            </div>
-        </div>
-
-        <!-- 4. 详情 View -->
-        <div id="view-post" class="view-section">
-            <div id="detailContainer" class="bg-white border p-8 md:p-12 rounded-[2.5rem] shadow-sm max-w-4xl mx-auto"></div>
-            <button onclick="goBack()" class="mt-10 text-slate-400 font-bold block mx-auto hover:text-indigo-600 transition">← 返回列表</button>
-        </div>
-
-        <!-- 5. 历史记录 View -->
-        <div id="view-history" class="view-section space-y-8">
-            <h2 class="text-2xl font-black border-b pb-4 italic">My Footprints <span class="text-xs not-italic font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded ml-2">Current Chain</span></h2>
-            <div id="historyList" class="grid gap-6 md:grid-cols-2"></div>
-            <div class="flex justify-center items-center gap-6 pt-8 pb-12">
-                <button onclick="changeHistoryPage(-1)" id="histPrevBtn" class="pagination-btn shadow-sm" disabled>← 上一页</button>
-                <span id="histPageIndicator" class="text-sm font-black text-slate-400 tracking-widest">PAGE 1</span>
-                <button onclick="changeHistoryPage(1)" id="histNextBtn" class="pagination-btn shadow-sm" disabled>下一页 →</button>
-            </div>
-        </div>
-
-        <!-- 6. 编辑 View -->
-        <div id="view-edit" class="view-section max-w-xl mx-auto">
-            <div class="bg-white border p-8 rounded-3xl shadow-sm">
-                <h2 class="text-2xl font-black mb-6">编辑帖子</h2>
-                <input type="hidden" id="editPostId"><input type="hidden" id="editPostNetId">
-                <input type="text" id="editTitle" placeholder="标题" class="w-full p-4 bg-slate-50 rounded-xl mb-4 font-bold outline-none border focus:border-indigo-500 transition">
-                
-                <div id="edit-v6-fields" class="hidden mb-4 p-4 bg-pink-50 rounded-xl border border-pink-100">
-                    <label class="block text-xs font-bold text-pink-600 mb-2">修改封面 (V6)</label>
-                    <input type="text" id="editCoverUrl" class="w-full p-3 bg-white rounded-lg text-sm outline-none border border-pink-200">
-                </div>
-
-                <textarea id="editContent" placeholder="内容..." class="w-full p-4 bg-slate-50 rounded-xl h-48 mb-6 font-medium outline-none border focus:border-indigo-500 transition"></textarea>
-                <div class="flex gap-4">
-                    <button onclick="goBack()" class="flex-1 bg-slate-100 text-slate-600 py-4 rounded-xl font-bold hover:bg-slate-200 transition">取消</button>
-                    <button onclick="handleUpdate()" class="flex-[2] bg-indigo-600 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-indigo-700 transition">更新</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 7. 管理 View (修复版) -->
-        <div id="view-admin" class="view-section space-y-8">
-            <div class="bg-amber-50 p-8 rounded-[2rem] border border-amber-100 shadow-sm">
-                <h3 class="text-xl font-black text-amber-900 mb-4 flex items-center gap-2">
-                    <span class="bg-amber-200 w-6 h-6 rounded-lg flex items-center justify-center text-xs">!</span> 
-                    用户权限管理
-                </h3>
-                <div class="flex gap-3">
-                    <input type="text" id="targetAddr" placeholder="输入用户地址 (0x...)" class="flex-1 p-4 rounded-xl outline-none border border-amber-200 font-mono text-sm bg-white focus:border-amber-400 transition">
-                    <button onclick="handleBan(true)" class="bg-rose-500 text-white px-6 py-2 rounded-xl font-bold shadow-md hover:bg-rose-600 transition">封禁</button>
-                    <button onclick="handleBan(false)" class="bg-emerald-500 text-white px-6 py-2 rounded-xl font-bold shadow-md hover:bg-emerald-600 transition">解封</button>
-                </div>
-            </div>
-            
-            <div class="bg-white border rounded-[2rem] p-8 shadow-sm">
-                <div class="flex justify-between items-center mb-6">
-                    <h4 class="font-black text-lg text-slate-800">已注册用户列表</h4>
-                    <span class="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded">Current Chain</span>
-                </div>
-                <!-- 表格容器 -->
-                <div class="overflow-x-auto">
-                    <div id="userList" class="min-w-full"></div>
-                </div>
-            </div>
-        </div>
-
-    </main>
+    <script src="./config.js"></script>
 
     <script>
-        // --- 核心配置 ---
-        const MAINNET_IDS = ['0x64', '0xcc']; 
-        const TESTNET_IDS = ['0xa5bd', '0xaa36a7', '0xc488', '0x88bb0', '0x15eb', '0x61', '0x4cef52', '0x164ce', '0x14a34'];
-        const DEFAULT_ACTIVE = ['0x64', '0xcc', '0xa5bd', '0xaa36a7', '0xc488']; 
-        const GALLERY_CHAIN = '0xa5bd'; 
-
-        // --- 完整 ABI (V5 & V6 兼容) ---
-        const V6_ABI = [
-            "function register(string _username) public",
-            "function createPost(string _title, string _content) public",
-            "function updatePost(uint256 _id, string _newTitle, string _newContent) public",
-            "function createPost(string _title, string _content, string _coverImageUrl, uint8 _imageCount) public",
-            "function updatePost(uint256 _id, string _newTitle, string _newContent, string _newCoverImageUrl, uint8 _newImageCount) public",
-            "function deletePost(uint256 _id) public",
-            "function getPostCount() view returns (uint256)",
-            "function getPaginatedPosts(uint256 _page, uint256 _pageSize) view returns (tuple(uint256 id, string title, string content, address author, string authorName, uint256 createdAt, uint256 updatedAt, string chainLabel, bool exists, string coverImageUrl, uint8 imageCount)[])",
-            "function users(address) view returns (string username, bool isBanned, bool isRegistered, address userAddress)",
-            "function posts(uint256) view returns (uint256 id, string title, string content, address author, string authorName, uint256 createdAt, uint256 updatedAt, string chainLabel, bool exists, string coverImageUrl, uint8 imageCount)",
-            "function getPostIdsByAddress(address _user) view returns (uint256[])",
-            "function getUserCount() view returns (uint256)",
-            "function allRegisteredUsers(uint256) view returns (address)",
-            "function setBannedStatus(address _user, bool _status) public",
-            "function owner() view returns (address)"
-        ];
-
-        // 状态变量
-        let activeChains = [...DEFAULT_ACTIVE];
-        let userAddr, currentChainId;
-        let lastView = 'dashboard';
-        let currentPage = 1;
-        let currentGalleryPage = 1;
-        let currentHistoryPage = 1;
-        let historyIdsCache = []; 
-        const THEMES = ['theme-1', 'theme-2', 'theme-3', 'theme-4', 'theme-5', 'theme-6', 'theme-7', 'theme-8', 'theme-9', 'theme-10'];
-
-        // --- 初始化 ---
-        window.onload = async () => {
-            marked.setOptions({ breaks: true, gfm: true });
-            Object.keys(NETWORKS).forEach((id, index) => { NETWORKS[id].theme = THEMES[index % THEMES.length]; });
-            renderChainSelectors();
-            renderNetworkSwitcher();
-            
-            const urlParams = new URLSearchParams(window.location.search);
-            const netId = urlParams.get('netId'), postId = urlParams.get('postId');
-            
-            if (netId && postId) { 
-                goDetail(netId, postId); 
-            } else { 
-                showView('dashboard'); 
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Georgia', 'serif'] },
+                    borderRadius: { '4xl': '2.5rem' },
+                    boxShadow: { 'soft': '0 20px 40px -10px rgba(0,0,0,0.05)' }
+                }
             }
-            
-            if (window.ethereum) {
-                window.ethereum.on('accountsChanged', () => window.location.reload());
-                try {
-                    const acc = await window.ethereum.request({ method: 'eth_accounts' });
-                    if (acc.length > 0) connect();
-                } catch(e){}
-            }
-        };
-
-        // --- UI 逻辑: 紧凑型选择器 ---
-        function renderChainSelectors() {
-            const createCheckbox = (id) => {
-                if (!NETWORKS[id]) return '';
-                const isChecked = activeChains.includes(id) ? 'checked' : '';
-                return `
-                <label class="relative cursor-pointer select-none group">
-                    <input type="checkbox" class="chain-checkbox hidden" value="${id}" ${isChecked} onchange="toggleChain('${id}')">
-                    <div class="chain-pill px-2 py-1 border border-slate-200 rounded text-slate-500 hover:bg-slate-50 relative">
-                        ${NETWORKS[id].name}
-                    </div>
-                </label>`;
-            };
-
-            document.getElementById('mainnet-filters').innerHTML = MAINNET_IDS.map(createCheckbox).join('');
-            document.getElementById('testnet-filters').innerHTML = TESTNET_IDS.map(createCheckbox).join('');
         }
-
-        function toggleChain(id) {
-            if (activeChains.includes(id)) activeChains = activeChains.filter(c => c !== id);
-            else activeChains.push(id);
-            currentPage = 1;
-            loadDashboard(1);
-        }
-
-        // --- 核心逻辑: 数据加载 ---
+    </script>
+    <style>
+        body { background-color: #faf9f6; color: #111; font-family: 'Inter', sans-serif; }
+        .bento-card { transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); border: 1px solid rgba(0,0,0,0.06); }
+        .bento-card:hover { transform: translateY(-6px); box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.1); z-index: 5; }
         
-        function showView(name) {
-            lastView = name;
-            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('view-active'));
-            document.querySelectorAll('#navMenu button').forEach(b => b.classList.remove('nav-link-active'));
-            
-            const targetView = document.getElementById(`view-${name}`);
-            const targetBtn = document.getElementById(`nav-${name}`);
-            if (targetView) targetView.classList.add('view-active');
-            if (targetBtn) targetBtn.classList.add('nav-link-active');
+        .nav-btn { font-size: 0.9rem; font-weight: 800; text-transform: uppercase; color: #999; letter-spacing: 0.5px; transition: color 0.2s; }
+        .nav-btn:hover { color: #000; }
+        .nav-btn.active { color: #000; text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 3px; }
+        
+        .hero-big { font-size: 5rem; font-weight: 900; line-height: 0.9; letter-spacing: -0.04em; }
+        .no-scroll::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+    <div id="app">
+        
+        <!-- Loader -->
+        <div v-if="loading" class="fixed inset-0 z-50 flex items-center justify-center bg-white/90 backdrop-blur">
+            <div class="animate-spin w-8 h-8 border-4 border-gray-300 border-t-black rounded-full"></div>
+        </div>
 
-            if (name === 'dashboard') loadDashboard(currentPage);
-            if (name === 'gallery') loadGallery(currentGalleryPage);
-            if (name === 'history') loadHistory(currentHistoryPage);
-            if (name === 'admin') loadAdmin();
-        }
-
-        // 1. 大厅 (每链 6 条)
-        async function loadDashboard(page) {
-            const container = document.getElementById('globalFeed');
-            container.innerHTML = `<div class="col-span-full py-16 text-center animate-pulse text-slate-400 font-bold">同步数据中...</div>`;
-            
-            document.getElementById('pageIndicator').innerText = `PAGE ${page}`;
-            document.getElementById('prevBtn').disabled = (page === 1);
-
-            const PER_CHAIN_LIMIT = 6; 
-            const tasks = activeChains.map(async (chainId) => {
-                const net = NETWORKS[chainId];
-                if (!net) return [];
-                try {
-                    const provider = new ethers.JsonRpcProvider(net.rpc);
-                    const contract = new ethers.Contract(net.proxy, V6_ABI, provider);
-                    const posts = await contract.getPaginatedPosts(page, PER_CHAIN_LIMIT);
-                    return posts.map(p => parsePost(p, chainId)).filter(p => p.exists);
-                } catch (e) { return []; }
-            });
-
-            const results = await Promise.all(tasks);
-            let merged = results.flat().sort((a, b) => b.createdAt - a.createdAt);
-            
-            if (merged.length === 0) container.innerHTML = `<div class="col-span-full text-center text-slate-400 py-10">当前页无数据。</div>`;
-            else container.innerHTML = merged.map(p => renderCard(p)).join('');
-        }
-
-        function changePage(delta) {
-            if (currentPage + delta < 1) return;
-            currentPage += delta;
-            loadDashboard(currentPage);
-        }
-
-        // 2. 看图 (请求14条，展示12条)
-        async function loadGallery(page) {
-            const container = document.getElementById('galleryFeed');
-            container.innerHTML = `<div class="col-span-full py-20 text-center animate-pulse text-pink-400 font-bold">正在加载 Tempo 影像...</div>`;
-            
-            document.getElementById('galPageIndicator').innerText = `PAGE ${page}`;
-            document.getElementById('galPrevBtn').disabled = (page === 1);
-
-            const net = NETWORKS[GALLERY_CHAIN];
-            try {
-                const provider = new ethers.JsonRpcProvider(net.rpc);
-                const contract = new ethers.Contract(net.proxy, V6_ABI, provider);
+        <!-- 1. HEADER (NOT Sticky as requested, 大尺寸, scroll away) -->
+        <header class="bg-white border-b border-gray-100 py-8 px-6">
+            <div class="max-w-[1400px] mx-auto flex items-center justify-between">
                 
-                const FETCH_SIZE = 14; 
-                const DISPLAY_SIZE = 12;
-
-                const posts = await contract.getPaginatedPosts(page, FETCH_SIZE);
-                let parsed = posts.map(p => parsePost(p, GALLERY_CHAIN)).filter(p => p.exists && (p.coverImageUrl || p.imageCount > 0));
-
-                if (parsed.length > DISPLAY_SIZE) parsed = parsed.slice(0, DISPLAY_SIZE);
-
-                if (parsed.length === 0) container.innerHTML = `<div class="col-span-full text-center text-slate-400 py-10">本页无图片数据。</div>`;
-                else container.innerHTML = parsed.map(p => renderGalleryCard(p)).join('');
-            } catch (e) {
-                container.innerHTML = `<div class="col-span-full text-center text-rose-500 py-10">网络错误</div>`;
-            }
-        }
-
-        function changeGalleryPage(delta) {
-            if (currentGalleryPage + delta < 1) return;
-            currentGalleryPage += delta;
-            loadGallery(currentGalleryPage);
-        }
-
-        // 3. 历史记录
-        async function loadHistory(page = 1) {
-            currentHistoryPage = page;
-            const list = document.getElementById('historyList');
-            document.getElementById('histPageIndicator').innerText = `PAGE ${page}`;
-            document.getElementById('histPrevBtn').disabled = (page === 1);
-            
-            list.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400">检索中...</div>`;
-            
-            if (!currentChainId || !userAddr) return list.innerHTML = `<div class="col-span-full text-center font-bold text-indigo-500">请先连接钱包</div>`;
-            
-            try {
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const contract = new ethers.Contract(NETWORKS[currentChainId].proxy, V6_ABI, await provider.getSigner());
-                
-                if (historyIdsCache.length === 0 || page === 1) {
-                    const ids = await contract.getPostIdsByAddress(userAddr);
-                    historyIdsCache = [...ids].reverse();
-                }
-
-                if (historyIdsCache.length === 0) {
-                    document.getElementById('histNextBtn').disabled = true;
-                    return list.innerHTML = `<div class="col-span-full text-center text-slate-400">无记录</div>`;
-                }
-
-                const PAGE_SIZE = 10;
-                const start = (page - 1) * PAGE_SIZE;
-                const end = start + PAGE_SIZE;
-                const pageIds = historyIdsCache.slice(start, end);
-
-                document.getElementById('histNextBtn').disabled = (end >= historyIdsCache.length);
-
-                const postPromises = pageIds.map(id => contract.posts(id));
-                const rawPosts = await Promise.all(postPromises);
-                const posts = rawPosts.map(p => parsePost(p, currentChainId));
-
-                list.innerHTML = posts.map(p => renderCard(p)).join('');
-            } catch(e) { list.innerHTML = `<div class="col-span-full text-center text-rose-500">错误: ${e.message}</div>`; }
-        }
-
-        function changeHistoryPage(delta) {
-            if (currentHistoryPage + delta < 1) return;
-            loadHistory(currentHistoryPage + delta);
-        }
-
-        // 4. 管理员 (已修复：增加 count==0 判断，表格重构)
-        async function loadAdmin() {
-            const container = document.getElementById('userList');
-            container.innerHTML = `<div class="text-center text-slate-400 py-8 animate-pulse">正在从链上读取用户数据...</div>`;
-            
-            if (!currentChainId) return container.innerHTML = `<div class="text-center text-indigo-500 font-bold py-4">请先连接钱包</div>`;
-
-            try {
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const contract = new ethers.Contract(NETWORKS[currentChainId].proxy, V6_ABI, await provider.getSigner());
-                
-                const countBn = await contract.getUserCount();
-                const count = Number(countBn);
-
-                if (count === 0) {
-                    return container.innerHTML = `<div class="text-center text-slate-400 py-8">当前网络暂无注册用户。</div>`;
-                }
-                
-                // 表格头
-                let html = `
-                <table class="w-full text-left text-sm border-collapse">
-                    <thead>
-                        <tr class="text-slate-500 border-b-2 border-slate-100 bg-slate-50">
-                            <th class="p-4 rounded-tl-xl">昵称</th>
-                            <th class="p-4">钱包地址</th>
-                            <th class="p-4 rounded-tr-xl">状态</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-                
-                const limit = Math.min(count, 20); // 限制前20个防止卡顿
-                
-                for(let i = 0; i < limit; i++) {
-                    const addr = await contract.allRegisteredUsers(i);
-                    const user = await contract.users(addr);
-                    // 斑马纹行样式
-                    const bgClass = i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50';
-                    html += `
-                    <tr class="border-b border-slate-50 hover:bg-indigo-50/50 transition ${bgClass}">
-                        <td class="p-4 font-bold text-slate-700">@${user.username}</td>
-                        <td class="p-4 font-mono text-slate-400 text-xs break-all max-w-[150px] md:max-w-none">${addr}</td>
-                        <td class="p-4">
-                            ${user.isBanned 
-                                ? '<span class="bg-rose-100 text-rose-600 px-2 py-1 rounded text-xs font-bold">已封禁</span>' 
-                                : '<span class="bg-emerald-100 text-emerald-600 px-2 py-1 rounded text-xs font-bold">正常</span>'}
-                        </td>
-                    </tr>`;
-                }
-                container.innerHTML = html + "</tbody></table>";
-            } catch(e) {
-                console.error(e);
-                container.innerHTML = `<div class="text-center text-rose-500 py-8">读取失败，请检查您是否在正确的网络，或者合约是否支持该功能。</div>`;
-            }
-        }
-
-        // --- 辅助函数 ---
-        function parsePost(p, chainId) {
-            const isV6 = (chainId === '0xa5bd'); 
-            let cover = isV6 ? p.coverImageUrl : '';
-            let count = isV6 ? Number(p.imageCount) : 0;
-            
-            if (!cover) {
-                const match = p.content.match(/!\[.*?\]\((.*?)\)/);
-                if (match) cover = match[1];
-            }
-            if (count === 0) {
-                const matches = p.content.match(/!\[.*?\]\((.*?)\)/g);
-                if (matches) count = matches.length;
-            }
-
-            return {
-                id: Number(p.id),
-                title: p.title,
-                content: p.content,
-                author: p.author,
-                authorName: p.authorName,
-                createdAt: Number(p.createdAt),
-                sourceId: chainId,
-                exists: p.exists,
-                coverImageUrl: cover,
-                imageCount: count
-            };
-        }
-
-        function renderCard(p) {
-            const net = NETWORKS[p.sourceId];
-            return `<div class="bg-white border rounded-2xl p-6 hover:shadow-lg transition card-${net.theme}">
-                <div class="flex justify-between items-start mb-3"><span class="text-[9px] font-black px-2 py-0.5 rounded tag-${net.theme}">${net.name} #${p.id}</span></div>
-                <h3 class="text-lg font-black mb-4 line-clamp-1">${p.title}</h3>
-                <div class="flex justify-between items-center pt-4 border-t"><span class="text-xs font-black text-${net.theme}">@${p.authorName}</span><button onclick="goDetail('${p.sourceId}', ${p.id})" class="text-xs font-bold text-indigo-600">详情 →</button></div>
-            </div>`;
-        }
-
-        function renderGalleryCard(p) {
-            const net = NETWORKS[p.sourceId];
-            const imgUrl = p.coverImageUrl || "https://placehold.co/600x800/f1f5f9/94a3b8?text=No+Image";
-            const countTag = p.imageCount > 0 ? `[${p.imageCount}P]` : '';
-            
-            return `
-            <div class="gallery-card group" onclick="goDetail('${p.sourceId}', ${p.id})">
-                <div class="absolute top-2 left-2 z-10 pointer-events-none">
-                    <span class="bg-black/40 text-white text-[10px] px-2 py-1 rounded-full backdrop-blur-md shadow-sm font-bold flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-pink-500 inline-block"></span>
-                        @${p.authorName}
-                    </span>
-                </div>
-                <img src="${imgUrl}" class="gallery-img" loading="lazy" alt="${p.title}" onerror="this.src='https://placehold.co/600x800/f1f5f9/94a3b8?text=Error'">
-                <div class="gallery-overlay">
-                    <div class="gallery-title text-sm">${p.title}</div>
-                    <div class="gallery-meta">
-                        <span>${countTag}</span>
-                        <span class="gallery-badge bg-pink-500">${net.name}</span>
+                <!-- Logo -->
+                <div class="flex items-center gap-4 cursor-pointer" @click="currentView='home'">
+                    <div class="w-14 h-14 bg-black text-white flex items-center justify-center font-black text-2xl rounded-2xl shadow-xl">Ω</div>
+                    <div class="flex flex-col">
+                        <span class="text-2xl font-black tracking-tight leading-none">OmniVerse</span>
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-1">Full-Chain Protocol</span>
                     </div>
                 </div>
-            </div>`;
-        }
 
-        // --- 详情与分享 ---
-        async function goDetail(netId, id) {
-            showView('post');
-            const container = document.getElementById('detailContainer');
-            container.innerHTML = "加载中...";
-            try {
-                const net = NETWORKS[netId];
-                // 允许免登录查看
-                const provider = new ethers.JsonRpcProvider(net.rpc);
-                const contract = new ethers.Contract(net.proxy, V6_ABI, provider);
-                const p = await contract.posts(id);
-                const post = parsePost(p, netId);
-                const isAuthor = userAddr && userAddr.toLowerCase() === post.author.toLowerCase();
+                <!-- Nav Center -->
+                <nav class="hidden lg:flex items-center gap-8 bg-gray-50 px-10 py-4 rounded-full border border-gray-100">
+                    <button v-for="t in ['home', 'explore', 'gallery', 'create', 'history']" 
+                        @click="currentView=t" 
+                        :class="['nav-btn', { active: currentView===t }]">
+                        {{ t==='explore'?'大厅':t==='gallery'?'画廊':t==='create'?'发布':t==='history'?'我的': '首页' }}
+                    </button>
+                    <div v-if="userStatus.isOwner" class="h-4 w-px bg-gray-300"></div>
+                    <button v-if="userStatus.isOwner" @click="currentView='admin'" class="nav-btn text-red-600 hover:text-red-800">管理员</button>
+                </nav>
+
+                <!-- Wallet Tools -->
+                <div class="flex items-center gap-4">
+                    <div class="relative group">
+                        <select :value="wallet.chainId" @change="switchNet($event.target.value)" 
+                            class="appearance-none bg-gray-100 hover:bg-gray-200 border-none font-bold text-xs py-3 pl-4 pr-8 rounded-xl cursor-pointer w-40 truncate transition outline-none text-gray-700">
+                            <option value="" disabled>切换网络...</option>
+                            <option v-for="(n, id) in networks" :value="id">{{ n.name }}</option>
+                        </select>
+                        <div class="pointer-events-none absolute right-3 top-3 text-[10px]">▼</div>
+                    </div>
+
+                    <button v-if="!wallet.isConnected" @click="connectWallet" class="bg-black text-white px-8 py-3 rounded-xl font-bold text-sm shadow-xl hover:scale-105 transition">连接钱包</button>
+                    <div v-else class="flex items-center gap-3 bg-white border border-gray-200 pl-4 pr-2 py-2 rounded-xl">
+                        <span class="text-xs font-bold font-mono">{{ wallet.address.slice(0,6) }}</span>
+                        <div class="w-8 h-8 rounded-lg bg-green-500 text-white flex items-center justify-center font-bold text-xs">{{ userStatus.username ? userStatus.username[0] : 'U' }}</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 2. MAIN -->
+        <main class="max-w-[1400px] mx-auto px-6 py-12 min-h-screen">
+            <transition name="fade" mode="out-in">
                 
-                container.innerHTML = `
-                    <div class="mb-6 flex justify-between items-center">
-                        <span class="tag-${net.theme} px-3 py-1 rounded-lg font-black text-[10px] uppercase">${net.name}</span>
-                        <div class="flex gap-2">
-                             <button onclick="handleShare('${netId}', '${id}')" class="bg-blue-500 text-white px-3 py-1 rounded text-xs font-bold shadow hover:bg-blue-600 transition">分享</button>
-                             ${isAuthor ? `<button onclick="goEdit('${netId}', ${id})" class="bg-indigo-500 text-white px-3 py-1 rounded text-xs font-bold shadow hover:bg-indigo-600 transition">编辑</button>` : ''}
-                             ${isAuthor ? `<button onclick="handleDelete('${netId}', ${id})" class="bg-rose-500 text-white px-3 py-1 rounded text-xs font-bold shadow hover:bg-rose-600 transition">删除</button>` : ''}
+                <!-- A. HOME -->
+                <div v-if="currentView==='home'" class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:h-[600px]">
+                    <div class="lg:col-span-3 bg-black text-white rounded-4xl p-16 flex flex-col justify-between relative overflow-hidden cursor-pointer group bento-card" @click="currentView='explore'">
+                        <div class="absolute -right-32 -top-32 w-[600px] h-[600px] bg-gradient-to-br from-indigo-900 to-purple-900 rounded-full blur-[100px] opacity-60 group-hover:scale-110 transition duration-1000"></div>
+                        <div class="relative z-10">
+                            <span class="border border-white/20 px-4 py-2 rounded-full text-xs font-bold tracking-wider">WEB3 STORAGE</span>
+                            <h1 class="hero-big mt-8">DATA IS<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-gray-400 to-white">IMMUTABLE.</span></h1>
+                        </div>
+                        <div class="relative z-10 flex justify-between items-end">
+                            <p class="text-gray-400 font-medium max-w-sm">基于智能合约的全链信息流协议。部署于 Gnosis, opBNB 及 Tempo。</p>
+                            <div class="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center text-2xl font-bold group-hover:rotate-45 transition">→</div>
                         </div>
                     </div>
-                    <h1 class="text-3xl font-black mb-8 text-slate-800 leading-tight">${post.title}</h1>
-                    <div class="prose prose-lg max-w-none text-slate-700 mb-12">${marked.parse(post.content)}</div>
-                    <div class="border-t pt-6 flex justify-between items-end">
-                        <div><div class="font-black text-xl text-${net.theme}">@${post.authorName}</div><div class="text-xs text-slate-400 mt-1">${new Date(post.createdAt*1000).toLocaleString()}</div></div>
-                        <div class="text-xs font-mono text-slate-300">ID: ${post.id}</div>
-                    </div>`;
-            } catch (e) { container.innerHTML = "读取失败，请检查网络连接。"; }
-        }
+                    <div class="flex flex-col gap-6">
+                        <div @click="currentView='gallery'" class="flex-1 bg-white border border-gray-200 rounded-4xl p-10 flex flex-col justify-center text-center cursor-pointer bento-card hover:border-pink-300 group">
+                            <div class="text-6xl mb-4 group-hover:scale-110 transition">🌸</div>
+                            <h2 class="font-black text-2xl">Visuals</h2>
+                            <p class="text-xs font-bold text-gray-400 mt-2 uppercase tracking-widest">Tempo V6 Gallery</p>
+                        </div>
+                        <div @click="currentView='create'" class="flex-1 bg-blue-600 text-white rounded-4xl p-10 flex flex-col justify-center text-center cursor-pointer bento-card hover:bg-blue-700">
+                            <h2 class="font-black text-2xl mb-1">Create</h2>
+                            <p class="text-blue-200 text-xs">Start Publishing</p>
+                        </div>
+                    </div>
+                </div>
 
-        function handleShare(netId, postId) {
-            const url = `${window.location.origin}${window.location.pathname}?netId=${netId}&postId=${postId}`;
-            navigator.clipboard.writeText(url).then(() => {
-                alert("链接已复制！分享此链接，朋友无需登录即可查看内容。");
-            }, () => { prompt("请手动复制链接:", url); });
-        }
+                <!-- B. EXPLORE (Colored) -->
+                <div v-else-if="currentView==='explore'">
+                    <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                        <h1 class="text-5xl font-black">发现</h1>
+                        <div class="flex flex-wrap gap-2 justify-end max-w-2xl">
+                            <label v-for="(n, id) in networks" class="cursor-pointer border px-4 py-2 rounded-lg text-[10px] font-bold uppercase transition select-none hover:opacity-80" 
+                                :style="{backgroundColor: activeNetworks.includes(id) ? 'black' : 'white', color: activeNetworks.includes(id) ? 'white' : '#999', borderColor: activeNetworks.includes(id) ? 'black' : '#eee'}">
+                                <input type="checkbox" v-model="activeNetworks" :value="id" @change="fetchExp" class="hidden">{{ n.name }}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div v-if="explorePosts.length===0" class="col-span-full py-32 text-center text-gray-300 font-bold bg-gray-50 rounded-4xl border-2 border-dashed">暂无聚合数据</div>
+                        <div v-for="p in explorePosts" :key="p.id+p.chainId" @click="goPost(p)" class="p-8 rounded-[2.5rem] h-80 flex flex-col justify-between cursor-pointer bento-card relative group bg-white border-2" :style="getCardStyle(p.chainId)">
+                            <div>
+                                <div class="flex justify-between items-center mb-6 opacity-60 text-[10px] font-black uppercase tracking-widest">
+                                    <span :style="getTagColor(p.chainId)" class="px-2 py-1 rounded">{{ safeNetName(p.chainId) }}</span> 
+                                    <span>#{{ p.id }}</span>
+                                </div>
+                                <h3 class="text-2xl font-black leading-tight line-clamp-3 group-hover:translate-x-1 transition">{{ p.title }}</h3>
+                            </div>
+                            <div class="flex items-center gap-3 pt-6 border-t border-black/5 mt-auto">
+                                <div class="w-8 h-8 rounded-full bg-white/60 flex items-center justify-center text-xs font-black">{{ p.authorName[0] }}</div>
+                                <div><div class="text-xs font-bold">@{{ p.authorName }}</div><div class="text-[9px] opacity-60 font-mono mt-0.5">{{ new Date(p.createdAt*1000).toLocaleDateString() }}</div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-16 flex justify-center gap-4 text-xs font-bold">
+                        <button @click="page.explore--;fetchExp()" :disabled="page.explore<=1" class="px-6 py-3 border bg-white rounded-full disabled:opacity-50">上一页</button>
+                        <button @click="page.explore++;fetchExp()" class="px-6 py-3 bg-black text-white rounded-full">下一页</button>
+                    </div>
+                </div>
 
-        // --- 交互功能 ---
-        async function goEdit(netId, postId) {
-            showView('edit');
-            const net = NETWORKS[netId];
-            try {
-                const provider = new ethers.JsonRpcProvider(net.rpc);
-                const contract = new ethers.Contract(net.proxy, V6_ABI, provider);
-                const p = await contract.posts(postId);
-                const post = parsePost(p, netId);
+                <!-- C. DETAIL -->
+                <div v-else-if="currentView==='detail' && currentPost" class="max-w-4xl mx-auto mt-10">
+                    <button @click="goBack" class="mb-10 text-xs font-bold text-gray-400 hover:text-black flex items-center gap-2 transition">← BACK TO FEED</button>
+                    
+                    <div v-if="!isEditMode">
+                        <div class="text-center">
+                            <span class="inline-block px-3 py-1 bg-black text-white rounded-full text-[10px] font-bold uppercase mb-6 tracking-wider">{{ safeNetName(currentPost.chainId) }} / #{{ currentPost.id }}</span>
+                            <h1 class="text-5xl md:text-7xl font-black text-gray-900 leading-[0.95] mb-10">{{ currentPost.title }}</h1>
+                            <div class="flex justify-center gap-8 border-y border-gray-100 py-6 mb-12">
+                                <div class="flex items-center gap-2 font-bold text-sm"><div class="w-6 h-6 bg-gray-200 rounded-full"></div> @{{ currentPost.authorName }}</div>
+                                <div class="font-mono text-xs text-gray-400 self-center">{{ new Date(currentPost.createdAt*1000).toLocaleString() }}</div>
+                                <button @click="copyLink" class="text-blue-600 font-bold text-xs hover:underline">分享链接 🔗</button>
+                            </div>
+                        </div>
+                        <article class="prose prose-xl prose-slate mx-auto font-serif text-gray-800 leading-loose" v-html="parseMd(currentPost.content)"></article>
+                        
+                        <div v-if="canEdit(currentPost.author)" class="mt-20 pt-10 border-t flex justify-end gap-4">
+                            <button @click="del" class="text-red-500 font-bold text-xs px-4">DELETE</button>
+                            <button @click="isEditMode=true" class="bg-black text-white px-8 py-3 rounded-xl font-bold hover:shadow-xl transition">Edit Post</button>
+                        </div>
+                    </div>
 
-                document.getElementById('editPostId').value = postId;
-                document.getElementById('editPostNetId').value = netId;
-                document.getElementById('editTitle').value = post.title;
-                document.getElementById('editContent').value = post.content;
-                
-                const v6Fields = document.getElementById('edit-v6-fields');
-                if (netId === '0xa5bd') { 
-                    v6Fields.classList.remove('hidden');
-                    document.getElementById('editCoverUrl').value = post.coverImageUrl || "";
-                } else { v6Fields.classList.add('hidden'); }
-            } catch (e) { alert("无法加载数据"); goBack(); }
-        }
+                    <div v-else class="bg-white p-12 rounded-[3rem] border border-gray-200 shadow-xl">
+                        <h2 class="text-3xl font-black mb-8">Editing</h2>
+                        <input v-model="currentPost.title" class="w-full text-3xl font-bold border-b-2 py-3 outline-none focus:border-black mb-6">
+                        <input v-if="isV6" v-model="currentPost.cover" class="w-full text-xs font-mono bg-pink-50 p-3 rounded mb-6 text-pink-600 outline-none" placeholder="Cover">
+                        <textarea v-model="currentPost.content" class="w-full h-[400px] bg-gray-50 rounded-2xl p-6 text-lg font-serif outline-none resize-none"></textarea>
+                        <div class="flex justify-end gap-4 pt-8">
+                            <button @click="isEditMode=false" class="font-bold text-gray-400 hover:text-black">取消</button>
+                            <button @click="update" class="bg-green-600 text-white px-10 py-3 rounded-xl font-bold shadow-lg">保存</button>
+                        </div>
+                    </div>
+                </div>
 
-        async function handleUpdate() {
-            const postId = document.getElementById('editPostId').value;
-            const netId = document.getElementById('editPostNetId').value;
-            const title = document.getElementById('editTitle').value;
-            const content = document.getElementById('editContent').value;
-            const cover = document.getElementById('editCoverUrl').value;
+                <!-- D. CREATE -->
+                <div v-else-if="currentView==='create'" class="max-w-3xl mx-auto pt-10">
+                    <div class="bg-white rounded-[3rem] p-12 border border-gray-100 shadow-2xl relative overflow-hidden">
+                        <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+                        <h2 class="text-4xl font-black mb-10">发布内容</h2>
+                        
+                        <div v-if="!wallet.isConnected" class="py-20 text-center"><button @click="connect" class="bg-black text-white px-8 py-3 rounded-xl font-bold">请先连接钱包</button></div>
+                        <div v-else-if="!userStatus.isRegistered" class="text-center py-10">
+                            <input v-model="registerName" class="text-center text-3xl font-bold w-full border-b-2 py-4 outline-none focus:border-black" placeholder="注册昵称">
+                            <button @click="register" class="mt-8 bg-blue-600 text-white px-10 py-3 rounded-xl font-bold shadow-lg">注册</button>
+                        </div>
+                        <div v-else class="space-y-8">
+                            <div class="flex justify-between font-bold text-xs text-gray-400 uppercase"><span>NET: {{ safeNetName(wallet.chainId) }}</span><span v-if="isV6" class="text-pink-500">V6 Mode</span></div>
+                            <input v-model="createForm.title" class="w-full text-5xl font-black outline-none placeholder-gray-200" placeholder="标题...">
+                            <input v-if="isV6" v-model="createForm.cover" class="w-full text-xs font-mono text-pink-500 bg-pink-50 p-3 rounded-lg outline-none" placeholder="Cover URL">
+                            <textarea v-model="createForm.content" class="w-full h-80 text-xl font-serif text-gray-600 resize-none outline-none leading-relaxed placeholder-gray-300" placeholder="开始写作... (Markdown)"></textarea>
+                            <div class="text-right pt-6"><button @click="create" class="bg-black text-white px-12 py-4 rounded-2xl font-bold shadow-xl hover:scale-105 transition">发布</button></div>
+                        </div>
+                    </div>
+                </div>
 
-            if (currentChainId !== netId) return alert(`请切换到 ${NETWORKS[netId].name} 网络`);
+                <!-- E. HISTORY -->
+                <div v-else-if="currentView==='history'" class="max-w-3xl mx-auto pt-10">
+                    <h2 class="text-4xl font-black mb-8 pl-6 border-l-4 border-gray-200">我的记录 <span class="text-sm font-bold bg-gray-100 px-2 py-1 rounded ml-2 text-gray-500">{{ safeNetName(wallet.chainId) }}</span></h2>
+                    <div class="space-y-4">
+                        <div v-if="historyPosts.length===0" class="py-24 text-center border-2 border-dashed border-gray-200 rounded-3xl text-gray-300 font-bold">暂无数据</div>
+                        <div v-for="p in historyPosts" @click="goPost(p)" class="bg-white p-6 rounded-2xl border border-gray-100 flex justify-between items-center cursor-pointer hover:border-black transition shadow-sm">
+                            <div><h3 class="font-bold text-xl">{{ p.title }}</h3><p class="text-xs text-gray-400 mt-1 font-mono">{{ new Date(p.createdAt*1000).toLocaleString() }}</p></div>
+                            <div class="font-bold text-xs bg-gray-100 px-3 py-1 rounded">查看</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-center mt-10 gap-4"><button @click="page.history--;fetchHis()" :disabled="page.history<=1" class="border px-4 py-2 bg-white rounded font-bold disabled:opacity-50">Prev</button><button @click="page.history++;fetchHis()" class="bg-black text-white px-4 py-2 rounded font-bold">Next</button></div>
+                </div>
 
-            try {
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const contract = new ethers.Contract(NETWORKS[netId].proxy, V6_ABI, await provider.getSigner());
-                let tx;
-                if (netId === '0xa5bd') {
-                    const count = (content.match(/!\[.*?\]\((.*?)\)/g) || []).length;
-                    tx = await contract.updatePost(postId, title, content, cover, count);
-                } else {
-                    tx = await contract.updatePost(postId, title, content);
-                }
-                await tx.wait();
-                alert("更新成功");
-                goDetail(netId, postId);
-            } catch (e) { alert("更新失败: " + e.message); }
-        }
+                <!-- F. GALLERY -->
+                <div v-else-if="currentView==='gallery'">
+                    <h2 class="text-4xl font-black mb-10 pl-4 border-l-8 border-pink-500">Visuals</h2>
+                    <div class="columns-1 md:columns-3 gap-6 space-y-6">
+                        <div v-for="p in galleryPosts" @click="goPost(p)" class="break-inside-avoid relative rounded-2xl overflow-hidden bg-black cursor-pointer group">
+                            <img :src="p.img" class="w-full opacity-80 group-hover:opacity-100 transition duration-500 group-hover:scale-105">
+                            <div class="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white font-bold text-xs translate-y-full group-hover:translate-y-0 transition">{{ p.title }}</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-center mt-10 gap-4"><button @click="page.gallery--;fetchGal()" :disabled="page.gallery<=1" class="border px-4 py-2 bg-white rounded font-bold disabled:opacity-50">Prev</button><button @click="page.gallery++;fetchGal()" class="bg-black text-white px-4 py-2 rounded font-bold">Next</button></div>
+                </div>
 
-        async function handlePost() {
-            if (!currentChainId) return alert("请先连接钱包");
-            const t = document.getElementById('postTitle').value;
-            const c = document.getElementById('postContent').value;
-            const cover = document.getElementById('coverUrl').value || '';
-            if (!t || !c) return alert("请填写标题和内容");
-            
-            const btn = document.getElementById('postBtn');
-            btn.innerText = "广播中..."; btn.disabled = true;
-            
-            try {
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const contract = new ethers.Contract(NETWORKS[currentChainId].proxy, V6_ABI, await provider.getSigner());
-                let tx;
-                if (currentChainId === '0xa5bd') {
-                    const imgCount = (c.match(/!\[.*?\]\((.*?)\)/g) || []).length;
-                    tx = await contract.createPost(t, c, cover, imgCount);
-                } else {
-                    tx = await contract.createPost(t, c);
-                }
-                await tx.wait();
-                alert("发布成功！");
-                if (currentChainId === '0xa5bd') showView('gallery'); else showView('dashboard');
-            } catch (e) { alert("发布失败: " + e.message); } finally { btn.innerText = "广播上链"; btn.disabled = false; }
-        }
+                <!-- G. ADMIN -->
+                <div v-else-if="currentView==='admin'" class="max-w-4xl mx-auto pt-10">
+                    <div class="bg-white p-12 rounded-[3rem] shadow-xl border border-red-50">
+                        <h1 class="text-3xl font-black text-red-600 mb-8">ADMINISTRATION</h1>
+                        <div v-for="u in adminUsers" class="flex justify-between py-4 border-b hover:bg-red-50/50 px-2 transition">
+                            <span class="font-bold">@{{u.name}} <span class="text-xs text-gray-400 font-mono font-normal ml-2">{{u.addr}}</span></span>
+                            <button @click="toggleBan(u.addr,!u.ban)" class="text-xs font-bold border px-3 py-1 rounded" :class="u.ban?'text-green-600 border-green-200':'text-red-500 border-red-200'">{{u.ban?'解除封禁':'封禁用户'}}</button>
+                        </div>
+                    </div>
+                </div>
 
-        async function handleRegister() {
-            const n = document.getElementById('regInput').value;
-            if(!n) return alert("昵称不能为空");
-            try {
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const contract = new ethers.Contract(NETWORKS[currentChainId].proxy, V6_ABI, await provider.getSigner());
-                await (await contract.register(n)).wait();
-                alert("注册成功！");
-                window.location.reload();
-            } catch(e) { alert("注册失败: " + e.message); }
-        }
-
-        async function handleDelete(netId, postId) {
-            if(!confirm("确定要删除吗？")) return;
-            if(currentChainId !== netId) return alert("请切换网络");
-            try {
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const contract = new ethers.Contract(NETWORKS[netId].proxy, V6_ABI, await provider.getSigner());
-                await (await contract.deletePost(postId)).wait();
-                alert("删除成功");
-                goBack();
-            } catch(e) { alert("删除失败"); }
-        }
-        
-        async function handleBan(status) {
-            const addr = document.getElementById('targetAddr').value;
-            if(!ethers.isAddress(addr)) return alert("地址无效");
-            try {
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const contract = new ethers.Contract(NETWORKS[currentChainId].proxy, V6_ABI, await provider.getSigner());
-                await (await contract.setBannedStatus(addr, status)).wait();
-                alert("操作成功");
-                loadAdmin();
-            } catch(e) { alert("无权限或网络错误"); }
-        }
-
-        async function connect() {
-            if (!window.ethereum) return alert("请安装 MetaMask");
-            try {
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const signer = await provider.getSigner();
-                userAddr = await signer.getAddress();
-                const net = await provider.getNetwork();
-                currentChainId = "0x" + net.chainId.toString(16).toLowerCase();
-                updateUI();
-                checkNetStatus();
-            } catch(e) { console.error(e); }
-        }
-        
-        function updateUI() {
-            document.getElementById('connectBtn').classList.add('hidden');
-            document.getElementById('userInfo').classList.remove('hidden');
-            document.getElementById('nav-history').classList.remove('hidden');
-            document.getElementById('netSwitcher').value = currentChainId;
-        }
-
-        function checkNetStatus() {
-            const net = NETWORKS[currentChainId];
-            const alertEl = document.getElementById('netAlert');
-            const v6Fields = document.getElementById('v6-fields');
-            
-            if (net) {
-                syncUserStatus(net);
-                if (currentChainId === '0xa5bd') {
-                    alertEl.className = "mb-4 p-4 rounded-xl text-center text-xs font-black bg-pink-50 text-pink-600 border border-pink-200";
-                    alertEl.innerHTML = `当前接入 V6 网络：${net.name}`;
-                    v6Fields.classList.remove('hidden');
-                } else {
-                    alertEl.className = "mb-4 p-4 rounded-xl text-center text-xs font-black bg-indigo-50 text-indigo-600 border border-indigo-200";
-                    alertEl.innerHTML = `当前接入网络：${net.name}`;
-                    v6Fields.classList.add('hidden');
-                }
-            } else {
-                alertEl.className = "mb-4 p-4 rounded-xl text-center text-xs font-black bg-slate-100 text-slate-500";
-                alertEl.innerHTML = "请切换至支持的网络";
-            }
-        }
-
-        async function syncUserStatus(net) {
-            try {
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const contract = new ethers.Contract(net.proxy, V6_ABI, await provider.getSigner());
-                const user = await contract.users(userAddr);
-                const owner = await contract.owner();
-                document.getElementById('userName').innerText = user.isRegistered ? "@" + user.username : "未注册";
-                document.getElementById('userAvatar').innerText = user.isRegistered ? user.username[0].toUpperCase() : '?';
-                document.getElementById('regArea').classList.toggle('hidden', user.isRegistered);
-                document.getElementById('createArea').classList.toggle('hidden', !user.isRegistered);
-                document.getElementById('nav-admin').classList.toggle('hidden', userAddr.toLowerCase() !== owner.toLowerCase());
-            } catch(e) {}
-        }
-
-        function renderNetworkSwitcher() {
-            let html = '<option value="">切换网络...</option>';
-            for(let id in NETWORKS) html += `<option value="${id}">${NETWORKS[id].name}</option>`;
-            document.getElementById('netSwitcher').innerHTML = html;
-        }
-
-        async function switchNetwork(id) {
-            if (!id) return;
-            try { await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: id }] }); }
-            catch(e) { if(e.code === 4902) {
-                const net = NETWORKS[id];
-                await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: id, chainName: net.name, rpcUrls: [net.rpc] }] });
-            }}
-        }
-
-        function goBack() { if(lastView==='post') showView('gallery'); else showView(lastView); }
-        function goHome() { showView('dashboard'); }
-    </script>
+            </transition>
+        </main>
+    </div>
+    <script src="./logic.js"></script>
 </body>
 </html>
