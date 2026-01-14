@@ -28,6 +28,15 @@ const V6_ABI = [ ...COMMON_ABI,
 createApp({
     setup() {
         const networks = window.NETWORKS || {};
+
+        // --- 🆕 动态计算网络统计信息 ---
+        const networkStats = computed(() => {
+            const keys = Object.keys(networks);
+            const total = keys.length;
+            const mainnet = keys.filter(k => networks[k].type === 'mainnet').length;
+            const testnet = keys.filter(k => networks[k].type === 'testnet').length;
+            return `当前集成 ${total} 个网络，${mainnet} 个主网，${testnet} 个测试网`;
+        });
         
         // --- 响应式数据 ---
         const currentView = ref('home');
@@ -226,6 +235,7 @@ createApp({
         watch([()=>page.value.explore,()=>page.value.gallery,()=>page.value.history], (n,o)=>{if(n[0]!==o[0])fetchExp();if(n[1]!==o[1])fetchGal();if(n[2]!==o[2])fetchHis();});
 
         return {
+            networkStats, // <--- 添加这个
             currentView, activeNetworks, networks, wallet, userStatus, loading, 
             explorePosts, galleryPosts, historyPosts, adminUsers, page, currentPost, isEditMode, createForm, registerName, isV6:computed(()=>isV6Net(wallet.value.chainId)),
             // Correctly named exports matching index.html

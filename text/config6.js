@@ -72,21 +72,99 @@ const NETWORKS = {
         rpc: "https://opbnb-testnet-rpc.bnbchain.org"
     },
 
-};
+    // 新增的测试网合约信息 均是v5合约
+    "0xdede":{
+        name:"Sonic Blaze",
+        proxy:"0x177D8DCAf02504A8eFeAFcaFDC7253473ace4C34",
+        rpc:"https://sonic-blaze-rpc.publicnode.com"
+    },
 
-// 2. 合约ABI (Application Binary Interface) - 无改动
-const ABI = [
-    "function register(string _username) public",
-    "function createPost(string _title, string _content) public",
-    "function updatePost(uint256 _id, string _newTitle, string _newContent) public",
-    "function deletePost(uint256 _id) public",
-    "function getPostCount() view returns (uint256)",
-    "function getPaginatedPosts(uint256 _page, uint256 _pageSize) view returns (tuple(uint256 id, string title, string content, address author, string authorName, uint256 createdAt, uint256 updatedAt, string chainLabel, bool exists)[])",
-    "function users(address) view returns (string username, bool isBanned, bool isRegistered, address userAddress)",
-    "function posts(uint256) view returns (uint256 id, string title, string content, address author, string authorName, uint256 createdAt, uint256 updatedAt, string chainLabel, bool exists)",
-    "function getPostIdsByAddress(address _user) view returns (uint256[])",
-    "function getUserCount() view returns (uint256)",
-    "function allRegisteredUsers(uint256) view returns (address)",
-    "function setBannedStatus(address _user, bool _status) public",
-    "function owner() view returns (address)"
-];
+    "0x66eee":{
+        name:"Arbitrum Sepolia",
+        proxy:"0x7d342C7A5a7dc33Fb57eA4474D2D17eF8217cD71",
+        rpc:"https://arbitrum-sepolia-rpc.publicnode.com"
+    },
+
+    "0x350b":{
+        name:"Intuition",
+        proxy:"0x177D8DCAf02504A8eFeAFcaFDC7253473ace4C34",
+        rpc:"https://testnet.rpc.intuition.systems"
+    },
+
+    "0x515":{
+        name:"Unichain Sepolia",
+        proxy:"0x177D8DCAf02504A8eFeAFcaFDC7253473ace4C34",
+        rpc:"https://unichain-sepolia-rpc.publicnode.com"
+    },
+
+
+    "0x138b":{
+        name:"Mantle Sepolia",
+        proxy:"0x177D8DCAf02504A8eFeAFcaFDC7253473ace4C34",
+        rpc:"https://rpc.sepolia.mantle.xyz"
+    },
+
+    "0xa869":{
+        name:"Avalanche Fuji",
+        proxy:"0x177D8DCAf02504A8eFeAFcaFDC7253473ace4C34",
+        rpc:"https://avalanche-fuji-c-chain-rpc.publicnode.com"
+    },
+
+
+    "0xaa37dc":{
+        name:"OP Sepolia",
+        proxy:"0x177D8DCAf02504A8eFeAFcaFDC7253473ace4C34",
+        rpc:"https://optimism-sepolia.drpc.org"
+    },
+
+    "0x18233":{
+        name:"Plume",
+        proxy:"0x177D8DCAf02504A8eFeAFcaFDC7253473ace4C34",
+        rpc:"https://testnet-rpc.plume.org"
+    },
+
+    "0x13fb":{
+        name:"Citrea",
+        proxy:"0x177D8DCAf02504A8eFeAFcaFDC7253473ace4C34",
+        rpc:"https://rpc.testnet.citrea.xyz"
+    },
+
+    "0x940":{
+        name:"KiteAI",
+        proxy:"0x177D8DCAf02504A8eFeAFcaFDC7253473ace4C34",
+        rpc:"https://rpc-testnet.gokite.ai"
+    },
+
+
+    "0xaa39db":{
+        name:"RISE",
+        proxy:"0x177D8DCAf02504A8eFeAFcaFDC7253473ace4C34",
+        rpc:"https://testnet.riselabs.xyz"
+    },
+
+    "0x899":{
+        name:"Stable",
+        proxy:"0x177D8DCAf02504A8eFeAFcaFDC7253473ace4C34",
+        rpc:"https://rpc.testnet.stable.xyz"
+    },
+
+
+    "0x7e5":{
+        name:"Ronin stats",
+        proxy:"0x177D8DCAf02504A8eFeAFcaFDC7253473ace4C34",
+        rpc:"https://saigon-testnet.roninchain.com/rpc"
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+};
