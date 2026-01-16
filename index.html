@@ -3,200 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XS | Digital Craftsman</title>
     
-    <!-- SEO 基础 -->
-    <title>XS | Blockchain Artist & Coder - 120.show 官方作品集</title>
-    <meta name="description" content="XS | Blockchain Artist & Coder。探索区块链技术、数字艺术与开源工具。提供 链上信息存证、Z-Library 账号共享、轻小说下载及在线祈福空间。">
-    <meta name="keywords" content="XS, 区块链, 程序员, 艺术家, 链上存证, Z-Library账号共享, 轻小说下载, 在线祈福, 120.show">
-    <link rel="canonical" href="https://120.show/" />
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://120.show/">
-    <meta property="og:title" content="XS | Blockchain Artist & Coder">
-    <meta property="og:description" content="探索区块链技术与艺术的交汇点。集成链上存证、ZLib 账号共享等多个开源工具。">
-    <meta property="og:image" content="https://gnfd-testnet-sp1.nodereal.io/view/abc/tw.png">
-
-    <!-- 图标 -->
-    <link rel="icon" href="https://gnfd-testnet-sp1.nodereal.io/view/abc/tw.png">
-    <link rel="apple-touch-icon" href="https://gnfd-testnet-sp1.nodereal.io/view/abc/tw.png">
-
+    <!-- 引入设计感字体 Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
         :root {
-            --bg-color: #08080a; --text-primary: #ffffff; --text-secondary: #94a3b8;
-            --accent-pink: #FD52AA; --accent-cyan: #00f2ea; --accent-purple: #9d50bb;
-            --accent-orange: #ff9a44;
-            --card-bg: rgba(17, 18, 22, 0.4); --card-border: rgba(255, 255, 255, 0.06);
+            /* 优雅白昼主题 */
+            --bg-body: #F8F9FB;       /* 极淡的灰白背景，护眼且高级 */
+            --card-bg: #FFFFFF;       /* 纯白卡片 */
+            --text-main: #1A202C;     /* 深黑灰文字，比纯黑更柔和 */
+            --text-sub: #718096;      /* 次级文字 */
+            --border-color: #E2E8F0;  /* 极细的淡边框 */
         }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
-            font-family: 'Inter', -apple-system, system-ui, sans-serif;
-            background-color: var(--bg-color); color: var(--text-primary);
-            line-height: 1.6; overflow-x: hidden;
-            background-image: radial-gradient(circle at 50% -20%, #1e1e2d 0%, #08080a 60%);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            /* 极简的点阵背景，增加空气感 */
+            background-image: radial-gradient(#E5E7EB 1.5px, transparent 1.5px);
+            background-size: 32px 32px; 
         }
 
-        .container { width: 100%; max-width: 1000px; padding: 100px 30px; margin: 0 auto; }
+        /* 核心网格容器 */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: minmax(180px, auto);
+            gap: 24px;
+            max-width: 1100px;
+            margin: 60px auto;
+            padding: 0 24px;
+        }
+
+        /* 卡片基础物理属性 */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px; /* 更圆润的角 */
+            padding: 32px;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-decoration: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); /* 极轻的阴影 */
+            overflow: hidden;
+        }
+
+        /* 悬停时的物理反馈：上浮 + 投影加深 */
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.01);
+            border-color: #CBD5E0;
+        }
+
+        /* 布局辅助类 */
+        .col-span-2 { grid-column: span 2; }
+        .col-span-4 { grid-column: span 4; }
+        .row-span-2 { grid-row: span 2; }
+
+        /* 排版微调 */
+        h1 { letter-spacing: -0.03em; line-height: 1.1; }
+        h3 { font-size: 1.35rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px; letter-spacing: -0.02em; }
+        p { color: var(--text-sub); font-size: 0.95rem; line-height: 1.6; font-weight: 500; }
         
-        /* 头部 Hero 升级 */
-        .hero { display: flex; align-items: center; gap: 60px; margin-bottom: 100px; animation: fadeInUp 0.8s ease-out; }
-        .avatar { 
-            width: 180px; height: 180px; border-radius: 50px; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            background: #1a1a1a; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            transition: 0.5s;
+        .tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: #F1F5F9;
+            color: #64748B;
+            width: fit-content;
+            margin-bottom: 20px;
+            letter-spacing: 0.05em;
         }
-        .avatar:hover { transform: rotate(5deg) scale(1.05); }
 
-        h1 { font-size: 4.5rem; font-weight: 900; letter-spacing: -2px; margin: 10px 0; background: linear-gradient(135deg, #fff 30%, #64748b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        /* === 1. 个人简介卡片 === */
+        .profile-card {
+            display: flex; flex-direction: row; align-items: center; justify-content: space-between;
+        }
+        .avatar {
+            width: 100px; height: 100px; border-radius: 24px;
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+        }
+        .icon-btn {
+            width: 48px; height: 48px; border-radius: 12px;
+            background: #F8FAFC; color: var(--text-main); border: 1px solid #E2E8F0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem; transition: 0.2s;
+        }
+        .icon-btn:hover { background: var(--text-main); color: #fff; border-color: var(--text-main); }
         
-        .bio-text { color: var(--text-secondary); font-size: 1.25rem; font-weight: 500; letter-spacing: 0.5px; }
-
-        /* 社交栏 */
-        .social-bar { display: flex; gap: 20px; margin-top: 30px; }
-        .social-btn { font-size: 1.4rem; color: var(--text-secondary); transition: 0.3s; }
-        .social-btn:hover { color: #fff; transform: translateY(-3px); }
-
-        /* 关于区域升级 */
-        .about-section { 
-            margin-bottom: 100px; padding: 50px; 
-            background: var(--card-bg); backdrop-filter: blur(10px);
-            border-radius: 32px; border: 1px solid var(--card-border); 
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.05);
+        /* === 2. 博客卡片 (重要新增) === */
+        .card-blog {
+            background: linear-gradient(135deg, #F8FAFC 0%, #FFFFFF 100%);
         }
-        h2 { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 3px; color: var(--accent-cyan); margin-bottom: 25px; font-weight: 800; }
-        .about-section p { font-size: 1.1rem; color: #cbd5e1; max-width: 800px; }
+        .card-blog:hover { border-color: #3B82F6; }
+        .card-blog .tag { background: #DBEAFE; color: #2563EB; }
+        .card-blog h3 { color: #1E40AF; }
 
-        .internal-links { margin-top: 30px; display: flex; gap: 25px; flex-wrap: wrap; }
-        .internal-links a { 
-            color: #fff; text-decoration: none; font-size: 0.9rem; font-weight: 700;
-            padding: 8px 16px; background: rgba(255,255,255,0.05); border-radius: 12px;
-            transition: 0.3s; border: 1px solid transparent;
+        /* === 3. ETH 项目 (签名大作) === */
+        .card-eth {
+            background: linear-gradient(135deg, #FFFBEB 0%, #FFFFFF 100%);
+            border-color: #FCD34D;
         }
-        .internal-links a:hover { background: rgba(255,255,255,0.1); border-color: var(--accent-pink); color: var(--accent-pink); }
-
-        /* 项目网格升级 */
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
-        
-        .card { 
-            background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border); 
-            border-radius: 32px; padding: 45px; text-decoration: none; position: relative; 
-            transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-            display: flex; flex-direction: column; justify-content: space-between;
-        }
-        .card::before {
-            content: ""; position: absolute; inset: 0; border-radius: 32px; padding: 1px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor; mask-composite: exclude;
+        .card-eth .tag { background: #FEF3C7; color: #D97706; }
+        .card-eth:hover { border-color: #F59E0B; }
+        .btn-eth {
+            display: inline-block;
+            background: #D97706; color: white;
+            padding: 10px 20px; border-radius: 10px;
+            font-weight: 700; font-size: 0.9rem;
+            margin-top: auto;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2);
         }
 
-        .card:hover { transform: translateY(-12px); border-color: rgba(255,255,255,0.2); box-shadow: 0 30px 60px -12px rgba(0,0,0,0.5); }
-        
-        h3 { font-size: 1.6rem; font-weight: 800; margin-bottom: 15px; transition: 0.3s; }
-        .card p { color: #64748b; font-size: 0.95rem; font-weight: 500; line-height: 1.6; }
-        
-        /* 卡片主题色 */
-        .card.zlib:hover h3 { color: var(--accent-purple); }
-        .card.qifu:hover h3 { color: var(--accent-pink); }
-        .card.qing:hover h3 { color: var(--accent-cyan); }
-        .card.tempo:hover h3 { color: var(--accent-orange); }
-        /* 新增 Hoodi 卡片悬停色 */
-        .card.hoodi:hover h3 { color: #00f2ea; }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* === 4. 工具类小卡片 === */
+        .icon-header {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; margin-bottom: 16px;
         }
+        /* Hoodi */
+        .card-hoodi:hover { border-color: #10B981; }
+        .card-hoodi .icon-header { background: #D1FAE5; color: #059669; }
+        /* Tempo */
+        .card-tempo:hover { border-color: #6366F1; }
+        .card-tempo .icon-header { background: #E0E7FF; color: #4F46E5; }
 
-        @media (max-width: 850px) { 
-            .hero { flex-direction: column; text-align: center; gap: 40px; } 
-            .grid { grid-template-columns: 1fr; } 
-            h1 { font-size: 3.2rem; } 
-            .container { padding: 60px 24px; }
+        @media (max-width: 1024px) {
+            .bento-grid { grid-template-columns: 1fr; }
+            .col-span-2, .col-span-4 { grid-column: span 1; }
+            .profile-card { flex-direction: column; text-align: center; gap: 20px; }
+            .row-span-2 { grid-row: span 1; }
+            .card { min-height: auto; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- H1: 页面主标题 -->
-        <header class="hero">
-            <img src="https://gnfd-testnet-sp1.nodereal.io/view/abc/tw.png" alt="XS Avatar" class="avatar">
-            <div class="bio">
-                <!-- 更新时间为 2026 -->
-                <span style="color: var(--accent-pink); font-weight: 800; letter-spacing: 2px; font-size: 0.8rem;">EST. 2026 / PORTFOLIO</span>
-                <h1>I'm XS.</h1>
-                <p class="bio-text">区块链开发者 / 数字艺术家 / 开源爱好者</p>
-                <div class="social-bar">
-                    <a href="https://github.com/xsbtc" target="_blank" class="social-btn"><i class="fa-brands fa-github"></i></a>
-                    <a href="https://twitter.com/btc_xs" target="_blank" class="social-btn"><i class="fa-brands fa-twitter"></i></a>
-                    <a href="https://blog.120.show" target="_blank" class="social-btn"><i class="fa-solid fa-rss"></i></a>
+    <div class="bento-grid">
+        
+        <!-- 1. Profile Section (顶部通栏) -->
+        <div class="card col-span-4 profile-card">
+            <div class="flex items-center gap-6 flex-col md:flex-row">
+                <img src="https://gnfd-testnet-sp1.nodereal.io/view/abc/tw.png" alt="XS" class="avatar">
+                <div class="text-center md:text-left">
+                    <h1 class="text-4xl font-extrabold mb-2 tracking-tight">I'm XS.</h1>
+                    <p class="text-lg text-gray-500">Blockchain Artist & Full-stack Developer</p>
                 </div>
             </div>
-        </header>
-
-        <!-- H2: 关键内容区域标题 -->
-        <section class="about-section">
-            <h2>About Lab / 关于数字实验室</h2>
-            <p>
-                这里是我的数字实验空间。在算法与规则构筑的丛林里，我致力于开发<strong>轻量、纯净、去中心化</strong>的工具。
-                从链上存证到知识共享，旨在通过代码为个体赋予更多自由的可能。
-            </p>
-            <div class="internal-links">
-                <a href="./text/index.html" target="_blank">链上存证</a>
-                <a href="./zlib/index.html" target="_blank">ZLib 共享</a>
-                <a href="./qing/index.html" target="_blank">轻小说下载</a>
-                <a href="./qifu/index.html" target="_blank">在线祈福</a>
-                <a href="./airdrop/hoodi.html" target="_blank">Hoodi 检测</a> <!-- 新增链接 -->
-                <a href="https://blog.120.show" target="_blank">技术博客</a>
+            <div class="flex gap-4 mt-4 md:mt-0">
+                <a href="https://github.com/xsbtc" target="_blank" class="icon-btn"><i class="fa-brands fa-github"></i></a>
+                <a href="https://twitter.com/btc_xs" target="_blank" class="icon-btn"><i class="fa-brands fa-twitter"></i></a>
+                <a href="mailto:root@temp.now" class="icon-btn"><i class="fa-solid fa-envelope"></i></a>
             </div>
-        </section>
+        </div>
 
-        <!-- H2: 项目列表标题 -->
-        <section>
-            <h2 style="margin-bottom: 40px; text-align: center; font-size: 0.8rem; color: #475569;">Featured Toolsets / 精选项目列表</h2>
-            <div class="grid">
-                
-                <!-- 新增项目：Hoodi 检测器 -->
-                <a href="./airdrop/hoodi.html" target="_blank" class="card hoodi">
-                    <h3 style="color: #fff;">Hoodi 余额检测</h3>
-                    <p>Web3 极客工具。批量检测 Hoodi 链上钱包余额，支持 1000+ 地址并发查询与数据导出，可视化资产看板。</p>
-                </a>
-
-                <!-- 项目：Tempo 链上存证 -->
-                <a href="./text/index.html" target="_blank" class="card tempo">
-                    <h3 style="color: #fff;">链上存证</h3>
-                    <p>去中心化信息保险箱。支持 Markdown 渲染与图片存证，数据永久存储于区块链，不可篡改且全网可查。</p>
-                </a>
-
-                <!-- 项目：ZLib -->
-                <a href="./zlib/index.html" target="_blank" class="card zlib">
-                    <h3 style="color: #fff;">Z-Library 助手</h3>
-                    <p>打破知识壁垒，共享人类文明。每日更新可用高级账号，助你随时随地连接全球最大的数字图书馆。</p>
-                </a>
-
-                <!-- 项目：祈福 -->
-                <a href="./qifu/index.html" target="_blank" class="card qifu">
-                    <h3 style="color: #fff;">在线祈福空间</h3>
-                    <p>数字时代的赛博灵性空间。一个纯粹的、无干扰的祈愿平台，为你的每一份美好期待留下印记。</p>
-                </a>
-
-                <!-- 项目：轻小说 -->
-                <a href="./qing/index.html" target="_blank" class="card qing">
-                    <h3 style="color: #fff;">轻小说下载站</h3>
-                    <p>回归阅读本质。极简直连界面，提供优质 EPUB 格式资源免费下载，专为纯粹的阅读者设计。</p>
-                </a>
-
+        <!-- 2. Technical Blog (您要求加入的项目 - 设为核心卡片) -->
+        <a href="https://blog.120.show" target="_blank" class="card col-span-2 card-blog">
+            <div>
+                <div class="tag">Knowledge Base</div>
+                <h3>Technical Blog</h3>
+                <p>沉淀技术思考。分享 Web3 开发实战、算法研究与数字艺术创作随笔。思维的后花园。</p>
             </div>
-        </section>
+            <div class="mt-8 flex items-center text-blue-600 font-bold text-sm tracking-wide group">
+                READ ARTICLES <i class="fa-solid fa-arrow-right ml-2 transition-transform group-hover:translate-x-1"></i>
+            </div>
+        </a>
+
+        <!-- 3. ETH Transfer (签名代表作 - 竖向占两行) -->
+        <a href="./web3/send.html" target="_blank" class="card col-span-2 row-span-2 card-eth">
+            <div>
+                <div class="tag">Signature Work</div>
+                <h3 class="text-3xl mb-4">ETH Transfer Panorama</h3>
+                <p class="mb-8 text-gray-600">
+                    以太坊转账技术的全景式交互实验。
+                    <br><br>
+                    摒弃枯燥的代码文档，用可视化的方式深度展示 <strong>EOA 转账</strong>、<strong>智能合约中转</strong>、<strong>临时隐私代理</strong> 以及 <strong>CREATE2 靓号挖掘</strong> 的底层原理。
+                </p>
+                <span class="btn-eth">
+                    立即交互体验
+                </span>
+            </div>
+            <img src="https://img.icons8.com/fluency/240/ethereum.png" class="absolute -bottom-10 -right-10 w-48 opacity-10 mix-blend-multiply" alt="ETH">
+        </a>
+
+        <!-- 4. Hoodi Tool -->
+        <a href="./airdrop/hoodi.html" target="_blank" class="card card-hoodi">
+            <div class="icon-header">
+                <i class="fa-solid fa-magnifying-glass-chart"></i>
+            </div>
+            <h3>Hoodi Checker</h3>
+            <p>Web3 资产透视工具，支持 10000+ 地址并发检测与可视化。</p>
+        </a>
+
+        <!-- 5. Tempo Evidence -->
+        <a href="./text/index.html" target="_blank" class="card card-tempo">
+            <div class="icon-header">
+                <i class="fa-solid fa-fingerprint"></i>
+            </div>
+            <h3>Chain Evidence</h3>
+            <p>基于区块链的永恒信息存证，支持 Markdown 渲染。</p>
+        </a>
+
+        <!-- 6. ZLib -->
+        <a href="./zlib/index.html" target="_blank" class="card">
+            <div class="tag">Public Good</div>
+            <h3>Z-Library Access</h3>
+            <p>打破知识壁垒，共享人类文明的高级通道。</p>
+        </a>
+
+        <!-- 7. Qing Novel -->
+        <a href="./qing/index.html" target="_blank" class="card">
+            <div class="tag">Reading</div>
+            <h3>Light Novel</h3>
+            <p>极简 EPUB 下载站，回归纯粹阅读体验。</p>
+        </a>
+
+        <!-- 8. QiFu -->
+        <a href="./qifu/index.html" target="_blank" class="card col-span-2">
+            <div class="flex justify-between items-center h-full">
+                <div>
+                    <div class="tag">Spiritual</div>
+                    <h3>Cyber Prayer</h3>
+                    <p>赛博灵性空间，为美好期待留下纯粹的数字印记。</p>
+                </div>
+                <div class="text-5xl text-gray-200">
+                    <i class="fa-solid fa-hands-praying"></i>
+                </div>
+            </div>
+        </a>
+
     </div>
+
+    <footer class="text-center py-12 text-gray-400 text-sm font-medium">
+        &copy; 2026 XS Digital Lab. Designed with Pure Simplicity.
+    </footer>
 
 </body>
 </html>
