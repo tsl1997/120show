@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini 手势烟花交互</title>
+    <!-- 引入 MediaPipe 核心库 -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; font-family: sans-serif; }
+        
+        /* 视频流镜像隐藏 */
+        #input_video { transform: scaleX(-1); display: none; }
+        
+        /* 画布全屏 */
+        #output_canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            transform: scaleX(-1); /* 镜像画面让交互更自然 */
+        }
+
+        .loading-ui {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #8e94f2; text-align: center; z-index: 10;
+        }
+
+        .hint {
+            position: absolute; bottom: 20px; width: 100%;
+            text-align: center; color: rgba(255,255,255,0.7);
+            font-size: 14px; pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="loading-ui" id="loading">
+    <h2>正在启动 AI 视觉系统...</h2>
+    <p>请允许摄像头权限</p>
+</div>
+
+<div class="hint">把食指和大拇指捏在一起试试</div>
+
+<video id="input_video"></video>
+<canvas id="output_canvas"></canvas>
+
+<script>
+    const videoElement = document.getElementById('input_video');
+    const canvasElement = document.getElementById('output_canvas');
+    const canvasCtx = canvasElement.getContext('2d');
+    const loadingUI = document.getElementById('loading');
+
+    let particles = [];
+    let isPinched = false; // 防抖开关
+
+    // --- 粒子类 (烟花效果) ---
+    class Particle {
+        constructor(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.size = Math.random() * 4 + 2;
+            this.speedX = (Math.random() - 0.5) * 12;
+            this.speedY = (Math.random() - 0.5) * 12;
+            this.opacity = 1;
+            this.gravity = 0.15;
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.speedY += this.gravity;
+            this.opacity -= 0.015;
+        }
+        draw() {
+            canvasCtx.globalAlpha = this.opacity;
+            canvasCtx.fillStyle = this.color;
+            canvasCtx.beginPath();
+            canvasCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            canvasCtx.fill();
+        }
+    }
+
+    function createFirework(x, y) {
+        const colors = ['#4285F4', '#9B72F3', '#34A853', '#FBBC05', '#EA4335'];
+        for (let i = 0; i < 40; i++) {
+            particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.length)]));
+        }
+    }
+
+    // --- 手势识别逻辑 ---
+    function onResults(results) {
+        loadingUI.style.display = 'none';
+        
+        // 设置画布大小
+        canvasElement.width = window.innerWidth;
+        canvasElement.height = window.innerHeight;
+
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+        // 绘制摄像头背景（半透明虚化感）
+        canvasCtx.globalAlpha = 0.4;
+        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+        canvasCtx.globalAlpha = 1;
+
+        if (results.multiHandLandmarks) {
+            for (const landmarks of results.multiHandLandmarks) {
+                // 1. 绘制手部关节点 (可选)
+                drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {color: '#ffffff33', lineWidth: 2});
+                
+                // 2. 获取食指尖 (8) 和 拇指尖 (4)
+                const thumbTip = landmarks[4];
+                const indexTip = landmarks[8];
+
+                // 3. 计算屏幕坐标
+                const x1 = thumbTip.x * canvasElement.width;
+                const y1 = thumbTip.y * canvasElement.height;
+                const x2 = indexTip.x * canvasElement.width;
+                const y2 = indexTip.y * canvasElement.height;
+
+                // 4. 计算距离 (欧式距离)
+                const distance = Math.hypot(x1 - x2, y1 - y2);
+
+                // 5. 捏合检测阈值 (通常小于 40 像素认为捏合)
+                if (distance < 40) {
+                    if (!isPinched) {
+                        const midX = (x1 + x2) / 2;
+                        const midY = (y1 + y2) / 2;
+                        createFirework(midX, midY);
+                        isPinched = true; // 锁定，直到松开
+                    }
+                } else {
+                    isPinched = false; // 已松开
+                }
+            }
+        }
+
+        // 更新并绘制所有粒子
+        particles = particles.filter(p => p.opacity > 0);
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+
+        canvasCtx.restore();
+    }
+
+    // --- 初始化 MediaPipe ---
+    const hands = new Hands({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+    });
+
+    hands.setOptions({
+        maxNumHands: 2,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.7,
+        minTrackingConfidence: 0.7
+    });
+
+    hands.onResults(onResults);
+
+    const camera = new Camera(videoElement, {
+        onFrame: async () => {
+            await hands.send({image: videoElement});
+        },
+        width: 1280,
+        height: 720
+    });
+    camera.start();
+
+    // 适配窗口大小
+    window.addEventListener('resize', () => {
+        canvasElement.width = window.innerWidth;
+        canvasElement.height = window.innerHeight;
+    });
+</script>
+</body>
+</html>

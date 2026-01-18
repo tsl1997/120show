@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Gemini AR - 实时手势烟火</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; font-family: -apple-system, sans-serif; }
+        #input_video { display: none; }
+        
+        /* 画布镜像处理，让交互符合直觉 */
+        #output_canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            transform: scaleX(-1); 
+        }
+
+        .ui-label {
+            position: absolute; bottom: 30px; left: 0; width: 100%;
+            text-align: center; color: white; z-index: 10;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            font-size: 14px; letter-spacing: 1px; pointer-events: none;
+        }
+
+        #loader {
+            position: fixed; inset: 0; background: #000; z-index: 100;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div id="loader">
+    <h2>正在启动实时视觉系统</h2>
+    <p>请授权摄像头访问</p>
+</div>
+
+<div class="ui-label">双指捏合 · 在现实中绽放烟火</div>
+
+<video id="input_video"></video>
+<canvas id="output_canvas"></canvas>
+
+<script>
+    const videoElement = document.getElementById('input_video');
+    const canvasElement = document.getElementById('output_canvas');
+    const ctx = canvasElement.getContext('2d');
+    const loader = document.getElementById('loader');
+
+    let fireworks = [];
+    let isPinched = false;
+
+    // --- 大厂级烟火粒子引擎 ---
+    class Particle {
+        constructor(x, y, h) {
+            this.x = x;
+            this.y = y;
+            // 物理参数
+            const angle = Math.random() * Math.PI * 2;
+            const force = Math.random() * 15 + 3;
+            this.vx = Math.cos(angle) * force;
+            this.vy = Math.sin(angle) * force;
+            this.friction = 0.94; // 空气阻力
+            this.gravity = 0.2;  // 重力
+            
+            // 属性
+            this.h = h;
+            this.alpha = 1;
+            this.decay = Math.random() * 0.01 + 0.01;
+            this.history = []; // 曳尾轨迹
+        }
+
+        update() {
+            this.history.push({x: this.x, y: this.y});
+            if (this.history.length > 15) this.history.shift();
+
+            this.vx *= this.friction;
+            this.vy *= this.friction;
+            this.vy += this.gravity;
+            this.x += this.vx;
+            this.y += this.vy;
+            this.alpha -= this.decay;
+        }
+
+        draw() {
+            if (this.alpha <= 0 || this.history.length < 2) return;
+
+            ctx.beginPath();
+            ctx.moveTo(this.history[0].x, this.history[0].y);
+            for(let p of this.history) ctx.lineTo(p.x, p.y);
+
+            // 针对视频背景增强发光感
+            ctx.strokeStyle = `hsla(${this.h}, 100%, 65%, ${this.alpha})`;
+            ctx.lineWidth = 3 * this.alpha;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+
+            // 头部明亮核心
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, 1.5 * this.alpha, 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${this.h}, 100%, 90%, ${this.alpha})`;
+            ctx.fill();
+        }
+    }
+
+    function createExplosion(x, y) {
+        const hue = Math.random() * 360;
+        for (let i = 0; i < 100; i++) {
+            fireworks.push(new Particle(x, y, hue));
+        }
+    }
+
+    // --- MediaPipe 核心逻辑 ---
+    function onResults(results) {
+        loader.style.display = 'none';
+
+        canvasElement.width = window.innerWidth;
+        canvasElement.height = window.innerHeight;
+
+        // 1. 绘制背景：直接使用摄像头当前帧
+        ctx.save();
+        ctx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+        ctx.restore();
+
+        if (results.multiHandLandmarks) {
+            for (const landmarks of results.multiHandLandmarks) {
+                // 获取大拇指和食指坐标
+                const thumb = landmarks[4];
+                const index = landmarks[8];
+                const tx = thumb.x * canvasElement.width;
+                const ty = thumb.y * canvasElement.height;
+                const ix = index.x * canvasElement.width;
+                const iy = index.y * canvasElement.height;
+
+                const dist = Math.hypot(tx - ix, ty - iy);
+
+                // 2. 交互判定
+                if (dist < 40) { // 捏合阈值
+                    if (!isPinched) {
+                        createExplosion((tx + ix) / 2, (ty + iy) / 2);
+                        isPinched = true;
+                    }
+                } else {
+                    isPinched = false;
+                }
+
+                // 指尖微光提示
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                ctx.beginPath();
+                ctx.arc(tx, ty, 8, 0, Math.PI*2);
+                ctx.arc(ix, iy, 8, 0, Math.PI*2);
+                ctx.fill();
+            }
+        }
+
+        // 3. 渲染烟火效果
+        // 使用 lighter 模式让烟火在视频画面上产生真实的“光学叠加”
+        ctx.globalCompositeOperation = 'lighter';
+        fireworks = fireworks.filter(p => p.alpha > 0);
+        fireworks.forEach(p => {
+            p.update();
+            p.draw();
+        });
+        ctx.globalCompositeOperation = 'source-over';
+    }
+
+    const hands = new Hands({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+    });
+
+    hands.setOptions({
+        maxNumHands: 2,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.7,
+        minTrackingConfidence: 0.7
+    });
+
+    hands.onResults(onResults);
+
+    const camera = new Camera(videoElement, {
+        onFrame: async () => {
+            await hands.send({image: videoElement});
+        },
+        width: 1280,
+        height: 720
+    });
+    camera.start();
+
+    window.addEventListener('resize', () => {
+        canvasElement.width = window.innerWidth;
+        canvasElement.height = window.innerHeight;
+    });
+</script>
+</body>
+</html>

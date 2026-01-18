@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Gemini Pro - 手势光流烟花</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+        #input_video { display: none; }
+        #output_canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            transform: scaleX(-1);
+        }
+        .ui-overlay {
+            position: absolute;
+            top: 20px; left: 20px;
+            color: white;
+            z-index: 100;
+            pointer-events: none;
+        }
+        .loading-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #050505; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; color: #4285F4;
+            transition: opacity 0.5s; z-index: 200;
+        }
+    </style>
+</head>
+<body>
+
+<div class="loading-screen" id="loader">
+    <h1>正在初始化视觉引擎</h1>
+    <p>请保持光线充足并允许摄像头权限</p>
+</div>
+
+<div class="ui-overlay">
+    <h2 style="margin:0; font-weight: 300; letter-spacing: 2px;">GEMINI <span style="color:#4285F4">SPARK</span></h2>
+    <p style="opacity: 0.6; font-size: 12px;">捏合食指与大拇指释放能量</p>
+</div>
+
+<video id="input_video"></video>
+<canvas id="output_canvas"></canvas>
+
+<script>
+    const videoElement = document.getElementById('input_video');
+    const canvasElement = document.getElementById('output_canvas');
+    const ctx = canvasElement.getContext('2d');
+    const loader = document.getElementById('loader');
+
+    let fireworks = [];
+    let isPinched = false;
+
+    // --- 高阶烟花粒子类 ---
+    class Spark {
+        constructor(x, y, color, angle, speed) {
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            // 曳尾坐标追踪
+            this.history = [{x: x, y: y}];
+            this.maxHistory = 15; // 拖尾长度
+            
+            this.angle = angle;
+            this.speed = speed;
+            this.friction = 0.96; // 空气阻力
+            this.gravity = 0.12;  // 重力
+            this.opacity = 1;
+            this.decay = Math.random() * 0.015 + 0.01; // 消失速度
+            this.flicker = Math.random() > 0.5; // 是否闪烁
+        }
+
+        update() {
+            // 保存历史轨迹
+            this.history.push({x: this.x, y: this.y});
+            if (this.history.length > this.maxHistory) this.history.shift();
+
+            // 物理计算
+            this.speed *= this.friction;
+            this.x += Math.cos(this.angle) * this.speed;
+            this.y += Math.sin(this.angle) * this.speed + this.gravity;
+            this.opacity -= this.decay;
+        }
+
+        draw() {
+            if (this.opacity <= 0) return;
+
+            ctx.beginPath();
+            ctx.moveTo(this.history[0].x, this.history[0].y);
+            
+            for (let i = 1; i < this.history.length; i++) {
+                ctx.lineTo(this.history[i].x, this.history[i].y);
+            }
+
+            // 闪烁特效
+            let currentOpacity = this.opacity;
+            if (this.flicker && Math.random() > 0.8) currentOpacity = 0.2;
+
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = 2 * this.opacity;
+            ctx.lineCap = 'round';
+            ctx.globalAlpha = currentOpacity;
+            ctx.stroke();
+
+            // 头部发光点
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, 1.5 * this.opacity, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+        }
+    }
+
+    function launchFirework(x, y) {
+        const particleCount = 60;
+        const colorPalette = [
+            `hsl(${Math.random() * 360}, 100%, 70%)`, // 随机鲜艳色
+            '#4285F4', '#9B72F3', '#00F2FF' // Gemini 风格色
+        ];
+        const baseColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+
+        for (let i = 0; i < particleCount; i++) {
+            const angle = (Math.PI * 2 / particleCount) * i + (Math.random() - 0.5);
+            const speed = Math.random() * 8 + 4;
+            fireworks.push(new Spark(x, y, baseColor, angle, speed));
+        }
+    }
+
+    // --- MediaPipe 核心交互 ---
+    function onResults(results) {
+        loader.style.opacity = '0';
+        setTimeout(() => loader.style.display = 'none', 500);
+
+        canvasElement.width = window.innerWidth;
+        canvasElement.height = window.innerHeight;
+
+        ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+        // 绘制半透明背景视频
+        ctx.save();
+        ctx.globalAlpha = 0.3;
+        ctx.filter = 'brightness(0.5) contrast(1.2) blur(2px)';
+        ctx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+        ctx.restore();
+
+        if (results.multiHandLandmarks) {
+            for (const landmarks of results.multiHandLandmarks) {
+                const thumb = landmarks[4];
+                const index = landmarks[8];
+                
+                const tx = thumb.x * canvasElement.width;
+                const ty = thumb.y * canvasElement.height;
+                const ix = index.x * canvasElement.width;
+                const iy = index.y * canvasElement.height;
+
+                const dist = Math.hypot(tx - ix, ty - iy);
+
+                // 捏合判断
+                if (dist < 35) {
+                    if (!isPinched) {
+                        launchFirework((tx + ix) / 2, (ty + iy) / 2);
+                        isPinched = true;
+                    }
+                } else {
+                    isPinched = false;
+                }
+
+                // 绘制指尖光晕提示
+                ctx.beginPath();
+                ctx.arc(tx, ty, 10, 0, Math.PI * 2);
+                ctx.arc(ix, iy, 10, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.fill();
+            }
+        }
+
+        // 使用 "lighter" 混合模式增强发光感
+        ctx.globalCompositeOperation = 'lighter';
+        fireworks = fireworks.filter(s => s.opacity > 0);
+        fireworks.forEach(s => {
+            s.update();
+            s.draw();
+        });
+        ctx.globalCompositeOperation = 'source-over';
+    }
+
+    const hands = new Hands({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+    });
+
+    hands.setOptions({
+        maxNumHands: 1,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.8,
+        minTrackingConfidence: 0.8
+    });
+
+    hands.onResults(onResults);
+
+    const camera = new Camera(videoElement, {
+        onFrame: async () => {
+            await hands.send({image: videoElement});
+        },
+        width: 1280,
+        height: 720
+    });
+    camera.start();
+</script>
+</body>
+</html>

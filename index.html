@@ -106,7 +106,7 @@
         }
         .icon-btn:hover { background: var(--text-main); color: #fff; border-color: var(--text-main); }
         
-        /* === 2. 博客卡片 (重要新增) === */
+        /* === 2. 博客卡片 === */
         .card-blog {
             background: linear-gradient(135deg, #F8FAFC 0%, #FFFFFF 100%);
         }
@@ -114,7 +114,7 @@
         .card-blog .tag { background: #DBEAFE; color: #2563EB; }
         .card-blog h3 { color: #1E40AF; }
 
-        /* === 3. ETH 项目 (签名大作) === */
+        /* === 3. ETH 项目 === */
         .card-eth {
             background: linear-gradient(135deg, #FFFBEB 0%, #FFFFFF 100%);
             border-color: #FCD34D;
@@ -143,6 +143,9 @@
         .card-tempo:hover { border-color: #6366F1; }
         .card-tempo .icon-header { background: #E0E7FF; color: #4F46E5; }
 
+        /* === 5. AR 交互项目 === */
+        .card-ar:hover { border-color: #8B5CF6; }
+
         @media (max-width: 1024px) {
             .bento-grid { grid-template-columns: 1fr; }
             .col-span-2, .col-span-4 { grid-column: span 1; }
@@ -156,10 +159,10 @@
 
     <div class="bento-grid">
         
-        <!-- 1. Profile Section (顶部通栏) -->
+        <!-- 1. Profile Section -->
         <div class="card col-span-4 profile-card">
             <div class="flex items-center gap-6 flex-col md:flex-row">
-                <img src="https://gnfd-testnet-sp1.nodereal.io/view/abc/tw.png" alt="XS" class="avatar">
+                <img src="https://gnfd-testnet-sp1.nodereal.io/view/vibe/tw.png" alt="XS" class="avatar">
                 <div class="text-center md:text-left">
                     <h1 class="text-4xl font-extrabold mb-2 tracking-tight">I'm XS.</h1>
                     <p class="text-lg text-gray-500">Blockchain Artist & Full-stack Developer</p>
@@ -172,7 +175,7 @@
             </div>
         </div>
 
-        <!-- 2. Technical Blog (您要求加入的项目 - 设为核心卡片) -->
+        <!-- 2. Technical Blog -->
         <a href="https://blog.120.show" target="_blank" class="card col-span-2 card-blog">
             <div>
                 <div class="tag">Knowledge Base</div>
@@ -184,7 +187,7 @@
             </div>
         </a>
 
-        <!-- 3. ETH Transfer (签名代表作 - 竖向占两行) -->
+        <!-- 3. ETH Transfer -->
         <a href="./web3/send.html" target="_blank" class="card col-span-2 row-span-2 card-eth">
             <div>
                 <div class="tag">Signature Work</div>
@@ -233,7 +236,21 @@
             <p>极简 EPUB 下载站，回归纯粹阅读体验。</p>
         </a>
 
-        <!-- 8. QiFu -->
+        <!-- 8. Gemini AR Firework (新增加的项目) -->
+        <a href="./camera/smokeflower/index3.html" target="_blank" class="card col-span-2 card-ar">
+            <div class="flex justify-between items-center h-full">
+                <div>
+                    <div class="tag">Vision Interaction</div>
+                    <h3>Gemini AR Firework</h3>
+                    <p>基于 MediaPipe 的实时手势识别烟火系统。双指捏合，在现实世界中触发绚丽的视觉盛宴。</p>
+                </div>
+                <div class="text-5xl text-purple-600 opacity-20">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- 9. QiFu -->
         <a href="./qifu/index.html" target="_blank" class="card col-span-2">
             <div class="flex justify-between items-center h-full">
                 <div>
