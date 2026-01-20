@@ -3,9 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XS | Digital Craftsman</title>
+    <!-- SEO 基础优化 -->
+    <title>XS | Digital Craftsman - Blockchain & Vision Interaction</title>
+    <meta name="description" content="XS 的个人数字实验室。探索 Web3 智能合约、MediaPipe 视觉交互以及区块链技术应用。">
+    <meta name="keywords" content="Web3, 区块链, ETH, 智能合约, MediaPipe, AR 交互, 点头操控, 数字存证">
+    <meta name="author" content="XS">
     
-    <!-- 引入设计感字体 Plus Jakarta Sans -->
+    <!-- Open Graph (社交媒体预览) -->
+    <meta property="og:title" content="XS | Digital Craftsman Lab">
+    <meta property="og:description" content="探索 Web3 与视觉交互的前沿实验。">
+    <meta property="og:url" content="https://120.show/">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -14,12 +22,12 @@
 
     <style>
         :root {
-            /* 优雅白昼主题 */
-            --bg-body: #F8F9FB;       /* 极淡的灰白背景，护眼且高级 */
-            --card-bg: #FFFFFF;       /* 纯白卡片 */
-            --text-main: #1A202C;     /* 深黑灰文字，比纯黑更柔和 */
-            --text-sub: #718096;      /* 次级文字 */
-            --border-color: #E2E8F0;  /* 极细的淡边框 */
+            --bg-body: #F8F9FB;
+            --card-bg: #FFFFFF;
+            --text-main: #1A202C;
+            --text-sub: #718096;
+            --border-color: #E2E8F0;
+            --accent: #3B82F6;
         }
 
         body {
@@ -27,248 +35,266 @@
             color: var(--text-main);
             font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
-            /* 极简的点阵背景，增加空气感 */
             background-image: radial-gradient(#E5E7EB 1.5px, transparent 1.5px);
             background-size: 32px 32px; 
         }
 
-        /* 核心网格容器 */
+        /* 导航切换 */
+        .filter-nav {
+            max-width: 1100px;
+            margin: 0 auto 32px;
+            padding: 0 24px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .filter-btn {
+            padding: 10px 24px;
+            border-radius: 14px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-sub);
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .filter-btn.active {
+            background: var(--text-main);
+            color: white;
+            border-color: var(--text-main);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        /* 项目卡片 */
         .bento-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             grid-auto-rows: minmax(180px, auto);
             gap: 24px;
             max-width: 1100px;
-            margin: 60px auto;
+            margin: 0 auto 60px;
             padding: 0 24px;
         }
 
-        /* 卡片基础物理属性 */
+        .project-item {
+            transition: all 0.4s ease;
+            display: none; /* 默认隐藏，由 JS 控制显示 */
+        }
+
+        .project-item.show {
+            display: block;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 24px; /* 更圆润的角 */
+            border-radius: 28px;
             padding: 32px;
-            position: relative;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             text-decoration: none;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); /* 极轻的阴影 */
-            overflow: hidden;
+            transition: all 0.3s ease;
         }
 
-        /* 悬停时的物理反馈：上浮 + 投影加深 */
         .card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.01);
-            border-color: #CBD5E0;
+            border-color: var(--text-main);
+            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.05);
         }
 
-        /* 布局辅助类 */
+        .tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: #F1F5F9;
+            color: #64748B;
+            margin-bottom: 16px;
+            width: fit-content;
+        }
+
+        /* 布局辅助 */
         .col-span-2 { grid-column: span 2; }
         .col-span-4 { grid-column: span 4; }
         .row-span-2 { grid-row: span 2; }
 
-        /* 排版微调 */
-        h1 { letter-spacing: -0.03em; line-height: 1.1; }
-        h3 { font-size: 1.35rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px; letter-spacing: -0.02em; }
-        p { color: var(--text-sub); font-size: 0.95rem; line-height: 1.6; font-weight: 500; }
-        
-        .tag {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            padding: 6px 10px;
-            border-radius: 8px;
-            background: #F1F5F9;
-            color: #64748B;
-            width: fit-content;
-            margin-bottom: 20px;
-            letter-spacing: 0.05em;
-        }
-
-        /* === 1. 个人简介卡片 === */
-        .profile-card {
-            display: flex; flex-direction: row; align-items: center; justify-content: space-between;
-        }
-        .avatar {
-            width: 100px; height: 100px; border-radius: 24px;
-            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
-        }
-        .icon-btn {
-            width: 48px; height: 48px; border-radius: 12px;
-            background: #F8FAFC; color: var(--text-main); border: 1px solid #E2E8F0;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.25rem; transition: 0.2s;
-        }
-        .icon-btn:hover { background: var(--text-main); color: #fff; border-color: var(--text-main); }
-        
-        /* === 2. 博客卡片 === */
-        .card-blog {
-            background: linear-gradient(135deg, #F8FAFC 0%, #FFFFFF 100%);
-        }
-        .card-blog:hover { border-color: #3B82F6; }
-        .card-blog .tag { background: #DBEAFE; color: #2563EB; }
-        .card-blog h3 { color: #1E40AF; }
-
-        /* === 3. ETH 项目 === */
-        .card-eth {
-            background: linear-gradient(135deg, #FFFBEB 0%, #FFFFFF 100%);
-            border-color: #FCD34D;
-        }
-        .card-eth .tag { background: #FEF3C7; color: #D97706; }
-        .card-eth:hover { border-color: #F59E0B; }
-        .btn-eth {
-            display: inline-block;
-            background: #D97706; color: white;
-            padding: 10px 20px; border-radius: 10px;
-            font-weight: 700; font-size: 0.9rem;
-            margin-top: auto;
-            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2);
-        }
-
-        /* === 4. 工具类小卡片 === */
-        .icon-header {
-            width: 44px; height: 44px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; margin-bottom: 16px;
-        }
-        /* Hoodi */
-        .card-hoodi:hover { border-color: #10B981; }
-        .card-hoodi .icon-header { background: #D1FAE5; color: #059669; }
-        /* Tempo */
-        .card-tempo:hover { border-color: #6366F1; }
-        .card-tempo .icon-header { background: #E0E7FF; color: #4F46E5; }
-
-        /* === 5. AR 交互项目 === */
-        .card-ar:hover { border-color: #8B5CF6; }
-
         @media (max-width: 1024px) {
             .bento-grid { grid-template-columns: 1fr; }
             .col-span-2, .col-span-4 { grid-column: span 1; }
-            .profile-card { flex-direction: column; text-align: center; gap: 20px; }
             .row-span-2 { grid-row: span 1; }
-            .card { min-height: auto; }
+            .filter-nav { overflow-x: auto; white-space: nowrap; }
         }
     </style>
 </head>
 <body>
 
-    <div class="bento-grid">
-        
-        <!-- 1. Profile Section -->
-        <div class="card col-span-4 profile-card">
-            <div class="flex items-center gap-6 flex-col md:flex-row">
-                <img src="https://gnfd-testnet-sp1.nodereal.io/view/vibe/tw.png" alt="XS" class="avatar">
-                <div class="text-center md:text-left">
-                    <h1 class="text-4xl font-extrabold mb-2 tracking-tight">I'm XS.</h1>
-                    <p class="text-lg text-gray-500">Blockchain Artist & Full-stack Developer</p>
-                </div>
-            </div>
-            <div class="flex gap-4 mt-4 md:mt-0">
-                <a href="https://github.com/xsbtc" target="_blank" class="icon-btn"><i class="fa-brands fa-github"></i></a>
-                <a href="https://twitter.com/btc_xs" target="_blank" class="icon-btn"><i class="fa-brands fa-twitter"></i></a>
-                <a href="mailto:root@temp.now" class="icon-btn"><i class="fa-solid fa-envelope"></i></a>
-            </div>
-        </div>
-
-        <!-- 2. Technical Blog -->
-        <a href="https://blog.120.show" target="_blank" class="card col-span-2 card-blog">
-            <div>
-                <div class="tag">Knowledge Base</div>
-                <h3>Technical Blog</h3>
-                <p>沉淀技术思考。分享 Web3 开发实战、算法研究与数字艺术创作随笔。思维的后花园。</p>
-            </div>
-            <div class="mt-8 flex items-center text-blue-600 font-bold text-sm tracking-wide group">
-                READ ARTICLES <i class="fa-solid fa-arrow-right ml-2 transition-transform group-hover:translate-x-1"></i>
-            </div>
-        </a>
-
-        <!-- 3. ETH Transfer -->
-        <a href="./web3/send.html" target="_blank" class="card col-span-2 row-span-2 card-eth">
-            <div>
-                <div class="tag">Signature Work</div>
-                <h3 class="text-3xl mb-4">ETH Transfer Panorama</h3>
-                <p class="mb-8 text-gray-600">
-                    以太坊转账技术的全景式交互实验。
-                    <br><br>
-                    摒弃枯燥的代码文档，用可视化的方式深度展示 <strong>EOA 转账</strong>、<strong>智能合约中转</strong>、<strong>临时隐私代理</strong> 以及 <strong>CREATE2 靓号挖掘</strong> 的底层原理。
-                </p>
-                <span class="btn-eth">
-                    立即交互体验
-                </span>
-            </div>
-            <img src="https://img.icons8.com/fluency/240/ethereum.png" class="absolute -bottom-10 -right-10 w-48 opacity-10 mix-blend-multiply" alt="ETH">
-        </a>
-
-        <!-- 4. Hoodi Tool -->
-        <a href="./airdrop/hoodi.html" target="_blank" class="card card-hoodi">
-            <div class="icon-header">
-                <i class="fa-solid fa-magnifying-glass-chart"></i>
-            </div>
-            <h3>Hoodi Checker</h3>
-            <p>Web3 资产透视工具，支持 10000+ 地址并发检测与可视化。</p>
-        </a>
-
-        <!-- 5. Tempo Evidence -->
-        <a href="./text/index.html" target="_blank" class="card card-tempo">
-            <div class="icon-header">
-                <i class="fa-solid fa-fingerprint"></i>
-            </div>
-            <h3>Chain Evidence</h3>
-            <p>基于区块链的永恒信息存证，支持 Markdown 渲染。</p>
-        </a>
-
-        <!-- 6. ZLib -->
-        <a href="./zlib/index.html" target="_blank" class="card">
-            <div class="tag">Public Good</div>
-            <h3>Z-Library Access</h3>
-            <p>打破知识壁垒，共享人类文明的高级通道。</p>
-        </a>
-
-        <!-- 7. Qing Novel -->
-        <a href="./qing/index.html" target="_blank" class="card">
-            <div class="tag">Reading</div>
-            <h3>Light Novel</h3>
-            <p>极简 EPUB 下载站，回归纯粹阅读体验。</p>
-        </a>
-
-        <!-- 8. Gemini AR Firework (新增加的项目) -->
-        <a href="./camera/smokeflower/index3.html" target="_blank" class="card col-span-2 card-ar">
-            <div class="flex justify-between items-center h-full">
+    <!-- Header Section -->
+    <header class="max-w-[1100px] mx-auto pt-20 pb-12 px-6">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="flex items-center gap-6">
+                <img src="https://gnfd-testnet-sp1.nodereal.io/view/vibe/tw.png" alt="XS Avatar" class="w-24 h-24 rounded-[32px] shadow-xl">
                 <div>
-                    <div class="tag">Vision Interaction</div>
-                    <h3>Gemini AR Firework</h3>
-                    <p>基于 MediaPipe 的实时手势识别烟火系统。双指捏合，在现实世界中触发绚丽的视觉盛宴。</p>
-                </div>
-                <div class="text-5xl text-purple-600 opacity-20">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <h1 class="text-4xl font-extrabold tracking-tighter">I'm XS.</h1>
+                    <p class="text-gray-500 text-lg font-medium">Blockchain Artist & Full-stack Developer</p>
                 </div>
             </div>
-        </a>
+            <nav class="flex gap-4">
+                <a href="https://github.com/xsbtc" target="_blank" class="w-12 h-12 rounded-2xl border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-all" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                <a href="https://twitter.com/btc_xs" target="_blank" class="w-12 h-12 rounded-2xl border border-gray-200 flex items-center justify-center hover:bg-sky-500 hover:text-white transition-all" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                <a href="mailto:root@temp.now" class="w-12 h-12 rounded-2xl border border-gray-200 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+            </nav>
+        </div>
+    </header>
 
-        <!-- 9. QiFu -->
-        <a href="./qifu/index.html" target="_blank" class="card col-span-2">
-            <div class="flex justify-between items-center h-full">
+    <!-- 分类导航 -->
+    <nav class="filter-nav">
+        <button class="filter-btn active" onclick="showCategory('web3')">Web3 实验</button>
+        <button class="filter-btn" onclick="showCategory('vision')">视觉交互</button>
+        <button class="filter-btn" onclick="showCategory('tools')">内容与工具</button>
+    </nav>
+
+    <!-- 项目网格 -->
+    <main class="bento-grid" id="projectGrid">
+        
+        <!-- WEB3 分类 -->
+        <article class="project-item col-span-2 row-span-2 web3-cat">
+            <a href="./web3/send.html" class="card bg-orange-50/20 border-orange-100 hover:border-orange-400">
+                <div>
+                    <div class="tag bg-orange-100 text-orange-700">Signature</div>
+                    <h3 class="text-3xl font-black mb-4">ETH Transfer Panorama</h3>
+                    <p class="text-gray-600">以太坊转账全景交互实验：从 EOA 到智能合约代理，深度解构链上资产流转过程。</p>
+                </div>
+                <img src="https://img.icons8.com/fluency/240/ethereum.png" class="w-32 self-end mt-4 opacity-40" alt="Ethereum Logo">
+            </a>
+        </article>
+
+        <article class="project-item web3-cat">
+            <a href="./airdrop/hoodi.html" class="card hover:border-green-400">
+                <div>
+                    <div class="tag">Analytics</div>
+                    <h3 class="text-xl font-bold">Hoodi Checker</h3>
+                    <p class="text-sm text-gray-500 mt-2">高性能 Web3 地址并发扫描，支持 10,000+ 地址资产透视。</p>
+                </div>
+            </a>
+        </article>
+
+        <article class="project-item web3-cat">
+            <a href="./text/index.html" class="card hover:border-blue-400">
+                <div>
+                    <div class="tag">Security</div>
+                    <h3 class="text-xl font-bold">Chain Evidence</h3>
+                    <p class="text-sm text-gray-500 mt-2">基于区块链的永恒信息存证，不可篡改的数字指纹。</p>
+                </div>
+            </a>
+        </article>
+
+        <!-- VISION 分类 -->
+        <article class="project-item col-span-2 vision-cat">
+            <a href="./camera/picture/index.html" class="card hover:border-purple-400">
+                <div>
+                    <div class="tag">New Interaction</div>
+                    <h3 class="text-2xl font-bold">Head-Motion Gallery</h3>
+                    <p class="text-gray-600 mt-2">基于人脸追踪的点头/摇头操控图库。无需触碰屏幕，通过自然的肢体动作实现交互翻页。</p>
+                </div>
+                <div class="mt-4 flex items-center text-purple-600 font-bold text-xs uppercase tracking-widest">
+                    Open Camera <i class="fa-solid fa-camera ml-2"></i>
+                </div>
+            </a>
+        </article>
+
+        <article class="project-item vision-cat">
+            <a href="./camera/smokeflower/index3.html" class="card hover:border-pink-400">
+                <div>
+                    <div class="tag">AR Vision</div>
+                    <h3 class="text-xl font-bold">Gemini Firework</h3>
+                    <p class="text-sm text-gray-500 mt-2">手势识别烟火系统，在虚拟与现实的交点释放灿烂。</p>
+                </div>
+            </a>
+        </article>
+
+        <article class="project-item vision-cat">
+            <a href="./qifu/index.html" class="card hover:border-gray-400">
                 <div>
                     <div class="tag">Spiritual</div>
-                    <h3>Cyber Prayer</h3>
-                    <p>赛博灵性空间，为美好期待留下纯粹的数字印记。</p>
+                    <h3 class="text-xl font-bold">Cyber Prayer</h3>
+                    <p class="text-sm text-gray-500 mt-2">赛博祈福空间，为美好的愿望留下数字印记。</p>
                 </div>
-                <div class="text-5xl text-gray-200">
-                    <i class="fa-solid fa-hands-praying"></i>
+            </a>
+        </article>
+
+        <!-- TOOLS 分类 -->
+        <article class="project-item col-span-2 tools-cat">
+            <a href="https://blog.120.show" target="_blank" class="card bg-gray-900 text-white hover:bg-black">
+                <div>
+                    <div class="tag bg-white/10 text-gray-300">Archive</div>
+                    <h3 class="text-2xl font-bold">Technical Blog</h3>
+                    <p class="text-gray-400 mt-2">沉淀 Web3 技术思考与算法研究笔记，思维的后花园。</p>
                 </div>
-            </div>
-        </a>
+                <div class="mt-6 flex items-center text-xs font-bold tracking-widest">
+                    EXPLORE ARTICLES <i class="fa-solid fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+        </article>
 
-    </div>
+        <article class="project-item tools-cat">
+            <a href="./zlib/index.html" class="card">
+                <div>
+                    <div class="tag">Library</div>
+                    <h3 class="text-xl font-bold">Z-Lib Access</h3>
+                    <p class="text-sm text-gray-500 mt-2">打破知识壁垒的公共访问通道。</p>
+                </div>
+            </a>
+        </article>
 
-    <footer class="text-center py-12 text-gray-400 text-sm font-medium">
-        &copy; 2026 XS Digital Lab. Designed with Pure Simplicity.
+        <article class="project-item tools-cat">
+            <a href="./qing/index.html" class="card">
+                <div>
+                    <div class="tag">Reading</div>
+                    <h3 class="text-xl font-bold">Qing Novel</h3>
+                    <p class="text-sm text-gray-500 mt-2">极致纯净的 EPUB 阅读与下载体验。</p>
+                </div>
+            </a>
+        </article>
+
+    </main>
+
+    <footer class="text-center py-20 text-gray-400 text-sm font-medium">
+        &copy; 2026 XS Digital Lab. Built for the Decentralized Future.
     </footer>
 
+    <script>
+        function showCategory(category) {
+            // 更新按钮样式
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // 过滤项目
+            const items = document.querySelectorAll('.project-item');
+            items.forEach(item => {
+                if (item.classList.contains(category + '-cat')) {
+                    item.classList.add('show');
+                } else {
+                    item.classList.remove('show');
+                }
+            });
+        }
+
+        // 页面加载默认显示 Web3
+        window.onload = () => {
+            const defaultBtn = document.querySelector('.filter-btn');
+            if (defaultBtn) defaultBtn.click();
+        };
+    </script>
 </body>
 </html>

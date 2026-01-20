@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Gemini AR - 头部交互图库</title>
+    <!-- 引入 MediaPipe Face Mesh -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; font-family: -apple-system, sans-serif; }
+        #input_video { display: none; }
+        
+        /* 摄像头背景镜像 */
+        #output_canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            transform: scaleX(-1); 
+            object-fit: cover;
+        }
+
+        /* 图片显示容器 */
+        #image-container {
+            position: absolute;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid rgba(255,255,255,0.8);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #222;
+        }
+
+        /* 预览模式样式 */
+        .mode-preview {
+            top: 50px;
+            left: 50px;
+            width: 200px;
+            height: 300px;
+        }
+
+        /* 全屏模式样式 */
+        .mode-fullscreen {
+            top: 10vh;
+            left: 10vw;
+            width: 80vw;
+            height: 80vh;
+            border-width: 8px;
+        }
+
+        #display-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 30px;
+            left: 0; width: 100%;
+            text-align: center;
+            color: white;
+            z-index: 20;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        #loader {
+            position: fixed; inset: 0; background: #000; z-index: 100;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div id="loader">
+    <h2>正在初始化头部识别系统...</h2>
+    <p>请保持面部在画面中央</p>
+</div>
+
+<div class="hint">摇头：切换/退出 · 点头：放大查看</div>
+
+<video id="input_video"></video>
+<canvas id="output_canvas"></canvas>
+
+<div id="image-container" class="mode-preview">
+    <img id="display-img" src="./img/1.png" alt="Gallery">
+</div>
+
+<script>
+    const videoElement = document.getElementById('input_video');
+    const canvasElement = document.getElementById('output_canvas');
+    const ctx = canvasElement.getContext('2d');
+    const imgContainer = document.getElementById('image-container');
+    const displayImg = document.getElementById('display-img');
+    const loader = document.getElementById('loader');
+
+    // 图片配置
+    const images = ["1.png", "2.png", "3.png"]; // 确保 img 文件夹下有这些文件
+    let currentIndex = 0;
+    let isFullScreen = false;
+
+    // 动作判定参数
+    let lastX = 0;
+    let lastY = 0;
+    let lastUpdate = Date.now();
+    let cooldown = false; // 防止一次动作触发多次切换
+
+    function onResults(results) {
+        loader.style.display = 'none';
+        
+        canvasElement.width = window.innerWidth;
+        canvasElement.height = window.innerHeight;
+
+        // 绘制摄像头背景
+        ctx.save();
+        ctx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+        ctx.restore();
+
+        if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+            const landmarks = results.multiFaceLandmarks[0];
+            // 使用鼻尖点 (Landmark 1)
+            const nose = landmarks[1];
+            const currX = nose.x * 100;
+            const currY = nose.y * 100;
+            
+            const now = Date.now();
+            const dt = now - lastUpdate;
+
+            if (dt > 50 && !cooldown) {
+                const dx = currX - lastX;
+                const dy = currY - lastY;
+
+                // 摇头检测 (左右移动量超过阈值)
+                if (Math.abs(dx) > 3.5) {
+                    triggerAction('shake');
+                } 
+                // 点头检测 (上下移动量超过阈值)
+                else if (Math.abs(dy) > 2.5) {
+                    triggerAction('nod');
+                }
+
+                lastX = currX;
+                lastY = currY;
+                lastUpdate = now;
+            }
+        }
+    }
+
+    function triggerAction(type) {
+        cooldown = true;
+        
+        if (type === 'shake') {
+            if (isFullScreen) {
+                // 如果是全屏则退出
+                isFullScreen = false;
+                imgContainer.className = 'mode-preview';
+            } else {
+                // 如果是预览则切图
+                currentIndex = (currentIndex + 1) % images.length;
+                displayImg.src = `./img/${images[currentIndex]}`;
+            }
+        } 
+        else if (type === 'nod') {
+            if (!isFullScreen) {
+                isFullScreen = true;
+                imgContainer.className = 'mode-fullscreen';
+            }
+        }
+
+        // 1秒冷却时间，防止误触发
+        setTimeout(() => { cooldown = false; }, 1000);
+    }
+
+    const faceMesh = new FaceMesh({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+    });
+
+    faceMesh.setOptions({
+        maxNumFaces: 1,
+        refineLandmarks: true,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5
+    });
+
+    faceMesh.onResults(onResults);
+
+    const camera = new Camera(videoElement, {
+        onFrame: async () => {
+            await faceMesh.send({image: videoElement});
+        },
+        width: 1280,
+        height: 720
+    });
+    camera.start();
+
+    // 处理窗口缩放
+    window.addEventListener('resize', () => {
+        canvasElement.width = window.innerWidth;
+        canvasElement.height = window.innerHeight;
+    });
+</script>
+</body>
+</html>
