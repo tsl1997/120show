@@ -239,7 +239,7 @@ createApp({
             currentView, activeNetworks, networks, wallet, userStatus, loading, 
             explorePosts, galleryPosts, historyPosts, adminUsers, page, currentPost, isEditMode, createForm, registerName, isV6:computed(()=>isV6Net(wallet.value.chainId)),
             // Correctly named exports matching index.html
-            connectWallet, switchNet, register, createPost:sendPost, updatePost:editPostAction, deletePost:delPostAction, toggleBan, 
+            connectWallet, switchNet, register, create:sendPost, updatePost:editPostAction, deletePost:delPostAction, toggleBan, 
             getCardStyle, getTagColor, safeNetName, parseMd, goPost, goBack, copyLink, 
             fetchExp, fetchGal, fetchHis, fetchAdmin, 
             canEdit: (auth) => wallet.value.address && auth.toLowerCase() === wallet.value.address.toLowerCase()
