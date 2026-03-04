@@ -3,135 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Z-Library 账号共享</title>
+    <title>Z-Lib 共享入口 | XS 魔法实验室</title>
     <style>
-        /* 基础重置 */
+        :root {
+            --bg1: #fff8ff;
+            --bg2: #eef8ff;
+            --bg3: #fffef3;
+            --text-main: #33456f;
+            --text-muted: #6f7ea8;
+            --line: #dce7ff;
+            --pink: #ff7cb4;
+            --peach: #ffb37c;
+            --blue: #79b5ff;
+            --mint: #71d9c4;
+            --card-shadow: 0 12px 30px rgba(124, 154, 219, 0.16);
+            --card-shadow-hover: 0 18px 36px rgba(124, 154, 219, 0.24);
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: #f0f2f5;
+            font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(255, 179, 124, 0.28) 0, transparent 28%),
+                radial-gradient(circle at 86% 9%, rgba(181, 156, 255, 0.26) 0, transparent 30%),
+                radial-gradient(circle at 76% 82%, rgba(121, 181, 255, 0.22) 0, transparent 33%),
+                linear-gradient(160deg, var(--bg1), var(--bg2) 52%, var(--bg3));
             min-height: 100vh;
+            color: var(--text-main);
+            padding: 28px 16px 56px;
+        }
+
+        .sparkles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.45;
+            background-image:
+                radial-gradient(circle, rgba(255, 124, 180, 0.58) 1px, transparent 1px),
+                radial-gradient(circle, rgba(121, 181, 255, 0.58) 1px, transparent 1px);
+            background-size: 44px 44px, 60px 60px;
+            background-position: 0 0, 18px 22px;
+        }
+
+        .wrap { max-width: 900px; margin: 0 auto; position: relative; z-index: 2; }
+
+        .hero {
+            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(248,252,255,0.88));
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            box-shadow: var(--card-shadow);
+            padding: 16px;
+            margin-bottom: 14px;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            gap: 10px;
             align-items: center;
-            justify-content: center;
-            color: #1d1d1f;
-            padding: 20px;
+            flex-wrap: wrap;
         }
 
-        /* 核心大卡片 - 增加宽度 */
+        .pill {
+            font-size: 12px;
+            font-weight: 700;
+            color: #8d5d9d;
+            background: linear-gradient(90deg, #ffe3f2, #eaf3ff);
+            border: 1px solid #efdbff;
+            border-radius: 999px;
+            padding: 6px 12px;
+        }
+
+        .home-link {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 700;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 8px 12px;
+            transition: 0.2s ease;
+        }
+
+        .home-link:hover {
+            transform: translateY(-2px);
+            border-color: #cddcff;
+            box-shadow: 0 6px 14px rgba(131, 152, 206, 0.2);
+        }
+
         .card {
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.9);
             width: 100%;
-            max-width: 600px;
-            padding: 50px 40px;
-            border-radius: 32px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.08);
+            padding: 28px 20px;
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
             text-align: center;
-            transition: transform 0.3s ease;
         }
 
-        h1 { font-size: 28px; font-weight: 700; margin-bottom: 40px; letter-spacing: -0.5px; }
-
-        /* 内容区域 - 字体加大 */
-        .field-group { text-align: left; margin-bottom: 25px; }
-        .label { 
-            font-size: 13px; font-weight: 600; color: #86868b; 
-            margin-bottom: 10px; margin-left: 5px; display: block;
+        h1 {
+            font-size: clamp(28px, 5vw, 44px);
+            font-weight: 900;
+            margin-bottom: 22px;
+            background: linear-gradient(90deg, var(--pink), var(--peach) 34%, var(--blue) 70%, var(--mint));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
+
+        .field-group { text-align: left; margin-bottom: 16px; }
+        .label { font-size: 12px; font-weight: 800; color: #7587b5; margin-bottom: 8px; display: block; }
 
         .display-box {
-            background: #f5f5f7;
-            border-radius: 20px;
-            padding: 20px 25px;
+            background: #fff;
+            border-radius: 16px;
+            padding: 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border: 2px solid transparent;
-            transition: all 0.2s;
-        }
-        .display-box:hover { background: #fff; border-color: #0071e3; }
-
-        .value-text { 
-            font-size: 24px; /* 字体加大 */
-            font-weight: 700; 
-            word-break: break-all; 
-            color: #000;
-            font-family: 'SF Mono', SFMono-Regular, ui-monospace, monospace;
+            gap: 10px;
+            border: 1px solid #dbe8ff;
+            transition: 0.2s;
         }
 
-        /* 按钮设计 */
+        .display-box:hover { border-color: #b9ceff; box-shadow: 0 8px 16px rgba(131, 152, 206, 0.16); }
+
+        .value-text {
+            font-size: 18px;
+            font-weight: 800;
+            word-break: break-all;
+            color: #3d5080;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        }
+
         .btn { border: none; cursor: pointer; transition: all 0.2s; font-family: inherit; }
-        
-        .copy-btn { 
-            background: #0071e3; color: white; padding: 10px 18px; 
-            border-radius: 12px; font-size: 14px; font-weight: 600;
-            margin-left: 15px; flex-shrink: 0;
+
+        .copy-btn {
+            color: #fff;
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            flex-shrink: 0;
         }
-        .copy-btn:hover { background: #0077ed; transform: scale(1.05); }
 
-        .main-btns { display: flex; gap: 15px; margin-top: 35px; }
-        
-        .next-btn { 
-            flex: 2; background: #1d1d1f; color: white; padding: 20px; 
-            border-radius: 18px; font-size: 18px; font-weight: 600; 
+        .copy-btn:hover { transform: translateY(-1px); }
+
+        .main-btns { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+
+        .next-btn,
+        .history-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 13px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 800;
         }
-        .next-btn:hover { background: #000; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        
-        .history-btn { 
-            flex: 1; background: #e8e8ed; color: #1d1d1f; padding: 20px; 
-            border-radius: 18px; font-size: 18px; font-weight: 600;
+
+        .next-btn {
+            color: #fff;
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            box-shadow: 0 10px 18px rgba(134, 164, 227, 0.35);
         }
-        .history-btn:hover { background: #d2d2d7; }
 
-        /* 提示语 - 变小变淡 */
-        .usage-tip { font-size: 12px; color: #86868b; margin-top: 25px; line-height: 1.5; }
-        .visit-link { display: inline-block; margin-top: 15px; color: #0071e3; text-decoration: none; font-size: 14px; font-weight: 500; }
+        .next-btn:hover { transform: translateY(-2px); }
 
-        /* 页脚 */
-        .footer { margin-top: 40px; font-size: 13px; color: #86868b; }
-        .footer a { color: #515154; text-decoration: none; font-weight: 600; border-bottom: 1px solid #d2d2d7; padding-bottom: 2px; }
+        .history-btn {
+            background: #fff;
+            color: #5d6f9f;
+            border: 1px solid #dbe8ff;
+        }
 
-        /* 弹窗设计 */
+        .history-btn:hover { background: #f7faff; border-color: #c4d8ff; }
+
+        .usage-tip { font-size: 12px; color: var(--text-muted); margin-top: 16px; line-height: 1.6; }
+        .visit-link { display: inline-block; margin-top: 12px; color: #5d6f9f; text-decoration: none; font-size: 13px; font-weight: 700; }
+
+        .footer { margin-top: 18px; font-size: 12px; color: #7b8ab4; text-align: center; }
+        .footer a { color: #5d6f9f; text-decoration: none; font-weight: 700; }
+
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-            display: none; align-items: center; justify-content: center; z-index: 100;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(102, 124, 182, 0.22);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
         }
-        .modal {
-            background: white; width: 95%; max-width: 550px; border-radius: 28px;
-            padding: 30px; max-height: 80vh; display: flex; flex-direction: column;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
-        }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #f5f5f7; padding-bottom: 15px; }
-        .close-modal { font-size: 28px; cursor: pointer; color: #86868b; padding: 0 10px; }
-        
-        /* 历史列表项优化 */
-        .history-list { overflow-y: auto; flex: 1; border-radius: 12px; }
-        .history-item { 
-            padding: 18px; border-bottom: 1px solid #f0f0f2; font-size: 14px;
-            display: grid; grid-template-columns: 1fr 1fr auto; align-items: center; gap: 15px;
-            transition: background 0.2s;
-        }
-        .history-item:nth-child(even) { background-color: #fcfcfd; }
-        .history-item:hover { background-color: #f5f5f7; }
-        .history-item:last-child { border-bottom: none; }
-        .time-tag { color: #aeaeb2; font-size: 11px; font-family: monospace; }
 
-        /* 分页 */
-        .pagination { display: flex; justify-content: center; gap: 20px; margin-top: 25px; align-items: center; padding-top: 15px; border-top: 1px solid #f5f5f7; }
-        .page-btn { padding: 8px 16px; background: #f5f5f7; border-radius: 10px; font-size: 13px; font-weight: 600; color: #0071e3; }
-        .page-btn:disabled { color: #d2d2d7; cursor: not-allowed; }
+        .modal {
+            background: rgba(255,255,255,0.96);
+            border: 1px solid #dbe8ff;
+            width: 95%;
+            max-width: 620px;
+            border-radius: 22px;
+            padding: 18px;
+            max-height: 82vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #edf3ff; padding-bottom: 10px; }
+        .close-modal { font-size: 24px; cursor: pointer; color: #8ea0cb; padding: 0 8px; }
+
+        .history-list { overflow-y: auto; flex: 1; border-radius: 10px; }
+        .history-item {
+            padding: 12px;
+            border-bottom: 1px solid #edf3ff;
+            font-size: 13px;
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .history-item:nth-child(even) { background-color: #fbfdff; }
+        .history-item:last-child { border-bottom: none; }
+        .time-tag { color: #9badd5; font-size: 11px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+
+        .pagination { display: flex; justify-content: center; gap: 14px; margin-top: 12px; align-items: center; padding-top: 10px; border-top: 1px solid #edf3ff; }
+        .page-btn { padding: 8px 12px; background: #f8fbff; border: 1px solid #dbe8ff; border-radius: 10px; font-size: 12px; font-weight: 700; color: #5d6f9f; }
+        .page-btn:disabled { color: #bac9ea; cursor: not-allowed; }
 
         .toast {
-            position: fixed; bottom: 40px; background: #1d1d1f; color: white;
-            padding: 12px 24px; border-radius: 15px; font-size: 14px; font-weight: 500;
-            opacity: 0; transition: opacity 0.3s; z-index: 200; pointer-events: none;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            color: white;
+            padding: 10px 18px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 200;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
+    <div class="sparkles" aria-hidden="true"></div>
+
+    <div class="wrap">
+    <header class="hero">
+        <span class="pill">内容工具 / Z-Lib 共享入口</span>
+        <a class="home-link" href="../index.html" target="_blank" rel="noopener noreferrer">返回主页</a>
+    </header>
 
     <div class="card">
         <h1>Z-Library 共享中心</h1>
@@ -162,12 +288,13 @@
             如果额度用完，请点击上方“换一个”按钮尝试其他账号。
         </div>
 
-        <a href="https://zh.z-library.sk/" target="_blank" class="visit-link">前往 Z-Library 官方网站 →</a>
+        <a href="https://zh.z-library.sk/" target="_blank" rel="noopener noreferrer" class="visit-link">前往 Z-Library 官方网站 →</a>
     </div>
 
     <!-- 页脚署名 -->
     <div class="footer">
-        本作品由 <a href="https://x.com/btc_xs" target="_blank">XS</a> 制作
+        本作品由 <a href="https://x.com/btc_xs" target="_blank" rel="noopener noreferrer">XS</a> 制作
+    </div>
     </div>
 
     <!-- 历史记录弹窗 -->

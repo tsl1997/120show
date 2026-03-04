@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高级点名抽奖系统</title>
+    <!-- 引入外部库：Animate.css 和 Confetti -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #ec4899;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #818cf8, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5rem;
+        }
+
+        /* 导入区样式 */
+        .input-section {
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            background: #334155;
+            border: 2px solid #475569;
+            border-radius: 10px;
+            color: white;
+            padding: 10px;
+            font-size: 1rem;
+            resize: vertical;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            border-color: var(--primary-color);
+        }
+
+        .stats {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .import-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: opacity 0.3s;
+        }
+
+        /* 展示区样式 */
+        .display-area {
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 2rem 0;
+            background: #020617;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid #334155;
+        }
+
+        #roll-name {
+            font-size: 4rem;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+            transition: all 0.1s;
+        }
+
+        /* 按钮样式 */
+        .action-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(236, 72, 153, 0.6);
+        }
+
+        .action-btn:disabled {
+            background: #475569;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 获奖者特殊效果 */
+        .winner-effect {
+            color: #fbbf24 !important;
+            text-shadow: 0 0 30px #f59e0b, 0 0 50px #fbbf24 !important;
+            transform: scale(1.3);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1.3); }
+            50% { transform: scale(1.4); }
+            100% { transform: scale(1.3); }
+        }
+
+        /* 底部装饰 */
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: #475569;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container animate__animated animate__fadeIn">
+        <h1>🎉 幸运抽奖点名系统</h1>
+
+        <!-- 1. 导入区 -->
+        <div class="input-section">
+            <textarea id="nameInput" placeholder="请输入姓名或ID，每行一个姓名..."></textarea>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <button class="import-btn" onclick="importNames()">确认导入名单</button>
+                <div class="stats" id="statsCount">已导入人数：0</div>
+            </div>
+        </div>
+
+        <!-- 2. 跑马灯展示区 -->
+        <div class="display-area">
+            <div id="roll-name">等待开始</div>
+        </div>
+
+        <!-- 3. 控制区 -->
+        <button id="startBtn" class="action-btn" onclick="startLottery()">开始抽奖 (10s)</button>
+
+        <div class="footer">输入名单 -> 点击导入 -> 开启幸运时刻</div>
+    </div>
+
+    <script>
+        let names = [];
+        let rollingInterval = null;
+        const nameDisplay = document.getElementById('roll-name');
+        const startBtn = document.getElementById('startBtn');
+        const statsCount = document.getElementById('statsCount');
+        const nameInput = document.getElementById('nameInput');
+
+        // 导入名单功能
+        function importNames() {
+            const text = nameInput.value.trim();
+            if (!text) {
+                alert("请输入名单！");
+                return;
+            }
+            
+            // 将输入按行分割，并过滤掉空行
+            names = text.split('\n')
+                        .map(name => name.trim())
+                        .filter(name => name !== "");
+
+            statsCount.innerText = `已导入人数：${names.length}`;
+            
+            if (names.length > 0) {
+                nameDisplay.innerText = "准备就绪";
+                nameDisplay.classList.remove('winner-effect');
+            }
+        }
+
+        // 抽奖主函数
+        function startLottery() {
+            if (names.length < 2) {
+                alert("名单人数太少，请至少输入两个名字！");
+                return;
+            }
+
+            // 1. 初始化状态
+            startBtn.disabled = true;
+            nameDisplay.classList.remove('winner-effect', 'animate__animated', 'animate__bounceIn');
+            
+            let startTime = Date.now();
+            const duration = 10000; // 持续10秒
+            let speed = 50; // 初始滚动速度 (ms)
+
+            // 2. 跑马灯逻辑
+            rollingInterval = setInterval(() => {
+                const randomIndex = Math.floor(Math.random() * names.length);
+                nameDisplay.innerText = names[randomIndex];
+
+                // 动态调整速度（最后两秒变慢，增加紧张感）
+                let elapsed = Date.now() - startTime;
+                if (elapsed > 8000) {
+                    clearInterval(rollingInterval);
+                    // 重新开启一个更慢的定时器
+                    slowRoll(duration - elapsed);
+                }
+            }, speed);
+
+            // 3. 10秒后停止
+            setTimeout(() => {
+                stopLottery();
+            }, duration);
+        }
+
+        // 慢速滚动（增加仪式感）
+        function slowRoll(remainingTime) {
+            let slowInterval = setInterval(() => {
+                const randomIndex = Math.floor(Math.random() * names.length);
+                nameDisplay.innerText = names[randomIndex];
+            }, 150);
+
+            setTimeout(() => {
+                clearInterval(slowInterval);
+            }, remainingTime);
+        }
+
+        // 停止并展示中奖者
+        function stopLottery() {
+            clearInterval(rollingInterval);
+            
+            // 最终确定一个中奖者
+            const winnerIndex = Math.floor(Math.random() * names.length);
+            const winner = names[winnerIndex];
+            
+            nameDisplay.innerText = winner;
+            
+            // 4. 特殊效果
+            nameDisplay.classList.add('winner-effect', 'animate__animated', 'animate__bounceIn');
+            
+            // 触发五彩纸屑
+            triggerConfetti();
+
+            startBtn.disabled = false;
+            startBtn.innerText = "再次抽取";
+        }
+
+        // 五彩纸屑特效
+        function triggerConfetti() {
+            const duration = 3 * 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#6366f1', '#ec4899']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#6366f1', '#ec4899']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+    </script>
+</body>
+</html>

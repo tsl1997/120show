@@ -3,167 +3,373 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>轻小说资源库 - 现代大气版</title>
+    <title>轻小说下载中心 | XS 魔法实验室</title>
     <style>
         :root {
-            --primary-color: #3b82f6; /* 现代科技蓝 */
-            --accent-color: #6366f1;
-            --bg-color: #fcfdfe;
-            --text-main: #1e293b;
-            --text-muted: #94a3b8;
-            --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 4px 10px -5px rgba(0, 0, 0, 0.02);
-            --hover-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.15);
+            --bg1: #fff8ff;
+            --bg2: #eef8ff;
+            --bg3: #fffef3;
+            --text-main: #33456f;
+            --text-muted: #6f7ea8;
+            --line: #dce7ff;
+            --pink: #ff7cb4;
+            --peach: #ffb37c;
+            --blue: #79b5ff;
+            --mint: #71d9c4;
+            --card-shadow: 0 12px 30px rgba(124, 154, 219, 0.16);
+            --card-shadow-hover: 0 18px 36px rgba(124, 154, 219, 0.24);
         }
 
+        * { box-sizing: border-box; }
+
         body {
-            font-family: 'Inter', 'PingFang SC', 'Segoe UI', sans-serif;
-            background-color: var(--bg-color);
-            margin: 0; padding: 60px 20px;
+            font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(255, 179, 124, 0.28) 0, transparent 28%),
+                radial-gradient(circle at 86% 9%, rgba(181, 156, 255, 0.26) 0, transparent 30%),
+                radial-gradient(circle at 76% 82%, rgba(121, 181, 255, 0.22) 0, transparent 33%),
+                linear-gradient(160deg, var(--bg1), var(--bg2) 52%, var(--bg3));
+            margin: 0;
+            padding: 40px 20px 64px;
             color: var(--text-main);
             -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        .sparkles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.45;
+            background-image:
+                radial-gradient(circle, rgba(255, 124, 180, 0.58) 1px, transparent 1px),
+                radial-gradient(circle, rgba(121, 181, 255, 0.58) 1px, transparent 1px);
+            background-size: 44px 44px, 60px 60px;
+            background-position: 0 0, 18px 22px;
         }
 
         .container {
-            max-width: 1000px; /* 黄金视觉宽度 */
+            position: relative;
+            z-index: 2;
+            max-width: 1080px;
             margin: 0 auto;
         }
 
-        header {
-            text-align: left; /* 改为左对齐，更有设计感 */
-            margin-bottom: 50px;
-            padding-left: 20px;
-            border-left: 5px solid var(--primary-color);
-        }
-
-        header h1 {
-            font-size: 2.8rem; /* 超大标题 */
-            font-weight: 800;
-            margin: 0;
-            background: linear-gradient(to right, #1e293b, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        header p { color: var(--text-muted); font-size: 1.1rem; margin-top: 10px; }
-
-        /* 搜索框：现代浮动感 */
-        .search-box { margin-bottom: 40px; }
-        #searchInput {
-            width: 100%; box-sizing: border-box;
-            padding: 20px 30px; font-size: 1.2rem;
-            border: 1px solid #eef2f6; border-radius: 20px;
-            background: white; outline: none;
+        .hero {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(248, 252, 255, 0.88));
+            border: 1px solid var(--line);
+            border-radius: 26px;
             box-shadow: var(--card-shadow);
-            transition: all 0.3s ease;
-        }
-        #searchInput:focus {
-            box-shadow: var(--hover-shadow);
-            border-color: var(--primary-color);
-            transform: translateY(-2px);
+            padding: 24px;
+            margin-bottom: 22px;
         }
 
-        /* 列表项设计：取消表格，改用大气卡片 */
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            font-size: 12px;
+            font-weight: 700;
+            color: #8d5d9d;
+            background: linear-gradient(90deg, #ffe3f2, #eaf3ff);
+            border: 1px solid #efdbff;
+            border-radius: 999px;
+            padding: 6px 12px;
+        }
+
+        .home-link {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 700;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 8px 12px;
+            transition: 0.2s ease;
+        }
+
+        .home-link:hover {
+            transform: translateY(-2px);
+            border-color: #cddcff;
+            box-shadow: 0 6px 14px rgba(131, 152, 206, 0.2);
+        }
+
+        .hero h1 {
+            margin: 12px 0 0;
+            font-size: clamp(34px, 6vw, 52px);
+            font-weight: 800;
+            line-height: 1.08;
+            background: linear-gradient(90deg, var(--pink), var(--peach) 34%, var(--blue) 70%, var(--mint));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            margin: 10px 0 0;
+            color: var(--text-muted);
+            font-size: clamp(14px, 2vw, 17px);
+        }
+
+        .search-box {
+            margin-bottom: 26px;
+            padding: 12px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.75);
+            border: 1px solid var(--line);
+            box-shadow: var(--card-shadow);
+        }
+
+        #searchInput {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 16px 18px;
+            font-size: 1.05rem;
+            border: 1px solid #e6eeff;
+            border-radius: 14px;
+            background: #fff;
+            outline: none;
+            transition: all 0.3s ease;
+            color: var(--text-main);
+        }
+
+        #searchInput:focus {
+            border-color: #b8ceff;
+            box-shadow: 0 0 0 4px rgba(121, 181, 255, 0.16);
+        }
+
         .item-list { display: flex; flex-direction: column; gap: 20px; }
 
         .book-card {
-            background: white; border-radius: 24px;
-            padding: 25px 40px;
-            display: flex; align-items: center;
+            background: rgba(255, 255, 255, 0.88);
+            border-radius: 24px;
+            padding: 22px 24px;
+            display: flex;
+            align-items: center;
             justify-content: space-between;
             box-shadow: var(--card-shadow);
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            border: 1px solid rgba(255,255,255,0);
+            transition: all 0.28s ease;
+            border: 1px solid #dfebff;
+            gap: 16px;
         }
 
         .book-card:hover {
-            transform: translateY(-5px) scale(1.01);
-            box-shadow: var(--hover-shadow);
-            border-color: #dbeafe;
+            transform: translateY(-4px);
+            box-shadow: var(--card-shadow-hover);
+            border-color: #bed2ff;
         }
 
         .book-info { flex: 1; }
-        .book-id { 
-            font-size: 0.9rem; font-weight: 700; color: var(--primary-color); 
-            background: #eff6ff; padding: 4px 12px; border-radius: 8px;
-            display: inline-block; margin-bottom: 12px;
+
+        .book-id {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #5f6f9f;
+            background: #f3f7ff;
+            border: 1px solid #e4edff;
+            padding: 4px 10px;
+            border-radius: 999px;
+            display: inline-block;
+            margin-bottom: 12px;
         }
-        .book-name { font-size: 1.6rem; font-weight: 800; margin: 0; color: #0f172a; }
-        .book-meta { margin-top: 10px; font-size: 1rem; color: var(--text-muted); display: flex; gap: 20px; }
+
+        .book-name { font-size: 1.5rem; font-weight: 800; margin: 0; color: #354977; }
+
+        .book-meta {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
         .meta-item b { color: var(--text-main); }
 
         .book-actions { display: flex; gap: 15px; align-items: center; }
 
-        /* 按钮：现代圆润感 */
         .btn {
-            padding: 14px 28px; border-radius: 16px; font-weight: 700;
-            font-size: 1rem; cursor: pointer; border: none; transition: 0.3s;
-            text-decoration: none; display: inline-flex; align-items: center;
+            padding: 12px 18px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
         }
-        .btn-full { background: var(--primary-color); color: white; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3); }
-        .btn-full:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
-        
-        .btn-sub { background: #f8fafc; color: var(--text-main); border: 1px solid #e2e8f0; }
-        .btn-sub:hover { background: #f1f5f9; border-color: #cbd5e1; }
 
-        /* 分页器 */
-        .pagination { display: flex; justify-content: center; margin-top: 50px; gap: 10px; }
+        .btn-full {
+            color: #fff;
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            box-shadow: 0 8px 16px rgba(134, 164, 227, 0.35);
+        }
+
+        .btn-full:hover { transform: translateY(-2px); }
+
+        .btn-sub {
+            background: #fff;
+            color: #5a6a99;
+            border: 1px solid #d8e5ff;
+        }
+
+        .btn-sub:hover {
+            background: #f6f9ff;
+            border-color: #bfd4ff;
+        }
+
+        .pagination { display: flex; justify-content: center; margin-top: 40px; gap: 10px; flex-wrap: wrap; }
+
         .page-btn {
-            padding: 12px 20px; border-radius: 12px; border: none;
-            background: white; color: var(--text-muted); font-weight: 700;
-            cursor: pointer; box-shadow: var(--card-shadow); transition: 0.3s;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid #dce8ff;
+            background: white;
+            color: var(--text-muted);
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 14px rgba(131, 152, 206, 0.14);
+            transition: 0.2s ease;
         }
-        .page-btn.active { background: var(--primary-color); color: white; }
-        .page-btn:hover:not(.active) { transform: translateY(-3px); color: var(--primary-color); }
 
-        /* 弹窗：炫酷磨砂 */
+        .page-btn.active {
+            color: #fff;
+            border-color: transparent;
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+        }
+
+        .page-btn:hover:not(.active) {
+            transform: translateY(-2px);
+            color: #4f65a1;
+            border-color: #bfd3ff;
+        }
+
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(12px);
-            display: none; justify-content: center; align-items: center; z-index: 1000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(102, 124, 182, 0.22);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
         }
-        .modal { 
-            background: rgba(255, 255, 255, 0.95); width: 90%; max-width: 550px; 
-            border-radius: 30px; padding: 40px; position: relative;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+
+        .modal {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #dae6ff;
+            width: 92%;
+            max-width: 560px;
+            border-radius: 28px;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 24px 56px rgba(91, 114, 173, 0.24);
         }
-        .close-btn { position: absolute; top: 30px; right: 30px; font-size: 1.5rem; cursor: pointer; color: #94a3b8; }
-        
-        .vol-item { 
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 25px; background: white; 
-            margin-bottom: 12px; border-radius: 18px; 
-            border: 1px solid #f1f5f9; cursor: pointer;
+
+        .close-btn {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: #8ea0cb;
+        }
+
+        .vol-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 18px;
+            background: white;
+            margin-bottom: 12px;
+            border-radius: 18px;
+            border: 1px solid #dfebff;
+            cursor: pointer;
             transition: all 0.3s ease;
         }
-        .vol-item:hover { background: var(--primary-color); border-color: var(--primary-color); transform: scale(1.02); }
-        .vol-item:hover .vol-name, .vol-item:hover .vol-dl { color: white; }
-        .vol-name { font-weight: 700; font-size: 1.1rem; color: var(--text-main); }
-        .vol-dl { color: var(--primary-color); font-weight: 800; }
+
+        .vol-item:hover {
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            border-color: transparent;
+            transform: translateY(-2px);
+        }
+
+        .vol-item:hover .vol-name,
+        .vol-item:hover .vol-dl { color: white; }
+
+        .vol-name { font-weight: 700; font-size: 1rem; color: var(--text-main); }
+
+        .vol-dl {
+            color: #5d6f9f;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+
+        .empty-state,
+        .load-error {
+            border: 1px solid #dbe8ff;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.85);
+            color: #6a79a5;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+
+        @media (max-width: 860px) {
+            body { padding-top: 24px; }
+            .hero { padding: 18px; border-radius: 20px; }
+            .book-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
+            }
+            .book-actions {
+                width: 100%;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+            .btn { flex: 1; justify-content: center; }
+        }
     </style>
 </head>
 <body>
+<div class="sparkles" aria-hidden="true"></div>
 
 <div class="container">
-    <header>
+    <header class="hero">
+        <div class="hero-top">
+            <span class="pill">内容工具 / 轻小说下载中心</span>
+            <a class="home-link" href="../index.html" target="_blank" rel="noopener noreferrer">返回主页</a>
+        </div>
         <h1>轻小说下载中心</h1>
-        <p>探索、发现并获取您的专属数字藏书</p>
+        <p>按作品或作者检索，快速进入全集下载与分卷浏览。</p>
     </header>
 
     <div class="search-box">
         <input type="text" id="searchInput" placeholder="搜索作品名称或作者...">
     </div>
 
-    <div class="item-list" id="itemList">
-        <!-- 动态加载卡片 -->
-    </div>
-
+    <div class="item-list" id="itemList"></div>
     <div class="pagination" id="mainPagination"></div>
 </div>
 
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
         <span class="close-btn" id="closeModal">&times;</span>
-        <h2 id="modalTitle" style="margin-top:0; font-size: 1.8rem; font-weight: 800; margin-bottom: 25px;">分卷列表</h2>
+        <h2 id="modalTitle" style="margin-top:0; font-size:1.8rem; font-weight:800; margin-bottom:25px;">分卷列表</h2>
         <div id="volList"></div>
         <div class="pagination" id="volPagination"></div>
     </div>
@@ -178,20 +384,55 @@
     let currentVolPage = 1;
     const volsPerPage = 5;
 
+    function getDataJsonCandidates() {
+        const path = window.location.pathname || '/';
+        const hasFile = /\/[^/]+\.[^/]+$/.test(path);
+        const dir = hasFile ? path.slice(0, path.lastIndexOf('/') + 1) : (path.endsWith('/') ? path : path + '/');
+        return [
+            './data.json',
+            'data.json',
+            window.location.origin + dir + 'data.json'
+        ];
+    }
+
     async function init() {
         try {
-            const res = await fetch('./data.json');
-            allData = await res.json();
+            let data = null;
+            const candidates = getDataJsonCandidates();
+
+            for (const url of candidates) {
+                try {
+                    const res = await fetch(url, { cache: 'no-store' });
+                    if (!res.ok) continue;
+                    data = await res.json();
+                    break;
+                } catch (_) {
+                    // try next candidate
+                }
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error('data.json load failed');
+            }
+
+            allData = data;
             filteredData = allData;
             renderMainPage(1);
-        } catch (e) { console.error("Data Load Error", e); }
+        } catch (e) {
+            console.error('Data Load Error', e);
+            document.getElementById('itemList').innerHTML = '<div class="load-error">数据加载失败：请检查 data.json 路径或部署目录结构。</div>';
+        }
     }
 
     function renderMainPage(page) {
         currentMainPage = page;
         const list = document.getElementById('itemList');
         list.innerHTML = '';
-        const data = filteredData.slice((page-1)*itemsPerPage, page*itemsPerPage);
+        const data = filteredData.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+
+        if (data.length === 0) {
+            list.innerHTML = '<div class="empty-state">未找到匹配作品，试试更短的关键词。</div>';
+        }
 
         data.forEach(item => {
             const card = document.createElement('div');
@@ -206,12 +447,13 @@
                     </div>
                 </div>
                 <div class="book-actions">
-                    <button onclick="window.open('${item.full_url}')" class="btn btn-full">获取全集</button>
+                    <button onclick="window.open('${item.full_url}', '_blank', 'noopener,noreferrer')" class="btn btn-full">获取全集</button>
                     <button onclick="openVolModal('${item.id}')" class="btn btn-sub">分卷查看</button>
                 </div>
             `;
             list.appendChild(card);
         });
+
         updatePagination('mainPagination', filteredData.length, itemsPerPage, currentMainPage, renderMainPage);
     }
 
@@ -226,30 +468,32 @@
         currentVolPage = page;
         const list = document.getElementById('volList');
         list.innerHTML = '';
-        const data = currentActiveNovel.volumes.slice((page-1)*volsPerPage, page*volsPerPage);
-        
+        const data = currentActiveNovel.volumes.slice((page - 1) * volsPerPage, page * volsPerPage);
+
         data.forEach(v => {
             const div = document.createElement('div');
             div.className = 'vol-item';
-            div.onclick = () => window.open(v.url, '_blank');
-            div.innerHTML = `<span class="vol-name">${v.name}</span><span class="vol-dl">DOWNLOAD</span>`;
+            div.onclick = () => window.open(v.url, '_blank', 'noopener,noreferrer');
+            div.innerHTML = `<span class="vol-name">${v.name}</span><span class="vol-dl">下载</span>`;
             list.appendChild(div);
         });
+
         updatePagination('volPagination', currentActiveNovel.volumes.length, volsPerPage, currentVolPage, renderVolPage);
     }
 
     function updatePagination(id, total, per, current, callback) {
         const el = document.getElementById(id);
         el.innerHTML = '';
-        const pages = Math.ceil(total/per);
+        const pages = Math.ceil(total / per);
         if (pages <= 1) return;
         for (let i = 1; i <= pages; i++) {
             const b = document.createElement('button');
-            b.innerText = i; b.className = `page-btn ${i === current ? 'active' : ''}`;
+            b.innerText = i;
+            b.className = `page-btn ${i === current ? 'active' : ''}`;
             b.onclick = () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' }); // 翻页时平滑回到顶部
+                window.scrollTo({ top: 0, behavior: 'smooth' });
                 callback(i);
-            }; 
+            };
             el.appendChild(b);
         }
     }
@@ -260,9 +504,16 @@
         renderMainPage(1);
     });
 
-    document.getElementById('closeModal').onclick = () => document.getElementById('modalOverlay').style.display = 'none';
-    document.getElementById('modalOverlay').onclick = (e) => { if(e.target.id === 'modalOverlay') document.getElementById('modalOverlay').style.display = 'none'; }
-    
+    document.getElementById('closeModal').onclick = () => {
+        document.getElementById('modalOverlay').style.display = 'none';
+    };
+
+    document.getElementById('modalOverlay').onclick = (e) => {
+        if (e.target.id === 'modalOverlay') {
+            document.getElementById('modalOverlay').style.display = 'none';
+        }
+    };
+
     init();
 </script>
 </body>

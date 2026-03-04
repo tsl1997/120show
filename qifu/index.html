@@ -1,58 +1,356 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZenBless - 禅意祈福</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>赛博祈福 | XS 魔法实验室</title>
     <style>
+        :root {
+            --bg1: #fff8ff;
+            --bg2: #eef8ff;
+            --bg3: #fffef3;
+            --text-main: #33456f;
+            --text-muted: #6f7ea8;
+            --line: #dce7ff;
+            --pink: #ff7cb4;
+            --peach: #ffb37c;
+            --blue: #79b5ff;
+            --mint: #71d9c4;
+            --card-shadow: 0 12px 30px rgba(124, 154, 219, 0.16);
+            --card-shadow-hover: 0 18px 36px rgba(124, 154, 219, 0.24);
+        }
+
+        * { box-sizing: border-box; }
+
         body {
-            font-family: 'Noto Serif SC', serif;
-            background-color: #fdfaf6;
             margin: 0;
+            min-height: 100vh;
+            color: var(--text-main);
+            font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(255, 179, 124, 0.28) 0, transparent 28%),
+                radial-gradient(circle at 86% 9%, rgba(181, 156, 255, 0.26) 0, transparent 30%),
+                radial-gradient(circle at 76% 82%, rgba(121, 181, 255, 0.22) 0, transparent 33%),
+                linear-gradient(160deg, var(--bg1), var(--bg2) 52%, var(--bg3));
             -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
         }
-        .zen-gradient {
-            background: linear-gradient(180deg, #fdfaf6 0%, #f7f1e3 100%);
+
+        .sparkles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.45;
+            background-image:
+                radial-gradient(circle, rgba(255, 124, 180, 0.58) 1px, transparent 1px),
+                radial-gradient(circle, rgba(121, 181, 255, 0.58) 1px, transparent 1px);
+            background-size: 44px 44px, 60px 60px;
+            background-position: 0 0, 18px 22px;
         }
-        /* 紧凑布局微调 */
-        .main-container {
-            height: 100vh;
+
+        .page {
+            position: relative;
+            z-index: 2;
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 30px 16px 56px;
+        }
+
+        .hero {
+            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(248,252,255,0.88));
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+            margin-bottom: 18px;
+        }
+
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            font-size: 12px;
+            font-weight: 700;
+            color: #8d5d9d;
+            background: linear-gradient(90deg, #ffe3f2, #eaf3ff);
+            border: 1px solid #efdbff;
+            border-radius: 999px;
+            padding: 6px 12px;
+        }
+
+        .home-link {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 700;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 8px 12px;
+            transition: 0.2s ease;
+        }
+
+        .home-link:hover {
+            transform: translateY(-2px);
+            border-color: #cddcff;
+            box-shadow: 0 6px 14px rgba(131, 152, 206, 0.2);
+        }
+
+        .title {
+            margin: 12px 0 6px;
+            font-size: clamp(34px, 6vw, 52px);
+            font-weight: 900;
+            line-height: 1.08;
+            background: linear-gradient(90deg, var(--pink), var(--peach) 34%, var(--blue) 70%, var(--mint));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        .panel {
+            background: rgba(255,255,255,0.86);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            padding: 18px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #7788b7;
+            margin: 4px 0 10px;
+            letter-spacing: 0.08em;
+        }
+
+        .deity-wrap {
+            position: relative;
+            max-width: 360px;
+            margin: 0 auto;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid #d8e5ff;
+            box-shadow: 0 10px 20px rgba(131, 152, 206, 0.2);
+            background: #fff;
+        }
+
+        .deity-track {
+            display: flex;
+            transition: transform 0.45s ease;
+        }
+
+        .deity-item {
+            min-width: 100%;
+            position: relative;
+            aspect-ratio: 3 / 3.4;
+        }
+
+        .deity-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .deity-mask {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(22,33,66,0.68), rgba(22,33,66,0.04) 56%);
             display: flex;
             flex-direction: column;
-            padding: 1rem;
+            justify-content: flex-end;
+            padding: 14px;
+            color: #fff;
         }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #e7e5e4; border-radius: 10px; }
+
+        .deity-name { font-size: 20px; font-weight: 800; }
+        .deity-domain { font-size: 12px; opacity: 0.92; }
+
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 34px;
+            height: 34px;
+            border: 1px solid #dbe8ff;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.86);
+            color: #6278b0;
+            font-size: 18px;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            z-index: 5;
+        }
+
+        .arrow.left { left: 10px; }
+        .arrow.right { right: 10px; }
+
+        .offer-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .offer-item {
+            border-radius: 14px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: 0.2s ease;
+            background: #fff;
+            box-shadow: 0 6px 14px rgba(131, 152, 206, 0.18);
+            position: relative;
+        }
+
+        .offer-item img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+        }
+
+        .offer-item.active {
+            border-color: #f4a5cd;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px rgba(131, 152, 206, 0.22);
+        }
+
+        .offer-name {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 6px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(to top, rgba(20,32,67,0.68), rgba(20,32,67,0));
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 118px;
+            border: 1px solid #dde9ff;
+            border-radius: 14px;
+            padding: 14px;
+            color: var(--text-main);
+            resize: vertical;
+            outline: none;
+            background: #fff;
+            font: inherit;
+            box-shadow: inset 0 2px 8px rgba(124, 154, 219, 0.12);
+        }
+
+        textarea:focus { box-shadow: 0 0 0 4px rgba(121, 181, 255, 0.16); }
+
+        .submit-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: 12px;
+        }
+
+        .submit-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 12px 26px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            letter-spacing: 0.05em;
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            box-shadow: 0 10px 18px rgba(134, 164, 227, 0.35);
+            transition: 0.2s ease;
+        }
+
+        .submit-btn:hover:not(:disabled) { transform: translateY(-2px); }
+        .submit-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+        .history {
+            margin-top: 18px;
+            background: rgba(255,255,255,0.86);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            box-shadow: var(--card-shadow);
+            padding: 14px;
+        }
+
+        .history-title {
+            text-align: center;
+            font-size: 13px;
+            font-weight: 800;
+            color: #6f7ea8;
+            margin: 2px 0 10px;
+            letter-spacing: 0.08em;
+        }
+
+        .history-list {
+            max-height: 220px;
+            overflow: auto;
+            display: grid;
+            gap: 8px;
+            padding: 2px;
+        }
+
+        .history-item {
+            background: #fff;
+            border: 1px solid #dce9ff;
+            border-radius: 12px;
+            padding: 10px;
+            font-size: 12px;
+            color: #5e6f9c;
+        }
+
+        .history-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .history-empty {
+            text-align: center;
+            color: #8ea0cb;
+            font-size: 12px;
+            padding: 20px 0;
+        }
+
+        @media (max-width: 780px) {
+            .page { padding-top: 20px; }
+            .hero, .panel, .history { border-radius: 18px; }
+            .deity-wrap { max-width: 100%; }
+            .offer-grid { gap: 8px; }
+        }
     </style>
     <script type="importmap">
     {
       "imports": {
         "react": "https://esm.sh/react@19.0.0",
         "react-dom": "https://esm.sh/react-dom@19.0.0",
-        "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
-        "lucide-react": "https://esm.sh/lucide-react@0.460.0"
+        "react-dom/client": "https://esm.sh/react-dom@19.0.0/client"
       }
     }
     </script>
 </head>
-<body class="zen-gradient">
+<body>
+    <div class="sparkles" aria-hidden="true"></div>
     <div id="root"></div>
 
     <script type="module">
         import React, { useState, useEffect } from 'react';
         import ReactDOM from 'react-dom/client';
-        import { 
-          Heart, 
-          Sparkles, 
-          History, 
-          ScrollText, 
-          ChevronLeft, 
-          ChevronRight 
-        } from 'lucide-react';
 
         const BASE_OBJ_URL = 'https://gnfd-testnet-sp1.nodereal.io/view/vibe/qifu/obj/';
         const BASE_TRIBUTE_URL = 'https://gnfd-testnet-sp1.nodereal.io/view/vibe/qifu/tribute/';
@@ -99,17 +397,25 @@
           const handleSubmit = (e) => {
             e.preventDefault();
             if (!selectedOffering || !blessingText.trim()) {
-              alert("请选择供品并填写祈福内容。");
+              alert('请选择供品并填写祈福内容。');
               return;
             }
+
             setIsSubmitting(true);
+
             const newRecord = {
               id: Date.now().toString(),
-              time: new Date().toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+              time: new Date().toLocaleString('zh-CN', {
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+              }),
               deityName: selectedDeity.name,
               offeringName: selectedOffering.name,
               content: blessingText
             };
+
             setTimeout(() => {
               const updated = [newRecord, ...history];
               setHistory(updated);
@@ -117,97 +423,76 @@
               setBlessingText('');
               setSelectedOffering(null);
               setIsSubmitting(false);
-            }, 1000);
+            }, 800);
           };
 
           const el = React.createElement;
 
-          return el('div', { className: "max-w-3xl mx-auto px-4 min-h-screen flex flex-col justify-between" }, [
-            el('div', { key: 'main-form', className: "flex-grow flex flex-col justify-center py-4" }, [
-                // Header: 极简
-                el('header', { key: 'h', className: "text-center mb-4" }, [
-                  el('h1', { className: "text-2xl md:text-3xl font-black text-stone-800 tracking-[0.2em]" }, "禅 意 祈 福"),
-                ]),
-
-                el('form', { key: 'f', onSubmit: handleSubmit, className: "space-y-4" }, [
-                  // Carousel Deity
-                  el('section', { key: 's1', className: "flex flex-col items-center" }, [
-                    el('div', { className: "text-xs text-stone-400 mb-2 tracking-widest flex items-center gap-1" }, [
-                      el(Sparkles, { size: 12 }),
-                      "请选择一位神仙"
-                    ]),
-                    el('div', { className: "relative w-64 md:w-72 mx-auto overflow-hidden rounded-2xl shadow-xl bg-stone-100 border-2 border-stone-200" }, [
-                      el('button', { type: 'button', onClick: () => moveCarousel('left'), className: "absolute left-2 top-1/2 -translate-y-1/2 z-10 p-1.5 bg-white/80 rounded-full shadow hover:bg-white transition-colors" }, el(ChevronLeft, { size: 18 })),
-                      el('button', { type: 'button', onClick: () => moveCarousel('right'), className: "absolute right-2 top-1/2 -translate-y-1/2 z-10 p-1.5 bg-white/80 rounded-full shadow hover:bg-white transition-colors" }, el(ChevronRight, { size: 18 })),
-                      el('div', { 
-                        className: "flex transition-transform duration-500 ease-in-out", 
-                        style: { transform: `translateX(-${carouselIndex * 100}%)` } 
-                      }, DEITIES.map(d => el('div', { key: d.id, className: "min-w-full relative" }, [
-                        el('div', { className: "aspect-[3/3.5] overflow-hidden" }, [
-                          el('img', { src: d.imageUrl, className: "w-full h-full object-cover" })
-                        ]),
-                        el('div', { className: "absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-4 text-white" }, [
-                          el('h3', { className: "text-lg font-bold" }, d.name),
-                          el('p', { className: "text-[10px] text-amber-200" }, d.domain)
-                        ])
-                      ])))
-                    ])
-                  ]),
-
-                  // Offerings
-                  el('section', { key: 's2', className: "flex flex-col items-center" }, [
-                    el('div', { className: "text-xs text-stone-400 mb-2 tracking-widest flex items-center gap-1" }, [
-                      el(Heart, { size: 12 }),
-                      "请选择1个贡品"
-                    ]),
-                    el('div', { className: "grid grid-cols-3 gap-3 max-w-sm mx-auto" }, OFFERINGS.map(o => el('div', {
-                      key: o.id,
-                      onClick: () => setSelectedOffering(o),
-                      className: `group relative aspect-square rounded-xl overflow-hidden cursor-pointer border-2 transition-all ${selectedOffering?.id === o.id ? 'border-amber-500 scale-105 shadow-md' : 'border-transparent bg-stone-200'}`
-                    }, [
-                      el('img', { src: o.imageUrl, className: "w-full h-full object-cover transition-transform group-hover:scale-110" }),
-                      el('div', { className: `absolute inset-0 flex items-center justify-center bg-black/30 text-white text-[10px] font-bold transition-opacity ${selectedOffering?.id === o.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}` }, o.name)
-                    ])))
-                  ]),
-
-                  // Blessing Input
-                  el('section', { key: 's3' }, [
-                    el('textarea', {
-                      value: blessingText,
-                      onChange: (e) => setBlessingText(e.target.value),
-                      placeholder: "书写祈福内容...",
-                      className: "w-full h-24 p-4 text-base rounded-xl bg-white border border-stone-200 shadow-inner focus:outline-none focus:ring-2 focus:ring-amber-500/20 italic text-stone-600 resize-none"
-                    })
-                  ]),
-
-                  // Submit
-                  el('div', { key: 'btn', className: "flex justify-center" }, [
-                    el('button', {
-                      type: "submit",
-                      disabled: isSubmitting,
-                      className: `px-10 py-3 rounded-full text-lg font-bold tracking-widest transition-all ${isSubmitting ? 'bg-stone-300' : 'bg-stone-900 text-white hover:bg-amber-600 active:scale-95 shadow-lg'}`
-                    }, isSubmitting ? '祈愿中...' : '提交祈福')
-                  ])
-                ])
+          return el('div', { className: 'page' }, [
+            el('header', { key: 'hero', className: 'hero' }, [
+              el('div', { className: 'hero-top' }, [
+                el('span', { className: 'pill' }, '视觉交互 / 赛博祈福'),
+                el('a', { className: 'home-link', href: '../index.html', target: '_blank', rel: 'noopener noreferrer' }, '返回主页')
+              ]),
+              el('h1', { className: 'title' }, '赛博祈福'),
+              el('p', { className: 'subtitle' }, '选择神仙与供品，留下此刻的愿望。')
             ]),
 
-            // History Section
-            el('section', { key: 'hist', className: "mt-4 pt-4 border-t border-stone-200 pb-10" }, [
-              el('div', { className: "flex items-center justify-center gap-2 mb-4" }, [
-                el(History, { className: "text-stone-300", size: 16 }),
-                el('h2', { className: "text-sm font-bold text-stone-500 tracking-widest" }, "功 德 簿")
+            el('main', { key: 'panel', className: 'panel' }, [
+              el('div', { className: 'section-title' }, '选择神仙'),
+              el('div', { className: 'deity-wrap' }, [
+                el('button', { type: 'button', className: 'arrow left', onClick: () => moveCarousel('left'), 'aria-label': '上一个' }, '‹'),
+                el('button', { type: 'button', className: 'arrow right', onClick: () => moveCarousel('right'), 'aria-label': '下一个' }, '›'),
+                el('div', { className: 'deity-track', style: { transform: `translateX(-${carouselIndex * 100}%)` } },
+                  DEITIES.map(d => el('div', { key: d.id, className: 'deity-item' }, [
+                    el('img', { src: d.imageUrl, alt: d.name }),
+                    el('div', { className: 'deity-mask' }, [
+                      el('div', { className: 'deity-name' }, d.name),
+                      el('div', { className: 'deity-domain' }, d.domain)
+                    ])
+                  ]))
+                )
               ]),
-              history.length === 0 ? el('p', { className: "text-center text-stone-400 text-xs italic" }, "尚无记录")
-              : el('div', { className: "space-y-2 max-w-lg mx-auto overflow-y-auto max-h-48 px-2" }, history.map(r => el('div', { key: r.id, className: "bg-white p-3 rounded-lg shadow-sm border border-stone-100 text-[11px]" }, [
-                el('div', { className: "flex justify-between mb-1" }, [
-                  el('div', { className: "flex gap-2" }, [
-                    el('span', { className: "font-bold text-stone-800" }, r.deityName),
-                    el('span', { className: "text-amber-600" }, `[${r.offeringName}]`)
-                  ]),
-                  el('span', { className: "text-stone-300" }, r.time)
-                ]),
-                el('p', { className: "text-stone-500 italic" }, r.content)
-              ])))
+
+              el('div', { className: 'section-title', style: { marginTop: '16px' } }, '选择供品'),
+              el('div', { className: 'offer-grid' },
+                OFFERINGS.map(o => el('div', {
+                  key: o.id,
+                  className: `offer-item ${selectedOffering?.id === o.id ? 'active' : ''}`,
+                  onClick: () => setSelectedOffering(o)
+                }, [
+                  el('img', { src: o.imageUrl, alt: o.name }),
+                  el('div', { className: 'offer-name' }, o.name)
+                ]))
+              ),
+
+              el('form', { onSubmit: handleSubmit, style: { marginTop: '16px' } }, [
+                el('textarea', {
+                  value: blessingText,
+                  onChange: (e) => setBlessingText(e.target.value),
+                  placeholder: `向 ${selectedDeity.name} 写下你的愿望...`
+                }),
+                el('div', { className: 'submit-wrap' },
+                  el('button', {
+                    type: 'submit',
+                    className: 'submit-btn',
+                    disabled: isSubmitting
+                  }, isSubmitting ? '祈愿中...' : '提交祈福')
+                )
+              ])
+            ]),
+
+            el('section', { key: 'history', className: 'history' }, [
+              el('div', { className: 'history-title' }, '功德簿'),
+              history.length === 0
+                ? el('div', { className: 'history-empty' }, '尚无记录')
+                : el('div', { className: 'history-list' }, history.map(r => el('div', { key: r.id, className: 'history-item' }, [
+                    el('div', { className: 'history-row' }, [
+                      el('span', null, `${r.deityName} [${r.offeringName}]`),
+                      el('span', { style: { opacity: 0.8 } }, r.time)
+                    ]),
+                    el('div', null, r.content)
+                  ])))
             ])
           ]);
         }

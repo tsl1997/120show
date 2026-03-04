@@ -3,298 +3,476 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- SEO 基础优化 -->
-    <title>XS | Digital Craftsman - Blockchain & Vision Interaction</title>
-    <meta name="description" content="XS 的个人数字实验室。探索 Web3 智能合约、MediaPipe 视觉交互以及区块链技术应用。">
-    <meta name="keywords" content="Web3, 区块链, ETH, 智能合约, MediaPipe, AR 交互, 点头操控, 数字存证">
-    <meta name="author" content="XS">
-    
-    <!-- Open Graph (社交媒体预览) -->
-    <meta property="og:title" content="XS | Digital Craftsman Lab">
-    <meta property="og:description" content="探索 Web3 与视觉交互的前沿实验。">
+    <title>XS 魔法实验室 | 120.show</title>
+    <meta name="description" content="XS 的动漫二次元风格个人主页，收录 Web3 实验、视觉互动与实用工具。">
+    <meta name="keywords" content="XS, 二次元, 动漫风, Web3, 视觉交互, 个人主页">
+    <meta property="og:title" content="XS 魔法实验室">
+    <meta property="og:description" content="可爱明亮风格的个人实验室主页。">
     <meta property="og:url" content="https://120.show/">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-
     <style>
         :root {
-            --bg-body: #F8F9FB;
-            --card-bg: #FFFFFF;
-            --text-main: #1A202C;
-            --text-sub: #718096;
-            --border-color: #E2E8F0;
-            --accent: #3B82F6;
+            --bg1: #fff8ff;
+            --bg2: #eef8ff;
+            --bg3: #fffef3;
+            --text: #314069;
+            --sub: #6d7ca6;
+            --line: #dbe6ff;
+            --pink: #ff7cb4;
+            --peach: #ffb37c;
+            --blue: #79b5ff;
+            --mint: #71d9c4;
+            --lavender: #b59cff;
+            --card: rgba(255, 255, 255, 0.86);
         }
+
+        * { box-sizing: border-box; }
 
         body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            color: var(--text);
+            font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(255, 179, 124, 0.28) 0, transparent 28%),
+                radial-gradient(circle at 86% 9%, rgba(181, 156, 255, 0.26) 0, transparent 30%),
+                radial-gradient(circle at 76% 82%, rgba(121, 181, 255, 0.22) 0, transparent 33%),
+                linear-gradient(160deg, var(--bg1), var(--bg2) 52%, var(--bg3));
             min-height: 100vh;
-            background-image: radial-gradient(#E5E7EB 1.5px, transparent 1.5px);
-            background-size: 32px 32px; 
         }
 
-        /* 导航切换 */
-        .filter-nav {
-            max-width: 1100px;
-            margin: 0 auto 32px;
-            padding: 0 24px;
+        .sparkles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.5;
+            background-image:
+                radial-gradient(circle, rgba(255, 124, 180, 0.6) 1px, transparent 1px),
+                radial-gradient(circle, rgba(121, 181, 255, 0.6) 1px, transparent 1px);
+            background-size: 44px 44px, 60px 60px;
+            background-position: 0 0, 18px 22px;
+        }
+
+        .wrap {
+            max-width: 1160px;
+            margin: 0 auto;
+            padding: 22px 18px 70px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(248, 252, 255, 0.86));
+            border: 1px solid var(--line);
+            border-radius: 26px;
+            box-shadow: 0 16px 40px rgba(131, 152, 206, 0.2);
+            padding: 24px;
+        }
+
+        .hero-top {
             display: flex;
-            gap: 12px;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
         }
 
-        .filter-btn {
-            padding: 10px 24px;
-            border-radius: 14px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-sub);
+        .pill {
+            font-size: 12px;
             font-weight: 700;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
+            color: #8d5d9d;
+            background: linear-gradient(90deg, #ffe3f2, #eaf3ff);
+            border: 1px solid #efdbff;
+            border-radius: 999px;
+            padding: 6px 12px;
         }
 
-        .filter-btn.active {
-            background: var(--text-main);
-            color: white;
-            border-color: var(--text-main);
+        .social {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .social a {
+            text-decoration: none;
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 700;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 8px 11px;
+            transition: 0.2s ease;
+        }
+
+        .social a:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            border-color: #cddcff;
+            box-shadow: 0 6px 14px rgba(131, 152, 206, 0.2);
         }
 
-        /* 项目卡片 */
-        .bento-grid {
+        .hero-main {
+            margin-top: 16px;
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-auto-rows: minmax(180px, auto);
-            gap: 24px;
-            max-width: 1100px;
-            margin: 0 auto 60px;
-            padding: 0 24px;
+            grid-template-columns: 110px 1fr;
+            gap: 18px;
+            align-items: center;
         }
 
-        .project-item {
-            transition: all 0.4s ease;
-            display: none; /* 默认隐藏，由 JS 控制显示 */
+        .avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 28px;
+            overflow: hidden;
+            border: 3px solid #fff;
+            box-shadow: 0 12px 24px rgba(124, 153, 218, 0.35), 0 0 0 1px #d7e5ff;
+            background: #fff;
         }
 
-        .project-item.show {
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             display: block;
-            animation: fadeIn 0.4s ease forwards;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        .title {
+            margin: 0;
+            font-size: clamp(34px, 6vw, 58px);
+            line-height: 1.04;
+            letter-spacing: 0.3px;
+            color: #2d3f69;
+            font-weight: 900;
+        }
+
+        .title .accent {
+            background: linear-gradient(90deg, #ff7cb4, #ffb37c 34%, #79b5ff 70%, #8fdabf);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sub {
+            margin: 8px 0 0;
+            color: var(--sub);
+            font-size: clamp(14px, 2.2vw, 18px);
+        }
+
+        .tabs {
+            margin: 22px 0 24px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            border: 1px solid #dce8ff;
+            background: #ffffff;
+            color: #6f7daa;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            border-color: #bed2ff;
+            color: #455b95;
+        }
+
+        .tab-btn.active {
+            color: #fff;
+            border-color: transparent;
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            box-shadow: 0 10px 20px rgba(143, 169, 231, 0.35);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
+        }
+
+        .item { display: none; }
+        .item.show {
+            display: block;
+            animation: rise 0.32s ease;
+        }
+
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
+        .span-3 { grid-column: span 3; }
+        .span-4 { grid-column: span 4; }
+        .span-6 { grid-column: span 6; }
+        .span-8 { grid-column: span 8; }
+
         .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 28px;
-            padding: 32px;
-            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            min-height: 196px;
+            border-radius: 22px;
+            padding: 20px;
             text-decoration: none;
-            transition: all 0.3s ease;
+            color: var(--text);
+            background: var(--card);
+            border: 1px solid #dfe9ff;
+            box-shadow: 0 12px 24px rgba(128, 153, 212, 0.18);
+            position: relative;
+            overflow: hidden;
+            transition: 0.22s ease;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            right: -26px;
+            top: -26px;
+            background: radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,255,255,0));
         }
 
         .card:hover {
-            border-color: var(--text-main);
-            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.05);
+            transform: translateY(-5px);
+            box-shadow: 0 18px 34px rgba(128, 153, 212, 0.26);
         }
+
+        .card.pink { background: linear-gradient(145deg, #fff4fb, #fff); }
+        .card.blue { background: linear-gradient(145deg, #eff7ff, #fff); }
+        .card.mint { background: linear-gradient(145deg, #ecfff8, #fff); }
+        .card.lavender { background: linear-gradient(145deg, #f3f0ff, #fff); }
+        .card.peach { background: linear-gradient(145deg, #fff4ea, #fff); }
 
         .tag {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 8px;
-            background: #F1F5F9;
-            color: #64748B;
-            margin-bottom: 16px;
+            display: inline-block;
             width: fit-content;
+            margin-bottom: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            border-radius: 999px;
+            padding: 4px 10px;
+            border: 1px solid #e0eaff;
+            color: #6a78a4;
+            background: rgba(255, 255, 255, 0.92);
         }
 
-        /* 布局辅助 */
-        .col-span-2 { grid-column: span 2; }
-        .col-span-4 { grid-column: span 4; }
-        .row-span-2 { grid-row: span 2; }
+        .card h3 {
+            margin: 0;
+            font-size: 22px;
+            line-height: 1.24;
+            color: #354977;
+        }
 
-        @media (max-width: 1024px) {
-            .bento-grid { grid-template-columns: 1fr; }
-            .col-span-2, .col-span-4 { grid-column: span 1; }
-            .row-span-2 { grid-row: span 1; }
-            .filter-nav { overflow-x: auto; white-space: nowrap; }
+        .card p {
+            margin: 8px 0 0;
+            font-size: 13px;
+            line-height: 1.56;
+            color: #6b7ba7;
+        }
+
+        .link {
+            margin-top: 14px;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0.9px;
+            color: #5d6f9f;
+        }
+
+        .footer {
+            margin-top: 34px;
+            text-align: center;
+            font-size: 12px;
+            color: #7c8bb5;
+        }
+
+        @media (max-width: 900px) {
+            .hero-main {
+                grid-template-columns: 1fr;
+                text-align: center;
+                justify-items: center;
+            }
+            .span-3, .span-4, .span-6, .span-8 { grid-column: span 12; }
         }
     </style>
 </head>
 <body>
+    <div class="sparkles" aria-hidden="true"></div>
 
-    <!-- Header Section -->
-    <header class="max-w-[1100px] mx-auto pt-20 pb-12 px-6">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div class="flex items-center gap-6">
-                <img src="https://gnfd-testnet-sp1.nodereal.io/view/vibe/tw.png" alt="XS Avatar" class="w-24 h-24 rounded-[32px] shadow-xl">
+    <div class="wrap">
+        <header class="hero">
+            <div class="hero-top">
+                <span class="pill">动漫风主页样板</span>
+                <nav class="social" aria-label="外部链接">
+                    <a href="https://github.com/xsbtc" target="_blank" rel="noopener noreferrer">GitHub</a>
+                    <a href="https://twitter.com/btc_xs" target="_blank" rel="noopener noreferrer">X / 推特</a>
+                    <a href="mailto:root@temp.now" target="_blank" rel="noopener noreferrer">邮箱</a>
+                </nav>
+            </div>
+
+            <div class="hero-main">
+                <div class="avatar">
+                    <img src="https://gnfd-testnet-sp1.nodereal.io/view/vibe/tw.png" alt="XS Avatar">
+                </div>
                 <div>
-                    <h1 class="text-4xl font-extrabold tracking-tighter">I'm XS.</h1>
-                    <p class="text-gray-500 text-lg font-medium">Blockchain Artist & Full-stack Developer</p>
+                    <h1 class="title">XS <span class="accent">Magical Lab</span></h1>
+                    <p class="sub">分享，开源，免费，进步。</p>
                 </div>
             </div>
-            <nav class="flex gap-4">
-                <a href="https://github.com/xsbtc" target="_blank" class="w-12 h-12 rounded-2xl border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-all" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-                <a href="https://twitter.com/btc_xs" target="_blank" class="w-12 h-12 rounded-2xl border border-gray-200 flex items-center justify-center hover:bg-sky-500 hover:text-white transition-all" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
-                <a href="mailto:root@temp.now" class="w-12 h-12 rounded-2xl border border-gray-200 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
-            </nav>
-        </div>
-    </header>
+        </header>
 
-    <!-- 分类导航 -->
-    <nav class="filter-nav">
-        <button class="filter-btn active" onclick="showCategory('web3')">Web3 实验</button>
-        <button class="filter-btn" onclick="showCategory('vision')">视觉交互</button>
-        <button class="filter-btn" onclick="showCategory('tools')">内容与工具</button>
-    </nav>
+        <nav class="tabs" aria-label="分类切换">
+            <button class="tab-btn active" type="button" data-cat="web3">Web3 实验</button>
+            <button class="tab-btn" type="button" data-cat="vision">视觉交互</button>
+            <button class="tab-btn" type="button" data-cat="tools">内容工具</button>
+        </nav>
 
-    <!-- 项目网格 -->
-    <main class="bento-grid" id="projectGrid">
-        
-        <!-- WEB3 分类 -->
-        <article class="project-item col-span-2 row-span-2 web3-cat">
-            <a href="./web3/send.html" class="card bg-orange-50/20 border-orange-100 hover:border-orange-400">
-                <div>
-                    <div class="tag bg-orange-100 text-orange-700">Signature</div>
-                    <h3 class="text-3xl font-black mb-4">ETH Transfer Panorama</h3>
-                    <p class="text-gray-600">以太坊转账全景交互实验：从 EOA 到智能合约代理，深度解构链上资产流转过程。</p>
-                </div>
-                <img src="https://img.icons8.com/fluency/240/ethereum.png" class="w-32 self-end mt-4 opacity-40" alt="Ethereum Logo">
-            </a>
-        </article>
+        <main class="grid" id="projectGrid">
+            <article class="item span-8 web3-cat">
+                <a class="card blue" href="./web3/send.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">核心实验</span>
+                        <h3>以太坊转账全景</h3>
+                        <p>从 EOA 到 CREATE2，完整展示链上转账路径与交互机制。</p>
+                    </div>
+                    <span class="link">立即进入 -></span>
+                </a>
+            </article>
 
-        <article class="project-item web3-cat">
-            <a href="./airdrop/hoodi.html" class="card hover:border-green-400">
-                <div>
-                    <div class="tag">Analytics</div>
-                    <h3 class="text-xl font-bold">Hoodi Checker</h3>
-                    <p class="text-sm text-gray-500 mt-2">高性能 Web3 地址并发扫描，支持 10,000+ 地址资产透视。</p>
-                </div>
-            </a>
-        </article>
+            <article class="item span-4 web3-cat">
+                <a class="card mint" href="./airdrop/hoodi.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">批量扫描</span>
+                        <h3>Hoodi 地址检查</h3>
+                        <p>批量地址资产检查，快速筛查目标地址状态。</p>
+                    </div>
+                    <span class="link">打开工具 -></span>
+                </a>
+            </article>
 
-        <article class="project-item web3-cat">
-            <a href="./text/index.html" class="card hover:border-blue-400">
-                <div>
-                    <div class="tag">Security</div>
-                    <h3 class="text-xl font-bold">Chain Evidence</h3>
-                    <p class="text-sm text-gray-500 mt-2">基于区块链的永恒信息存证，不可篡改的数字指纹。</p>
-                </div>
-            </a>
-        </article>
+            <article class="item span-6 web3-cat">
+                <a class="card lavender" href="./text/index.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">协议应用</span>
+                        <h3>全链存证协议</h3>
+                        <p>多链内容发布与链上存证，纯前端运行的 DApp。</p>
+                    </div>
+                    <span class="link">进入协议 -></span>
+                </a>
+            </article>
 
-        <!-- VISION 分类 -->
-        <article class="project-item col-span-2 vision-cat">
-            <a href="./camera/picture/index.html" class="card hover:border-purple-400">
-                <div>
-                    <div class="tag">New Interaction</div>
-                    <h3 class="text-2xl font-bold">Head-Motion Gallery</h3>
-                    <p class="text-gray-600 mt-2">基于人脸追踪的点头/摇头操控图库。无需触碰屏幕，通过自然的肢体动作实现交互翻页。</p>
-                </div>
-                <div class="mt-4 flex items-center text-purple-600 font-bold text-xs uppercase tracking-widest">
-                    Open Camera <i class="fa-solid fa-camera ml-2"></i>
-                </div>
-            </a>
-        </article>
+            <article class="item span-6 web3-cat">
+                <a class="card peach" href="https://blog.120.show" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">技术归档</span>
+                        <h3>技术博客</h3>
+                        <p>记录 Web3 开发与实验思考，持续更新中。</p>
+                    </div>
+                    <span class="link">前往阅读 -></span>
+                </a>
+            </article>
 
-        <article class="project-item vision-cat">
-            <a href="./camera/smokeflower/index3.html" class="card hover:border-pink-400">
-                <div>
-                    <div class="tag">AR Vision</div>
-                    <h3 class="text-xl font-bold">Gemini Firework</h3>
-                    <p class="text-sm text-gray-500 mt-2">手势识别烟火系统，在虚拟与现实的交点释放灿烂。</p>
-                </div>
-            </a>
-        </article>
+            <article class="item span-8 vision-cat">
+                <a class="card pink" href="./camera/picture/index.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">人脸追踪</span>
+                        <h3>点头摇头图库</h3>
+                        <p>摇头切换、点头放大，基于人脸追踪的无接触交互图库。</p>
+                    </div>
+                    <span class="link">开启摄像头 -></span>
+                </a>
+            </article>
 
-        <article class="project-item vision-cat">
-            <a href="./qifu/index.html" class="card hover:border-gray-400">
-                <div>
-                    <div class="tag">Spiritual</div>
-                    <h3 class="text-xl font-bold">Cyber Prayer</h3>
-                    <p class="text-sm text-gray-500 mt-2">赛博祈福空间，为美好的愿望留下数字印记。</p>
-                </div>
-            </a>
-        </article>
+            <article class="item span-4 vision-cat">
+                <a class="card lavender" href="./camera/smokeflower/index3.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">手势 AR</span>
+                        <h3>双子烟火</h3>
+                        <p>手势触发烟火粒子，在现实背景中绽放特效。</p>
+                    </div>
+                    <span class="link">开始体验 -></span>
+                </a>
+            </article>
 
-        <!-- TOOLS 分类 -->
-        <article class="project-item col-span-2 tools-cat">
-            <a href="https://blog.120.show" target="_blank" class="card bg-gray-900 text-white hover:bg-black">
-                <div>
-                    <div class="tag bg-white/10 text-gray-300">Archive</div>
-                    <h3 class="text-2xl font-bold">Technical Blog</h3>
-                    <p class="text-gray-400 mt-2">沉淀 Web3 技术思考与算法研究笔记，思维的后花园。</p>
-                </div>
-                <div class="mt-6 flex items-center text-xs font-bold tracking-widest">
-                    EXPLORE ARTICLES <i class="fa-solid fa-arrow-right ml-2"></i>
-                </div>
-            </a>
-        </article>
+            <article class="item span-6 vision-cat">
+                <a class="card mint" href="./qifu/index.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">祈福空间</span>
+                        <h3>赛博祈福</h3>
+                        <p>轻量祈福记录页，以温和交互保留愿望。</p>
+                    </div>
+                    <span class="link">写下心愿 -></span>
+                </a>
+            </article>
 
-        <article class="project-item tools-cat">
-            <a href="./zlib/index.html" class="card">
-                <div>
-                    <div class="tag">Library</div>
-                    <h3 class="text-xl font-bold">Z-Lib Access</h3>
-                    <p class="text-sm text-gray-500 mt-2">打破知识壁垒的公共访问通道。</p>
-                </div>
-            </a>
-        </article>
+            <article class="item span-6 tools-cat">
+                <a class="card blue" href="./zlib/index.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">共享访问</span>
+                        <h3>Z-Lib 共享入口</h3>
+                        <p>账号信息复制、历史记录查看、便捷访问。</p>
+                    </div>
+                    <span class="link">打开入口 -></span>
+                </a>
+            </article>
 
-        <article class="project-item tools-cat">
-            <a href="./qing/index.html" class="card">
-                <div>
-                    <div class="tag">Reading</div>
-                    <h3 class="text-xl font-bold">Qing Novel</h3>
-                    <p class="text-sm text-gray-500 mt-2">极致纯净的 EPUB 阅读与下载体验。</p>
-                </div>
-            </a>
-        </article>
+            <article class="item span-6 tools-cat">
+                <a class="card pink" href="./qing/index.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">轻小说阅读</span>
+                        <h3>轻小说资源库</h3>
+                        <p>轻小说资源索引，支持搜索和分页浏览。</p>
+                    </div>
+                    <span class="link">进入书库 -></span>
+                </a>
+            </article>
 
-    </main>
+            <article class="item span-6 tools-cat">
+                <a class="card peach" href="./text/index.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">创作面板</span>
+                        <h3>链上写作</h3>
+                        <p>进入创作与管理面板，发布你的链上内容。</p>
+                    </div>
+                    <span class="link">开始创作 -></span>
+                </a>
+            </article>
+        </main>
 
-    <footer class="text-center py-20 text-gray-400 text-sm font-medium">
-        &copy; 2026 XS Digital Lab. Built for the Decentralized Future.
-    </footer>
+        <footer class="footer">© 2026 XS 魔法实验室 · 明亮动漫风主页</footer>
+    </div>
 
     <script>
-        function showCategory(category) {
-            // 更新按钮样式
-            const buttons = document.querySelectorAll('.filter-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+        (function () {
+            var buttons = document.querySelectorAll('.tab-btn');
+            var items = document.querySelectorAll('.item');
 
-            // 过滤项目
-            const items = document.querySelectorAll('.project-item');
-            items.forEach(item => {
-                if (item.classList.contains(category + '-cat')) {
-                    item.classList.add('show');
-                } else {
-                    item.classList.remove('show');
-                }
+            function showCategory(category) {
+                buttons.forEach(function (btn) {
+                    btn.classList.toggle('active', btn.getAttribute('data-cat') === category);
+                });
+
+                items.forEach(function (item) {
+                    var matched = item.classList.contains(category + '-cat');
+                    item.classList.toggle('show', matched);
+                });
+            }
+
+            buttons.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    showCategory(btn.getAttribute('data-cat'));
+                });
             });
-        }
 
-        // 页面加载默认显示 Web3
-        window.onload = () => {
-            const defaultBtn = document.querySelector('.filter-btn');
-            if (defaultBtn) defaultBtn.click();
-        };
+            showCategory('web3');
+        })();
     </script>
 </body>
 </html>
