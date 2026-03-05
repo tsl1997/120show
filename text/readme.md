@@ -114,6 +114,15 @@ V6 (Enhanced):
 CDN 依赖: 这里的 Tailwind 和 Vue 通过 CDN 加载。在生产环境中虽然方便，但极少数情况下可能会受到 CDN 网络波动影响。
 Browser Security: 请务必通过 http:// 或 https:// 协议访问，不要直接双击 index.html (file://)，否则无法连接 Metamask。
 
+### 🧭 版本与配置维护说明
+
+- 主入口页面：`text/index.html`
+- 网络配置唯一来源：`text/config.js`
+- `text/config6.js` 仅作为兼容层（把 `window.NETWORKS` 映射为旧版页面可读的 `NETWORKS`）
+- 历史页面已归档到：`text/archive/`
+
+建议后续新增网络时只改 `config.js`，避免多份配置漂移。
+
 ### 📄 License
 
 MIT License.

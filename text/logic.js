@@ -65,7 +65,44 @@ createApp({
         const isV6Net = (id) => networks[id]?.isV6 || false;
         const getABI = (id) => isV6Net(id) ? V6_ABI : V5_ABI;
         const safeNetName = (id) => networks[id] ? networks[id].name : id;
-        const parseMd = (t) => t ? marked.parse(t.replace(/\n/g, '  \n')) : '';
+        const sanitizeHtml = (rawHtml) => {
+            if (!rawHtml) return '';
+            if (window.DOMPurify) {
+                return window.DOMPurify.sanitize(rawHtml, { USE_PROFILES: { html: true } });
+            }
+            return rawHtml
+                .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+                .replace(/on\w+\s*=\s*"[^"]*"/gi, '')
+                .replace(/on\w+\s*=\s*'[^']*'/gi, '');
+        };
+        const parseMd = (t) => {
+            if (!t) return '';
+            const rawHtml = marked.parse(t.replace(/\n/g, '  \n'));
+            return sanitizeHtml(rawHtml);
+        };
+
+        const RPC_TIMEOUT_MS = 12000;
+        const withTimeout = (promise, timeoutMs = RPC_TIMEOUT_MS) => Promise.race([
+            promise,
+            new Promise((_, reject) => setTimeout(() => reject(new Error('RPC timeout')), timeoutMs))
+        ]);
+        const getRpcCandidates = (cid) => {
+            const rpc = networks[cid]?.rpc;
+            if (!rpc) return [];
+            return Array.isArray(rpc) ? rpc : [rpc];
+        };
+        const runReadOnNetwork = async (cid, runWithProvider) => {
+            const rpcList = getRpcCandidates(cid);
+            for (const rpcUrl of rpcList) {
+                try {
+                    const provider = new ethers.JsonRpcProvider(rpcUrl);
+                    return await withTimeout(runWithProvider(provider));
+                } catch (_) {
+                    // try next rpc
+                }
+            }
+            throw new Error(`all rpc failed for ${cid}`);
+        };
 
         // 生成卡片的动态内联样式 (修复 Tailwind 卡死问题)
         const getCardStyle = (cid) => {
@@ -156,10 +193,11 @@ createApp({
             loading.value=true; explorePosts.value=[];
             const t = activeNetworks.value.map(async cid=>{
                 if(!networks[cid])return[]; try{
-                    const p=new ethers.JsonRpcProvider(networks[cid].rpc);
-                    const c=new ethers.Contract(networks[cid].proxy, getABI(cid), p);
-                    const r=await c.getPaginatedPosts(page.value.explore, 6);
-                    return r.map(x=>fmt(x,cid)).filter(x=>x.exists);
+                    return await runReadOnNetwork(cid, async (p) => {
+                        const c = new ethers.Contract(networks[cid].proxy, getABI(cid), p);
+                        const r = await c.getPaginatedPosts(page.value.explore, 6);
+                        return r.map(x => fmt(x, cid)).filter(x => x.exists);
+                    });
                 }catch(e){return[];}
             });
             const all=await Promise.all(t);
@@ -170,9 +208,10 @@ createApp({
         const fetchGal = async () => {
             const cid="0xa5bd"; if(!networks[cid]) return;
             loading.value=true; try{
-                const p=new ethers.JsonRpcProvider(networks[cid].rpc);
-                const c=new ethers.Contract(networks[cid].proxy, V6_ABI, p);
-                const r=await c.getPaginatedPosts(page.value.gallery, 12);
+                const r = await runReadOnNetwork(cid, async (p) => {
+                    const c = new ethers.Contract(networks[cid].proxy, V6_ABI, p);
+                    return await c.getPaginatedPosts(page.value.gallery, 12);
+                });
                 galleryPosts.value = r.map(x=>fmt(x,cid)).map(p=>{ p.img = p.cover||(p.content.match(/!\[.*?\]\((.*?)\)/)?.[1])||null; return p; }).filter(p=>p.exists&&p.img);
             }catch(e){} loading.value=false;
         };
@@ -198,8 +237,16 @@ createApp({
             loading.value=true; adminUsers.value=[];
             try{
                 const p=new ethers.BrowserProvider(window.ethereum); const c=new ethers.Contract(networks[wallet.value.chainId].proxy, COMMON_ABI, await p.getSigner());
-                const t=await c.getUserCount(); const l=[];
-                for(let i=Number(t)-1; i>=Math.max(0,Number(t)-20); i--){ const a=await c.allRegisteredUsers(i); const u=await c.users(a); l.push({addr:a,name:u.username,ban:u.isBanned}); }
+                const t=await c.getUserCount();
+                const start = Number(t)-1;
+                const end = Math.max(0, Number(t)-20);
+                const indexes = [];
+                for(let i=start; i>=end; i--) indexes.push(i);
+                const l = await Promise.all(indexes.map(async (idx) => {
+                    const a = await c.allRegisteredUsers(idx);
+                    const u = await c.users(a);
+                    return { addr:a, name:u.username, ban:u.isBanned };
+                }));
                 adminUsers.value=l;
             }catch(e){} loading.value=false;
         };
@@ -224,7 +271,7 @@ createApp({
         const delPostAction=async()=>{if(!confirm("Del?"))return;loading.value=true;try{const p=new ethers.BrowserProvider(window.ethereum);const c=new ethers.Contract(networks[wallet.value.chainId].proxy,COMMON_ABI,await p.getSigner());await(await c.deletePost(currentPost.value.id)).wait();alert("Deleted");goBack();}catch(e){alert("Err");}loading.value=false;}
         const toggleBan=async(a,s)=>{try{const p=new ethers.BrowserProvider(window.ethereum);const c=new ethers.Contract(networks[wallet.value.chainId].proxy,COMMON_ABI,await p.getSigner());await(await c.setBannedStatus(a,s)).wait();fetchAdmin();}catch(e){alert("Err");}}
 
-        const deepLink=async(c,i)=>{ if(!networks[c])return; loading.value=true;try{const p=new ethers.JsonRpcProvider(networks[c].rpc);const ct=new ethers.Contract(networks[c].proxy,getABI(c),p);const r=await ct.posts(i);const x=fmt(r,c);if(x.exists)goPost(x);else alert("Invalid");}catch(e){}loading.value=false;};
+        const deepLink=async(c,i)=>{ if(!networks[c])return; loading.value=true;try{const r=await runReadOnNetwork(c, async (p)=>{const ct=new ethers.Contract(networks[c].proxy,getABI(c),p);return await ct.posts(i);});const x=fmt(r,c);if(x.exists)goPost(x);else alert("Invalid");}catch(e){}loading.value=false;};
 
         // Lifecycle
         onMounted(async()=>{
@@ -239,7 +286,7 @@ createApp({
             currentView, activeNetworks, networks, wallet, userStatus, loading, 
             explorePosts, galleryPosts, historyPosts, adminUsers, page, currentPost, isEditMode, createForm, registerName, isV6:computed(()=>isV6Net(wallet.value.chainId)),
             // Correctly named exports matching index.html
-            connectWallet, switchNet, register, create:sendPost, updatePost:editPostAction, deletePost:delPostAction, toggleBan, 
+            connectWallet, connect:connectWallet, switchNet, register, create:sendPost, updatePost:editPostAction, update:editPostAction, deletePost:delPostAction, del:delPostAction, toggleBan, 
             getCardStyle, getTagColor, safeNetName, parseMd, goPost, goBack, copyLink, 
             fetchExp, fetchGal, fetchHis, fetchAdmin, 
             canEdit: (auth) => wallet.value.address && auth.toLowerCase() === wallet.value.address.toLowerCase()

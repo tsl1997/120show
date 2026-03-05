@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OmniVerse Protocol | 跨链存证中心 v6.8</title>
-    <!-- 配置文件 (必须存在 config.js) -->
-    <script src="config6.js"></script> 
+    <!-- 统一配置源：先加载 config.js，再用 config6.js 做兼容映射 -->
+    <script src="../config.js"></script>
+    <script src="../config6.js"></script> 
     
     <!-- 国内 CDN 加速 -->
     <script src="https://cdn.staticfile.org/ethers/6.7.0/ethers.umd.min.js"></script>

@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2FA 验证码工具 | XS 魔法实验室</title>
+    <style>
+        :root {
+            --bg1: #fff8ff;
+            --bg2: #eef8ff;
+            --bg3: #fffef3;
+            --text-main: #33456f;
+            --text-muted: #6f7ea8;
+            --line: #dce7ff;
+            --pink: #ff7cb4;
+            --peach: #ffb37c;
+            --blue: #79b5ff;
+            --mint: #71d9c4;
+            --card-shadow: 0 12px 30px rgba(124, 154, 219, 0.16);
+            --card-shadow-hover: 0 18px 36px rgba(124, 154, 219, 0.24);
+            --danger: #ea5b7a;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--text-main);
+            font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(255, 179, 124, 0.28) 0, transparent 28%),
+                radial-gradient(circle at 86% 9%, rgba(181, 156, 255, 0.26) 0, transparent 30%),
+                radial-gradient(circle at 76% 82%, rgba(121, 181, 255, 0.22) 0, transparent 33%),
+                linear-gradient(160deg, var(--bg1), var(--bg2) 52%, var(--bg3));
+            padding: 26px 14px 60px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .sparkles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.45;
+            background-image:
+                radial-gradient(circle, rgba(255, 124, 180, 0.58) 1px, transparent 1px),
+                radial-gradient(circle, rgba(121, 181, 255, 0.58) 1px, transparent 1px);
+            background-size: 44px 44px, 60px 60px;
+            background-position: 0 0, 18px 22px;
+        }
+
+        .app {
+            position: relative;
+            z-index: 2;
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+
+        .hero,
+        .panel,
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .hero {
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            font-size: 12px;
+            font-weight: 700;
+            color: #8d5d9d;
+            background: linear-gradient(90deg, #ffe3f2, #eaf3ff);
+            border: 1px solid #efdbff;
+            border-radius: 999px;
+            padding: 6px 12px;
+        }
+
+        .home-link {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 700;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 8px 12px;
+        }
+
+        h1 {
+            margin: 10px 0 5px;
+            font-size: clamp(30px, 5vw, 50px);
+            font-weight: 900;
+            line-height: 1.08;
+            background: linear-gradient(90deg, var(--pink), var(--peach) 34%, var(--blue) 70%, var(--mint));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sub { margin: 0; color: var(--text-muted); font-size: 14px; }
+
+        .panel {
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        label { display: block; font-size: 12px; font-weight: 700; color: #7384b1; margin-bottom: 6px; }
+
+        input,
+        select {
+            width: 100%;
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            padding: 10px 11px;
+            font-size: 14px;
+            outline: none;
+            color: var(--text-main);
+            background: #fff;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #b9ceff;
+            box-shadow: 0 0 0 4px rgba(121, 181, 255, 0.16);
+        }
+
+        .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 11px 14px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .btn-primary {
+            color: #fff;
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            box-shadow: 0 10px 18px rgba(134, 164, 227, 0.35);
+        }
+
+        .msg { margin-top: 8px; font-size: 12px; color: var(--text-muted); }
+
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .chip {
+            border: 1px solid #dbe8ff;
+            background: #fff;
+            color: #6d7ea9;
+            border-radius: 999px;
+            padding: 6px 11px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .chip.active {
+            color: #fff;
+            border-color: transparent;
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .card { padding: 12px; transition: 0.2s ease; }
+        .card:hover { transform: translateY(-2px); box-shadow: var(--card-shadow-hover); }
+
+        .card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .name { font-size: 15px; font-weight: 800; color: #41558d; }
+        .cate { font-size: 11px; color: #7384b1; background: #f6f9ff; border: 1px solid #dbe8ff; border-radius: 999px; padding: 3px 8px; }
+
+        .otp-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .otp {
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            font-size: 30px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: #374b82;
+        }
+
+        .copy {
+            border: 1px solid #dbe8ff;
+            border-radius: 10px;
+            background: #fff;
+            color: #5d6f9f;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 8px;
+            cursor: pointer;
+        }
+
+        .time-line {
+            width: 100%;
+            height: 8px;
+            border-radius: 999px;
+            background: #edf3ff;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .time-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            transition: width 0.2s linear;
+        }
+
+        .time-text { font-size: 12px; color: #7d8db8; display: flex; justify-content: space-between; }
+
+        .secret-hint {
+            margin-top: 8px;
+            font-size: 11px;
+            color: #97a6cd;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            word-break: break-all;
+        }
+
+        .danger {
+            border: 1px solid #ffd0dc;
+            background: #fff6f9;
+            color: var(--danger);
+            border-radius: 10px;
+            padding: 5px 7px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .empty {
+            text-align: center;
+            color: #8da0cd;
+            border: 1px dashed #dbe8ff;
+            border-radius: 16px;
+            padding: 26px;
+            background: rgba(255,255,255,0.7);
+        }
+
+        @media (max-width: 980px) {
+            .form-grid { grid-template-columns: 1fr 1fr; }
+            .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 640px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .grid { grid-template-columns: 1fr; }
+            .otp { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sparkles" aria-hidden="true"></div>
+
+    <div class="app">
+        <header class="hero">
+            <div class="hero-top">
+                <span class="pill">内容工具 / 本地 2FA 管理器</span>
+                <a class="home-link" href="../index.html" target="_blank" rel="noopener noreferrer">返回主页</a>
+            </div>
+            <h1>2FA 验证码工具</h1>
+            <p class="sub">本地缓存、离线计算、支持多账户分类管理（不会上传到服务器）。</p>
+        </header>
+
+        <section class="panel">
+            <div class="form-grid">
+                <div>
+                    <label for="nameInput">名称</label>
+                    <input id="nameInput" type="text" placeholder="例如：Google 主号">
+                </div>
+                <div>
+                    <label for="categoryInput">分类</label>
+                    <select id="categoryInput">
+                        <option>Google</option>
+                        <option>X</option>
+                        <option>DC</option>
+                        <option>FB</option>
+                        <option>INS</option>
+                        <option>其他</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="secretInput">2FA 秘钥</label>
+                    <input id="secretInput" type="text" placeholder="例如：JBSW Y3DP-EHPK 3PXP">
+                </div>
+                <button id="addBtn" class="btn btn-primary" type="button">添加卡片</button>
+            </div>
+            <div class="msg" id="msg">输入的秘钥会自动去掉空格和 `-` 后再计算。</div>
+        </section>
+
+        <section class="panel">
+            <div class="toolbar" id="filterBar"></div>
+            <div class="grid" id="cardGrid"></div>
+            <div class="empty" id="emptyState" style="display:none;">当前分类暂无 2FA 卡片，先添加一个吧。</div>
+        </section>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'xs_2fa_cards_v1';
+        const CATEGORIES = ['全部', 'Google', 'X', 'DC', 'FB', 'INS', '其他'];
+        const DIGITS = 6;
+        const PERIOD = 30;
+
+        const state = {
+            cards: [],
+            filter: '全部'
+        };
+
+        const nameInput = document.getElementById('nameInput');
+        const categoryInput = document.getElementById('categoryInput');
+        const secretInput = document.getElementById('secretInput');
+        const addBtn = document.getElementById('addBtn');
+        const msg = document.getElementById('msg');
+        const filterBar = document.getElementById('filterBar');
+        const cardGrid = document.getElementById('cardGrid');
+        const emptyState = document.getElementById('emptyState');
+
+        function nowSec() {
+            return Math.floor(Date.now() / 1000);
+        }
+
+        function remainSec() {
+            const t = nowSec();
+            return PERIOD - (t % PERIOD);
+        }
+
+        function normalizeSecret(raw) {
+            return (raw || '').replace(/[\s-]/g, '').toUpperCase();
+        }
+
+        function maskSecret(secret) {
+            if (!secret) return '';
+            if (secret.length <= 8) return secret;
+            return secret.slice(0, 4) + '...' + secret.slice(-4);
+        }
+
+        function loadCards() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                state.cards = raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                state.cards = [];
+            }
+        }
+
+        function saveCards() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state.cards));
+        }
+
+        function setMsg(text, isError = false) {
+            msg.textContent = text;
+            msg.style.color = isError ? 'var(--danger)' : 'var(--text-muted)';
+        }
+
+        function buildFilterBar() {
+            filterBar.innerHTML = '';
+            CATEGORIES.forEach((item) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'chip' + (state.filter === item ? ' active' : '');
+                btn.textContent = item;
+                btn.onclick = () => {
+                    state.filter = item;
+                    buildFilterBar();
+                    renderCards();
+                };
+                filterBar.appendChild(btn);
+            });
+        }
+
+        function base32ToBytes(base32) {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+            const cleaned = normalizeSecret(base32).replace(/=+$/g, '');
+            if (!cleaned) throw new Error('empty secret');
+
+            let bits = '';
+            for (const char of cleaned) {
+                const val = alphabet.indexOf(char);
+                if (val === -1) throw new Error('invalid base32 char');
+                bits += val.toString(2).padStart(5, '0');
+            }
+
+            const bytes = [];
+            for (let i = 0; i + 8 <= bits.length; i += 8) {
+                bytes.push(parseInt(bits.slice(i, i + 8), 2));
+            }
+            return new Uint8Array(bytes);
+        }
+
+        async function totp(secret, time) {
+            const keyBytes = base32ToBytes(secret);
+            const key = await crypto.subtle.importKey('raw', keyBytes, { name: 'HMAC', hash: 'SHA-1' }, false, ['sign']);
+
+            const counter = Math.floor(time / PERIOD);
+            const buffer = new ArrayBuffer(8);
+            const view = new DataView(buffer);
+            view.setUint32(0, Math.floor(counter / 0x100000000), false);
+            view.setUint32(4, counter >>> 0, false);
+
+            const hmac = new Uint8Array(await crypto.subtle.sign('HMAC', key, buffer));
+            const offset = hmac[hmac.length - 1] & 0x0f;
+            const binary = ((hmac[offset] & 0x7f) << 24) | ((hmac[offset + 1] & 0xff) << 16) | ((hmac[offset + 2] & 0xff) << 8) | (hmac[offset + 3] & 0xff);
+            const otp = binary % (10 ** DIGITS);
+            return String(otp).padStart(DIGITS, '0');
+        }
+
+        async function renderCards() {
+            cardGrid.innerHTML = '';
+
+            const list = state.filter === '全部'
+                ? state.cards
+                : state.cards.filter(item => item.category === state.filter);
+
+            if (!list.length) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            emptyState.style.display = 'none';
+
+            const remain = remainSec();
+            const fillPct = (remain / PERIOD) * 100;
+
+            for (const item of list) {
+                const card = document.createElement('article');
+                card.className = 'card';
+
+                let code = '------';
+                let invalid = false;
+                try {
+                    code = await totp(item.secret, nowSec());
+                } catch (_) {
+                    invalid = true;
+                    code = '无效秘钥';
+                }
+
+                card.innerHTML = `
+                    <div class="card-head">
+                        <div class="name">${escapeHtml(item.name)}</div>
+                        <div class="cate">${escapeHtml(item.category)}</div>
+                    </div>
+                    <div class="otp-row">
+                        <div class="otp">${code}</div>
+                        <button class="copy" type="button">复制</button>
+                    </div>
+                    <div class="time-line"><div class="time-fill" style="width:${fillPct}%"></div></div>
+                    <div class="time-text">
+                        <span>${invalid ? '无法计算，请检查秘钥' : '剩余时间'}</span>
+                        <span>${invalid ? '--' : remain + 's'}</span>
+                    </div>
+                    <div class="secret-hint">Key: ${maskSecret(item.secret)}</div>
+                    <div style="margin-top:8px; display:flex; justify-content:flex-end;">
+                        <button class="danger" type="button">删除</button>
+                    </div>
+                `;
+
+                const copyBtn = card.querySelector('.copy');
+                const delBtn = card.querySelector('.danger');
+
+                copyBtn.onclick = async () => {
+                    if (invalid) return;
+                    try {
+                        await navigator.clipboard.writeText(code);
+                        copyBtn.textContent = '已复制';
+                        setTimeout(() => { copyBtn.textContent = '复制'; }, 900);
+                    } catch (_) {
+                        alert('复制失败，请手动复制。');
+                    }
+                };
+
+                delBtn.onclick = () => {
+                    state.cards = state.cards.filter(x => x.id !== item.id);
+                    saveCards();
+                    renderCards();
+                };
+
+                cardGrid.appendChild(card);
+            }
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#39;');
+        }
+
+        function addCard() {
+            const name = nameInput.value.trim();
+            const category = categoryInput.value;
+            const rawSecret = secretInput.value.trim();
+            const cleanedSecret = normalizeSecret(rawSecret);
+
+            if (!name) return setMsg('请先输入名称。', true);
+            if (!cleanedSecret) return setMsg('请先输入 2FA 秘钥。', true);
+
+            try {
+                base32ToBytes(cleanedSecret);
+            } catch (_) {
+                return setMsg('秘钥格式不正确（需为 Base32）。', true);
+            }
+
+            state.cards.unshift({
+                id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
+                name,
+                category,
+                secret: cleanedSecret
+            });
+
+            saveCards();
+            nameInput.value = '';
+            secretInput.value = '';
+            setMsg('已添加并保存到本地缓存。');
+            renderCards();
+        }
+
+        addBtn.onclick = addCard;
+        secretInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addCard();
+            }
+        });
+
+        loadCards();
+        buildFilterBar();
+        renderCards();
+
+        setInterval(() => {
+            renderCards();
+        }, 1000);
+    </script>
+</body>
+</html>

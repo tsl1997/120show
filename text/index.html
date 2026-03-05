@@ -11,6 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
     
     <script src="./config.js"></script>
 
@@ -26,15 +27,119 @@
         }
     </script>
     <style>
-        body { background-color: #faf9f6; color: #111; font-family: 'Inter', sans-serif; }
-        .bento-card { transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); border: 1px solid rgba(0,0,0,0.06); }
-        .bento-card:hover { transform: translateY(-6px); box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.1); z-index: 5; }
-        
-        .nav-btn { font-size: 0.9rem; font-weight: 800; text-transform: uppercase; color: #999; letter-spacing: 0.5px; transition: color 0.2s; }
-        .nav-btn:hover { color: #000; }
-        .nav-btn.active { color: #000; text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 3px; }
-        
+        :root {
+            --bg1: #fff8ff;
+            --bg2: #eef8ff;
+            --bg3: #fffef3;
+            --text-main: #33456f;
+            --text-muted: #6f7ea8;
+            --line: #dce7ff;
+            --pink: #ff7cb4;
+            --peach: #ffb37c;
+            --blue: #79b5ff;
+            --mint: #71d9c4;
+            --card-shadow: 0 12px 30px rgba(124, 154, 219, 0.16);
+            --card-shadow-hover: 0 18px 36px rgba(124, 154, 219, 0.24);
+        }
+
+        body {
+            color: var(--text-main);
+            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(255, 179, 124, 0.28) 0, transparent 28%),
+                radial-gradient(circle at 86% 9%, rgba(181, 156, 255, 0.26) 0, transparent 30%),
+                radial-gradient(circle at 76% 82%, rgba(121, 181, 255, 0.22) 0, transparent 33%),
+                linear-gradient(160deg, var(--bg1), var(--bg2) 52%, var(--bg3));
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.45;
+            background-image:
+                radial-gradient(circle, rgba(255, 124, 180, 0.58) 1px, transparent 1px),
+                radial-gradient(circle, rgba(121, 181, 255, 0.58) 1px, transparent 1px);
+            background-size: 44px 44px, 60px 60px;
+            background-position: 0 0, 18px 22px;
+            z-index: 0;
+        }
+
+        #app { position: relative; z-index: 1; }
+
+        .site-header {
+            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(248,252,255,0.88));
+            border-bottom: 1px solid var(--line) !important;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(6px);
+        }
+
+        .logo-box {
+            background: linear-gradient(135deg, var(--pink), var(--peach), var(--blue));
+            color: #fff;
+            border-radius: 16px;
+        }
+
+        .main-nav-shell {
+            background: rgba(255,255,255,0.75) !important;
+            border: 1px solid var(--line) !important;
+            border-radius: 16px !important;
+        }
+
+        .nav-btn { font-size: 0.9rem; font-weight: 800; color: var(--text-muted); letter-spacing: 0.5px; transition: all 0.2s; }
+        .nav-btn:hover { color: #4f66a0; }
+        .nav-btn.active {
+            color: #fff;
+            text-decoration: none;
+            border-radius: 12px;
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            box-shadow: 0 10px 18px rgba(134, 164, 227, 0.35);
+        }
+
+        .wallet-btn {
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            box-shadow: 0 10px 18px rgba(134, 164, 227, 0.35);
+        }
+
+        .wallet-chip {
+            background: rgba(255,255,255,0.86) !important;
+            border: 1px solid var(--line) !important;
+            border-radius: 12px;
+        }
+
+        .bento-card {
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            border: 1px solid var(--line) !important;
+            box-shadow: var(--card-shadow);
+            background: rgba(255,255,255,0.88);
+        }
+
+        .bento-card:hover { transform: translateY(-5px); box-shadow: var(--card-shadow-hover); z-index: 5; }
+
+        .hero-main-card {
+            color: #fff !important;
+            background: linear-gradient(135deg, #7aa2ff, #8d82ff 45%, #ff93c8 100%) !important;
+            border: 1px solid rgba(255,255,255,0.35) !important;
+        }
+
         .hero-big { font-size: 5rem; font-weight: 900; line-height: 0.9; letter-spacing: -0.04em; }
+        .hero-big .hl {
+            background: linear-gradient(90deg, #ffffff, #ffe8f5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .action-primary {
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue)) !important;
+            border: none !important;
+            color: #fff !important;
+        }
+
         .no-scroll::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -47,12 +152,12 @@
         </div>
 
         <!-- 1. HEADER (NOT Sticky as requested, 大尺寸, scroll away) -->
-        <header class="bg-white border-b border-gray-100 py-8 px-6">
+        <header class="site-header py-8 px-6">
             <div class="max-w-[1400px] mx-auto flex items-center justify-between">
                 
                 <!-- Logo -->
                 <div class="flex items-center gap-4 cursor-pointer" @click="currentView='home'">
-                    <div class="w-14 h-14 bg-black text-white flex items-center justify-center font-black text-2xl rounded-2xl shadow-xl">Ω</div>
+                    <div class="w-14 h-14 logo-box flex items-center justify-center font-black text-2xl shadow-xl">Ω</div>
                     <div class="flex flex-col">
                         <span class="text-2xl font-black tracking-tight leading-none">OmniVerse</span>
                         <span class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-1">Full-Chain Protocol</span>
@@ -60,7 +165,7 @@
                 </div>
 
                 <!-- Nav Center -->
-                <nav class="hidden lg:flex items-center gap-8 bg-gray-50 px-10 py-4 rounded-full border border-gray-100">
+                <nav class="hidden lg:flex items-center gap-8 px-10 py-4 main-nav-shell">
                     <button v-for="t in ['home', 'explore', 'gallery', 'create', 'history']" 
                         @click="currentView=t" 
                         :class="['nav-btn', { active: currentView===t }]">
@@ -81,8 +186,8 @@
                         <div class="pointer-events-none absolute right-3 top-3 text-[10px]">▼</div>
                     </div>
 
-                    <button v-if="!wallet.isConnected" @click="connectWallet" class="bg-black text-white px-8 py-3 rounded-xl font-bold text-sm shadow-xl hover:scale-105 transition">连接钱包</button>
-                    <div v-else class="flex items-center gap-3 bg-white border border-gray-200 pl-4 pr-2 py-2 rounded-xl">
+                    <button v-if="!wallet.isConnected" @click="connectWallet" class="wallet-btn px-8 py-3 font-bold text-sm hover:scale-105 transition">连接钱包</button>
+                    <div v-else class="wallet-chip flex items-center gap-3 pl-4 pr-2 py-2">
                         <span class="text-xs font-bold font-mono">{{ wallet.address.slice(0,6) }}</span>
                         <div class="w-8 h-8 rounded-lg bg-green-500 text-white flex items-center justify-center font-bold text-xs">{{ userStatus.username ? userStatus.username[0] : 'U' }}</div>
                     </div>
@@ -96,11 +201,11 @@
                 
                 <!-- A. HOME -->
                 <div v-if="currentView==='home'" class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:h-[600px]">
-                    <div class="lg:col-span-3 bg-black text-white rounded-4xl p-16 flex flex-col justify-between relative overflow-hidden cursor-pointer group bento-card" @click="currentView='explore'">
+                    <div class="lg:col-span-3 text-white rounded-4xl p-16 flex flex-col justify-between relative overflow-hidden cursor-pointer group bento-card hero-main-card" @click="currentView='explore'">
                         <div class="absolute -right-32 -top-32 w-[600px] h-[600px] bg-gradient-to-br from-indigo-900 to-purple-900 rounded-full blur-[100px] opacity-60 group-hover:scale-110 transition duration-1000"></div>
                         <div class="relative z-10">
                             <span class="border border-white/20 px-4 py-2 rounded-full text-xs font-bold tracking-wider">WEB3 STORAGE</span>
-                            <h1 class="hero-big mt-8">DATA IS<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-gray-400 to-white">IMMUTABLE.</span></h1>
+                            <h1 class="hero-big mt-8">DATA IS<br><span class="hl">IMMUTABLE.</span></h1>
                         </div>
                         <div class="mb-4 space-y-1">
                             <p class="text-white font-bold text-lg leading-tight tracking-wide">{{ networkStats }}</p>
@@ -113,7 +218,7 @@
                             <h2 class="font-black text-2xl">Visuals</h2>
                             <p class="text-xs font-bold text-gray-400 mt-2 uppercase tracking-widest">Tempo V6 Gallery</p>
                         </div>
-                        <div @click="currentView='create'" class="flex-1 bg-blue-600 text-white rounded-4xl p-10 flex flex-col justify-center text-center cursor-pointer bento-card hover:bg-blue-700">
+                        <div @click="currentView='create'" class="flex-1 text-white rounded-4xl p-10 flex flex-col justify-center text-center cursor-pointer bento-card action-primary">
                             <h2 class="font-black text-2xl mb-1">Create</h2>
                             <p class="text-blue-200 text-xs">Start Publishing</p>
                         </div>
@@ -148,8 +253,8 @@
                         </div>
                     </div>
                     <div class="mt-16 flex justify-center gap-4 text-xs font-bold">
-                        <button @click="page.explore--;fetchExp()" :disabled="page.explore<=1" class="px-6 py-3 border bg-white rounded-full disabled:opacity-50">上一页</button>
-                        <button @click="page.explore++;fetchExp()" class="px-6 py-3 bg-black text-white rounded-full">下一页</button>
+                        <button @click="page.explore--" :disabled="page.explore<=1" class="px-6 py-3 border bg-white rounded-full disabled:opacity-50">上一页</button>
+                        <button @click="page.explore++" class="px-6 py-3 rounded-full action-primary">下一页</button>
                     </div>
                 </div>
 
@@ -170,8 +275,8 @@
                         <article class="prose prose-xl prose-slate mx-auto font-serif text-gray-800 leading-loose" v-html="parseMd(currentPost.content)"></article>
                         
                         <div v-if="canEdit(currentPost.author)" class="mt-20 pt-10 border-t flex justify-end gap-4">
-                            <button @click="del" class="text-red-500 font-bold text-xs px-4">DELETE</button>
-                            <button @click="isEditMode=true" class="bg-black text-white px-8 py-3 rounded-xl font-bold hover:shadow-xl transition">Edit Post</button>
+                            <button @click="deletePost" class="text-red-500 font-bold text-xs px-4">DELETE</button>
+                            <button @click="isEditMode=true" class="action-primary px-8 py-3 rounded-xl font-bold hover:shadow-xl transition">Edit Post</button>
                         </div>
                     </div>
 
@@ -182,7 +287,7 @@
                         <textarea v-model="currentPost.content" class="w-full h-[400px] bg-gray-50 rounded-2xl p-6 text-lg font-serif outline-none resize-none"></textarea>
                         <div class="flex justify-end gap-4 pt-8">
                             <button @click="isEditMode=false" class="font-bold text-gray-400 hover:text-black">取消</button>
-                            <button @click="update" class="bg-green-600 text-white px-10 py-3 rounded-xl font-bold shadow-lg">保存</button>
+                            <button @click="updatePost" class="bg-green-600 text-white px-10 py-3 rounded-xl font-bold shadow-lg">保存</button>
                         </div>
                     </div>
                 </div>
@@ -193,7 +298,7 @@
                         <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 to-purple-600"></div>
                         <h2 class="text-4xl font-black mb-10">发布内容</h2>
                         
-                        <div v-if="!wallet.isConnected" class="py-20 text-center"><button @click="connect" class="bg-black text-white px-8 py-3 rounded-xl font-bold">请先连接钱包</button></div>
+                        <div v-if="!wallet.isConnected" class="py-20 text-center"><button @click="connectWallet" class="wallet-btn px-8 py-3 font-bold">请先连接钱包</button></div>
                         <div v-else-if="!userStatus.isRegistered" class="text-center py-10">
                             <input v-model="registerName" class="text-center text-3xl font-bold w-full border-b-2 py-4 outline-none focus:border-black" placeholder="注册昵称">
                             <button @click="register" class="mt-8 bg-blue-600 text-white px-10 py-3 rounded-xl font-bold shadow-lg">注册</button>
@@ -203,7 +308,7 @@
                             <input v-model="createForm.title" class="w-full text-5xl font-black outline-none placeholder-gray-200" placeholder="标题...">
                             <input v-if="isV6" v-model="createForm.cover" class="w-full text-xs font-mono text-pink-500 bg-pink-50 p-3 rounded-lg outline-none" placeholder="Cover URL">
                             <textarea v-model="createForm.content" class="w-full h-80 text-xl font-serif text-gray-600 resize-none outline-none leading-relaxed placeholder-gray-300" placeholder="开始写作... (Markdown)"></textarea>
-                            <div class="text-right pt-6"><button @click="create" class="bg-black text-white px-12 py-4 rounded-2xl font-bold shadow-xl hover:scale-105 transition">发布</button></div>
+                            <div class="text-right pt-6"><button @click="create" class="action-primary px-12 py-4 rounded-2xl font-bold shadow-xl hover:scale-105 transition">发布</button></div>
                         </div>
                     </div>
                 </div>
@@ -218,7 +323,7 @@
                             <div class="font-bold text-xs bg-gray-100 px-3 py-1 rounded">查看</div>
                         </div>
                     </div>
-                    <div class="flex justify-center mt-10 gap-4"><button @click="page.history--;fetchHis()" :disabled="page.history<=1" class="border px-4 py-2 bg-white rounded font-bold disabled:opacity-50">Prev</button><button @click="page.history++;fetchHis()" class="bg-black text-white px-4 py-2 rounded font-bold">Next</button></div>
+                    <div class="flex justify-center mt-10 gap-4"><button @click="page.history--" :disabled="page.history<=1" class="border px-4 py-2 bg-white rounded font-bold disabled:opacity-50">Prev</button><button @click="page.history++" class="action-primary px-4 py-2 rounded font-bold">Next</button></div>
                 </div>
 
                 <!-- F. GALLERY -->
@@ -230,7 +335,7 @@
                             <div class="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white font-bold text-xs translate-y-full group-hover:translate-y-0 transition">{{ p.title }}</div>
                         </div>
                     </div>
-                    <div class="flex justify-center mt-10 gap-4"><button @click="page.gallery--;fetchGal()" :disabled="page.gallery<=1" class="border px-4 py-2 bg-white rounded font-bold disabled:opacity-50">Prev</button><button @click="page.gallery++;fetchGal()" class="bg-black text-white px-4 py-2 rounded font-bold">Next</button></div>
+                    <div class="flex justify-center mt-10 gap-4"><button @click="page.gallery--" :disabled="page.gallery<=1" class="border px-4 py-2 bg-white rounded font-bold disabled:opacity-50">Prev</button><button @click="page.gallery++" class="action-primary px-4 py-2 rounded font-bold">Next</button></div>
                 </div>
 
                 <!-- G. ADMIN -->
