@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hoodi 地址检查 | XS 魔法实验室</title>
+    <title>测试网地址检查器 | XS 魔法实验室</title>
     <style>
         :root {
             --bg1: #fff8ff;
@@ -137,7 +137,7 @@
             margin-bottom: 8px;
         }
 
-        input[type="text"], textarea {
+        input[type="text"], textarea, select {
             width: 100%;
             border: 1px solid #dbe8ff;
             color: var(--text-main);
@@ -149,6 +149,7 @@
         }
 
         input[type="text"]:focus,
+        select:focus,
         textarea:focus {
             outline: none;
             border-color: #b9ceff;
@@ -327,14 +328,27 @@
 <div class="container">
     <header class="hero">
         <div class="hero-top">
-            <span class="pill">Web3 实验 / Hoodi 地址检查</span>
+            <span class="pill">Web3 实验 / 多测试网地址检查</span>
             <a href="../index.html" class="home-link" target="_blank" rel="noopener noreferrer">返回主页</a>
         </div>
-        <h1>Hoodi 地址检查</h1>
-        <p class="subtitle">万级地址并发扫描，快速统计有余额账户和 ETH 总量。</p>
+        <h1>多测试网地址检查</h1>
+        <p class="subtitle">支持多个 EVM 测试网，万级地址并发扫描，快速统计有余额账户和 ETH 总量。</p>
     </header>
 
     <div class="panel">
+        <div class="form-group">
+            <label>测试网</label>
+            <select id="networkSelect">
+                <option value="hoodi">Hoodi</option>
+                <option value="sepolia">Ethereum Sepolia</option>
+                <option value="holesky">Ethereum Holesky</option>
+                <option value="op-sepolia">OP Sepolia</option>
+                <option value="arb-sepolia">Arbitrum Sepolia</option>
+                <option value="base-sepolia">Base Sepolia</option>
+                <option value="custom">自定义 RPC</option>
+            </select>
+        </div>
+
         <div class="form-group">
             <label>RPC 节点地址</label>
             <input type="text" id="rpcUrl" value="https://0xrpc.io/hoodi" placeholder="Network Endpoint">
@@ -344,6 +358,12 @@
             <label>钱包地址列表（最多 10000 行）</label>
             <textarea id="addressInput" placeholder="请粘贴地址，每行一个..."></textarea>
             <div class="helper-text" id="counter">0 / 10000 行</div>
+        </div>
+
+        <div class="form-group">
+            <label>线程数量</label>
+            <input type="text" id="concurrencyInput" value="50" placeholder="请输入线程数量">
+            <div class="helper-text">默认 50，建议不超过 100</div>
         </div>
 
         <div class="control-panel">
@@ -381,11 +401,21 @@
 
 <script>
     const MAX_LINES = 10000;
-    const BATCH_SIZE = 50;
+    const DEFAULT_BATCH_SIZE = 50;
     const BATCH_DELAY = 100;
+    const NETWORK_PRESETS = {
+        hoodi: { label: 'Hoodi', rpc: 'https://0xrpc.io/hoodi' },
+        sepolia: { label: 'Ethereum Sepolia', rpc: 'https://ethereum-sepolia-rpc.publicnode.com' },
+        holesky: { label: 'Ethereum Holesky', rpc: 'https://ethereum-holesky-rpc.publicnode.com' },
+        'op-sepolia': { label: 'OP Sepolia', rpc: 'https://optimism-sepolia-rpc.publicnode.com' },
+        'arb-sepolia': { label: 'Arbitrum Sepolia', rpc: 'https://arbitrum-sepolia-rpc.publicnode.com' },
+        'base-sepolia': { label: 'Base Sepolia', rpc: 'https://base-sepolia-rpc.publicnode.com' }
+    };
 
+    const networkSelect = document.getElementById('networkSelect');
     const rpcInput = document.getElementById('rpcUrl');
     const addressInput = document.getElementById('addressInput');
+    const concurrencyInput = document.getElementById('concurrencyInput');
     const counterEl = document.getElementById('counter');
     const checkBtn = document.getElementById('checkBtn');
     const resultArea = document.getElementById('resultArea');
@@ -400,6 +430,12 @@
 
     let csvData = [];
     let isRunning = false;
+
+    networkSelect.addEventListener('change', () => {
+        applyNetworkPreset(networkSelect.value);
+    });
+
+    applyNetworkPreset(networkSelect.value);
 
     addressInput.addEventListener('input', () => {
         const lines = addressInput.value.split('\n').filter(l => l.trim() !== '').length;
@@ -417,9 +453,13 @@
     async function startCheck() {
         if (isRunning) return;
 
+        const networkKey = networkSelect.value;
+        const networkLabel = getNetworkLabel(networkKey);
         const rpc = rpcInput.value.trim();
+        const batchSize = getBatchSize();
         const rawText = addressInput.value;
         if (!rpc) { alert('RPC 地址不能为空'); return; }
+        if (!batchSize) return;
 
         const addresses = rawText.split('\n').map(l => l.trim()).filter(l => l !== '');
         if (addresses.length === 0) { alert('请输入地址'); return; }
@@ -436,8 +476,9 @@
         table.innerHTML = `
             <thead>
                 <tr>
-                    <th style="width:60%">钱包地址</th>
-                    <th style="width:40%">余额（ETH）</th>
+                    <th style="width:24%">网络</th>
+                    <th style="width:50%">钱包地址</th>
+                    <th style="width:26%">余额（ETH）</th>
                 </tr>
             </thead>
             <tbody id="resultBody"></tbody>
@@ -452,16 +493,17 @@
 
         progressWrapper.style.display = 'block';
         updateProgress(0, totalCount);
+        progressStatus.textContent = `扫描中... ${networkLabel}`;
 
-        for (let i = 0; i < totalCount; i += BATCH_SIZE) {
-            const batch = addresses.slice(i, i + BATCH_SIZE);
+        for (let i = 0; i < totalCount; i += batchSize) {
+            const batch = addresses.slice(i, i + batchSize);
 
             const batchPromises = batch.map(async (addr) => {
                 const row = document.createElement('tr');
                 let ethVal = '0';
 
                 if (!isValidEthAddress(addr)) {
-                    row.innerHTML = `<td class="addr-invalid">${addr}</td><td><span style="font-size:12px;color:#9caad0">无效格式</span></td>`;
+                    row.innerHTML = `<td>${networkLabel}</td><td class="addr-invalid">${addr}</td><td><span style="font-size:12px;color:#9caad0">无效格式</span></td>`;
                 } else {
                     try {
                         const balanceWeiHex = await fetchBalance(rpc, addr);
@@ -471,14 +513,14 @@
                         if (balanceWei > 0n) {
                             fundedCount++;
                             totalBalanceWei += balanceWei;
-                            csvData.push({ address: addr, balance: ethVal });
-                            row.innerHTML = `<td>${addr}</td><td class="val-eth">${ethVal}</td>`;
+                            csvData.push({ network: networkLabel, address: addr, balance: ethVal });
+                            row.innerHTML = `<td>${networkLabel}</td><td>${addr}</td><td class="val-eth">${ethVal}</td>`;
                         } else {
-                            row.innerHTML = `<td style="opacity:0.75">${addr}</td><td class="val-zero">0</td>`;
+                            row.innerHTML = `<td>${networkLabel}</td><td style="opacity:0.75">${addr}</td><td class="val-zero">0</td>`;
                         }
                     } catch (error) {
                         console.error(`Error fetching ${addr}:`, error);
-                        row.innerHTML = `<td>${addr}</td><td class="status-error">RPC Error</td>`;
+                        row.innerHTML = `<td>${networkLabel}</td><td>${addr}</td><td class="status-error">RPC Error</td>`;
                     }
                 }
                 return row;
@@ -495,7 +537,7 @@
             totalBalanceEl.textContent = formatWeiToEth(totalBalanceWei);
             statsPanel.style.display = 'grid';
 
-            if (i + BATCH_SIZE < totalCount) {
+            if (i + batchSize < totalCount) {
                 await sleep(BATCH_DELAY);
             }
         }
@@ -547,14 +589,56 @@
 
     function downloadCSV() {
         if (csvData.length === 0) return alert('暂无数据可导出');
-        let csvContent = 'Address,Balance(ETH)\n';
-        csvData.forEach(i => { csvContent += `${i.address},${i.balance}\n`; });
+        let csvContent = 'Network,Address,Balance(ETH)\n';
+        csvData.forEach(i => { csvContent += `${i.network},${i.address},${i.balance}\n`; });
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         const dateStr = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-        link.download = `Hoodi_Balances_${dateStr}.csv`;
+        link.download = `${getNetworkLabel(networkSelect.value).replace(/\s+/g, '_')}_Balances_${dateStr}.csv`;
         link.click();
+    }
+
+    function applyNetworkPreset(networkKey) {
+        if (networkKey === 'custom') {
+            rpcInput.readOnly = false;
+            rpcInput.placeholder = 'https://your-testnet-rpc.example';
+            if (NETWORK_PRESETS.hoodi.rpc === rpcInput.value.trim()) {
+                rpcInput.value = '';
+            }
+            return;
+        }
+
+        const preset = NETWORK_PRESETS[networkKey];
+        rpcInput.value = preset ? preset.rpc : '';
+        rpcInput.readOnly = false;
+    }
+
+    function getBatchSize() {
+        const value = concurrencyInput.value.trim();
+        const parsed = Number(value);
+        const isInteger = Number.isInteger(parsed);
+
+        if (!isInteger || parsed <= 0) {
+            alert('输入错误，请重新输入。线程数量必须是正整数。');
+            concurrencyInput.focus();
+            return null;
+        }
+
+        if (parsed > 100) {
+            const shouldContinue = confirm('线程数量过大，是否要继续？');
+            if (!shouldContinue) {
+                concurrencyInput.focus();
+                return null;
+            }
+        }
+
+        return parsed;
+    }
+
+    function getNetworkLabel(networkKey) {
+        if (networkKey === 'custom') return 'Custom RPC';
+        return NETWORK_PRESETS[networkKey]?.label || networkKey;
     }
 
     function isValidEthAddress(addr) {

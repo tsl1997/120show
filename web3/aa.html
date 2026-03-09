@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AA 账号体验台 | XS 魔法实验室</title>
+    <style>
+        :root {
+            --bg1: #fff8fb;
+            --bg2: #eef8ff;
+            --bg3: #fffef3;
+            --text-main: #33456f;
+            --text-muted: #6f7ea8;
+            --line: #dce7ff;
+            --pink: #ff7cb4;
+            --peach: #ffb37c;
+            --blue: #79b5ff;
+            --mint: #71d9c4;
+            --lavender: #9f8bff;
+            --card-shadow: 0 12px 30px rgba(124, 154, 219, 0.16);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(255, 179, 124, 0.28) 0, transparent 28%),
+                radial-gradient(circle at 86% 9%, rgba(181, 156, 255, 0.26) 0, transparent 30%),
+                radial-gradient(circle at 76% 82%, rgba(121, 181, 255, 0.22) 0, transparent 33%),
+                linear-gradient(160deg, var(--bg1), var(--bg2) 52%, var(--bg3));
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 28px 16px 56px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container { width: 100%; max-width: 1050px; margin: 0 auto; }
+
+        .hero,
+        .panel,
+        .tips,
+        .log {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .hero { padding: 18px; margin-bottom: 14px; }
+        .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+        .pill {
+            font-size: 12px;
+            font-weight: 800;
+            color: #8d5d9d;
+            background: linear-gradient(90deg, #ffe3f2, #eaf3ff);
+            border: 1px solid #efdbff;
+            border-radius: 999px;
+            padding: 6px 12px;
+        }
+
+        .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .ghost,
+        .connect {
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--text-main);
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            padding: 8px 12px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .ghost:hover,
+        .connect:hover { transform: translateY(-2px); box-shadow: 0 8px 14px rgba(131, 152, 206, 0.18); }
+
+        .mode-btn {
+            border: 1px solid #dbe8ff;
+            background: #f8fbff;
+            color: #5b78c9;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 800;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+        .mode-btn:hover { background: #eef5ff; transform: translateY(-2px); }
+
+        h1 {
+            margin: 12px 0 6px;
+            font-size: clamp(30px, 6vw, 48px);
+            font-weight: 900;
+            line-height: 1.08;
+            background: linear-gradient(90deg, var(--pink), var(--peach) 34%, var(--blue) 70%, var(--mint));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle { color: var(--text-muted); font-size: 15px; }
+        .net-limit {
+            margin-top: 8px;
+            display: inline-block;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 800;
+            border-radius: 999px;
+            color: #8a64a1;
+            background: linear-gradient(90deg, #ffe6f3, #f0ecff);
+            border: 1px solid #eddcff;
+        }
+
+        #walletInfo { margin-top: 10px; font-size: 12px; color: #6479ad; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .panel { padding: 16px; }
+        .right-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            height: 100%;
+        }
+        .field { margin-bottom: 12px; }
+        .label { display: block; font-size: 12px; color: #6f7ea8; font-weight: 800; margin-bottom: 7px; }
+        .main-note {
+            margin-bottom: 12px;
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            background: #f8fbff;
+            padding: 9px 10px;
+            font-size: 12px;
+            color: #5f74ad;
+            line-height: 1.45;
+        }
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 7px;
+        }
+        .label-row .label { margin-bottom: 0; }
+        .quick-link {
+            font-size: 12px;
+            font-weight: 800;
+            color: #5b78c9;
+            text-decoration: none;
+            border: 1px solid #dbe8ff;
+            border-radius: 999px;
+            padding: 4px 8px;
+            background: #f8fbff;
+        }
+        .quick-link:hover { background: #eef5ff; }
+
+        input[type="text"] {
+            width: 100%;
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            padding: 11px 12px;
+            color: var(--text-main);
+            outline: none;
+            transition: .2s ease;
+            background: #fff;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        }
+
+        input[type="text"]:focus { border-color: #b9ceff; box-shadow: 0 0 0 4px rgba(121, 181, 255, 0.16); }
+
+        .switches { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+        .switch {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            padding: 10px;
+            background: #fff;
+            font-size: 13px;
+            color: #4d5f92;
+            font-weight: 700;
+        }
+
+        .switch input { accent-color: #ff7cb4; }
+
+        .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .btn:hover { transform: translateY(-2px); }
+        .btn.a { background: linear-gradient(90deg, #79b5ff, #68d0ff); }
+        .btn.b { background: linear-gradient(90deg, #ff7cb4, #ffad8e); }
+        .btn.c { background: linear-gradient(90deg, #9f8bff, #7eb7ff); }
+
+        .tips { padding: 14px; }
+        .tips h3 { font-size: 16px; color: #4c6398; margin-bottom: 10px; }
+        .tip-item {
+            border: 1px solid #e6efff;
+            border-radius: 12px;
+            padding: 10px;
+            background: #fff;
+            margin-bottom: 8px;
+        }
+        .tip-item b { font-size: 12px; color: #5872ad; }
+        .tip-item p { margin-top: 4px; font-size: 12px; color: #6f7ea8; line-height: 1.45; }
+
+        .fold {
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            background: #fff;
+            margin-bottom: 12px;
+        }
+        .fold > summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 900;
+            color: #4d5f92;
+            user-select: none;
+        }
+        .fold > summary::-webkit-details-marker { display: none; }
+        .fold-body {
+            border-top: 1px dashed #e6efff;
+            padding: 10px;
+        }
+
+        .log {
+            padding: 14px;
+            height: 340px;
+            min-height: 340px;
+            max-height: 340px;
+            display: flex;
+            flex-direction: column;
+        }
+        .log h3 { font-size: 16px; color: #4c6398; margin-bottom: 10px; }
+        pre {
+            background: #f8fbff;
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            padding: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-size: 12px;
+            color: #4d5f92;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        .flow {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .step {
+            background: #fff;
+            border: 1px dashed #dbe8ff;
+            border-radius: 12px;
+            padding: 9px;
+            font-size: 12px;
+            color: #6f7ea8;
+            text-align: center;
+            font-weight: 700;
+        }
+        .step.on { border-style: solid; color: #fff; background: linear-gradient(90deg, #ff7cb4, #79b5ff); border-color: transparent; }
+
+        .smart-box {
+            border: 1px solid #ffd8d8;
+            border-radius: 12px;
+            background: #fff7f7;
+            padding: 10px;
+            margin-bottom: 12px;
+        }
+        .smart-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            align-items: center;
+        }
+        .tiny-btn {
+            border: 1px solid #ffcaca;
+            background: #fff;
+            color: #d46363;
+            border-radius: 10px;
+            padding: 9px 10px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .tiny-btn:hover { background: #fff1f1; }
+        .smart-meta {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #6f7ea8;
+        }
+        .quick-fund {
+            margin-top: 8px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            align-items: center;
+        }
+        .funding-warn {
+            margin-top: 8px;
+            border: 1px solid #ffbcbc;
+            background: #fff0f0;
+            color: #ca4c4c;
+            border-radius: 10px;
+            padding: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            display: none;
+        }
+
+        .compare {
+            margin-top: 12px;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            box-shadow: var(--card-shadow);
+            padding: 14px;
+        }
+        .compare h3 { font-size: 16px; color: #4c6398; margin-bottom: 10px; }
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .compare-card {
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            background: #fff;
+            padding: 10px;
+        }
+        .compare-title { font-size: 13px; font-weight: 900; color: #4d5f92; margin-bottom: 8px; }
+        .compare-line { font-size: 12px; color: #6f7ea8; line-height: 1.5; margin-bottom: 4px; }
+        .compare-status {
+            margin-top: 8px;
+            border: 1px dashed #dbe8ff;
+            border-radius: 10px;
+            padding: 8px;
+            font-size: 12px;
+            color: #5f74ad;
+            background: #f8fbff;
+            word-break: break-all;
+        }
+        .run-tags {
+            margin-top: 10px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .tag-chip {
+            border: 1px solid #dbe8ff;
+            background: #f8fbff;
+            color: #5f74ad;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 5px 9px;
+        }
+        .history {
+            margin-top: 12px;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            box-shadow: var(--card-shadow);
+            padding: 14px;
+        }
+        .history h3 { font-size: 16px; color: #4c6398; margin-bottom: 10px; }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            color: #5f74ad;
+        }
+        .history-table th,
+        .history-table td {
+            border-bottom: 1px solid #e8f0ff;
+            padding: 8px 6px;
+            text-align: left;
+            vertical-align: top;
+            word-break: break-all;
+        }
+        .history-table th { color: #4d5f92; font-weight: 900; }
+        .history-empty { font-size: 12px; color: #8a97bf; }
+
+        body.simple-mode .tips,
+        body.simple-mode .compare,
+        body.simple-mode .history,
+        body.simple-mode details[data-group="advanced"],
+        body.simple-mode details[data-group="wallet"] {
+            display: none;
+        }
+        body.simple-mode .grid { grid-template-columns: 1fr; }
+        body.simple-mode .log { margin-top: 0; }
+
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: 1fr; }
+            .btns { grid-template-columns: 1fr; }
+            .switches { grid-template-columns: 1fr; }
+            .flow { grid-template-columns: 1fr 1fr; }
+            .compare-grid { grid-template-columns: 1fr; }
+            .log { height: 300px; min-height: 300px; max-height: 300px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="hero">
+        <div class="top">
+            <span class="pill">Web3 实验 / AA 账号体验台</span>
+            <div class="actions">
+                <a class="ghost" href="../index.html" target="_blank" rel="noopener noreferrer">返回主页</a>
+                <button class="mode-btn" id="simpleModeBtn" onclick="toggleSimpleMode()">极简模式：关</button>
+                <button class="connect" id="connectBtn" onclick="connectWallet()">连接钱包</button>
+            </div>
+        </div>
+        <h1>AA 账号体验 Demo</h1>
+        <p class="subtitle">接入 permissionless.js + SimpleAccount，真实提交 UserOperation 到 Sepolia。</p>
+        <div class="net-limit">当前仅限 Sepolia 测试网络体验使用</div>
+        <div id="walletInfo">未连接钱包</div>
+    </header>
+
+    <section class="grid">
+        <div class="panel">
+            <div class="main-note">
+                推荐流程：<b>1. 连接钱包</b> -> <b>2. 初始化 SDK</b> -> （若余额不足，先“一键转账到 AA”）-> <b>3. 发送 AA 交易</b> -> <b>4. 查询回执</b>
+            </div>
+
+            <details class="fold" open data-group="main">
+                <summary>主要操作（推荐先看这里）</summary>
+                <div class="fold-body">
+                    <div class="field">
+                        <label class="label">接收方地址</label>
+                        <input type="text" id="toInput" placeholder="0x...">
+                    </div>
+                    <div class="field">
+                        <label class="label">转账金额 (ETH)</label>
+                        <input type="text" id="amountInput" value="0.0001" placeholder="0.0001">
+                    </div>
+
+                    <div class="switches">
+                        <label class="switch"><input type="checkbox" id="sponsorGas" checked> 使用 Paymaster 代付 Gas（推荐）</label>
+                        <label class="switch"><input type="checkbox" id="batchMode"> 使用批量操作模式（演示）</label>
+                    </div>
+
+                    <div class="btns">
+                        <button class="btn a" onclick="connectWallet()">1. 连接钱包</button>
+                        <button class="btn b" onclick="initSdk()">2. 初始化 SDK</button>
+                    </div>
+                    <div class="btns" style="margin-top:8px;">
+                        <button class="btn c" id="btnSendAA" onclick="sendAATx()">3. 发送 AA 交易</button>
+                        <button class="btn b" onclick="queryUserOpReceipt()">4. 查询 UserOp 回执</button>
+                    </div>
+                    <div class="btns" style="margin-top:8px;">
+                        <button class="btn a" onclick="sendNormalTx()">对照：普通交易直发</button>
+                    </div>
+
+                    <div class="flow">
+                        <div class="step" id="step1">连接 EOA</div>
+                        <div class="step" id="step2">创建 SimpleAccount</div>
+                        <div class="step" id="step3">发送 UserOp</div>
+                        <div class="step" id="step4">回执确认</div>
+                    </div>
+                    <div class="run-tags" id="runTags"></div>
+                </div>
+            </details>
+
+            <details class="fold" data-group="advanced">
+                <summary>高级设置（API Key / 策略）</summary>
+                <div class="fold-body">
+                    <div class="field">
+                        <div class="label-row">
+                            <label class="label">Pimlico API Key</label>
+                            <a class="quick-link" href="https://dashboard.pimlico.io" target="_blank" rel="noopener noreferrer">去官网注册/拿 Key</a>
+                        </div>
+                        <input type="text" id="pimlicoApiKey" value="pim_HfRrL9afGH6SPNxsER4kpD" placeholder="请填写你的 Pimlico API Key">
+                    </div>
+                    <div class="field">
+                        <label class="label">可选 Sponsorship Policy ID</label>
+                        <input type="text" id="policyIdInput" placeholder="不填则使用默认策略（若你的项目配置允许）">
+                    </div>
+                </div>
+            </details>
+
+            <details class="fold" open data-group="wallet">
+                <summary>AA 账户信息与快速充值</summary>
+                <div class="fold-body">
+                    <div class="smart-box" style="margin-bottom:0;">
+                        <div class="smart-row">
+                            <input type="text" id="smartAddr" placeholder="初始化后显示 Smart Account 地址" readonly>
+                            <button class="tiny-btn" onclick="copySmartAddress()">复制地址</button>
+                        </div>
+                        <div class="smart-meta" id="smartBalance">Smart Account 余额: -</div>
+                        <div class="quick-fund">
+                            <input type="text" id="quickFundAmount" value="0.01" placeholder="0.01">
+                            <button class="tiny-btn" onclick="quickFundSmartAccount()">一键转账到 AA</button>
+                        </div>
+                        <div class="funding-warn" id="fundingWarn">余额不足：Paymaster 只赞助 Gas，不会赞助转账金额。请先向 Smart Account 充值 Sepolia ETH。</div>
+                    </div>
+                </div>
+            </details>
+
+        </div>
+
+        <div class="right-stack">
+            <aside class="tips">
+                <h3>这页你能体验什么</h3>
+                <div class="tip-item">
+                    <b>AA 视角</b>
+                    <p>你发的是 UserOperation，不是 EOA 交易。这里会真实走 Bundler + EntryPoint。</p>
+                </div>
+                <div class="tip-item">
+                    <b>Gas 代付</b>
+                    <p>勾选后使用 Pimlico Paymaster 实际赞助。若策略不匹配，会返回真实错误。</p>
+                </div>
+                <div class="tip-item">
+                    <b>批量模式</b>
+                    <p>勾选后用一次 UserOp 发两笔调用（第 1 笔 0 ETH 演示 + 第 2 笔真实转账）。</p>
+                </div>
+                <div class="tip-item">
+                    <b>对照模式</b>
+                    <p>你可以点“普通交易直发”，对比 EOA 与 AA 的用户体验差异。</p>
+                </div>
+            </aside>
+
+            <section class="log">
+                <h3>输出面板</h3>
+                <pre id="output">等待操作中...</pre>
+            </section>
+        </div>
+    </section>
+
+    <section class="compare">
+        <h3>EOA vs AA 对比（同一页面）</h3>
+        <div class="compare-grid">
+            <div class="compare-card">
+                <div class="compare-title">EOA 直发交易</div>
+                <div class="compare-line">- 调用方式：`eth_sendTransaction`</div>
+                <div class="compare-line">- 发起主体：你的钱包地址</div>
+                <div class="compare-line">- Gas 支付：默认你自己支付</div>
+                <div class="compare-line">- 适合：简单直接、快速验证</div>
+                <div class="compare-status" id="eoaStatus">最近一次 EOA 交易：暂无</div>
+            </div>
+            <div class="compare-card">
+                <div class="compare-title">AA UserOperation</div>
+                <div class="compare-line">- 调用方式：Bundler + EntryPoint</div>
+                <div class="compare-line">- 发起主体：Smart Account（合约钱包）</div>
+                <div class="compare-line">- Gas 支付：可由 Paymaster 赞助</div>
+                <div class="compare-line">- 适合：产品化钱包体验、可编程规则</div>
+                <div class="compare-status" id="aaStatus">最近一次 AA 提交：暂无</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="history">
+        <h3>最近 5 次操作记录</h3>
+        <div class="history-empty" id="historyEmpty">暂无记录</div>
+        <table class="history-table" id="historyTable" style="display:none;">
+            <thead>
+            <tr>
+                <th style="width:18%">时间</th>
+                <th style="width:12%">类型</th>
+                <th style="width:12%">模式</th>
+                <th style="width:14%">状态</th>
+                <th style="width:44%">摘要</th>
+            </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+        </table>
+    </section>
+</div>
+
+<script type="module">
+    import { createPublicClient, http, parseEther } from 'https://esm.sh/viem@2.44.4';
+    import { sepolia } from 'https://esm.sh/viem@2.44.4/chains';
+    import { entryPoint07Address } from 'https://esm.sh/viem@2.44.4/account-abstraction';
+    import { createSmartAccountClient } from 'https://esm.sh/permissionless@0.3.4';
+    import { toSimpleSmartAccount } from 'https://esm.sh/permissionless@0.3.4/accounts';
+    import { createPimlicoClient } from 'https://esm.sh/permissionless@0.3.4/clients/pimlico';
+
+    const CHAIN_ID_HEX = '0xaa36a7';
+    let eoaAddress = '';
+    let publicClient;
+    let smartAccount;
+    let smartAccountClient;
+    let currentUserOpHash = '';
+    let lastAATxHash = '';
+    let lastEoaTxHash = '';
+    let smartBalanceWei = 0n;
+    const runHistory = [];
+    let isSimpleMode = false;
+
+    async function connectWallet() {
+        if (!window.ethereum) return alert('请安装 MetaMask');
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+        const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+        if (chainId !== CHAIN_ID_HEX) {
+            try {
+                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: CHAIN_ID_HEX }] });
+            } catch (_e) {
+                return alert('请切换到 Sepolia 测试网');
+            }
+        }
+
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        eoaAddress = (accounts && accounts[0]) || '';
+        if (!eoaAddress) return alert('未获取到钱包地址');
+
+        document.getElementById('connectBtn').innerText = eoaAddress.slice(0, 6) + '...' + eoaAddress.slice(-4);
+        document.getElementById('walletInfo').innerText = '钱包: ' + eoaAddress + ' | 网络: Sepolia (11155111)';
+        document.getElementById('step1').classList.add('on');
+        writeOutput('钱包连接成功', { eoaAddress, chainId: 11155111 });
+    }
+
+    async function initSdk() {
+        if (!eoaAddress || !window.ethereum) return alert('请先连接钱包');
+
+        const apiKey = document.getElementById('pimlicoApiKey').value.trim();
+        if (!apiKey) return alert('请填写 Pimlico API Key');
+
+        const sponsorGas = document.getElementById('sponsorGas').checked;
+        const policyId = document.getElementById('policyIdInput').value.trim();
+        const pimlicoUrl = 'https://api.pimlico.io/v2/sepolia/rpc?apikey=' + encodeURIComponent(apiKey);
+
+        publicClient = createPublicClient({ chain: sepolia, transport: http('https://ethereum-sepolia-rpc.publicnode.com') });
+
+        const pimlicoClient = createPimlicoClient({
+            transport: http(pimlicoUrl),
+            entryPoint: {
+                address: entryPoint07Address,
+                version: '0.7'
+            }
+        });
+
+        smartAccount = await toSimpleSmartAccount({
+            client: publicClient,
+            owner: window.ethereum,
+            entryPoint: {
+                address: entryPoint07Address,
+                version: '0.7'
+            }
+        });
+
+        smartAccountClient = createSmartAccountClient({
+            account: smartAccount,
+            chain: sepolia,
+            bundlerTransport: http(pimlicoUrl),
+            paymaster: sponsorGas ? pimlicoClient : undefined,
+            userOperation: {
+                estimateFeesPerGas: async () => {
+                    const prices = await pimlicoClient.getUserOperationGasPrice();
+                    return prices.fast;
+                },
+                ...(sponsorGas && policyId
+                    ? {
+                        sponsorUserOperation: async ({ userOperation }) => {
+                            return await pimlicoClient.sponsorUserOperation({
+                                userOperation,
+                                sponsorshipPolicyId: policyId,
+                                entryPoint: {
+                                    address: entryPoint07Address,
+                                    version: '0.7'
+                                }
+                            });
+                        }
+                    }
+                    : {})
+            }
+        });
+
+        document.getElementById('step2').classList.add('on');
+        document.getElementById('smartAddr').value = smartAccount.address;
+        await refreshSmartBalance();
+        updateRunTags({ sponsorGas, batchMode: document.getElementById('batchMode').checked, policyId });
+        writeOutput('SDK 初始化完成，可真实提交 UserOperation', {
+            smartAccountAddress: smartAccount.address,
+            entryPoint: entryPoint07Address,
+            sponsorGas,
+            policyId: policyId || '(未填写)'
+        });
+    }
+
+    async function sendAATx() {
+        if (!smartAccountClient || !smartAccount) return alert('请先初始化 SDK');
+
+        const to = document.getElementById('toInput').value.trim();
+        if (!isAddressLike(to)) return alert('接收方地址无效');
+
+        const amountWei = parseAmount('amountInput');
+        if (!amountWei) return;
+
+        await refreshSmartBalance();
+        if (smartBalanceWei < amountWei) {
+            alert('Smart Account 余额不足，请先充值 Sepolia ETH 后再发送。');
+            return;
+        }
+
+        const batchMode = document.getElementById('batchMode').checked;
+        const sponsorGas = document.getElementById('sponsorGas').checked;
+        const policyId = document.getElementById('policyIdInput').value.trim();
+        updateRunTags({ sponsorGas, batchMode, policyId });
+
+        try {
+            const sendBtn = document.getElementById('btnSendAA');
+            sendBtn.disabled = true;
+            sendBtn.textContent = '3. 提交中...';
+            writeOutput('AA 交易提交中（仅提交 UserOp，不等链上确认）', {
+                smartAccount: smartAccount.address,
+                to,
+                amountWei: amountWei.toString(),
+                mode: batchMode ? 'batch' : 'single'
+            });
+
+            let hash;
+            if (batchMode) {
+                hash = await smartAccountClient.sendCalls({
+                    calls: [
+                        { to, value: 0n, data: '0x' },
+                        { to, value: amountWei, data: '0x' }
+                    ]
+                });
+            } else {
+                hash = await smartAccountClient.sendTransaction({
+                    to,
+                    value: amountWei,
+                    data: '0x'
+                });
+            }
+
+            if (typeof hash === 'string') {
+                currentUserOpHash = hash;
+                lastAATxHash = hash;
+            } else {
+                currentUserOpHash = hash.id || '';
+                lastAATxHash = hash.transactionHash || '';
+            }
+
+            document.getElementById('step3').classList.add('on');
+            writeOutput('AA 交易提交成功', {
+                smartAccount: smartAccount.address,
+                userOpOrTxHash: hash
+            });
+            await refreshSmartBalance();
+            updateCompareStatus();
+            pushHistory({
+                kind: 'AA',
+                mode: batchMode ? 'Batch' : 'Single',
+                status: '成功',
+                summary: 'Hash: ' + (typeof hash === 'string' ? hash : JSON.stringify(hash).slice(0, 120) + '...')
+            });
+            sendBtn.textContent = '3. 发送 AA 交易';
+            sendBtn.disabled = false;
+        } catch (e) {
+            const rawError = e?.message || String(e);
+            const hint = explainError(rawError);
+            writeOutput('AA 交易提交失败', { error: rawError, hint });
+            pushHistory({ kind: 'AA', mode: batchMode ? 'Batch' : 'Single', status: '失败', summary: hint });
+            alert('AA 交易提交失败: ' + hint);
+            const sendBtn = document.getElementById('btnSendAA');
+            sendBtn.textContent = '3. 发送 AA 交易';
+            sendBtn.disabled = false;
+        }
+    }
+
+    async function queryUserOpReceipt() {
+        if (!smartAccountClient && !publicClient) return alert('请先初始化 SDK');
+        if (!currentUserOpHash && !lastAATxHash) return alert('请先发送 AA 交易');
+
+        try {
+            const queryBtn = document.querySelector('button[onclick="queryUserOpReceipt()"]');
+            if (queryBtn) {
+                queryBtn.disabled = true;
+                queryBtn.textContent = '4. 查询中...';
+            }
+
+            if (currentUserOpHash && smartAccountClient?.getUserOperationReceipt) {
+                const userOpReceipt = await waitForUserOpReceipt(currentUserOpHash, 5, 2000);
+                if (userOpReceipt) {
+                    document.getElementById('step4').classList.add('on');
+                    writeOutput('UserOp 回执查询成功', { userOpHash: currentUserOpHash, userOpReceipt });
+                    pushHistory({ kind: 'Receipt', mode: 'AA', status: '成功', summary: 'UserOpHash: ' + currentUserOpHash });
+                    if (queryBtn) {
+                        queryBtn.disabled = false;
+                        queryBtn.textContent = '4. 查询 UserOp 回执';
+                    }
+                    return;
+                }
+            }
+
+            const txHash = lastAATxHash || currentUserOpHash;
+            const txReceipt = await publicClient.getTransactionReceipt({ hash: txHash });
+            document.getElementById('step4').classList.add('on');
+            writeOutput('交易回执查询成功（该 hash 被当作链上交易哈希）', { txHash, txReceipt });
+            pushHistory({ kind: 'Receipt', mode: 'TX', status: '成功', summary: 'TxHash: ' + txHash });
+            if (queryBtn) {
+                queryBtn.disabled = false;
+                queryBtn.textContent = '4. 查询 UserOp 回执';
+            }
+        } catch (e) {
+            const hint = explainError(e?.message || String(e));
+            writeOutput('回执查询失败', {
+                userOpHash: currentUserOpHash,
+                txHash: lastAATxHash,
+                error: e?.message || String(e),
+                hint
+            });
+            pushHistory({ kind: 'Receipt', mode: 'AA/TX', status: '失败', summary: hint });
+            alert('回执查询失败: ' + hint);
+            const queryBtn = document.querySelector('button[onclick="queryUserOpReceipt()"]');
+            if (queryBtn) {
+                queryBtn.disabled = false;
+                queryBtn.textContent = '4. 查询 UserOp 回执';
+            }
+        }
+    }
+
+    async function waitForUserOpReceipt(hash, maxAttempts, delayMs) {
+        for (let i = 0; i < maxAttempts; i++) {
+            try {
+                const receipt = await smartAccountClient.getUserOperationReceipt({ hash });
+                if (receipt) return receipt;
+            } catch (e) {
+                const msg = String(e?.message || '').toLowerCase();
+                if (!msg.includes('could not be found') && !msg.includes('not have been processed yet')) {
+                    throw e;
+                }
+            }
+            await new Promise(r => setTimeout(r, delayMs));
+        }
+        return null;
+    }
+
+    async function sendNormalTx() {
+        if (!eoaAddress || !window.ethereum) return alert('请先连接钱包');
+
+        const to = document.getElementById('toInput').value.trim();
+        if (!isAddressLike(to)) return alert('接收方地址无效');
+
+        const amountWei = parseAmount('amountInput');
+        if (!amountWei) return;
+
+        const ok = confirm('将发起一笔真实 Sepolia 测试网交易，是否继续？');
+        if (!ok) return;
+
+        try {
+            const txHash = await window.ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [{ from: eoaAddress, to, value: '0x' + amountWei.toString(16) }]
+            });
+            lastEoaTxHash = txHash;
+            writeOutput('普通交易已提交', {
+                txHash,
+                explorer: 'https://sepolia.etherscan.io/tx/' + txHash
+            });
+            updateCompareStatus();
+            pushHistory({ kind: 'EOA', mode: 'Single', status: '成功', summary: 'TxHash: ' + txHash });
+        } catch (e) {
+            const hint = explainError(e?.message || String(e));
+            pushHistory({ kind: 'EOA', mode: 'Single', status: '失败', summary: hint });
+            alert(hint);
+        }
+    }
+
+    async function quickFundSmartAccount() {
+        if (!eoaAddress || !window.ethereum) return alert('请先连接钱包');
+        const to = document.getElementById('smartAddr').value.trim();
+        if (!to) return alert('请先初始化 SDK，生成 Smart Account 地址');
+        const amountWei = parseAmount('quickFundAmount');
+        if (!amountWei) return;
+
+        try {
+            const txHash = await window.ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [{ from: eoaAddress, to, value: '0x' + amountWei.toString(16) }]
+            });
+            writeOutput('一键转账到 AA 已提交', {
+                to,
+                txHash,
+                explorer: 'https://sepolia.etherscan.io/tx/' + txHash
+            });
+            pushHistory({ kind: 'Fund', mode: 'EOA->AA', status: '成功', summary: '向AA充值: ' + txHash });
+            setTimeout(() => { refreshSmartBalance(); }, 2000);
+        } catch (e) {
+            const hint = explainError(e?.message || String(e));
+            pushHistory({ kind: 'Fund', mode: 'EOA->AA', status: '失败', summary: hint });
+            alert('一键转账失败: ' + hint);
+        }
+    }
+
+    function parseAmount(id) {
+        const v = document.getElementById(id).value.trim();
+        if (!v) {
+            alert('请输入金额');
+            return null;
+        }
+        try {
+            const wei = parseEther(v);
+            if (wei <= 0n) {
+                alert('金额必须大于 0');
+                return null;
+            }
+            return wei;
+        } catch (_e) {
+            alert('金额格式错误');
+            return null;
+        }
+    }
+
+    function isAddressLike(addr) {
+        return /^0x[a-fA-F0-9]{40}$/.test(addr);
+    }
+
+    function writeOutput(title, payload) {
+        const out = document.getElementById('output');
+        out.textContent = title + '\n\n' + safeStringify(payload);
+    }
+
+    function safeStringify(payload) {
+        return JSON.stringify(
+            payload,
+            (_key, value) => (typeof value === 'bigint' ? value.toString() : value),
+            2
+        );
+    }
+
+    async function refreshSmartBalance() {
+        if (!publicClient || !smartAccount?.address) return;
+        try {
+            smartBalanceWei = await publicClient.getBalance({ address: smartAccount.address });
+            const balanceEth = Number(smartBalanceWei) / 1e18;
+            const amountWei = parseAmountSilent('amountInput');
+            const needFunding = amountWei !== null && smartBalanceWei < amountWei;
+            document.getElementById('smartBalance').textContent = 'Smart Account 余额: ' + balanceEth.toFixed(8) + ' ETH';
+            document.getElementById('fundingWarn').style.display = needFunding ? 'block' : 'none';
+            document.getElementById('btnSendAA').disabled = needFunding;
+            document.getElementById('btnSendAA').style.opacity = needFunding ? '0.65' : '1';
+            document.getElementById('btnSendAA').style.cursor = needFunding ? 'not-allowed' : 'pointer';
+        } catch (_e) {
+            document.getElementById('smartBalance').textContent = 'Smart Account 余额: 查询失败';
+        }
+    }
+
+    function parseAmountSilent(id) {
+        const v = document.getElementById(id).value.trim();
+        if (!v) return null;
+        try {
+            const wei = parseEther(v);
+            return wei > 0n ? wei : null;
+        } catch (_e) {
+            return null;
+        }
+    }
+
+    async function copySmartAddress() {
+        const addr = document.getElementById('smartAddr').value.trim();
+        if (!addr) {
+            alert('请先初始化 SDK，生成 Smart Account 地址');
+            return;
+        }
+        await navigator.clipboard.writeText(addr);
+        alert('Smart Account 地址已复制');
+    }
+
+    function updateCompareStatus() {
+        const eoaEl = document.getElementById('eoaStatus');
+        const aaEl = document.getElementById('aaStatus');
+
+        eoaEl.textContent = lastEoaTxHash
+            ? '最近一次 EOA 交易: ' + 'https://sepolia.etherscan.io/tx/' + lastEoaTxHash
+            : '最近一次 EOA 交易：暂无';
+
+        if (currentUserOpHash) {
+            aaEl.textContent = '最近一次 AA 提交 (UserOpHash): ' + currentUserOpHash;
+        } else if (lastAATxHash) {
+            aaEl.textContent = '最近一次 AA 交易: ' + 'https://sepolia.etherscan.io/tx/' + lastAATxHash;
+        } else {
+            aaEl.textContent = '最近一次 AA 提交：暂无';
+        }
+    }
+
+    function updateRunTags({ sponsorGas, batchMode, policyId }) {
+        const el = document.getElementById('runTags');
+        el.innerHTML = '';
+        const tags = [
+            'Paymaster: ' + (sponsorGas ? 'ON' : 'OFF'),
+            'Batch: ' + (batchMode ? 'ON' : 'OFF'),
+            'Policy: ' + (policyId ? policyId : 'default')
+        ];
+        tags.forEach(t => {
+            const chip = document.createElement('span');
+            chip.className = 'tag-chip';
+            chip.textContent = t;
+            el.appendChild(chip);
+        });
+    }
+
+    function pushHistory({ kind, mode, status, summary }) {
+        const row = {
+            time: new Date().toLocaleTimeString(),
+            kind,
+            mode,
+            status,
+            summary
+        };
+        runHistory.unshift(row);
+        if (runHistory.length > 5) runHistory.pop();
+        renderHistory();
+    }
+
+    function renderHistory() {
+        const emptyEl = document.getElementById('historyEmpty');
+        const tableEl = document.getElementById('historyTable');
+        const bodyEl = document.getElementById('historyBody');
+
+        if (runHistory.length === 0) {
+            emptyEl.style.display = 'block';
+            tableEl.style.display = 'none';
+            bodyEl.innerHTML = '';
+            return;
+        }
+
+        emptyEl.style.display = 'none';
+        tableEl.style.display = 'table';
+        bodyEl.innerHTML = runHistory.map(i => (
+            '<tr>' +
+            '<td>' + i.time + '</td>' +
+            '<td>' + i.kind + '</td>' +
+            '<td>' + i.mode + '</td>' +
+            '<td>' + i.status + '</td>' +
+            '<td>' + i.summary + '</td>' +
+            '</tr>'
+        )).join('');
+    }
+
+    function explainError(message) {
+        const m = (message || '').toLowerCase();
+        if (m.includes('401') || m.includes('unauthorized')) return 'API Key 无效或无权限，请检查 Pimlico Key。';
+        if (m.includes('insufficient funds') || m.includes('reverted during simulation')) return '大概率是 Smart Account 余额不足（Paymaster 只赞助 Gas，不赞助转账金额）。';
+        if (m.includes('could not be found') || m.includes('not have been processed yet')) return 'UserOp 还在打包处理中，请等待几秒后再次查询。';
+        if (m.includes('user rejected') || m.includes('denied')) return '你在钱包里取消了签名/交易。';
+        if (m.includes('policy') || m.includes('sponsor')) return '赞助策略不匹配，请检查 Sponsorship Policy ID。';
+        if (m.includes('chain') || m.includes('network')) return '网络不匹配，请确认钱包在 Sepolia。';
+        return '请看输出面板原始错误，通常是余额、策略或网络导致。';
+    }
+
+    function toggleSimpleMode() {
+        isSimpleMode = !isSimpleMode;
+        document.body.classList.toggle('simple-mode', isSimpleMode);
+        const btn = document.getElementById('simpleModeBtn');
+        btn.textContent = isSimpleMode ? '极简模式：开' : '极简模式：关';
+
+        if (isSimpleMode) {
+            const mainFold = document.querySelector('details[data-group="main"]');
+            if (mainFold) mainFold.open = true;
+            writeOutput('已切换到极简模式', {
+                kept: ['主要操作', '输出面板'],
+                hidden: ['高级设置', 'AA账户信息与充值', '这页你能体验什么', 'EOA vs AA对比', '最近5次记录']
+            });
+        }
+    }
+
+    window.connectWallet = connectWallet;
+    window.initSdk = initSdk;
+    window.sendAATx = sendAATx;
+    window.queryUserOpReceipt = queryUserOpReceipt;
+    window.sendNormalTx = sendNormalTx;
+    window.copySmartAddress = copySmartAddress;
+    window.quickFundSmartAccount = quickFundSmartAccount;
+    window.toggleSimpleMode = toggleSimpleMode;
+
+    document.getElementById('amountInput').addEventListener('input', () => {
+        refreshSmartBalance();
+    });
+    document.getElementById('sponsorGas').addEventListener('change', () => {
+        updateRunTags({
+            sponsorGas: document.getElementById('sponsorGas').checked,
+            batchMode: document.getElementById('batchMode').checked,
+            policyId: document.getElementById('policyIdInput').value.trim()
+        });
+    });
+    document.getElementById('batchMode').addEventListener('change', () => {
+        updateRunTags({
+            sponsorGas: document.getElementById('sponsorGas').checked,
+            batchMode: document.getElementById('batchMode').checked,
+            policyId: document.getElementById('policyIdInput').value.trim()
+        });
+    });
+    document.getElementById('policyIdInput').addEventListener('input', () => {
+        updateRunTags({
+            sponsorGas: document.getElementById('sponsorGas').checked,
+            batchMode: document.getElementById('batchMode').checked,
+            policyId: document.getElementById('policyIdInput').value.trim()
+        });
+    });
+    updateRunTags({ sponsorGas: true, batchMode: false, policyId: '' });
+</script>
+</body>
+</html>

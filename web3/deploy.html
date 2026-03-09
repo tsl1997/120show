@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合约部署测试台 | XS 魔法实验室</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.1/ethers.umd.min.js"></script>
+    <style>
+        :root {
+            --bg1: #fff8fb;
+            --bg2: #eef8ff;
+            --bg3: #fffef3;
+            --text-main: #33456f;
+            --text-muted: #6f7ea8;
+            --line: #dce7ff;
+            --pink: #ff7cb4;
+            --blue: #79b5ff;
+            --mint: #71d9c4;
+            --card-shadow: 0 12px 30px rgba(124, 154, 219, 0.16);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(255, 179, 124, 0.28) 0, transparent 28%),
+                radial-gradient(circle at 86% 9%, rgba(181, 156, 255, 0.26) 0, transparent 30%),
+                radial-gradient(circle at 76% 82%, rgba(121, 181, 255, 0.22) 0, transparent 33%),
+                linear-gradient(160deg, var(--bg1), var(--bg2) 52%, var(--bg3));
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 28px 16px 56px;
+        }
+
+        .container { width: 100%; max-width: 1000px; margin: 0 auto; }
+        .hero, .panel, .output {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .hero { padding: 18px; margin-bottom: 12px; }
+        .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .pill {
+            font-size: 12px;
+            font-weight: 800;
+            color: #8d5d9d;
+            background: linear-gradient(90deg, #ffe3f2, #eaf3ff);
+            border: 1px solid #efdbff;
+            border-radius: 999px;
+            padding: 6px 12px;
+        }
+        .back {
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--text-main);
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            padding: 8px 12px;
+            text-decoration: none;
+        }
+        h1 {
+            margin: 12px 0 6px;
+            font-size: clamp(28px, 6vw, 42px);
+            font-weight: 900;
+            line-height: 1.08;
+            background: linear-gradient(90deg, var(--pink), var(--blue) 58%, var(--mint));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .subtitle { color: var(--text-muted); font-size: 14px; }
+
+        .mode-switch {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .mode-btn {
+            border: 1px solid #dbe8ff;
+            background: #fff;
+            color: #4d5f92;
+            border-radius: 12px;
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+        .mode-btn.active {
+            color: #fff;
+            border-color: transparent;
+            background: linear-gradient(90deg, var(--pink), var(--blue));
+            box-shadow: 0 8px 18px rgba(121, 181, 255, 0.28);
+        }
+
+        .panel { padding: 16px; margin-bottom: 12px; }
+        .summary {
+            margin-bottom: 12px;
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            background: #f8fbff;
+            padding: 10px;
+            font-size: 12px;
+            color: #5f74ad;
+        }
+
+        .template-panel { display: none; }
+        .template-panel.active { display: block; }
+        .fold {
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            background: #fff;
+            margin-bottom: 12px;
+        }
+        .fold > summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 900;
+            color: #4d5f92;
+        }
+        .fold > summary::-webkit-details-marker { display: none; }
+        .fold-body {
+            border-top: 1px dashed #e6efff;
+            padding: 12px;
+        }
+
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .field { margin-bottom: 10px; }
+        label { display: block; font-size: 12px; color: #6f7ea8; font-weight: 800; margin-bottom: 7px; }
+        input[type="text"] {
+            width: 100%;
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            padding: 10px 12px;
+            color: var(--text-main);
+            background: #fff;
+            outline: none;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        }
+
+        .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 11px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .btn.a { background: linear-gradient(90deg, #79b5ff, #68d0ff); }
+        .btn.b { background: linear-gradient(90deg, #ff7cb4, #ffad8e); }
+        .btn.c { background: linear-gradient(90deg, #9f8bff, #7eb7ff); }
+
+        .status {
+            margin-top: 8px;
+            border: 1px dashed #dbe8ff;
+            border-radius: 10px;
+            background: #f8fbff;
+            padding: 8px;
+            font-size: 12px;
+            color: #5f74ad;
+            line-height: 1.5;
+            word-break: break-all;
+        }
+
+        .output { padding: 14px; }
+        .output h3 { font-size: 16px; color: #4c6398; margin-bottom: 10px; }
+        pre {
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            background: #fff;
+            padding: 12px;
+            min-height: 260px;
+            max-height: 420px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-size: 12px;
+            color: #4d5f92;
+        }
+
+        @media (max-width: 900px) {
+            .row, .actions, .mode-switch { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="hero">
+        <div class="top">
+            <span class="pill">Web3 实验 / 合约部署测试</span>
+            <a class="back" href="../index.html" target="_blank" rel="noopener noreferrer">返回主页</a>
+        </div>
+        <h1>合约部署测试台</h1>
+        <p class="subtitle">支持简单返回值、ERC20、ERC721 三种模板。改几个参数即可编译并部署。</p>
+    </header>
+
+    <section class="panel">
+        <div class="summary">编译器固定使用 Solidity `0.8.30`（前端自动加载，无需你手动下载）。仅允许 Sepolia 网络部署。</div>
+
+        <div class="mode-switch">
+            <button class="mode-btn active" id="modeSimple" onclick="setTemplate('simple')">简单合约</button>
+            <button class="mode-btn" id="modeErc20" onclick="setTemplate('erc20')">代币合约</button>
+            <button class="mode-btn" id="modeNft" onclick="setTemplate('nft')">NFT 合约</button>
+        </div>
+
+        <details class="fold" open>
+            <summary>参数设置</summary>
+            <div class="fold-body">
+                <div class="template-panel active" id="panelSimple">
+                    <div class="row">
+                        <div class="field">
+                            <label>合约名称</label>
+                            <input type="text" id="simpleContractName" value="HelloSepolia" placeholder="例如: HelloSepolia">
+                        </div>
+                        <div class="field">
+                            <label>返回值</label>
+                            <input type="text" id="simpleReturnValue" value="Hello from Sepolia" placeholder="例如: Hello from Sepolia">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="template-panel" id="panelErc20">
+                    <div class="row">
+                        <div class="field">
+                            <label>合约名称</label>
+                            <input type="text" id="erc20ContractName" value="DemoToken" placeholder="例如: DemoToken">
+                        </div>
+                        <div class="field">
+                            <label>代币名称</label>
+                            <input type="text" id="erc20Name" value="Demo Token" placeholder="例如: Demo Token">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="field">
+                            <label>代币符号</label>
+                            <input type="text" id="erc20Symbol" value="DMT" placeholder="例如: DMT">
+                        </div>
+                        <div class="field">
+                            <label>初始供应量（整数）</label>
+                            <input type="text" id="erc20Supply" value="1000000" placeholder="例如: 1000000">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="template-panel" id="panelNft">
+                    <div class="row">
+                        <div class="field">
+                            <label>合约名称</label>
+                            <input type="text" id="nftContractName" value="DemoNFT" placeholder="例如: DemoNFT">
+                        </div>
+                        <div class="field">
+                            <label>NFT 名称</label>
+                            <input type="text" id="nftName" value="Demo NFT" placeholder="例如: Demo NFT">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="field">
+                            <label>NFT 符号</label>
+                            <input type="text" id="nftSymbol" value="DNFT" placeholder="例如: DNFT">
+                        </div>
+                        <div class="field">
+                            <label>Base URI（默认 mint Token #1 给部署者）</label>
+                            <input type="text" id="nftBaseUri" value="https://example.com/metadata/" placeholder="例如: https://example.com/metadata/">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn a" onclick="connectWallet()">连接 MetaMask</button>
+                    <button class="btn b" onclick="compileContract()">编译合约</button>
+                    <button class="btn c" onclick="deployContract()">部署到 Sepolia</button>
+                </div>
+
+                <div class="status" id="status">等待操作...</div>
+            </div>
+        </details>
+    </section>
+
+    <section class="output">
+        <h3>编译 / 部署输出</h3>
+        <pre id="output">还没有输出</pre>
+    </section>
+</div>
+
+<script type="module">
+    import solc from 'https://esm.sh/solc@0.8.30';
+
+    const CHAIN_ID = 11155111;
+    let provider;
+    let signer;
+    let compiled = null;
+    let currentTemplate = 'simple';
+
+    function setStatus(text) {
+        document.getElementById('status').textContent = text;
+    }
+
+    function setOutput(obj) {
+        document.getElementById('output').textContent = typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2);
+    }
+
+    function escapeSolidityString(v) {
+        return String(v)
+            .replace(/\\/g, '\\\\')
+            .replace(/"/g, '\\"')
+            .replace(/\n/g, '\\n')
+            .replace(/\r/g, '\\r')
+            .replace(/\t/g, '\\t');
+    }
+
+    function buildSimpleSource(name, value) {
+        return [
+            '// SPDX-License-Identifier: MIT',
+            'pragma solidity ^0.8.20;',
+            '',
+            'contract ' + name + ' {',
+            '    function getValue() external pure returns (string memory) {',
+            '        return "' + escapeSolidityString(value) + '";',
+            '    }',
+            '}'
+        ].join('\n');
+    }
+
+    function buildErc20Source(contractName, tokenName, tokenSymbol, supplyInt) {
+        return [
+            '// SPDX-License-Identifier: MIT',
+            'pragma solidity ^0.8.20;',
+            '',
+            'contract ' + contractName + ' {',
+            '    string public name = "' + escapeSolidityString(tokenName) + '";',
+            '    string public symbol = "' + escapeSolidityString(tokenSymbol) + '";',
+            '    uint8 public decimals = 18;',
+            '    uint256 public totalSupply;',
+            '    mapping(address => uint256) public balanceOf;',
+            '    event Transfer(address indexed from, address indexed to, uint256 value);',
+            '    constructor() {',
+            '        uint256 initialSupply = ' + supplyInt + ' * 10 ** uint256(decimals);',
+            '        totalSupply = initialSupply;',
+            '        balanceOf[msg.sender] = initialSupply;',
+            '        emit Transfer(address(0), msg.sender, initialSupply);',
+            '    }',
+            '    function transfer(address to, uint256 value) external returns (bool) {',
+            '        require(to != address(0), "zero to");',
+            '        require(balanceOf[msg.sender] >= value, "insufficient");',
+            '        balanceOf[msg.sender] -= value;',
+            '        balanceOf[to] += value;',
+            '        emit Transfer(msg.sender, to, value);',
+            '        return true;',
+            '    }',
+            '}'
+        ].join('\n');
+    }
+
+    function buildNftSource(contractName, nftName, nftSymbol, baseUri) {
+        return [
+            '// SPDX-License-Identifier: MIT',
+            'pragma solidity ^0.8.20;',
+            '',
+            'interface IERC721Receiver {',
+            '    function onERC721Received(address operator, address from, uint256 tokenId, bytes calldata data) external returns (bytes4);',
+            '}',
+            '',
+            'contract ' + contractName + ' {',
+            '    string public name = "' + escapeSolidityString(nftName) + '";',
+            '    string public symbol = "' + escapeSolidityString(nftSymbol) + '";',
+            '    string public baseURI = "' + escapeSolidityString(baseUri) + '";',
+            '',
+            '    mapping(uint256 => address) private _ownerOf;',
+            '    mapping(address => uint256) private _balanceOf;',
+            '    mapping(uint256 => address) private _tokenApprovals;',
+            '    mapping(address => mapping(address => bool)) private _operatorApprovals;',
+            '',
+            '    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);',
+            '    event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);',
+            '    event ApprovalForAll(address indexed owner, address indexed operator, bool approved);',
+            '',
+            '    constructor() {',
+            '        _mint(msg.sender, 1);',
+            '    }',
+            '',
+            '    function supportsInterface(bytes4 interfaceId) external pure returns (bool) {',
+            '        return interfaceId == 0x80ac58cd || interfaceId == 0x5b5e139f || interfaceId == 0x01ffc9a7;',
+            '    }',
+            '',
+            '    function balanceOf(address owner) public view returns (uint256) {',
+            '        require(owner != address(0), "zero owner");',
+            '        return _balanceOf[owner];',
+            '    }',
+            '',
+            '    function ownerOf(uint256 tokenId) public view returns (address) {',
+            '        address owner = _ownerOf[tokenId];',
+            '        require(owner != address(0), "not minted");',
+            '        return owner;',
+            '    }',
+            '',
+            '    function getApproved(uint256 tokenId) public view returns (address) {',
+            '        require(_ownerOf[tokenId] != address(0), "not minted");',
+            '        return _tokenApprovals[tokenId];',
+            '    }',
+            '',
+            '    function isApprovedForAll(address owner, address operator) public view returns (bool) {',
+            '        return _operatorApprovals[owner][operator];',
+            '    }',
+            '',
+            '    function approve(address to, uint256 tokenId) external {',
+            '        address owner = ownerOf(tokenId);',
+            '        require(msg.sender == owner || isApprovedForAll(owner, msg.sender), "not allowed");',
+            '        _tokenApprovals[tokenId] = to;',
+            '        emit Approval(owner, to, tokenId);',
+            '    }',
+            '',
+            '    function setApprovalForAll(address operator, bool approved) external {',
+            '        require(operator != msg.sender, "self operator");',
+            '        _operatorApprovals[msg.sender][operator] = approved;',
+            '        emit ApprovalForAll(msg.sender, operator, approved);',
+            '    }',
+            '',
+            '    function transferFrom(address from, address to, uint256 tokenId) public {',
+            '        require(to != address(0), "zero to");',
+            '        address owner = ownerOf(tokenId);',
+            '        require(owner == from, "wrong from");',
+            '        require(_isApprovedOrOwner(msg.sender, tokenId), "not approved");',
+            '',
+            '        delete _tokenApprovals[tokenId];',
+            '        _balanceOf[from] -= 1;',
+            '        _balanceOf[to] += 1;',
+            '        _ownerOf[tokenId] = to;',
+            '        emit Transfer(from, to, tokenId);',
+            '    }',
+            '',
+            '    function safeTransferFrom(address from, address to, uint256 tokenId) external {',
+            '        safeTransferFrom(from, to, tokenId, "");',
+            '    }',
+            '',
+            '    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public {',
+            '        transferFrom(from, to, tokenId);',
+            '        if (to.code.length > 0) {',
+            '            require(',
+            '                IERC721Receiver(to).onERC721Received(msg.sender, from, tokenId, data) == IERC721Receiver.onERC721Received.selector,',
+            '                "unsafe receiver"',
+            '            );',
+            '        }',
+            '    }',
+            '',
+            '    function tokenURI(uint256 tokenId) external view returns (string memory) {',
+            '        require(_ownerOf[tokenId] != address(0), "not minted");',
+            '        return string(abi.encodePacked(baseURI, _toString(tokenId)));',
+            '    }',
+            '',
+            '    function _mint(address to, uint256 tokenId) internal {',
+            '        require(to != address(0), "zero to");',
+            '        require(_ownerOf[tokenId] == address(0), "exists");',
+            '        _ownerOf[tokenId] = to;',
+            '        _balanceOf[to] += 1;',
+            '        emit Transfer(address(0), to, tokenId);',
+            '    }',
+            '',
+            '    function _isApprovedOrOwner(address spender, uint256 tokenId) internal view returns (bool) {',
+            '        address owner = ownerOf(tokenId);',
+            '        return spender == owner || getApproved(tokenId) == spender || isApprovedForAll(owner, spender);',
+            '    }',
+            '',
+            '    function _toString(uint256 value) internal pure returns (string memory) {',
+            '        if (value == 0) return "0";',
+            '        uint256 temp = value; uint256 digits;',
+            '        while (temp != 0) { digits++; temp /= 10; }',
+            '        bytes memory buffer = new bytes(digits);',
+            '        while (value != 0) {',
+            '            digits -= 1;',
+            '            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));',
+            '            value /= 10;',
+            '        }',
+            '        return string(buffer);',
+            '    }',
+            '}'
+        ].join('\n');
+    }
+
+    function validateName(name) {
+        return /^[A-Za-z_][A-Za-z0-9_]*$/.test(name);
+    }
+
+    function setTemplate(mode) {
+        currentTemplate = mode;
+        document.getElementById('modeSimple').classList.toggle('active', mode === 'simple');
+        document.getElementById('modeErc20').classList.toggle('active', mode === 'erc20');
+        document.getElementById('modeNft').classList.toggle('active', mode === 'nft');
+
+        document.getElementById('panelSimple').classList.toggle('active', mode === 'simple');
+        document.getElementById('panelErc20').classList.toggle('active', mode === 'erc20');
+        document.getElementById('panelNft').classList.toggle('active', mode === 'nft');
+    }
+
+    async function ensureSepolia() {
+        const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' });
+        if (chainIdHex === '0xaa36a7') return true;
+        try {
+            await window.ethereum.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: '0xaa36a7' }]
+            });
+            return true;
+        } catch (_e) {
+            return false;
+        }
+    }
+
+    async function connectWallet() {
+        if (!window.ethereum) return setStatus('未检测到 MetaMask');
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const ok = await ensureSepolia();
+        if (!ok) return setStatus('请切换到 Sepolia 网络后再继续');
+
+        provider = new ethers.BrowserProvider(window.ethereum);
+        signer = await provider.getSigner();
+        const addr = await signer.getAddress();
+        setStatus('钱包已连接: ' + addr);
+    }
+
+    async function compileContract() {
+        let name;
+        let source;
+
+        if (currentTemplate === 'simple') {
+            name = document.getElementById('simpleContractName').value.trim();
+            const value = document.getElementById('simpleReturnValue').value;
+            if (!validateName(name)) return setStatus('合约名称不合法（需字母/下划线开头，后续可含数字）');
+            source = buildSimpleSource(name, value);
+        } else if (currentTemplate === 'erc20') {
+            name = document.getElementById('erc20ContractName').value.trim();
+            const tokenName = document.getElementById('erc20Name').value.trim();
+            const tokenSymbol = document.getElementById('erc20Symbol').value.trim();
+            const supplyRaw = document.getElementById('erc20Supply').value.trim();
+            if (!validateName(name)) return setStatus('合约名称不合法（需字母/下划线开头，后续可含数字）');
+            if (!tokenName || !tokenSymbol) return setStatus('代币名称和符号不能为空');
+            if (!/^[0-9]+$/.test(supplyRaw)) return setStatus('初始供应量必须是非负整数');
+            source = buildErc20Source(name, tokenName, tokenSymbol, supplyRaw);
+        } else {
+            name = document.getElementById('nftContractName').value.trim();
+            const nftName = document.getElementById('nftName').value.trim();
+            const nftSymbol = document.getElementById('nftSymbol').value.trim();
+            const baseUri = document.getElementById('nftBaseUri').value.trim();
+            if (!validateName(name)) return setStatus('合约名称不合法（需字母/下划线开头，后续可含数字）');
+            if (!nftName || !nftSymbol || !baseUri) return setStatus('NFT 名称、符号、Base URI 不能为空');
+            source = buildNftSource(name, nftName, nftSymbol, baseUri);
+        }
+
+        const input = {
+            language: 'Solidity',
+            sources: {
+                'Test.sol': { content: source }
+            },
+            settings: {
+                optimizer: { enabled: false, runs: 200 },
+                outputSelection: {
+                    '*': {
+                        '*': ['abi', 'evm.bytecode']
+                    }
+                }
+            }
+        };
+
+        try {
+            const output = JSON.parse(solc.compile(JSON.stringify(input)));
+            if (output.errors && output.errors.length) {
+                const fatal = output.errors.find(e => e.severity === 'error');
+                if (fatal) {
+                    setStatus('编译失败');
+                    setOutput(output.errors);
+                    return;
+                }
+            }
+
+            const artifact = output.contracts['Test.sol'][name];
+            if (!artifact) {
+                setStatus('编译失败：未找到目标合约产物');
+                setOutput(output);
+                return;
+            }
+
+            compiled = {
+                name,
+                template: currentTemplate,
+                source,
+                abi: artifact.abi,
+                bytecode: artifact.evm.bytecode.object
+            };
+
+            setStatus('编译成功，可执行部署');
+            setOutput({
+                contract: name,
+                abiItems: artifact.abi.length,
+                bytecodeLength: artifact.evm.bytecode.object.length,
+                sourcePreview: source
+            });
+        } catch (e) {
+            setStatus('编译异常: ' + (e.message || String(e)));
+        }
+    }
+
+    async function deployContract() {
+        if (!window.ethereum) return setStatus('未检测到 MetaMask');
+        if (!compiled) return setStatus('请先编译合约');
+        if (!signer) await connectWallet();
+        if (!signer) return;
+
+        const network = await provider.getNetwork();
+        if (Number(network.chainId) !== CHAIN_ID) {
+            setStatus('当前不是 Sepolia 网络，已阻止部署');
+            return;
+        }
+
+        try {
+            setStatus('部署中，请在 MetaMask 确认...');
+            const factory = new ethers.ContractFactory(compiled.abi, compiled.bytecode, signer);
+            const contract = await factory.deploy();
+            const tx = contract.deploymentTransaction();
+            setOutput({ stage: 'submitted', txHash: tx ? tx.hash : '' });
+            await contract.waitForDeployment();
+            const addr = await contract.getAddress();
+            setStatus('部署成功: ' + addr);
+            setOutput({
+                contractName: compiled.name,
+                address: addr,
+                explorer: 'https://sepolia.etherscan.io/address/' + addr
+            });
+        } catch (e) {
+            setStatus('部署失败: ' + (e.message || String(e)));
+        }
+    }
+
+    window.connectWallet = connectWallet;
+    window.compileContract = compileContract;
+    window.deployContract = deployContract;
+    window.setTemplate = setTemplate;
+</script>
+</body>
+</html>

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenCode 配置生成器 | XS 魔法实验室</title>
+    <style>
+        :root {
+            --bg1: #fff8fb;
+            --bg2: #eef8ff;
+            --bg3: #fffef3;
+            --text-main: #33456f;
+            --text-muted: #6f7ea8;
+            --line: #dce7ff;
+            --blue: #79b5ff;
+            --pink: #ff7cb4;
+            --mint: #71d9c4;
+            --card-shadow: 0 12px 30px rgba(124, 154, 219, 0.16);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(circle at 14% 12%, rgba(255, 179, 124, 0.28) 0, transparent 28%),
+                radial-gradient(circle at 86% 10%, rgba(181, 156, 255, 0.22) 0, transparent 30%),
+                radial-gradient(circle at 78% 85%, rgba(121, 181, 255, 0.20) 0, transparent 33%),
+                linear-gradient(160deg, var(--bg1), var(--bg2) 52%, var(--bg3));
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 28px 16px 56px;
+        }
+
+        .container { width: 100%; max-width: 1050px; margin: 0 auto; }
+        .hero,
+        .panel,
+        .output {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .hero { padding: 18px; margin-bottom: 12px; }
+        .top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .pill {
+            font-size: 12px;
+            font-weight: 800;
+            color: #8d5d9d;
+            background: linear-gradient(90deg, #ffe3f2, #eaf3ff);
+            border: 1px solid #efdbff;
+            border-radius: 999px;
+            padding: 6px 12px;
+        }
+        .back {
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--text-main);
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            padding: 8px 12px;
+            text-decoration: none;
+        }
+        h1 {
+            margin: 12px 0 6px;
+            font-size: clamp(28px, 6vw, 42px);
+            font-weight: 900;
+            line-height: 1.08;
+            background: linear-gradient(90deg, var(--pink), var(--blue) 58%, var(--mint));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .subtitle { color: var(--text-muted); font-size: 14px; }
+
+        .panel { padding: 16px; margin-bottom: 12px; }
+        .summary {
+            margin-bottom: 12px;
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            background: #f8fbff;
+            padding: 10px;
+            font-size: 12px;
+            color: #5f74ad;
+            line-height: 1.5;
+        }
+
+        .provider {
+            border: 1px solid #dbe8ff;
+            border-radius: 14px;
+            background: #fff;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .provider-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .provider-title {
+            font-size: 14px;
+            font-weight: 900;
+            color: #4d5f92;
+        }
+
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .field { margin-bottom: 10px; }
+        label { display: block; font-size: 12px; color: #6f7ea8; font-weight: 800; margin-bottom: 7px; }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            padding: 11px 12px;
+            color: var(--text-main);
+            background: #fff;
+            outline: none;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        }
+
+        .models { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+        .check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            padding: 9px;
+            background: #fff;
+            font-size: 12px;
+            color: #4d5f92;
+            font-weight: 700;
+        }
+
+        .mini-actions {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .actions { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
+        .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 10px;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .btn.a { background: linear-gradient(90deg, #79b5ff, #68d0ff); }
+        .btn.b { background: linear-gradient(90deg, #ff7cb4, #ffad8e); }
+        .btn.c { background: linear-gradient(90deg, #9f8bff, #7eb7ff); }
+        .btn.d { background: linear-gradient(90deg, #71d9c4, #6cc7ff); }
+
+        .status {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #6f7ea8;
+            font-weight: 700;
+        }
+
+        .output { padding: 14px; }
+        .output-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .output h3 { font-size: 16px; color: #4c6398; }
+        .mini { font-size: 12px; color: #6f7ea8; font-weight: 700; }
+
+        pre {
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            background: #fff;
+            padding: 12px;
+            min-height: 260px;
+            max-height: 460px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-size: 12px;
+            color: #4d5f92;
+        }
+
+        @media (max-width: 900px) {
+            .row, .models, .mini-actions, .actions { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="hero">
+        <div class="top">
+            <span class="pill">工具箱 / OpenCode 配置生成</span>
+            <a class="back" href="../index.html" target="_blank" rel="noopener noreferrer">返回主页</a>
+        </div>
+        <h1>OpenCode 配置生成器</h1>
+        <p class="subtitle">可配置多个模型服务站点，勾选预设模型并支持手动添加，生成后可复制与下载。</p>
+    </header>
+
+    <section class="panel">
+        <div class="summary">已按你的配置习惯预置模型：`gpt-5.3-codex`、`gpt-5.2-codex`、`gpt-5.3`、`gpt-5.4`。其他模型可手动添加。</div>
+
+        <div id="providerList"></div>
+
+        <div class="actions">
+            <button class="btn a" onclick="addProvider()">新增服务站点</button>
+            <button class="btn d" onclick="generateConfig()">生成配置</button>
+            <button class="btn b" onclick="copyConfig()">一键复制</button>
+            <button class="btn c" onclick="downloadConfig()">下载文件</button>
+        </div>
+
+        <div class="status" id="status">等待操作...</div>
+    </section>
+
+    <section class="output">
+        <div class="output-head">
+            <h3>配置预览</h3>
+            <span class="mini">文件名将按当前时间命名</span>
+        </div>
+        <pre id="preview">{
+  "provider": {},
+  "$schema": "https://opencode.ai/config.json"
+}</pre>
+    </section>
+</div>
+
+<template id="providerTemplate">
+    <div class="provider">
+        <div class="provider-head">
+            <div class="provider-title">服务站点</div>
+            <button class="btn c" type="button" data-act="remove">删除</button>
+        </div>
+        <div class="row">
+            <div class="field">
+                <label>Provider 名称</label>
+                <input type="text" data-key="name" placeholder="例如: openai / xiaoyan公益站">
+            </div>
+            <div class="field">
+                <label>API URL (baseURL)</label>
+                <input type="text" data-key="baseURL" placeholder="https://api.example.com/v1">
+            </div>
+        </div>
+        <div class="field">
+            <label>API 协议</label>
+            <select data-key="api" style="width:100%;border:1px solid #dbe8ff;border-radius:12px;padding:11px 12px;color:var(--text-main);background:#fff;outline:none;">
+                <option value="responses" selected>responses (/v1/responses)</option>
+                <option value="chat">chat/completions (/v1/chat/completions)</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>API Key</label>
+            <input type="password" data-key="apiKey" placeholder="sk-... 或其他 key">
+        </div>
+        <div class="field">
+            <label>模型选择</label>
+            <div class="models">
+                <label class="check"><input type="checkbox" value="gpt-5.3-codex" checked> gpt-5.3-codex</label>
+                <label class="check"><input type="checkbox" value="gpt-5.2-codex" checked> gpt-5.2-codex</label>
+                <label class="check"><input type="checkbox" value="gpt-5.3" checked> gpt-5.3</label>
+                <label class="check"><input type="checkbox" value="gpt-5.4" checked> gpt-5.4</label>
+            </div>
+            <div class="mini-actions">
+                <input type="text" data-key="customModel" placeholder="手动添加模型，例如: gpt-4o-mini">
+                <button class="btn a" type="button" data-act="addModel">添加模型</button>
+                <button class="btn d" type="button" data-act="test">测试连通</button>
+            </div>
+            <div class="status" data-key="testStatus">连通性未测试</div>
+        </div>
+    </div>
+</template>
+
+<script>
+    const providerListEl = document.getElementById('providerList');
+    let latestConfigText = '{\n  "provider": {},\n  "$schema": "https://opencode.ai/config.json"\n}';
+
+    function addProvider(prefill) {
+        const tpl = document.getElementById('providerTemplate');
+        const node = tpl.content.firstElementChild.cloneNode(true);
+        const idx = providerListEl.children.length + 1;
+        node.querySelector('.provider-title').textContent = '服务站点 #' + idx;
+
+        const nameEl = node.querySelector('[data-key="name"]');
+        const urlEl = node.querySelector('[data-key="baseURL"]');
+        const keyEl = node.querySelector('[data-key="apiKey"]');
+        const apiEl = node.querySelector('[data-key="api"]');
+
+        if (prefill) {
+            nameEl.value = prefill.name || '';
+            urlEl.value = prefill.baseURL || '';
+            keyEl.value = prefill.apiKey || '';
+            apiEl.value = prefill.api || 'responses';
+        }
+
+        node.querySelector('[data-act="remove"]').addEventListener('click', () => {
+            if (providerListEl.children.length === 1) return setStatus('至少保留一个服务站点');
+            node.remove();
+            renumberProviders();
+            setStatus('已删除服务站点');
+        });
+
+        node.querySelector('[data-act="addModel"]').addEventListener('click', () => {
+            const input = node.querySelector('[data-key="customModel"]');
+            const model = input.value.trim();
+            if (!model) return;
+            if (hasModel(node, model)) {
+                input.value = '';
+                return setStatus('模型已存在: ' + model);
+            }
+            const lab = document.createElement('label');
+            lab.className = 'check';
+            const safeModel = escapeHtml(model);
+            lab.innerHTML = '<input type="checkbox" value="' + safeModel + '" checked> ' + safeModel;
+            node.querySelector('.models').appendChild(lab);
+            input.value = '';
+            setStatus('已添加模型: ' + model);
+        });
+
+        node.querySelector('[data-act="test"]').addEventListener('click', () => {
+            testProvider(node);
+        });
+
+        providerListEl.appendChild(node);
+        renumberProviders();
+    }
+
+    function renumberProviders() {
+        Array.from(providerListEl.children).forEach((el, i) => {
+            el.querySelector('.provider-title').textContent = '服务站点 #' + (i + 1);
+        });
+    }
+
+    function hasModel(providerEl, model) {
+        const checks = providerEl.querySelectorAll('.models input[type="checkbox"]');
+        return Array.from(checks).some(c => c.value === model);
+    }
+
+    function collectProvider(providerEl) {
+        const name = providerEl.querySelector('[data-key="name"]').value.trim();
+        const baseURL = providerEl.querySelector('[data-key="baseURL"]').value.trim();
+        const apiKey = providerEl.querySelector('[data-key="apiKey"]').value.trim();
+        const api = providerEl.querySelector('[data-key="api"]').value.trim() || 'responses';
+        const models = Array.from(providerEl.querySelectorAll('.models input[type="checkbox"]'))
+            .filter(c => c.checked)
+            .map(c => c.value.trim())
+            .filter(Boolean);
+
+        return { name, baseURL, apiKey, api, models };
+    }
+
+    function generateConfig() {
+        const providers = {};
+        const items = Array.from(providerListEl.children);
+        if (items.length === 0) return setStatus('请至少添加一个服务站点');
+
+        for (let i = 0; i < items.length; i++) {
+            const p = collectProvider(items[i]);
+            if (!p.name) return setStatus('第 ' + (i + 1) + ' 个服务站点名称不能为空');
+            if (!p.baseURL || !/^https?:\/\//i.test(p.baseURL)) return setStatus('第 ' + (i + 1) + ' 个 API URL 格式不正确');
+            if (!p.apiKey) return setStatus('第 ' + (i + 1) + ' 个 API Key 不能为空');
+            if (p.models.length === 0) return setStatus('第 ' + (i + 1) + ' 个服务站点至少勾选一个模型');
+            if (providers[p.name]) return setStatus('Provider 名称重复: ' + p.name);
+
+            const modelMap = {};
+            p.models.forEach(m => {
+                modelMap[m] = {
+                    name: m,
+                    options: { store: false },
+                    variants: {
+                        low: {},
+                        medium: {},
+                        high: {},
+                        xhigh: {}
+                    }
+                };
+            });
+
+            providers[p.name] = {
+                npm: '@ai-sdk/openai',
+                api: p.api,
+                options: {
+                    baseURL: p.baseURL,
+                    apiKey: p.apiKey
+                },
+                models: modelMap
+            };
+        }
+
+        const config = {
+            provider: providers,
+            agent: {
+                build: { options: { store: false } },
+                plan: { options: { store: false } }
+            },
+            $schema: 'https://opencode.ai/config.json'
+        };
+
+        latestConfigText = JSON.stringify(config, null, 2);
+        document.getElementById('preview').textContent = latestConfigText;
+        setStatus('配置已生成，共 ' + Object.keys(providers).length + ' 个服务站点');
+    }
+
+    async function testProvider(providerEl) {
+        const p = collectProvider(providerEl);
+        const out = providerEl.querySelector('[data-key="testStatus"]');
+
+        if (!p.baseURL || !/^https?:\/\//i.test(p.baseURL)) {
+            out.textContent = '测试失败：API URL 格式不正确';
+            return;
+        }
+        if (!p.apiKey) {
+            out.textContent = '测试失败：API Key 不能为空';
+            return;
+        }
+
+        out.textContent = '测试中...';
+        try {
+            const endpoint = p.baseURL.replace(/\/+$/, '') + '/models';
+            const res = await fetch(endpoint, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + p.apiKey,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!res.ok) {
+                out.textContent = '测试失败：HTTP ' + res.status;
+                return;
+            }
+
+            const data = await res.json();
+            const size = Array.isArray(data.data) ? data.data.length : 0;
+            out.textContent = '测试成功：可访问 /models，返回模型数 ' + size;
+        } catch (e) {
+            out.textContent = '测试失败：' + (e.message || String(e));
+        }
+    }
+
+    async function copyConfig() {
+        await navigator.clipboard.writeText(latestConfigText);
+        setStatus('已复制到剪贴板');
+    }
+
+    function downloadConfig() {
+        const blob = new Blob([latestConfigText], { type: 'application/json;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'opencode_config_' + formatFileTime(new Date()) + '.jsonc';
+        a.click();
+        setStatus('配置文件已下载');
+    }
+
+    function setStatus(text) {
+        document.getElementById('status').textContent = text;
+    }
+
+    function formatFileTime(d) {
+        const pad = n => String(n).padStart(2, '0');
+        return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + '_' + pad(d.getHours()) + '-' + pad(d.getMinutes()) + '-' + pad(d.getSeconds());
+    }
+
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    addProvider({ name: 'openai', baseURL: 'https://api.openai.com/v1', apiKey: '', api: 'responses' });
+</script>
+</body>
+</html>

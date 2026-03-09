@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVM 离线钱包生成器 | XS 魔法实验室</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.1/ethers.umd.min.js"></script>
+    <style>
+        :root {
+            --bg1: #fff8fb;
+            --bg2: #eef8ff;
+            --bg3: #fffef3;
+            --text-main: #33456f;
+            --text-muted: #6f7ea8;
+            --line: #dce7ff;
+            --pink: #ff7cb4;
+            --peach: #ffb37c;
+            --blue: #79b5ff;
+            --mint: #71d9c4;
+            --card-shadow: 0 12px 30px rgba(124, 154, 219, 0.16);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(255, 179, 124, 0.28) 0, transparent 28%),
+                radial-gradient(circle at 86% 9%, rgba(181, 156, 255, 0.26) 0, transparent 30%),
+                radial-gradient(circle at 76% 82%, rgba(121, 181, 255, 0.22) 0, transparent 33%),
+                linear-gradient(160deg, var(--bg1), var(--bg2) 52%, var(--bg3));
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 28px 16px 56px;
+        }
+
+        .container { width: 100%; max-width: 1050px; margin: 0 auto; }
+        .hero,
+        .panel,
+        .result {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .hero { padding: 18px; margin-bottom: 12px; }
+        .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .pill {
+            font-size: 12px;
+            font-weight: 800;
+            color: #8d5d9d;
+            background: linear-gradient(90deg, #ffe3f2, #eaf3ff);
+            border: 1px solid #efdbff;
+            border-radius: 999px;
+            padding: 6px 12px;
+        }
+        .back {
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--text-main);
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            padding: 8px 12px;
+            text-decoration: none;
+        }
+        h1 {
+            margin: 12px 0 6px;
+            font-size: clamp(28px, 6vw, 44px);
+            font-weight: 900;
+            line-height: 1.08;
+            background: linear-gradient(90deg, var(--pink), var(--peach) 34%, var(--blue) 70%, var(--mint));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .subtitle { color: var(--text-muted); font-size: 14px; }
+
+        .panel { padding: 16px; }
+        .summary {
+            margin-bottom: 12px;
+            border: 1px solid #cfe1ff;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #f8fbff, #fff4fb);
+            padding: 10px;
+            font-size: 12px;
+            color: #5f74ad;
+            line-height: 1.5;
+            font-weight: 800;
+        }
+
+        .mode-switch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .mode-card {
+            border: 1px solid #d7e6ff;
+            border-radius: 14px;
+            background: linear-gradient(160deg, #ffffff, #f6fbff);
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 900;
+            color: #4d5f92;
+            cursor: pointer;
+            text-align: center;
+            transition: .2s ease;
+        }
+        .mode-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 18px rgba(121, 181, 255, 0.18);
+        }
+        .mode-card.active {
+            color: #fff;
+            border-color: transparent;
+            background: linear-gradient(90deg, #79b5ff, #ff7cb4 70%, #ffb37c);
+            box-shadow: 0 10px 20px rgba(121, 181, 255, 0.28);
+        }
+        .mode-panel {
+            border: 1px solid #d7e6ff;
+            border-radius: 12px;
+            background: linear-gradient(160deg, #ffffff, #fbfdff);
+            padding: 12px;
+            margin-bottom: 12px;
+            display: none;
+        }
+        .mode-panel.active { display: block; }
+        .quick-tools {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+        .result-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .result-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .hl {
+            background: linear-gradient(90deg, #ffe2f1, #e8f2ff);
+            color: #c24f8e;
+            border-radius: 4px;
+            padding: 0 1px;
+            font-weight: 900;
+        }
+
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .field { margin-bottom: 10px; }
+        label { display: block; font-size: 12px; color: #6f7ea8; font-weight: 800; margin-bottom: 7px; }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            padding: 10px 12px;
+            color: var(--text-main);
+            outline: none;
+            background: #fff;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        }
+
+        .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            padding: 9px;
+            background: #fff;
+            font-size: 12px;
+            color: #4d5f92;
+            font-weight: 700;
+        }
+
+        .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 11px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .btn.a { background: linear-gradient(90deg, #79b5ff, #68d0ff); }
+        .btn.b { background: linear-gradient(90deg, #ff7cb4, #ffad8e); }
+        .btn.c { background: linear-gradient(90deg, #9f8bff, #7eb7ff); }
+        .btn.d { background: linear-gradient(90deg, #71d9c4, #6cc7ff); }
+
+        .estimate {
+            margin-top: 8px;
+            border: 1px dashed #dbe8ff;
+            border-radius: 10px;
+            background: #f8fbff;
+            padding: 8px;
+            font-size: 12px;
+            color: #5f74ad;
+            line-height: 1.5;
+        }
+        .status {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #6f7ea8;
+            font-weight: 700;
+        }
+
+        .result { margin-top: 12px; padding: 14px; }
+        .result h3 { font-size: 16px; color: #4c6398; margin-bottom: 0; }
+        .table-wrap {
+            border: 1px solid #d7e6ff;
+            border-radius: 12px;
+            overflow: auto;
+            max-height: 420px;
+            background: #fff;
+        }
+        .pager {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: auto auto 1fr auto auto auto auto;
+            gap: 8px;
+            align-items: center;
+        }
+        .pager-info { font-size: 12px; color: #6f7ea8; font-weight: 700; }
+        .tiny-input {
+            width: 90px;
+            border: 1px solid #d7e6ff;
+            border-radius: 10px;
+            padding: 7px 8px;
+            font-size: 12px;
+        }
+        .result .btn {
+            padding: 9px 12px;
+            font-size: 12px;
+            border-radius: 10px;
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th, td {
+            border-bottom: 1px solid #edf3ff;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+            color: #5f74ad;
+            word-break: break-all;
+            vertical-align: top;
+        }
+        th { position: sticky; top: 0; background: #f8fbff; color: #4d5f92; font-weight: 900; }
+
+        @media (max-width: 900px) {
+            .row, .checks, .actions, .mode-switch, .pager { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="hero">
+        <div class="top">
+            <span class="pill">Web3 实验 / 离线钱包生成</span>
+            <a class="back" href="../index.html" target="_blank" rel="noopener noreferrer">返回主页</a>
+        </div>
+        <h1>EVM 离线钱包生成器</h1>
+        <p class="subtitle">页面加载完成后可离线生成钱包。支持普通批量生成与前后缀定制生成。</p>
+    </header>
+
+    <section class="panel">
+        <div class="summary">离线生成，不上传私钥。建议先用普通模式批量生成，再按需切换靓号模式。</div>
+
+        <div class="mode-switch">
+            <button class="mode-card active" id="modeNormal" onclick="switchMode('normal')">普通模式</button>
+            <button class="mode-card" id="modeVanity" onclick="switchMode('vanity')">靓号模式</button>
+        </div>
+
+        <div class="mode-panel active" id="panelNormal">
+                <div class="row">
+                    <div class="field">
+                        <label>生成数量</label>
+                        <input type="number" id="normalCount" value="10" min="1" step="1">
+                    </div>
+                    <div class="field">
+                        <label>说明</label>
+                        <input type="text" value="数量过大仅渲染前100个，导出仍包含全部" readonly>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn a" id="btnNormal" onclick="generateNormal()">生成普通账号</button>
+                </div>
+                <div class="status" id="normalStatus">等待生成...</div>
+        </div>
+
+        <div class="mode-panel" id="panelVanity">
+                <div class="checks">
+                    <label class="check"><input type="checkbox" id="usePrefix">启用前缀</label>
+                    <label class="check"><input type="checkbox" id="useSuffix">启用后缀</label>
+                </div>
+                <div class="row">
+                    <div class="field">
+                        <label>前缀 (不带 0x, 十六进制)</label>
+                        <input type="text" id="prefixInput" placeholder="例如: abc">
+                    </div>
+                    <div class="field">
+                        <label>后缀 (不带 0x, 十六进制)</label>
+                        <input type="text" id="suffixInput" placeholder="例如: 888">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="field">
+                        <label>生成数量</label>
+                        <input type="number" id="vanityCount" value="1" min="1" step="1">
+                    </div>
+                    <div class="field">
+                        <label>预估说明</label>
+                        <input type="text" value="生成前会估算运行次数与耗时" readonly>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn b" id="btnVanity" onclick="generateVanity()">生成指定账号</button>
+                    <button class="btn c" id="btnStop" onclick="stopTask()">停止任务</button>
+                </div>
+                <div class="estimate" id="estimateBox">等待估算...</div>
+                <div class="status" id="vanityStatus">等待生成...</div>
+        </div>
+    </section>
+
+    <section class="result">
+        <div class="result-head">
+            <h3>生成结果（支持分页查看）</h3>
+            <div class="result-actions">
+                <button class="btn d" onclick="downloadCsv()">导出 CSV</button>
+                <button class="btn c" onclick="clearAllWallets()">一键清空结果</button>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th style="width:12%">类型</th>
+                    <th style="width:46%">私钥</th>
+                    <th style="width:36%">地址</th>
+                    <th style="width:6%">尝试</th>
+                </tr>
+                </thead>
+                <tbody id="resultBody"></tbody>
+            </table>
+        </div>
+        <div class="pager">
+            <button class="btn c" onclick="changePage(-1)">上一页</button>
+            <button class="btn c" onclick="changePage(1)">下一页</button>
+            <div class="pager-info" id="pagerInfo">第 1 / 1 页</div>
+            <input class="tiny-input" type="number" id="pageSizeInput" value="100" min="10" max="1000" step="10">
+            <button class="btn d" onclick="applyPageSize()">应用每页</button>
+            <input class="tiny-input" type="number" id="jumpPageInput" value="1" min="1" step="1">
+            <button class="btn d" onclick="jumpToPage()">跳转页</button>
+        </div>
+    </section>
+</div>
+
+<script>
+    const CURVE_N = BigInt('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
+    const wallets = [];
+
+    let running = false;
+    let stopRequested = false;
+    let benchmarkCache = null;
+    let currentMode = 'normal';
+    let currentPage = 1;
+    let pageSize = 100;
+
+    function updateSummary() {
+        const total = wallets.length;
+        const maxPage = Math.max(1, Math.ceil(total / pageSize));
+        if (currentPage > maxPage) currentPage = maxPage;
+        document.getElementById('pagerInfo').textContent = '第 ' + currentPage + ' / ' + maxPage + ' 页';
+    }
+
+    function renderResults() {
+        const body = document.getElementById('resultBody');
+        body.innerHTML = '';
+        const startIndex = (currentPage - 1) * pageSize;
+        const pageItems = wallets.slice(startIndex, startIndex + pageSize);
+        pageItems.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML =
+                '<td>' + item.type + '</td>' +
+                '<td>' + item.privateKey + '</td>' +
+                '<td>' + highlightAddress(item) + '</td>' +
+                '<td>' + (item.tries || 1) + '</td>';
+            body.appendChild(tr);
+        });
+        updateSummary();
+    }
+
+    function switchMode(mode) {
+        currentMode = mode;
+        const isNormal = mode === 'normal';
+        document.getElementById('modeNormal').classList.toggle('active', isNormal);
+        document.getElementById('modeVanity').classList.toggle('active', !isNormal);
+        document.getElementById('panelNormal').classList.toggle('active', isNormal);
+        document.getElementById('panelVanity').classList.toggle('active', !isNormal);
+    }
+
+    function makeWallet() {
+        let privateKey;
+        while (true) {
+            const bytes = crypto.getRandomValues(new Uint8Array(32));
+            privateKey = ethers.hexlify(bytes);
+        const k = BigInt(privateKey);
+        if (k > 0n && k < CURVE_N) break;
+    }
+        return {
+            privateKey,
+            address: ethers.computeAddress(privateKey)
+        };
+    }
+
+    async function generateNormal() {
+        if (running) return;
+        const count = Number(document.getElementById('normalCount').value.trim());
+        if (!Number.isInteger(count) || count <= 0) return alert('生成数量必须是正整数');
+        if (count > 50000) return alert('数量过大，请分批生成（建议 <= 50000）');
+
+        running = true;
+        stopRequested = false;
+        document.getElementById('btnNormal').disabled = true;
+
+        const status = document.getElementById('normalStatus');
+        const start = performance.now();
+        let done = 0;
+        const batch = [];
+
+        while (done < count && !stopRequested) {
+            batch.push({ type: '普通', ...makeWallet(), tries: 1 });
+            done++;
+            if (batch.length >= 200 || done === count) {
+                wallets.push.apply(wallets, batch.splice(0, batch.length));
+                renderResults();
+                status.textContent = '普通账号生成中: ' + done + ' / ' + count;
+                await sleep(0);
+            }
+        }
+
+        const sec = ((performance.now() - start) / 1000).toFixed(2);
+        status.textContent = stopRequested
+            ? '任务已停止，已生成 ' + done + ' 个，用时 ' + sec + ' 秒。'
+            : '普通账号生成完成，共 ' + done + ' 个，用时 ' + sec + ' 秒。';
+
+        running = false;
+        document.getElementById('btnNormal').disabled = false;
+    }
+
+    async function generateVanity() {
+        if (running) return;
+
+        const usePrefix = document.getElementById('usePrefix').checked;
+        const useSuffix = document.getElementById('useSuffix').checked;
+        if (!usePrefix && !useSuffix) return alert('请至少勾选前缀或后缀其中一个');
+
+        const prefix = sanitizeHex(document.getElementById('prefixInput').value);
+        const suffix = sanitizeHex(document.getElementById('suffixInput').value);
+
+        if (usePrefix && !prefix) return alert('前缀不能为空，且只能是十六进制字符');
+        if (useSuffix && !suffix) return alert('后缀不能为空，且只能是十六进制字符');
+        if (usePrefix && prefix.length > 12) return alert('前缀建议不超过 12 位，避免耗时过长');
+        if (useSuffix && suffix.length > 12) return alert('后缀建议不超过 12 位，避免耗时过长');
+        if (hasConflict(prefix, suffix)) return alert('前缀与后缀存在冲突，不可能匹配，请修改');
+
+        const count = Number(document.getElementById('vanityCount').value.trim());
+        if (!Number.isInteger(count) || count <= 0) return alert('生成数量必须是正整数');
+
+        const expectedAttemptsOne = Math.pow(16, (usePrefix ? prefix.length : 0) + (useSuffix ? suffix.length : 0));
+        const speed = await benchmarkSpeed();
+        const totalExpected = expectedAttemptsOne * count;
+        const estSec = totalExpected / speed;
+
+        document.getElementById('estimateBox').textContent =
+            '预估单个期望尝试次数: ' + formatInt(expectedAttemptsOne) +
+            '；当前设备约 ' + formatInt(Math.floor(speed)) + ' 次/秒；总耗时约 ' + formatDuration(estSec) + '。';
+
+        if (estSec > 60) {
+            const ok = confirm('预计耗时约 ' + formatDuration(estSec) + '（>60 秒），是否继续？');
+            if (!ok) return;
+        }
+
+        running = true;
+        stopRequested = false;
+        const status = document.getElementById('vanityStatus');
+        const btn = document.getElementById('btnVanity');
+        btn.disabled = true;
+
+        let produced = 0;
+        const start = performance.now();
+
+        while (produced < count && !stopRequested) {
+            let tries = 0;
+            while (!stopRequested) {
+                tries++;
+                const w = makeWallet();
+                const hexAddr = w.address.slice(2).toLowerCase();
+                const matchPrefix = !usePrefix || hexAddr.startsWith(prefix);
+                const matchSuffix = !useSuffix || hexAddr.endsWith(suffix);
+                if (matchPrefix && matchSuffix) {
+                    wallets.push({
+                        type: '指定',
+                        privateKey: w.privateKey,
+                        address: w.address,
+                        tries,
+                        usePrefix,
+                        useSuffix,
+                        prefix,
+                        suffix
+                    });
+                    produced++;
+                    renderResults();
+                    break;
+                }
+                if (tries % 1000 === 0) {
+                    status.textContent = '指定账号生成中: ' + produced + ' / ' + count + '，当前第 ' + (produced + 1) + ' 个已尝试 ' + formatInt(tries) + ' 次';
+                    await sleep(0);
+                }
+            }
+        }
+
+        const sec = ((performance.now() - start) / 1000).toFixed(2);
+        status.textContent = stopRequested
+            ? '任务已停止，已生成 ' + produced + ' 个，用时 ' + sec + ' 秒。'
+            : '指定账号生成完成，共 ' + produced + ' 个，用时 ' + sec + ' 秒。';
+
+        running = false;
+        btn.disabled = false;
+    }
+
+    async function benchmarkSpeed() {
+        if (benchmarkCache) return benchmarkCache;
+        const rounds = 2000;
+        const t0 = performance.now();
+        for (let i = 0; i < rounds; i++) {
+            makeWallet();
+        }
+        const sec = (performance.now() - t0) / 1000;
+        benchmarkCache = Math.max(1, Math.floor(rounds / sec));
+        return benchmarkCache;
+    }
+
+    function downloadCsv() {
+        if (wallets.length === 0) return alert('暂无数据可导出');
+        let csv = 'Type,PrivateKey,Address,Tries\n';
+        wallets.forEach(w => {
+            csv += [w.type, w.privateKey, w.address, w.tries || 1].join(',') + '\n';
+        });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'EVM_Wallets_' + formatFileTime(new Date()) + '.csv';
+        a.click();
+    }
+
+    function clearAllWallets() {
+        if (running) return alert('请先停止当前任务');
+        wallets.length = 0;
+        currentPage = 1;
+        document.getElementById('jumpPageInput').value = '1';
+        renderResults();
+        document.getElementById('normalStatus').textContent = '等待生成...';
+        document.getElementById('vanityStatus').textContent = '等待生成...';
+    }
+
+    function clearForm() {
+        if (running) return alert('请先停止当前任务');
+        document.getElementById('normalCount').value = '10';
+        document.getElementById('usePrefix').checked = false;
+        document.getElementById('useSuffix').checked = false;
+        document.getElementById('prefixInput').value = '';
+        document.getElementById('suffixInput').value = '';
+        document.getElementById('vanityCount').value = '1';
+        document.getElementById('estimateBox').textContent = '等待估算...';
+        document.getElementById('normalStatus').textContent = '等待生成...';
+        document.getElementById('vanityStatus').textContent = '等待生成...';
+    }
+
+    function changePage(delta) {
+        const maxPage = Math.max(1, Math.ceil(wallets.length / pageSize));
+        currentPage += delta;
+        if (currentPage < 1) currentPage = 1;
+        if (currentPage > maxPage) currentPage = maxPage;
+        document.getElementById('jumpPageInput').value = String(currentPage);
+        renderResults();
+    }
+
+    function applyPageSize() {
+        const input = Number(document.getElementById('pageSizeInput').value.trim());
+        if (!Number.isInteger(input) || input < 10 || input > 1000) {
+            return alert('每页数量需为 10-1000 的整数');
+        }
+        pageSize = input;
+        currentPage = 1;
+        document.getElementById('jumpPageInput').value = '1';
+        renderResults();
+    }
+
+    function jumpToPage() {
+        const maxPage = Math.max(1, Math.ceil(wallets.length / pageSize));
+        const target = Number(document.getElementById('jumpPageInput').value.trim());
+        if (!Number.isInteger(target) || target < 1) return alert('页码必须是正整数');
+        currentPage = target > maxPage ? maxPage : target;
+        document.getElementById('jumpPageInput').value = String(currentPage);
+        renderResults();
+    }
+
+    function highlightAddress(item) {
+        const addr = item.address;
+        if (item.type !== '指定') return addr;
+
+        const core = addr.slice(2);
+        const p = item.usePrefix ? (item.prefix || '') : '';
+        const s = item.useSuffix ? (item.suffix || '') : '';
+
+        if (p && s) {
+            const midStart = p.length;
+            const midEnd = 40 - s.length;
+            return '0x' +
+                '<span class="hl">' + core.slice(0, p.length) + '</span>' +
+                core.slice(midStart, midEnd) +
+                '<span class="hl">' + core.slice(midEnd) + '</span>';
+        }
+        if (p) {
+            return '0x' + '<span class="hl">' + core.slice(0, p.length) + '</span>' + core.slice(p.length);
+        }
+        if (s) {
+            return '0x' + core.slice(0, 40 - s.length) + '<span class="hl">' + core.slice(40 - s.length) + '</span>';
+        }
+        return addr;
+    }
+
+    function stopTask() {
+        stopRequested = true;
+    }
+
+    function sanitizeHex(v) {
+        const cleaned = String(v || '').trim().replace(/^0x/i, '').toLowerCase();
+        if (!cleaned) return '';
+        if (!/^[0-9a-f]+$/.test(cleaned)) return '';
+        return cleaned;
+    }
+
+    function hasConflict(prefix, suffix) {
+        if (!prefix || !suffix) return false;
+        const overlap = prefix.length + suffix.length - 40;
+        if (overlap <= 0) return false;
+        for (let i = 0; i < overlap; i++) {
+            if (prefix[prefix.length - overlap + i] !== suffix[i]) return true;
+        }
+        return false;
+    }
+
+    function formatDuration(sec) {
+        if (!Number.isFinite(sec)) return '未知';
+        if (sec < 1) return '不到 1 秒';
+        if (sec < 60) return sec.toFixed(1) + ' 秒';
+        if (sec < 3600) return (sec / 60).toFixed(1) + ' 分钟';
+        return (sec / 3600).toFixed(2) + ' 小时';
+    }
+
+    function formatInt(num) {
+        return Number(num).toLocaleString('en-US');
+    }
+
+    function formatFileTime(d) {
+        const pad = n => String(n).padStart(2, '0');
+        return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + '_' + pad(d.getHours()) + '-' + pad(d.getMinutes()) + '-' + pad(d.getSeconds());
+    }
+
+    function sleep(ms) {
+        return new Promise(r => setTimeout(r, ms));
+    }
+
+    window.switchMode = switchMode;
+    window.clearForm = clearForm;
+    window.changePage = changePage;
+    window.applyPageSize = applyPageSize;
+    window.jumpToPage = jumpToPage;
+
+    renderResults();
+</script>
+</body>
+</html>
