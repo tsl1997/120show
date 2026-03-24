@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeployBot | Hoodi 策略执行台</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.1/ethers.umd.min.js"></script>
+    <style>
+        :root {
+            --bg1: #fff8ff;
+            --bg2: #eef8ff;
+            --bg3: #fffef3;
+            --text-main: #33456f;
+            --text-muted: #6f7ea8;
+            --line: #dce7ff;
+            --pink: #ff7cb4;
+            --peach: #ffb37c;
+            --blue: #79b5ff;
+            --mint: #71d9c4;
+            --danger: #e35c7a;
+            --ok: #16a34a;
+            --card-shadow: 0 12px 30px rgba(124, 154, 219, 0.16);
+            --card-shadow-hover: 0 18px 36px rgba(124, 154, 219, 0.24);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(255, 179, 124, 0.28) 0, transparent 28%),
+                radial-gradient(circle at 86% 9%, rgba(181, 156, 255, 0.26) 0, transparent 30%),
+                radial-gradient(circle at 76% 82%, rgba(121, 181, 255, 0.22) 0, transparent 33%),
+                linear-gradient(160deg, var(--bg1), var(--bg2) 52%, var(--bg3));
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 28px 16px 56px;
+        }
+
+        .sparkles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.45;
+            background-image:
+                radial-gradient(circle, rgba(255, 124, 180, 0.58) 1px, transparent 1px),
+                radial-gradient(circle, rgba(121, 181, 255, 0.58) 1px, transparent 1px);
+            background-size: 44px 44px, 60px 60px;
+            background-position: 0 0, 18px 22px;
+        }
+
+        .container { width: 100%; max-width: 1160px; margin: 0 auto; position: relative; z-index: 2; }
+        .hero, .panel, .log, .wallets {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .hero { padding: 16px; margin-bottom: 12px; }
+        .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .pill {
+            font-size: 12px; font-weight: 700; color: #8d5d9d;
+            background: linear-gradient(90deg, #ffe3f2, #eaf3ff);
+            border: 1px solid #efdbff; border-radius: 999px; padding: 6px 12px;
+        }
+        .back {
+            text-decoration: none; color: var(--text-main); font-size: 13px; font-weight: 700;
+            background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px;
+        }
+        h1 {
+            margin: 10px 0 4px;
+            font-size: clamp(30px, 5vw, 50px);
+            font-weight: 900;
+            line-height: 1.08;
+            background: linear-gradient(90deg, var(--pink), var(--peach) 34%, var(--blue) 70%, var(--mint));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .subtitle { color: var(--text-muted); font-size: 14px; }
+
+        .grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .panel { padding: 14px; }
+        .panel h3 { font-size: 16px; color: #4f66a0; margin-bottom: 10px; }
+
+        .hint {
+            margin-bottom: 10px;
+            border: 1px dashed #dbe8ff;
+            border-radius: 10px;
+            background: #f8fbff;
+            padding: 8px;
+            font-size: 12px;
+            color: #6578ad;
+            line-height: 1.5;
+        }
+
+        .field { margin-bottom: 10px; }
+        label { display: block; font-size: 12px; color: #7384b1; font-weight: 700; margin-bottom: 6px; }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            padding: 9px 10px;
+            font-size: 14px;
+            outline: none;
+            color: var(--text-main);
+            background: #fff;
+        }
+        input:focus, select:focus { border-color: #b9ceff; box-shadow: 0 0 0 4px rgba(121, 181, 255, 0.16); }
+
+        .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+        .btn {
+            border: none; border-radius: 12px; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer;
+            transition: .2s ease;
+        }
+        .btn.primary {
+            color: #fff;
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            box-shadow: 0 10px 18px rgba(134, 164, 227, 0.35);
+        }
+        .btn.soft { background: #fff; color: #5d6f9f; border: 1px solid #dbe8ff; }
+        .btn.danger { background: #fff6f9; color: var(--danger); border: 1px solid #ffd0dc; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
+
+        .tabs { display: flex; gap: 8px; margin-bottom: 10px; }
+        .tab {
+            flex: 1; border: 1px solid #dbe8ff; background: #fff; color: #5d6f9f;
+            border-radius: 12px; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer;
+        }
+        .tab.active {
+            color: #fff; border-color: transparent;
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+        }
+
+        .status {
+            margin-top: 8px;
+            border: 1px solid #dbe8ff;
+            border-radius: 10px;
+            background: #f8fbff;
+            padding: 8px;
+            font-size: 12px;
+            color: #5f74ad;
+            line-height: 1.5;
+            word-break: break-all;
+        }
+
+        .mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+        .ok { color: var(--ok); }
+        .bad { color: var(--danger); }
+
+        .log, .wallets { padding: 12px; }
+        .log h3, .wallets h3 { font-size: 15px; margin-bottom: 8px; color: #4f66a0; }
+        #logBox {
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            background: #fff;
+            min-height: 220px;
+            max-height: 320px;
+            overflow: auto;
+            padding: 10px;
+            font-size: 12px;
+            color: #506493;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        #walletTableWrap {
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            overflow: auto;
+            max-height: 380px;
+            background: #fff;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { padding: 8px 10px; border-bottom: 1px solid #edf3ff; text-align: left; }
+        th { position: sticky; top: 0; background: #f8fbff; color: #6e80ad; font-weight: 800; }
+
+        .pager { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 8px; }
+        .pager span { font-size: 12px; color: #6f7ea8; }
+
+        .download-row { display: flex; gap: 8px; margin-top: 8px; }
+
+        @media (max-width: 980px) {
+            .grid { grid-template-columns: 1fr; }
+            .row2, .row3 { grid-template-columns: 1fr; }
+            .tabs { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sparkles" aria-hidden="true"></div>
+    <div class="container">
+        <header class="hero">
+            <div class="top">
+                <span class="pill">Web3 实验 / DeployBot</span>
+                <a class="back" href="../index.html" target="_blank" rel="noopener noreferrer">返回主页</a>
+            </div>
+            <h1>DeployBot 策略执行台</h1>
+            <p class="subtitle">默认网络 Hoodi（560048），生成钱包、资金检测、策略执行与结果导出一体化。</p>
+        </header>
+
+        <div class="grid">
+            <section class="panel">
+                <h3>步骤 1 / 2：初始钱包与余额检测</h3>
+                <div class="hint">先生成初始钱包，手动转入测试 ETH，点击“已发送并检查余额”。秘钥仅保存在当前浏览器内存。</div>
+
+                <div class="field">
+                    <label>网络</label>
+                    <select id="networkSelect">
+                        <option value="hoodi">Hoodi Testnet (ChainId: 560048 / 0x88bb0)</option>
+                    </select>
+                </div>
+
+                <div class="row2">
+                    <button class="btn primary" id="genBtn">生成初始钱包</button>
+                    <button class="btn soft" id="checkBtn" disabled>已发送并检查余额</button>
+                </div>
+
+                <div class="status" id="walletStatus">尚未生成钱包。</div>
+
+                <div class="row2" style="margin-top:8px;">
+                    <div class="field" style="margin-bottom:0;">
+                        <label>初始地址</label>
+                        <input type="text" id="rootAddress" class="mono" readonly>
+                    </div>
+                    <div class="field" style="margin-bottom:0;">
+                        <label>地址操作</label>
+                        <button class="btn soft" id="copyAddrBtn" disabled>复制地址</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <h3>步骤 3：策略参数</h3>
+                <div class="tabs">
+                    <button class="tab active" id="tabDragonfly" data-tab="dragonfly">蜻蜓点水</button>
+                    <button class="tab" id="tabFactory" data-tab="factory">工厂分发</button>
+                </div>
+
+                <div id="panelDragonfly">
+                    <div class="row2">
+                        <div class="field">
+                            <label>路径数量</label>
+                            <input type="number" id="dfPathCount" min="1" max="500" value="1">
+                        </div>
+                        <div class="field">
+                            <label>转账金额百分比 (0-0.99)</label>
+                            <input type="number" id="dfPercent" min="0.01" max="0.99" step="0.000001" value="0.99">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="panelFactory" style="display:none;">
+                    <div class="row3">
+                        <div class="field">
+                            <label>生成钱包数量</label>
+                            <input type="number" id="fcWalletCount" min="1" max="5000" value="500">
+                        </div>
+                        <div class="field">
+                            <label>每批发送数量</label>
+                            <input type="number" id="fcBatchSize" min="1" max="500" value="100">
+                        </div>
+                        <div class="field">
+                            <label>发送存款百分比 (<=0.99)</label>
+                            <input type="number" id="fcDepositPercent" min="0.01" max="0.99" step="0.000001" value="0.8">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>分发后部署并发线程数（默认 50）</label>
+                        <input type="number" id="fcDeployThreads" min="1" max="500" value="50">
+                    </div>
+                    <div class="field">
+                        <label><input type="checkbox" id="fcDeployAfter" style="width:auto; margin-right:6px;">工厂分发完成后，让所有钱包继续部署固定合约</label>
+                    </div>
+                </div>
+
+                <div class="row2">
+                    <div class="field">
+                        <label>优先手续费 (Gwei)</label>
+                        <input type="number" id="maxPriorityGwei" step="0.000001" value="0.000001">
+                    </div>
+                    <div class="field">
+                        <label>最大手续费 (Gwei)</label>
+                        <input type="number" id="maxFeeGwei" step="0.000001" value="0.0001">
+                    </div>
+                </div>
+
+                <div class="row2">
+                    <button class="btn primary" id="runBtn" disabled>开始执行策略</button>
+                    <button class="btn danger" id="stopBtn" disabled>停止执行</button>
+                </div>
+                <div class="status" id="runStatus">等待执行。</div>
+            </section>
+        </div>
+
+        <section class="log" style="margin-bottom:12px;">
+            <h3>执行日志（自动滚动，可滚轮查看）</h3>
+            <div id="logBox">[系统] 准备就绪\n</div>
+        </section>
+
+        <section class="wallets">
+            <h3>生成与完成的钱包列表</h3>
+            <div id="walletTableWrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>策略</th>
+                            <th>地址</th>
+                            <th>私钥</th>
+                            <th>状态</th>
+                            <th>备注</th>
+                        </tr>
+                    </thead>
+                    <tbody id="walletTbody"></tbody>
+                </table>
+            </div>
+            <div class="pager">
+                <button class="btn soft" id="prevPageBtn">上一页</button>
+                <span id="pageInfo">第 1 / 1 页</span>
+                <button class="btn soft" id="nextPageBtn">下一页</button>
+            </div>
+            <div class="download-row">
+                <button class="btn soft" id="downloadCsvBtn">下载 CSV</button>
+                <button class="btn soft" id="downloadTxtBtn">下载 TXT</button>
+            </div>
+        </section>
+    </div>
+
+    <script type="module">
+        const { ethers } = window;
+
+        const NETWORKS = {
+            hoodi: {
+                name: 'Hoodi Testnet',
+                rpc: 'https://ethereum-hoodi-rpc.publicnode.com',
+                chainIdHex: '0x88bb0',
+                chainIdDec: 560048
+            }
+        };
+
+        const state = {
+            provider: null,
+            rootWallet: null,
+            rootBalanceWei: 0n,
+            strategy: 'dragonfly',
+            isRunning: false,
+            stopFlag: false,
+            compiled: null,
+            walletRows: [],
+            page: 1,
+            pageSize: 20,
+            deployedFactoryAddress: null
+        };
+
+        const el = {
+            networkSelect: document.getElementById('networkSelect'),
+            genBtn: document.getElementById('genBtn'),
+            checkBtn: document.getElementById('checkBtn'),
+            rootAddress: document.getElementById('rootAddress'),
+            copyAddrBtn: document.getElementById('copyAddrBtn'),
+            walletStatus: document.getElementById('walletStatus'),
+            runStatus: document.getElementById('runStatus'),
+            runBtn: document.getElementById('runBtn'),
+            stopBtn: document.getElementById('stopBtn'),
+            tabDragonfly: document.getElementById('tabDragonfly'),
+            tabFactory: document.getElementById('tabFactory'),
+            panelDragonfly: document.getElementById('panelDragonfly'),
+            panelFactory: document.getElementById('panelFactory'),
+            dfPathCount: document.getElementById('dfPathCount'),
+            dfPercent: document.getElementById('dfPercent'),
+            fcWalletCount: document.getElementById('fcWalletCount'),
+            fcBatchSize: document.getElementById('fcBatchSize'),
+            fcDepositPercent: document.getElementById('fcDepositPercent'),
+            fcDeployAfter: document.getElementById('fcDeployAfter'),
+            maxPriorityGwei: document.getElementById('maxPriorityGwei'),
+            maxFeeGwei: document.getElementById('maxFeeGwei'),
+            logBox: document.getElementById('logBox'),
+            walletTbody: document.getElementById('walletTbody'),
+            pageInfo: document.getElementById('pageInfo'),
+            prevPageBtn: document.getElementById('prevPageBtn'),
+            nextPageBtn: document.getElementById('nextPageBtn'),
+            downloadCsvBtn: document.getElementById('downloadCsvBtn'),
+            downloadTxtBtn: document.getElementById('downloadTxtBtn')
+        };
+
+        function log(msg) {
+            const line = `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+            el.logBox.textContent += line;
+            el.logBox.scrollTop = el.logBox.scrollHeight;
+        }
+
+        function setWalletStatus(msg, isErr = false) {
+            el.walletStatus.innerHTML = `<span class="${isErr ? 'bad' : 'ok'}">${msg}</span>`;
+        }
+
+        function setRunStatus(msg, isErr = false) {
+            el.runStatus.innerHTML = `<span class="${isErr ? 'bad' : 'ok'}">${msg}</span>`;
+        }
+
+        function getSelectedNetwork() {
+            return NETWORKS[el.networkSelect.value] || NETWORKS.hoodi;
+        }
+
+        function getProvider() {
+            const net = getSelectedNetwork();
+            if (!state.provider) state.provider = new ethers.JsonRpcProvider(net.rpc, net.chainIdDec);
+            return state.provider;
+        }
+
+        function toWeiByGwei(gweiStr) {
+            return ethers.parseUnits(String(gweiStr || '0'), 'gwei');
+        }
+
+        function getFeeOverrides() {
+            const maxPriorityFeePerGas = toWeiByGwei(el.maxPriorityGwei.value);
+            const maxFeePerGas = toWeiByGwei(el.maxFeeGwei.value);
+            return { maxPriorityFeePerGas, maxFeePerGas };
+        }
+
+        async function getAdaptiveFeeOverrides() {
+            const userFee = getFeeOverrides();
+            const feeData = await getProvider().getFeeData();
+
+            const suggestPriority = feeData.maxPriorityFeePerGas ?? 0n;
+            const suggestMax = feeData.maxFeePerGas ?? feeData.gasPrice ?? 0n;
+
+            let maxPriorityFeePerGas = userFee.maxPriorityFeePerGas;
+            let maxFeePerGas = userFee.maxFeePerGas;
+
+            if (suggestPriority > maxPriorityFeePerGas) {
+                maxPriorityFeePerGas = suggestPriority;
+            }
+            if (suggestMax > maxFeePerGas) {
+                maxFeePerGas = suggestMax;
+            }
+            if (maxFeePerGas < maxPriorityFeePerGas) {
+                maxFeePerGas = maxPriorityFeePerGas;
+            }
+
+            return {
+                maxPriorityFeePerGas,
+                maxFeePerGas,
+                gasPrice: feeData.gasPrice ?? maxFeePerGas
+            };
+        }
+
+        function scaledPercentToBigInt(percent) {
+            const n = Number(percent);
+            const safe = Math.max(0, Math.min(0.99, Number.isFinite(n) ? n : 0));
+            return BigInt(Math.floor(safe * 1_000_000));
+        }
+
+        function formatEth(wei) {
+            return Number(ethers.formatEther(wei)).toFixed(6);
+        }
+
+        function shortPk(pk) {
+            return pk ? `${pk.slice(0, 10)}...${pk.slice(-8)}` : '';
+        }
+
+        function shortAddr(addr) {
+            return `${addr.slice(0, 8)}...${addr.slice(-6)}`;
+        }
+
+        function addWalletRow(strategy, wallet, status, note) {
+            state.walletRows.push({
+                idx: state.walletRows.length + 1,
+                strategy,
+                address: wallet.address,
+                privateKey: wallet.privateKey,
+                status,
+                note
+            });
+            renderWalletTable();
+        }
+
+        function updateWalletStatus(address, status, note) {
+            const row = state.walletRows.find(r => r.address.toLowerCase() === address.toLowerCase());
+            if (row) {
+                row.status = status;
+                row.note = note;
+            }
+            renderWalletTable();
+        }
+
+        function renderWalletTable() {
+            const totalPages = Math.max(1, Math.ceil(state.walletRows.length / state.pageSize));
+            if (state.page > totalPages) state.page = totalPages;
+            const start = (state.page - 1) * state.pageSize;
+            const items = state.walletRows.slice(start, start + state.pageSize);
+
+            el.walletTbody.innerHTML = '';
+            if (!items.length) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td colspan="6" style="text-align:center;color:#8ea0cb;">暂无数据</td>';
+                el.walletTbody.appendChild(tr);
+            } else {
+                for (const item of items) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${item.idx}</td>
+                        <td>${item.strategy}</td>
+                        <td class="mono" title="${item.address}">${shortAddr(item.address)}</td>
+                        <td class="mono" title="${item.privateKey}">${shortPk(item.privateKey)}</td>
+                        <td>${item.status}</td>
+                        <td>${item.note || ''}</td>
+                    `;
+                    el.walletTbody.appendChild(tr);
+                }
+            }
+
+            el.pageInfo.textContent = `第 ${state.page} / ${totalPages} 页`;
+            el.prevPageBtn.disabled = state.page <= 1;
+            el.nextPageBtn.disabled = state.page >= totalPages;
+        }
+
+        function downloadTextFile(content, filename, mime) {
+            const blob = new Blob([content], { type: mime });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            a.click();
+        }
+
+        function getReadableDateForFile() {
+            const d = new Date();
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const h = String(d.getHours());
+            const mi = String(d.getMinutes()).padStart(2, '0');
+            const s = String(d.getSeconds()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd} ${h}-${mi}-${s}`;
+        }
+
+        function exportCsv() {
+            if (!state.walletRows.length) return alert('暂无钱包数据');
+            let csv = 'Index,Strategy,Address,PrivateKey,Status,Note\n';
+            for (const r of state.walletRows) {
+                csv += `${r.idx},${r.strategy},${r.address},${r.privateKey},${r.status},${(r.note || '').replace(/,/g, ' ')}\n`;
+            }
+            downloadTextFile(csv, `deploybot_wallets_${getReadableDateForFile()}.csv`, 'text/csv;charset=utf-8;');
+        }
+
+        function exportTxt() {
+            if (!state.walletRows.length) return alert('暂无钱包数据');
+            let txt = '';
+            for (const r of state.walletRows) {
+                txt += `#${r.idx} | ${r.strategy} | ${r.address} | ${r.privateKey} | ${r.status} | ${r.note || ''}\n`;
+            }
+            downloadTextFile(txt, `deploybot_wallets_${getReadableDateForFile()}.txt`, 'text/plain;charset=utf-8;');
+        }
+
+        async function runWithConcurrency(items, limit, worker) {
+            const maxWorkers = Math.max(1, Math.min(limit, items.length));
+            let cursor = 0;
+
+            const runners = Array.from({ length: maxWorkers }, async () => {
+                while (true) {
+                    const idx = cursor;
+                    cursor += 1;
+                    if (idx >= items.length) break;
+                    await worker(items[idx], idx);
+                }
+            });
+
+            await Promise.all(runners);
+        }
+
+        function setStrategy(strategy) {
+            state.strategy = strategy;
+            el.tabDragonfly.classList.toggle('active', strategy === 'dragonfly');
+            el.tabFactory.classList.toggle('active', strategy === 'factory');
+            el.panelDragonfly.style.display = strategy === 'dragonfly' ? 'block' : 'none';
+            el.panelFactory.style.display = strategy === 'factory' ? 'block' : 'none';
+        }
+
+        async function compileInWorker(source) {
+            const workerCode = `
+                import solc from 'https://esm.sh/solc@0.8.30';
+
+                self.onmessage = (ev) => {
+                    try {
+                        const source = ev.data.source;
+                        const input = {
+                            language: 'Solidity',
+                            sources: { 'DeployBot.sol': { content: source } },
+                            settings: {
+                                optimizer: { enabled: true, runs: 200 },
+                                outputSelection: { '*': { '*': ['abi', 'evm.bytecode.object'] } }
+                            }
+                        };
+                        const output = JSON.parse(solc.compile(JSON.stringify(input)));
+                        self.postMessage({ ok: true, output });
+                    } catch (err) {
+                        self.postMessage({ ok: false, error: err?.message || String(err) });
+                    }
+                };
+            `;
+
+            const blob = new Blob([workerCode], { type: 'text/javascript' });
+            const workerUrl = URL.createObjectURL(blob);
+
+            return await new Promise((resolve, reject) => {
+                const worker = new Worker(workerUrl, { type: 'module' });
+                worker.onmessage = (ev) => {
+                    worker.terminate();
+                    URL.revokeObjectURL(workerUrl);
+                    if (!ev.data?.ok) {
+                        reject(new Error(ev.data?.error || 'worker compile failed'));
+                        return;
+                    }
+                    resolve(ev.data.output);
+                };
+                worker.onerror = (e) => {
+                    worker.terminate();
+                    URL.revokeObjectURL(workerUrl);
+                    reject(new Error(e.message || 'worker error'));
+                };
+                worker.postMessage({ source });
+            });
+        }
+
+        function parseAndValidateParams() {
+            const fee = getFeeOverrides();
+            if (fee.maxFeePerGas <= 0n || fee.maxPriorityFeePerGas < 0n) throw new Error('手续费参数无效');
+            if (fee.maxFeePerGas < fee.maxPriorityFeePerGas) throw new Error('最大手续费必须 >= 优先手续费');
+
+            if (state.strategy === 'dragonfly') {
+                const pathCount = Number(el.dfPathCount.value);
+                const pct = Number(el.dfPercent.value);
+                if (!Number.isInteger(pathCount) || pathCount <= 0) throw new Error('路径数量必须为正整数');
+                if (!(pct > 0 && pct <= 0.99)) throw new Error('蜻蜓点水百分比范围为 (0, 0.99]');
+                return { pathCount, pct, ...fee };
+            }
+
+            const walletCount = Number(el.fcWalletCount.value);
+            const batchSize = Number(el.fcBatchSize.value);
+            const depositPct = Number(el.fcDepositPercent.value);
+            const deployThreads = Number(document.getElementById('fcDeployThreads').value);
+            if (!Number.isInteger(walletCount) || walletCount <= 0) throw new Error('生成钱包数量必须为正整数');
+            if (!Number.isInteger(batchSize) || batchSize <= 0) throw new Error('每批发送数量必须为正整数');
+            if (!(depositPct > 0 && depositPct <= 0.99)) throw new Error('存款百分比必须在 (0, 0.99]');
+            if (!Number.isInteger(deployThreads) || deployThreads <= 0) throw new Error('线程数量必须为正整数');
+            return {
+                walletCount,
+                batchSize,
+                depositPct,
+                deployAfter: el.fcDeployAfter.checked,
+                deployThreads,
+                ...fee
+            };
+        }
+
+        async function sendWithFee(wallet, txReq) {
+            const fee = await getAdaptiveFeeOverrides();
+            try {
+                return await wallet.sendTransaction({ ...txReq, ...fee });
+            } catch (e) {
+                const gasPrice = fee.maxFeePerGas;
+                return await wallet.sendTransaction({ ...txReq, gasPrice });
+            }
+        }
+
+        async function compileContracts() {
+            if (state.compiled) return state.compiled;
+            log('开始编译策略合约...');
+
+            const source = `
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract FixedNodeContract {
+    uint256 public createdAt;
+    constructor() {
+        createdAt = block.timestamp;
+    }
+}
+
+contract TransferProxy {
+    constructor(address payable recipient, uint256 amount) payable {
+        require(amount > 0, "Amount must be greater than 0");
+        require(address(this).balance >= amount, "Insufficient balance");
+
+        (bool success, ) = recipient.call{value: amount}("");
+        require(success, "ETH transfer failed");
+
+        selfdestruct(payable(msg.sender));
+    }
+}
+
+contract ETHTransferFactory {
+    address public owner;
+    event ETHTransferred(address indexed recipient, uint256 amount, address proxy);
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only contract owner can call this function");
+        _;
+    }
+
+    receive() external payable {}
+
+    function transferETH(address payable recipient, uint256 amount)
+        external
+        onlyOwner
+        payable
+    {
+        require(recipient != address(0), "Recipient address cannot be zero");
+        require(amount > 0, "Amount must be greater than 0");
+        require(address(this).balance >= amount, "Insufficient contract balance");
+
+        TransferProxy proxy = new TransferProxy{value: amount}(recipient, amount);
+        emit ETHTransferred(recipient, amount, address(proxy));
+    }
+
+    function Airdrop(address payable[] calldata recipients, uint256 amount)
+        external
+        onlyOwner
+        payable
+    {
+        require(recipients.length > 0, "Recipient list cannot be empty");
+        require(amount > 0, "Amount must be greater than 0");
+        require(address(this).balance >= amount * recipients.length, "Insufficient contract balance");
+
+        for (uint256 i = 0; i < recipients.length; i++) {
+            require(recipients[i] != address(0), "Recipient address cannot be zero");
+            TransferProxy proxy = new TransferProxy{value: amount}(recipients[i], amount);
+            emit ETHTransferred(recipients[i], amount, address(proxy));
+        }
+    }
+
+    function batchTransferETHVariable(address payable[] calldata recipients, uint256[] calldata amounts)
+        external
+        onlyOwner
+        payable
+    {
+        require(recipients.length > 0, "Recipient list cannot be empty");
+        require(recipients.length == amounts.length, "Arrays length mismatch");
+
+        uint256 totalAmount = 0;
+        for (uint256 i = 0; i < amounts.length; i++) {
+            require(amounts[i] > 0, "Amount must be greater than 0");
+            totalAmount += amounts[i];
+        }
+        require(address(this).balance >= totalAmount, "Insufficient contract balance");
+
+        for (uint256 i = 0; i < recipients.length; i++) {
+            require(recipients[i] != address(0), "Recipient address cannot be zero");
+            TransferProxy proxy = new TransferProxy{value: amounts[i]}(recipients[i], amounts[i]);
+            emit ETHTransferred(recipients[i], amounts[i], address(proxy));
+        }
+    }
+
+    function getBalance() external view returns (uint256) {
+        return address(this).balance;
+    }
+}
+            `;
+
+            const output = await compileInWorker(source);
+            if (output.errors) {
+                const errors = output.errors.filter(e => e.severity === 'error');
+                if (errors.length) throw new Error(errors.map(e => e.formattedMessage).join('\n'));
+            }
+
+            const fixed = output.contracts['DeployBot.sol']['FixedNodeContract'];
+            const factory = output.contracts['DeployBot.sol']['ETHTransferFactory'];
+
+            state.compiled = {
+                fixedAbi: fixed.abi,
+                fixedBytecode: '0x' + fixed.evm.bytecode.object,
+                factoryAbi: factory.abi,
+                factoryBytecode: '0x' + factory.evm.bytecode.object
+            };
+            log('编译完成。');
+            return state.compiled;
+        }
+
+        async function deployFixedContract(fromWallet) {
+            const compiled = await compileContracts();
+            const factory = new ethers.ContractFactory(compiled.fixedAbi, compiled.fixedBytecode, fromWallet);
+            const fee = await getAdaptiveFeeOverrides();
+            let instance;
+            try {
+                instance = await factory.deploy({ ...fee, gasLimit: 900000n });
+            } catch (_) {
+                try {
+                    instance = await factory.deploy({ gasPrice: fee.gasPrice, gasLimit: 900000n });
+                } catch (_) {
+                    instance = await factory.deploy({ gasLimit: 900000n });
+                }
+            }
+            await instance.deploymentTransaction().wait();
+            return instance.target;
+        }
+
+        async function deployFactoryContract(fromWallet) {
+            const compiled = await compileContracts();
+            const factory = new ethers.ContractFactory(compiled.factoryAbi, compiled.factoryBytecode, fromWallet);
+            const fee = await getAdaptiveFeeOverrides();
+            let instance;
+            try {
+                instance = await factory.deploy({ ...fee, gasLimit: 3000000n });
+            } catch (_) {
+                try {
+                    instance = await factory.deploy({ gasPrice: fee.gasPrice, gasLimit: 3000000n });
+                } catch (_) {
+                    instance = await factory.deploy({ gasLimit: 3000000n });
+                }
+            }
+            await instance.deploymentTransaction().wait();
+            return new ethers.Contract(instance.target, compiled.factoryAbi, fromWallet);
+        }
+
+        async function runDragonfly(params) {
+            log('开始执行【蜻蜓点水】策略');
+            let current = state.rootWallet.connect(getProvider());
+            const pctScaled = scaledPercentToBigInt(params.pct);
+
+            for (let i = 0; i < params.pathCount; i++) {
+                if (state.stopFlag) throw new Error('用户中止');
+
+                const currentBal = await getProvider().getBalance(current.address);
+                if (currentBal <= 0n) throw new Error(`节点 ${i + 1} 余额不足，流程中断`);
+
+                log(`节点 ${i + 1} (${shortAddr(current.address)}) 开始部署固定合约...`);
+                const fixedAddr = await deployFixedContract(current);
+                updateWalletStatus(current.address, '已部署', `合约: ${shortAddr(fixedAddr)}`);
+                log(`节点 ${i + 1} 固定合约已部署: ${fixedAddr}`);
+
+                const next = ethers.Wallet.createRandom().connect(getProvider());
+                addWalletRow('蜻蜓点水', next, '已生成', `链路节点 ${i + 2}`);
+
+                const transferWei = (currentBal * pctScaled) / 1_000_000n;
+                if (transferWei <= 0n) throw new Error('计算转账金额为 0，停止执行');
+
+                log(`节点 ${i + 1} -> 节点 ${i + 2} 转账 ${formatEth(transferWei)} ETH`);
+                const tx = await sendWithFee(current, { to: next.address, value: transferWei });
+                await tx.wait();
+                updateWalletStatus(next.address, '已收款', `${formatEth(transferWei)} ETH`);
+                current = next;
+            }
+
+            log('蜻蜓点水策略执行完成。');
+        }
+
+        async function runFactory(params) {
+            log('开始执行【工厂分发】策略');
+            const root = state.rootWallet.connect(getProvider());
+
+            if (!state.deployedFactoryAddress) {
+                log('部署工厂合约中...');
+                const factory = await deployFactoryContract(root);
+                state.deployedFactoryAddress = factory.target;
+                log(`工厂合约部署成功: ${factory.target}`);
+            }
+
+            const compiled = await compileContracts();
+            const factory = new ethers.Contract(state.deployedFactoryAddress, compiled.factoryAbi, root);
+
+            const rootBal = await getProvider().getBalance(root.address);
+            const depositScaled = scaledPercentToBigInt(params.depositPct);
+            const depositWei = (rootBal * depositScaled) / 1_000_000n;
+            if (depositWei <= 0n) throw new Error('存款金额为 0，无法继续');
+
+            log(`向工厂存款 ${formatEth(depositWei)} ETH...`);
+            const depTx = await sendWithFee(root, { to: state.deployedFactoryAddress, value: depositWei });
+            await depTx.wait();
+            log('工厂存款完成。');
+
+            const wallets = [];
+            for (let i = 0; i < params.walletCount; i++) {
+                const w = ethers.Wallet.createRandom().connect(getProvider());
+                wallets.push(w);
+                addWalletRow('工厂分发', w, '已生成', '待分发');
+            }
+
+            const perWalletWei = depositWei / BigInt(params.walletCount);
+            if (perWalletWei <= 0n) throw new Error('单钱包分发金额为 0，请提高存款或减少钱包数量');
+
+            log(`开始分批分发：总 ${params.walletCount} 个，每个 ${formatEth(perWalletWei)} ETH，批大小 ${params.batchSize}`);
+
+            for (let i = 0; i < wallets.length; i += params.batchSize) {
+                if (state.stopFlag) throw new Error('用户中止');
+                const slice = wallets.slice(i, i + params.batchSize);
+                const recipients = slice.map(w => w.address);
+
+                const fee = await getAdaptiveFeeOverrides();
+                let tx;
+                try {
+                    tx = await factory.Airdrop(recipients, perWalletWei, { ...fee, gasLimit: 12000000n });
+                } catch (_) {
+                    try {
+                        tx = await factory.Airdrop(recipients, perWalletWei, { gasPrice: fee.gasPrice, gasLimit: 12000000n });
+                    } catch (_) {
+                        tx = await factory.Airdrop(recipients, perWalletWei, { gasLimit: 12000000n });
+                    }
+                }
+                await tx.wait();
+
+                for (const w of slice) {
+                    updateWalletStatus(w.address, '已收款', `${formatEth(perWalletWei)} ETH`);
+                }
+                log(`批次完成: ${i + 1} - ${i + slice.length}`);
+            }
+
+            if (params.deployAfter) {
+                log(`开始执行“分发后部署固定合约”，并发线程: ${params.deployThreads}`);
+                let done = 0;
+                await runWithConcurrency(wallets, params.deployThreads, async (w) => {
+                    if (state.stopFlag) return;
+                    try {
+                        const fixedAddr = await deployFixedContract(w);
+                        updateWalletStatus(w.address, '已部署', `合约: ${shortAddr(fixedAddr)}`);
+                    } catch (e) {
+                        updateWalletStatus(w.address, '部署失败', e.message || 'unknown');
+                    } finally {
+                        done += 1;
+                        if (done % 20 === 0 || done === wallets.length) {
+                            log(`部署进度: ${done}/${wallets.length}`);
+                        }
+                    }
+                });
+                log('分发后部署流程完成。');
+            }
+
+            log('工厂分发策略执行完成。');
+        }
+
+        async function runStrategy() {
+            if (!state.rootWallet) return alert('请先生成初始钱包');
+            if (state.rootBalanceWei <= 0n) return alert('请先完成余额检查，确保初始钱包有余额');
+            if (state.isRunning) return;
+
+            let params;
+            try {
+                params = parseAndValidateParams();
+            } catch (e) {
+                return alert(e.message);
+            }
+
+            state.isRunning = true;
+            state.stopFlag = false;
+            el.runBtn.disabled = true;
+            el.stopBtn.disabled = false;
+            setRunStatus('执行中...');
+
+            try {
+                if (state.strategy === 'dragonfly') {
+                    await runDragonfly(params);
+                } else {
+                    await runFactory(params);
+                }
+                setRunStatus('执行完成');
+            } catch (e) {
+                setRunStatus(`执行失败: ${e.message || e}`, true);
+                log(`错误: ${e.message || e}`);
+            } finally {
+                state.isRunning = false;
+                el.runBtn.disabled = false;
+                el.stopBtn.disabled = true;
+            }
+        }
+
+        async function checkBalance() {
+            if (!state.rootWallet) return;
+            const bal = await getProvider().getBalance(state.rootWallet.address);
+            state.rootBalanceWei = bal;
+            const eth = formatEth(bal);
+            setWalletStatus(`当前余额: ${eth} ETH`, bal <= 0n);
+            log(`余额检查: ${state.rootWallet.address} = ${eth} ETH`);
+            el.runBtn.disabled = bal <= 0n;
+        }
+
+        function generateRootWallet() {
+            state.provider = null;
+            state.rootWallet = ethers.Wallet.createRandom();
+            state.rootBalanceWei = 0n;
+            state.walletRows = [];
+            state.page = 1;
+            state.deployedFactoryAddress = null;
+
+            addWalletRow('初始钱包', state.rootWallet, '已生成', '等待转入测试 ETH');
+
+            el.rootAddress.value = state.rootWallet.address;
+            el.copyAddrBtn.disabled = false;
+            el.checkBtn.disabled = false;
+            el.runBtn.disabled = true;
+
+            setWalletStatus('初始钱包已生成，请手动转入测试 ETH');
+            setRunStatus('等待余额检查');
+            log(`初始钱包生成完成: ${state.rootWallet.address}`);
+        }
+
+        function copyAddress() {
+            if (!state.rootWallet) return;
+            navigator.clipboard.writeText(state.rootWallet.address)
+                .then(() => log('初始地址已复制到剪贴板'))
+                .catch(() => alert('复制失败，请手动复制'));
+        }
+
+        el.genBtn.onclick = generateRootWallet;
+        el.copyAddrBtn.onclick = copyAddress;
+        el.checkBtn.onclick = checkBalance;
+        el.runBtn.onclick = runStrategy;
+        el.stopBtn.onclick = () => {
+            state.stopFlag = true;
+            log('已请求停止，当前交易完成后会中断。');
+        };
+        el.tabDragonfly.onclick = () => setStrategy('dragonfly');
+        el.tabFactory.onclick = () => setStrategy('factory');
+        el.prevPageBtn.onclick = () => {
+            if (state.page > 1) state.page--;
+            renderWalletTable();
+        };
+        el.nextPageBtn.onclick = () => {
+            const totalPages = Math.max(1, Math.ceil(state.walletRows.length / state.pageSize));
+            if (state.page < totalPages) state.page++;
+            renderWalletTable();
+        };
+        el.downloadCsvBtn.onclick = exportCsv;
+        el.downloadTxtBtn.onclick = exportTxt;
+
+        renderWalletTable();
+        log('DeployBot 已加载。默认网络: Hoodi');
+    </script>
+</body>
+</html>
