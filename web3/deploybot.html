@@ -227,8 +227,11 @@
                         <input type="text" id="rootAddress" class="mono" readonly>
                     </div>
                     <div class="field" style="margin-bottom:0;">
-                        <label>地址操作</label>
-                        <button class="btn soft" id="copyAddrBtn" disabled>复制地址</button>
+                        <label>地址操作 / 水龙头</label>
+                        <div class="row2" style="grid-template-columns: 1fr auto; margin: 0;">
+                            <button class="btn soft" id="copyAddrBtn" disabled>复制地址</button>
+                            <a class="btn soft" href="https://hoodi-faucet.pk910.de/" target="_blank" rel="noopener noreferrer" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">去水龙头</a>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -238,13 +241,14 @@
                 <div class="tabs">
                     <button class="tab active" id="tabDragonfly" data-tab="dragonfly">蜻蜓点水</button>
                     <button class="tab" id="tabFactory" data-tab="factory">工厂分发</button>
+                    <button class="tab" id="tabBinary" data-tab="binary">二叉树策略</button>
                 </div>
 
                 <div id="panelDragonfly">
                     <div class="row2">
                         <div class="field">
                             <label>路径数量</label>
-                            <input type="number" id="dfPathCount" min="1" max="500" value="1">
+                            <input type="number" id="dfPathCount" min="1" max="500" value="5">
                         </div>
                         <div class="field">
                             <label>转账金额百分比 (0-0.99)</label>
@@ -268,12 +272,33 @@
                             <input type="number" id="fcDepositPercent" min="0.01" max="0.99" step="0.000001" value="0.8">
                         </div>
                     </div>
+                    <div class="status" id="fcWarn" style="display:none; margin-bottom:10px;"></div>
                     <div class="field">
                         <label>分发后部署并发线程数（默认 50）</label>
                         <input type="number" id="fcDeployThreads" min="1" max="500" value="50">
                     </div>
                     <div class="field">
                         <label><input type="checkbox" id="fcDeployAfter" style="width:auto; margin-right:6px;">工厂分发完成后，让所有钱包继续部署固定合约</label>
+                    </div>
+                </div>
+
+                <div id="panelBinary" style="display:none;">
+                    <div class="row3">
+                        <div class="field">
+                            <label>轮次数量（0 表示不限）</label>
+                            <input type="number" id="btRoundCount" min="0" max="200" value="5">
+                        </div>
+                        <div class="field">
+                            <label>分叉总分发百分比（A+B）</label>
+                            <input type="number" id="btSplitPercent" min="0.01" max="0.99" step="0.000001" value="0.98">
+                        </div>
+                        <div class="field">
+                            <label>最大并发线程（默认 50）</label>
+                            <input type="number" id="btMaxThreads" min="1" max="200" value="50">
+                        </div>
+                    </div>
+                    <div class="hint" style="margin-bottom:0;">
+                        规则：每轮先为当前节点部署固定合约，再进行 A/B 随机分叉分发；当单节点可分发金额小于 0.0001 ETH 时自动停止该分支。
                     </div>
                 </div>
 
@@ -350,6 +375,7 @@
             isRunning: false,
             stopFlag: false,
             compiled: null,
+            compilePromise: null,
             walletRows: [],
             page: 1,
             pageSize: 20,
@@ -368,14 +394,20 @@
             stopBtn: document.getElementById('stopBtn'),
             tabDragonfly: document.getElementById('tabDragonfly'),
             tabFactory: document.getElementById('tabFactory'),
+            tabBinary: document.getElementById('tabBinary'),
             panelDragonfly: document.getElementById('panelDragonfly'),
             panelFactory: document.getElementById('panelFactory'),
+            panelBinary: document.getElementById('panelBinary'),
             dfPathCount: document.getElementById('dfPathCount'),
             dfPercent: document.getElementById('dfPercent'),
             fcWalletCount: document.getElementById('fcWalletCount'),
             fcBatchSize: document.getElementById('fcBatchSize'),
             fcDepositPercent: document.getElementById('fcDepositPercent'),
             fcDeployAfter: document.getElementById('fcDeployAfter'),
+            btRoundCount: document.getElementById('btRoundCount'),
+            btSplitPercent: document.getElementById('btSplitPercent'),
+            btMaxThreads: document.getElementById('btMaxThreads'),
+            fcWarn: document.getElementById('fcWarn'),
             maxPriorityGwei: document.getElementById('maxPriorityGwei'),
             maxFeeGwei: document.getElementById('maxFeeGwei'),
             logBox: document.getElementById('logBox'),
@@ -575,41 +607,28 @@
             state.strategy = strategy;
             el.tabDragonfly.classList.toggle('active', strategy === 'dragonfly');
             el.tabFactory.classList.toggle('active', strategy === 'factory');
+            el.tabBinary.classList.toggle('active', strategy === 'binary');
             el.panelDragonfly.style.display = strategy === 'dragonfly' ? 'block' : 'none';
             el.panelFactory.style.display = strategy === 'factory' ? 'block' : 'none';
+            el.panelBinary.style.display = strategy === 'binary' ? 'block' : 'none';
+        }
+
+        function updateFactoryWarning() {
+            const val = Number(el.fcWalletCount.value);
+            if (val > 5000) {
+                el.fcWarn.style.display = 'block';
+                el.fcWarn.innerHTML = '<span class="bad">提示：数量大于 5000 时，页面可能出现卡顿、浏览器占用升高、RPC 拒绝或超时等问题，建议分批执行。</span>';
+            } else {
+                el.fcWarn.style.display = 'none';
+                el.fcWarn.textContent = '';
+            }
         }
 
         async function compileInWorker(source) {
-            const workerCode = `
-                import solc from 'https://esm.sh/solc@0.8.30';
-
-                self.onmessage = (ev) => {
-                    try {
-                        const source = ev.data.source;
-                        const input = {
-                            language: 'Solidity',
-                            sources: { 'DeployBot.sol': { content: source } },
-                            settings: {
-                                optimizer: { enabled: true, runs: 200 },
-                                outputSelection: { '*': { '*': ['abi', 'evm.bytecode.object'] } }
-                            }
-                        };
-                        const output = JSON.parse(solc.compile(JSON.stringify(input)));
-                        self.postMessage({ ok: true, output });
-                    } catch (err) {
-                        self.postMessage({ ok: false, error: err?.message || String(err) });
-                    }
-                };
-            `;
-
-            const blob = new Blob([workerCode], { type: 'text/javascript' });
-            const workerUrl = URL.createObjectURL(blob);
-
-            return await new Promise((resolve, reject) => {
-                const worker = new Worker(workerUrl, { type: 'module' });
+            const runWithWorker = (workerFactory) => new Promise((resolve, reject) => {
+                const worker = workerFactory();
                 worker.onmessage = (ev) => {
                     worker.terminate();
-                    URL.revokeObjectURL(workerUrl);
                     if (!ev.data?.ok) {
                         reject(new Error(ev.data?.error || 'worker compile failed'));
                         return;
@@ -618,11 +637,51 @@
                 };
                 worker.onerror = (e) => {
                     worker.terminate();
-                    URL.revokeObjectURL(workerUrl);
                     reject(new Error(e.message || 'worker error'));
                 };
                 worker.postMessage({ source });
             });
+
+            // 1) 优先独立 worker 文件（HTTP 场景）
+            try {
+                return await runWithWorker(() => new Worker('./solc-compile-worker.js', { type: 'module' }));
+            } catch (e1) {
+                log(`独立 Worker 不可用，尝试 Blob Worker: ${e1.message || e1}`);
+            }
+
+            // 2) 回退 Blob module worker（file:// 场景）
+            try {
+                const code = `
+                    import solc from 'https://esm.sh/solc@0.8.30';
+                    self.onmessage = (ev) => {
+                        try {
+                            const source = ev.data.source;
+                            const input = {
+                                language: 'Solidity',
+                                sources: { 'DeployBot.sol': { content: source } },
+                                settings: {
+                                    optimizer: { enabled: true, runs: 200 },
+                                    outputSelection: { '*': { '*': ['abi', 'evm.bytecode.object'] } }
+                                }
+                            };
+                            const output = JSON.parse(solc.compile(JSON.stringify(input)));
+                            self.postMessage({ ok: true, output });
+                        } catch (err) {
+                            self.postMessage({ ok: false, error: err?.message || String(err) });
+                        }
+                    };
+                `;
+                const blob = new Blob([code], { type: 'text/javascript' });
+                const url = URL.createObjectURL(blob);
+                try {
+                    const res = await runWithWorker(() => new Worker(url, { type: 'module' }));
+                    return res;
+                } finally {
+                    URL.revokeObjectURL(url);
+                }
+            } catch (e2) {
+                throw new Error(`编译 Worker 启动失败。若你是 file:// 打开页面，请改用本地 HTTP 服务。详情: ${e2.message || e2}`);
+            }
         }
 
         function parseAndValidateParams() {
@@ -636,6 +695,16 @@
                 if (!Number.isInteger(pathCount) || pathCount <= 0) throw new Error('路径数量必须为正整数');
                 if (!(pct > 0 && pct <= 0.99)) throw new Error('蜻蜓点水百分比范围为 (0, 0.99]');
                 return { pathCount, pct, ...fee };
+            }
+
+            if (state.strategy === 'binary') {
+                const roundCount = Number(el.btRoundCount.value);
+                const splitPct = Number(el.btSplitPercent.value);
+                const maxThreads = Number(el.btMaxThreads.value);
+                if (!Number.isInteger(roundCount) || roundCount < 0) throw new Error('轮次数量必须为非负整数');
+                if (!(splitPct > 0 && splitPct <= 0.99)) throw new Error('分叉总分发百分比必须在 (0, 0.99]');
+                if (!Number.isInteger(maxThreads) || maxThreads <= 0) throw new Error('并发线程必须为正整数');
+                return { roundCount, splitPct, maxThreads, ...fee };
             }
 
             const walletCount = Number(el.fcWalletCount.value);
@@ -668,6 +737,8 @@
 
         async function compileContracts() {
             if (state.compiled) return state.compiled;
+            if (state.compilePromise) return await state.compilePromise;
+
             log('开始编译策略合约...');
 
             const source = `
@@ -765,23 +836,31 @@ contract ETHTransferFactory {
 }
             `;
 
-            const output = await compileInWorker(source);
-            if (output.errors) {
-                const errors = output.errors.filter(e => e.severity === 'error');
-                if (errors.length) throw new Error(errors.map(e => e.formattedMessage).join('\n'));
+            state.compilePromise = (async () => {
+                const output = await compileInWorker(source);
+                if (output.errors) {
+                    const errors = output.errors.filter(e => e.severity === 'error');
+                    if (errors.length) throw new Error(errors.map(e => e.formattedMessage).join('\n'));
+                }
+
+                const fixed = output.contracts['DeployBot.sol']['FixedNodeContract'];
+                const factory = output.contracts['DeployBot.sol']['ETHTransferFactory'];
+
+                state.compiled = {
+                    fixedAbi: fixed.abi,
+                    fixedBytecode: '0x' + fixed.evm.bytecode.object,
+                    factoryAbi: factory.abi,
+                    factoryBytecode: '0x' + factory.evm.bytecode.object
+                };
+                log('编译完成。');
+                return state.compiled;
+            })();
+
+            try {
+                return await state.compilePromise;
+            } finally {
+                state.compilePromise = null;
             }
-
-            const fixed = output.contracts['DeployBot.sol']['FixedNodeContract'];
-            const factory = output.contracts['DeployBot.sol']['ETHTransferFactory'];
-
-            state.compiled = {
-                fixedAbi: fixed.abi,
-                fixedBytecode: '0x' + fixed.evm.bytecode.object,
-                factoryAbi: factory.abi,
-                factoryBytecode: '0x' + factory.evm.bytecode.object
-            };
-            log('编译完成。');
-            return state.compiled;
         }
 
         async function deployFixedContract(fromWallet) {
@@ -850,6 +929,98 @@ contract ETHTransferFactory {
             }
 
             log('蜻蜓点水策略执行完成。');
+        }
+
+        async function runBinaryTree(params) {
+            log('开始执行【二叉树策略】');
+            const minDistributeWei = ethers.parseEther('0.0001');
+            const splitScaled = scaledPercentToBigInt(params.splitPct);
+            const unlimitedRounds = params.roundCount === 0;
+
+            let currentNodes = [state.rootWallet.connect(getProvider())];
+            let round = 1;
+
+            while (currentNodes.length > 0) {
+                if (state.stopFlag) throw new Error('用户中止');
+                if (!unlimitedRounds && round > params.roundCount) break;
+
+                log(`第 ${round} 轮开始，节点数: ${currentNodes.length}`);
+
+                const nextNodes = [];
+                const concurrency = Math.min(params.maxThreads, Math.max(1, currentNodes.length));
+
+                await runWithConcurrency(currentNodes, concurrency, async (nodeWallet, idx) => {
+                    if (state.stopFlag) return;
+
+                    const nodeAddr = nodeWallet.address;
+                    const nodeBal = await getProvider().getBalance(nodeAddr);
+                    if (nodeBal <= 0n) {
+                        updateWalletStatus(nodeAddr, '余额不足', `第${round}轮`);
+                        return;
+                    }
+
+                    try {
+                        const fixedAddr = await deployFixedContract(nodeWallet);
+                        updateWalletStatus(nodeAddr, '已部署', `第${round}轮 合约:${shortAddr(fixedAddr)}`);
+                    } catch (e) {
+                        updateWalletStatus(nodeAddr, '部署失败', `第${round}轮 ${e.message || e}`);
+                        return;
+                    }
+
+                    const distributable = (nodeBal * splitScaled) / 1_000_000n;
+                    if (distributable < minDistributeWei) {
+                        updateWalletStatus(nodeAddr, '分支终止', `可分发 ${formatEth(distributable)} < 0.0001`);
+                        return;
+                    }
+
+                    const randomRatio = 0.01 + Math.random() * 0.98;
+                    const ratioScaled = BigInt(Math.floor(randomRatio * 1_000_000));
+                    let amountA = (distributable * ratioScaled) / 1_000_000n;
+                    let amountB = distributable - amountA;
+
+                    if (amountA <= 0n || amountB <= 0n) {
+                        amountA = distributable / 2n;
+                        amountB = distributable - amountA;
+                    }
+                    if (amountA < minDistributeWei || amountB < minDistributeWei) {
+                        updateWalletStatus(nodeAddr, '分支终止', `随机拆分过小，A:${formatEth(amountA)} B:${formatEth(amountB)}`);
+                        return;
+                    }
+
+                    const walletA = ethers.Wallet.createRandom().connect(getProvider());
+                    const walletB = ethers.Wallet.createRandom().connect(getProvider());
+
+                    addWalletRow('二叉树', walletA, '已生成', `第${round}轮 ${shortAddr(nodeAddr)} -> A`);
+                    addWalletRow('二叉树', walletB, '已生成', `第${round}轮 ${shortAddr(nodeAddr)} -> B`);
+
+                    try {
+                        const txA = await sendWithFee(nodeWallet, { to: walletA.address, value: amountA });
+                        await txA.wait();
+                        updateWalletStatus(walletA.address, '已收款', `${formatEth(amountA)} ETH`);
+                    } catch (e) {
+                        updateWalletStatus(walletA.address, '收款失败', e.message || 'tx failed');
+                    }
+
+                    try {
+                        const txB = await sendWithFee(nodeWallet, { to: walletB.address, value: amountB });
+                        await txB.wait();
+                        updateWalletStatus(walletB.address, '已收款', `${formatEth(amountB)} ETH`);
+                    } catch (e) {
+                        updateWalletStatus(walletB.address, '收款失败', e.message || 'tx failed');
+                    }
+
+                    nextNodes.push(walletA, walletB);
+                    if ((idx + 1) % 10 === 0 || idx + 1 === currentNodes.length) {
+                        log(`第 ${round} 轮进度: ${idx + 1}/${currentNodes.length}`);
+                    }
+                });
+
+                log(`第 ${round} 轮完成，下一轮节点数: ${nextNodes.length}`);
+                currentNodes = nextNodes;
+                round += 1;
+            }
+
+            log('二叉树策略执行完成。');
         }
 
         async function runFactory(params) {
@@ -956,6 +1127,8 @@ contract ETHTransferFactory {
             try {
                 if (state.strategy === 'dragonfly') {
                     await runDragonfly(params);
+                } else if (state.strategy === 'binary') {
+                    await runBinaryTree(params);
                 } else {
                     await runFactory(params);
                 }
@@ -1017,6 +1190,7 @@ contract ETHTransferFactory {
         };
         el.tabDragonfly.onclick = () => setStrategy('dragonfly');
         el.tabFactory.onclick = () => setStrategy('factory');
+        el.tabBinary.onclick = () => setStrategy('binary');
         el.prevPageBtn.onclick = () => {
             if (state.page > 1) state.page--;
             renderWalletTable();
@@ -1028,8 +1202,10 @@ contract ETHTransferFactory {
         };
         el.downloadCsvBtn.onclick = exportCsv;
         el.downloadTxtBtn.onclick = exportTxt;
+        el.fcWalletCount.addEventListener('input', updateFactoryWarning);
 
         renderWalletTable();
+        updateFactoryWarning();
         log('DeployBot 已加载。默认网络: Hoodi');
     </script>
 </body>
