@@ -7,6 +7,7 @@ window.NETWORKS = {
         rpc: "https://gnosis-rpc.publicnode.com", 
         type: "mainnet", 
         color: "#10b981", 
+        symbol: "xDAI",
         default: true 
     },
     "0xcc": { 
@@ -15,6 +16,7 @@ window.NETWORKS = {
         rpc: "https://opbnb-mainnet-rpc.bnbchain.org", 
         type: "mainnet", 
         color: "#f59e0b", 
+        symbol: "BNB",
         default: true 
     },
     "0xa5bd": { 
@@ -23,8 +25,9 @@ window.NETWORKS = {
         rpc: "https://rpc.testnet.tempo.xyz", 
         type: "testnet", 
         isV6: true, 
-        color: "#ec4899", // V6 Pink
-        default: true 
+        color: "#ec4899", 
+        symbol: "TEMPO",
+        default: false 
     },
     "0xaa36a7": { 
         name: "Sepolia", 
@@ -32,6 +35,7 @@ window.NETWORKS = {
         rpc: "https://sepolia.drpc.org", 
         type: "testnet", 
         color: "#6366f1", 
+        symbol: "SepoliaETH",
         default: true 
     },
     "0xc488": { 
@@ -40,6 +44,7 @@ window.NETWORKS = {
         rpc: "https://dream-rpc.somnia.network", 
         type: "testnet", 
         color: "#8b5cf6", 
+        symbol: "SOM",
         default: true 
     },
     
@@ -66,8 +71,8 @@ window.NETWORKS = {
     "0x7e5": { name: "Ronin", proxy:"0x177D8DCAf02504A8eFeAFcaFDC7253473ace4C34", rpc:"https://saigon-testnet.roninchain.com/rpc", type:"testnet", color:"#22c55e", default: false },
     
     // Fallbacks
-    "0x4cef52": { name: "Arc", proxy:"0x7d342C7A5a7dc33Fb57eA4474D2D17eF8217cD71", rpc:"https://rpc.testnet.arc.network", type:"testnet", color:"#84cc16", default: false },
+    "0x4cef52": { name: "Arc", proxy:"0x7d342C7A5a7dc33Fb57eA4474D2D17eF8217cD71", rpc:"https://rpc.testnet.arc.io", type:"testnet", isV6: true, color:"#84cc16", symbol: "ARC", default: false },
     "0x164ce": { name: "Giwa", proxy:"0x177D8DCAf02504A8eFeAFcaFDC7253473ace4C34", rpc:"https://sepolia-rpc.giwa.io", type:"testnet", color:"#14b8a6", default: false },
     "0x14a34": { name: "Base Sep", proxy:"0x177D8DCAf02504A8eFeAFcaFDC7253473ace4C34", rpc:"https://base-sepolia-rpc.publicnode.com", type:"testnet", color:"#3b82f6", default: false },
-    "0x15eb": { name: "opBNB T", proxy:"0x177D8DCAf02504A8eFeAFcaFDC7253473ace4C34", rpc:"https://opbnb-testnet-rpc.bnbchain.org", type:"testnet", color:"#f97316", default: false }
+    "0x15eb": { name: "opBNB T", proxy:"0x177D8DCAf02504A8eFeAFcaFDC7253473ace4C34", rpc:"https://opbnb-testnet-rpc.bnbchain.org", type:"testnet", color:"#f97316", symbol: "tBNB", default: true }
 };
