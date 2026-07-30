@@ -201,7 +201,8 @@
     </header>
 
     <section class="panel">
-        <div class="summary">已按你的配置习惯预置模型：`gpt-5.3-codex`、`gpt-5.2-codex`、`gpt-5.3`、`gpt-5.4`。其他模型可手动添加。</div>
+        <div class="summary">已按你的配置习惯预置模型：`gpt-5.6-sol`、`gpt-5.6-terra`、`gpt-5.5-pro`、`gpt-5.4-mini`、`deepseek-v4-flash`。其他模型可手动添加。</div>
+        <div class="summary" style="background:#fff5f0;border-color:#ffc8b8;">注意：baseURL 末尾需加 <code>/v1</code>（例如 <code>https://sakuradori.dpdns.org/v1</code>）。Windows 用户的配置文件在：<code>C:\Users\&lt;你的用户名&gt;\.config\opencode\opencode.json</code></div>
 
         <div id="providerList"></div>
 
@@ -235,32 +236,32 @@
         </div>
         <div class="row">
             <div class="field">
-                <label>Provider 名称</label>
-                <input type="text" data-key="name" placeholder="例如: openai / xiaoyan公益站">
+                <label>Provider 标识（key）</label>
+                <input type="text" data-key="name" placeholder="例如: openai / my-deepseek">
             </div>
             <div class="field">
-                <label>API URL (baseURL)</label>
-                <input type="text" data-key="baseURL" placeholder="https://api.example.com/v1">
+                <label>显示名称（name）</label>
+                <input type="text" data-key="displayName" placeholder="例如: 中转站-DeepSeek">
             </div>
         </div>
-        <div class="field">
-            <label>API 协议</label>
-            <select data-key="api" style="width:100%;border:1px solid #dbe8ff;border-radius:12px;padding:11px 12px;color:var(--text-main);background:#fff;outline:none;">
-                <option value="responses" selected>responses (/v1/responses)</option>
-                <option value="chat">chat/completions (/v1/chat/completions)</option>
-            </select>
-        </div>
-        <div class="field">
-            <label>API Key</label>
-            <input type="password" data-key="apiKey" placeholder="sk-... 或其他 key">
+        <div class="row">
+            <div class="field">
+                <label>API URL (baseURL，末尾加 /v1)</label>
+                <input type="text" data-key="baseURL" placeholder="https://sakuradori.dpdns.org/v1">
+            </div>
+            <div class="field">
+                <label>API Key</label>
+                <input type="password" data-key="apiKey" placeholder="sk-... 或其他 key">
+            </div>
         </div>
         <div class="field">
             <label>模型选择</label>
             <div class="models">
-                <label class="check"><input type="checkbox" value="gpt-5.3-codex" checked> gpt-5.3-codex</label>
-                <label class="check"><input type="checkbox" value="gpt-5.2-codex" checked> gpt-5.2-codex</label>
-                <label class="check"><input type="checkbox" value="gpt-5.3" checked> gpt-5.3</label>
-                <label class="check"><input type="checkbox" value="gpt-5.4" checked> gpt-5.4</label>
+                <label class="check"><input type="checkbox" value="gpt-5.6-sol" checked> gpt-5.6-sol</label>
+                <label class="check"><input type="checkbox" value="gpt-5.6-terra" checked> gpt-5.6-terra</label>
+                <label class="check"><input type="checkbox" value="gpt-5.5-pro" checked> gpt-5.5-pro</label>
+                <label class="check"><input type="checkbox" value="gpt-5.4-mini" checked> gpt-5.4-mini</label>
+                <label class="check"><input type="checkbox" value="deepseek-v4-flash" checked> deepseek-v4-flash</label>
             </div>
             <div class="mini-actions">
                 <input type="text" data-key="customModel" placeholder="手动添加模型，例如: gpt-4o-mini">
@@ -285,13 +286,13 @@
         const nameEl = node.querySelector('[data-key="name"]');
         const urlEl = node.querySelector('[data-key="baseURL"]');
         const keyEl = node.querySelector('[data-key="apiKey"]');
-        const apiEl = node.querySelector('[data-key="api"]');
+        const displayEl = node.querySelector('[data-key="displayName"]');
 
         if (prefill) {
             nameEl.value = prefill.name || '';
             urlEl.value = prefill.baseURL || '';
             keyEl.value = prefill.apiKey || '';
-            apiEl.value = prefill.api || 'responses';
+            displayEl.value = prefill.displayName || '';
         }
 
         node.querySelector('[data-act="remove"]').addEventListener('click', () => {
@@ -339,15 +340,15 @@
 
     function collectProvider(providerEl) {
         const name = providerEl.querySelector('[data-key="name"]').value.trim();
+        const displayName = providerEl.querySelector('[data-key="displayName"]').value.trim() || name;
         const baseURL = providerEl.querySelector('[data-key="baseURL"]').value.trim();
         const apiKey = providerEl.querySelector('[data-key="apiKey"]').value.trim();
-        const api = providerEl.querySelector('[data-key="api"]').value.trim() || 'responses';
         const models = Array.from(providerEl.querySelectorAll('.models input[type="checkbox"]'))
             .filter(c => c.checked)
             .map(c => c.value.trim())
             .filter(Boolean);
 
-        return { name, baseURL, apiKey, api, models };
+        return { name, displayName, baseURL, apiKey, models };
     }
 
     function generateConfig() {
@@ -365,21 +366,12 @@
 
             const modelMap = {};
             p.models.forEach(m => {
-                modelMap[m] = {
-                    name: m,
-                    options: { store: false },
-                    variants: {
-                        low: {},
-                        medium: {},
-                        high: {},
-                        xhigh: {}
-                    }
-                };
+                modelMap[m] = { name: m };
             });
 
             providers[p.name] = {
-                npm: '@ai-sdk/openai',
-                api: p.api,
+                name: p.displayName,
+                npm: '@ai-sdk/openai-compatible',
                 options: {
                     baseURL: p.baseURL,
                     apiKey: p.apiKey
@@ -394,7 +386,8 @@
                 build: { options: { store: false } },
                 plan: { options: { store: false } }
             },
-            $schema: 'https://opencode.ai/config.json'
+            $schema: 'https://opencode.ai/config.json',
+            disabled_providers: []
         };
 
         latestConfigText = JSON.stringify(config, null, 2);
@@ -471,7 +464,7 @@
             .replace(/'/g, '&#39;');
     }
 
-    addProvider({ name: 'openai', baseURL: 'https://api.openai.com/v1', apiKey: '', api: 'responses' });
+    addProvider({ name: 'open-ai', displayName: '中转站', baseURL: 'https://sakuradori.dpdns.org/v1', apiKey: '' });
 </script>
 </body>
 </html>

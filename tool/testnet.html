@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Testnet Info · 120.show</title>
+  <style>
+    :root {
+      --bg1: #fff8ff;
+      --bg2: #eef8ff;
+      --bg3: #fffef3;
+      --text: #314069;
+      --sub: #6d7ca6;
+      --line: #dbe6ff;
+      --pink: #ff7cb4;
+      --peach: #ffb37c;
+      --blue: #79b5ff;
+      --mint: #71d9c4;
+      --lavender: #b59cff;
+      --card-bg: rgba(255,255,255,0.86);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: "Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      background:
+        radial-gradient(circle at 12% 14%, rgba(255,179,124,0.28) 0, transparent 28%),
+        radial-gradient(circle at 86% 9%, rgba(181,156,255,0.26) 0, transparent 30%),
+        radial-gradient(circle at 76% 82%, rgba(121,181,255,0.22) 0, transparent 33%),
+        linear-gradient(160deg, var(--bg1), var(--bg2) 52%, var(--bg3));
+      min-height: 100vh;
+    }
+    .wrap {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 22px 18px 70px;
+    }
+    .hero {
+      background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(248,252,255,0.86));
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      box-shadow: 0 16px 40px rgba(131,152,206,0.2);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: 28px;
+      font-weight: 900;
+      color: #2d3f69;
+      margin: 0;
+    }
+    .hero h1 .accent {
+      background: linear-gradient(90deg, #ff7cb4, #ffb37c 34%, #79b5ff 70%, #8fdabf);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .hero p { margin: 6px 0 0; color: var(--sub); font-size: 14px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      grid-column: span 4;
+      border-radius: 22px;
+      padding: 20px;
+      border: 1px solid #dfe9ff;
+      box-shadow: 0 12px 24px rgba(128,153,212,0.18);
+      transition: 0.22s ease;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 34px rgba(128,153,212,0.26);
+    }
+    .card h2 {
+      font-size: 18px;
+      margin-bottom: 4px;
+      color: #354977;
+    }
+    .card .sub {
+      font-size: 12px;
+      color: var(--sub);
+      margin-bottom: 14px;
+    }
+
+    .card.c1 { background: linear-gradient(145deg, #fff6e0, #fffef5); }
+    .card.c2 { background: linear-gradient(145deg, #e8f0ff, #f6faff); }
+    .card.c3 { background: linear-gradient(145deg, #edeaff, #f5f0ff, #ebfff0); }
+    .card.c4 { background: linear-gradient(145deg, #ffe8eb, #fff6f7); }
+    .card.c5 { background: linear-gradient(145deg, #f0e8ff, #f8f5ff); }
+    .card.c6 { background: linear-gradient(145deg, #fef7e0, #fffef5); }
+    .card.c7 { background: linear-gradient(145deg, #e8e8ec, #f5f5f7); }
+    .card.c8 { background: linear-gradient(145deg, #e0f5f0, #effaf7); }
+    .card.c9 { background: linear-gradient(145deg, #e8f0fe, #f4f9ff); }
+    .card.c10 { background: linear-gradient(145deg, #f0eefb, #f9f7ff); }
+    .net-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .net-list .net-item {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid #e0eaff;
+      background: rgba(255,255,255,0.7);
+      color: #5a6b9a;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+    .net-list .net-item b {
+      margin-left: 4px;
+      font-size: 11px;
+      color: #e8536d;
+      background: rgba(232,83,109,0.12);
+      padding: 0 6px;
+      border-radius: 4px;
+    }
+    .ex-tag {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(49,64,105,0.08);
+      color: #5a6b9a;
+      letter-spacing: 0.3px;
+    }
+    .net-item .ex-tag {
+      margin-left: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      background: rgba(49,64,105,0.1);
+    }
+    .net-list .net-item:hover {
+      transform: translateY(-2px);
+      border-color: #cddcff;
+      box-shadow: 0 6px 14px rgba(131,152,206,0.2);
+    }
+
+    @media (max-width: 900px) {
+      .card { grid-column: span 12; }
+    }
+
+    /* ---- Modal ---- */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(20,28,52,0.55);
+      backdrop-filter: blur(6px);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+
+    .modal {
+      background: #fff;
+      border-radius: 26px;
+      max-width: 460px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 28px 28px 18px;
+      box-shadow: 0 24px 64px rgba(30,50,100,0.3);
+      animation: modalIn .25s ease;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(.92) translateY(14px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .modal-head h3 {
+      font-size: 20px;
+      color: #2d3f69;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .max-badge {
+      font-size: 13px;
+      font-weight: 800;
+      color: #e8536d;
+      background: rgba(232,83,109,0.1);
+      padding: 2px 10px;
+      border-radius: 999px;
+    }
+    .modal-head .icon {
+      font-size: 22px;
+    }
+    .modal-close {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      border: 1px solid #e0eaff;
+      background: #fff;
+      color: #7c8bb5;
+      font-size: 17px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.15s;
+    }
+    .modal-close:hover { background: #f5f7ff; border-color: #cddcff; }
+
+    .modal-body .row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: 13px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+    .modal-body .row:last-child { border-bottom: none; }
+    .modal-body .row .tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 5px;
+      background: #f0f4ff;
+      color: #6a78a4;
+      min-width: 32px;
+      text-align: center;
+    }
+    .modal-body .row a {
+      color: #5271c4;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .modal-body .row a:hover { text-decoration: underline; }
+    .modal-body .row .label {
+      min-width: 44px;
+      color: var(--sub);
+      font-weight: 600;
+    }
+
+    .modal::-webkit-scrollbar { width: 5px; }
+    .modal::-webkit-scrollbar-track { background: transparent; }
+    .modal::-webkit-scrollbar-thumb { background: #d0dcf0; border-radius: 4px; }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--sub);
+      text-decoration: none;
+      transition: 0.15s;
+    }
+    .back-link:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <h1>🔬 <span class="accent">Testnet Info</span></h1>
+      <p>多链测试网络信息速查 · 点击任一网络查看详情</p>
+    </header>
+
+    <main class="grid" id="app"></main>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal" id="modalBox">
+      <div class="modal-head">
+        <h3 id="modalTitle">-</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+<script>
+const NETWORKS = [
+  {
+    category: 'BTC', icon: '₿',
+    items: [
+      { name: 'testnet3', max: '0.01', data: [
+        ['官网', '<a href="https://bitcoincore.org/" target="_blank">bitcoincore.org</a>'],
+        ['浏览器', '<a href="https://blockstream.info/testnet/" target="_blank">blockstream.info</a> &middot; <a href="https://mempool.space/testnet" target="_blank">mempool.space</a>'],
+        ['水龙头', '<a href="https://coinfaucet.eu/en/btc-testnet/" target="_blank">coinfaucet.eu</a> (0.01 tBTC)'],
+        ['领取量', '0.01 ~ 0.0001 tBTC / 次'],
+      ]},
+      { name: 'testnet4', max: '0.01', data: [
+        ['官网', '<a href="https://testnet4.dev/" target="_blank">testnet4.dev</a>'],
+        ['浏览器', '<a href="https://mempool.space/testnet4" target="_blank">mempool.space</a> &middot; <a href="https://blockstream.info/testnet/" target="_blank">blockstream.info</a>'],
+        ['水龙头', '<a href="https://testnet4.info/" target="_blank">testnet4.info</a> (0.01 tBTC)'],
+        ['领取量', '0.01 ~ 0.005 tBTC / 次'],
+      ]},
+    ]
+  },
+  {
+    category: 'Ethereum', icon: '◆',
+    items: [
+      { name: 'Sepolia', max: '32', data: [
+        ['官网', '<a href="https://sepolia.dev/" target="_blank">sepolia.dev</a>'],
+        ['浏览器', '<a href="https://sepolia.etherscan.io" target="_blank">etherscan.io</a> &middot; <a href="https://eth-sepolia.blockscout.com/" target="_blank">blockscout</a>'],
+        ['水龙头', '<a href="https://sepolia-faucet.pk910.de/" target="_blank">PoW Faucet</a> (32) &middot; <a href="https://www.alchemy.com/faucets/ethereum-sepolia" target="_blank">Alchemy</a> (0.1)'],
+        ['领取量', '0.1 ~ 32 ETH / 次'],
+      ]},
+      { name: 'Hoodi', max: '33', data: [
+        ['官网', '<a href="https://hoodi.dev/" target="_blank">hoodi.dev</a>'],
+        ['浏览器', '<a href="https://hoodi.etherscan.io/" target="_blank">etherscan.io</a> &middot; <a href="https://eth-hoodi.blockscout.com/" target="_blank">blockscout</a> &middot; <a href="https://hoodi.beaconcha.in/" target="_blank">beaconcha.in</a>'],
+        ['水龙头', '<a href="https://hoodi-faucet.pk910.de/" target="_blank">PoW Faucet</a> (33)'],
+        ['领取量', '0.1 ~ 33 ETH / 次'],
+      ]},
+    ]
+  },
+  {
+    category: 'Solana', icon: '◎',
+    items: [
+      { name: 'Devnet', max: '5', data: [
+        ['官网', '<a href="https://solana.com/" target="_blank">solana.com</a>'],
+        ['浏览器', '<a href="https://explorer.solana.com/?cluster=devnet" target="_blank">explorer.solana.com</a>'],
+        ['RPC', '<a href="https://api.devnet.solana.com" target="_blank">api.devnet.solana.com</a>'],
+        ['水龙头', '<a href="https://faucet.solana.com/" target="_blank">faucet.solana.com</a> (1 SOL)'],
+        ['领取量', '1 ~ 5 SOL / 次'],
+      ]},
+      { name: 'Testnet', max: '5', data: [
+        ['官网', '<a href="https://solana.com/" target="_blank">solana.com</a>'],
+        ['浏览器', '<a href="https://explorer.solana.com/?cluster=testnet" target="_blank">explorer.solana.com</a>'],
+        ['RPC', '<a href="https://api.testnet.solana.com" target="_blank">api.testnet.solana.com</a>'],
+        ['水龙头', '<a href="https://faucet.solana.com/" target="_blank">faucet.solana.com</a> (1 SOL)'],
+        ['领取量', '1 ~ 5 SOL / 次'],
+      ]},
+    ]
+  },
+  {
+    category: 'TRON', icon: '◆',
+    items: [
+      { name: 'Shasta', max: '2000', data: [
+        ['官网', '<a href="https://www.trongrid.io/shasta" target="_blank">trongrid.io/shasta</a>'],
+        ['浏览器', '<a href="https://shasta.tronscan.org" target="_blank">shasta.tronscan.org</a>'],
+        ['水龙头', '<a href="https://shasta.tronex.io/join/getJoinPage" target="_blank">shasta.tronex.io/join/getJoinPage</a>'],
+        ['领取量', '2000 TRX / 次'],
+      ]},
+      { name: 'Nile', max: '2000', data: [
+        ['官网', '<a href="http://nileex.io" target="_blank">nileex.io</a>'],
+        ['浏览器', '<a href="https://nile.tronscan.org" target="_blank">nile.tronscan.org</a>'],
+        ['水龙头', '<a href="https://nileex.io/join/getJoinPage" target="_blank">nileex.io/join/getJoinPage</a>'],
+        ['领取量', '2000 TRX / 次'],
+      ]},
+    ]
+  },
+  {
+    category: 'Polygon', icon: '◆',
+    items: [
+      { name: 'Amoy', max: '1', data: [
+        ['官网', '<a href="https://polygon.technology/" target="_blank">polygon.technology</a>'],
+        ['浏览器', '<a href="https://amoy.polygonscan.com/" target="_blank">amoy.polygonscan.com</a>'],
+        ['水龙头', '<a href="https://faucet.polygon.technology/" target="_blank">faucet.polygon.technology</a> &middot; <a href="https://www.alchemy.com/faucets/polygon-amoy" target="_blank">Alchemy</a> (0.1)'],
+        ['领取量', '1 POL / 次'],
+        ['Chain ID', '80002'],
+        ['RPC', '<a href="https://polygon-amoy.drpc.org" target="_blank">polygon-amoy.drpc.org</a>'],
+      ]},
+    ]
+  },
+  {
+    category: 'ARC', icon: '◈',
+    items: [
+      { name: 'ARC Testnet', max: '20', data: [
+        ['官网', '<a href="https://www.arc.io/" target="_blank">arc.io</a>'],
+        ['浏览器', '<a href="https://testnet.arcscan.app/" target="_blank">testnet.arcscan.app</a>'],
+        ['水龙头', '<a href="https://faucet.circle.com/" target="_blank">faucet.circle.com</a> (20 USDC)'],
+        ['领取量', '20 USDC / 次'],
+        ['Chain ID', '5042002'],
+        ['RPC', '<a href="https://rpc.testnet.arc.io" target="_blank">rpc.testnet.arc.io</a>'],
+      ]},
+    ]
+  },
+  {
+    category: 'CEX Testnets', icon: '◆',
+    items: [
+      { name: 'BSC Testnet', max: '0.3', exchange: '币安', data: [
+        ['官网', '<a href="https://www.bnbchain.org/" target="_blank">bnbchain.org</a> <span class="ex-tag">币安</span>'],
+        ['浏览器', '<a href="https://testnet.bscscan.com/" target="_blank">testnet.bscscan.com</a>'],
+        ['水龙头', '<a href="https://www.bnbchain.org/en/testnet-faucet" target="_blank">bnbchain.org/faucet</a> (0.3)'],
+        ['领取量', '0.3 tBNB / 次'],
+        ['Chain ID', '97'],
+        ['RPC', '<a href="https://bsc-testnet.bnbchain.org" target="_blank">bsc-testnet.bnbchain.org</a>'],
+      ]},
+      { name: 'opBNB Testnet', max: '0.3', exchange: '币安', data: [
+        ['官网', '<a href="https://docs.bnbchain.org/bnb-opbnb/" target="_blank">docs.bnbchain.org</a> <span class="ex-tag">币安</span>'],
+        ['浏览器', '<a href="https://testnet.opbnbscan.com" target="_blank">testnet.opbnbscan.com</a>'],
+        ['Chain ID', '5611'],
+        ['RPC', '<a href="https://opbnb-testnet-rpc.bnbchain.org" target="_blank">opbnb-testnet-rpc.bnbchain.org</a>'],
+        ['水龙头', '通过 BSC 水龙头领取后 <a href="https://opbnb-testnet-bridge.bnbchain.org" target="_blank">桥接到 opBNB</a>'],
+        ['领取量', '同 BSC (0.3 tBNB)'],
+      ]},
+      { name: 'Greenfield', max: '0.3', exchange: '币安', data: [
+        ['官网', '<a href="https://docs.bnbchain.org/bnb-greenfield/" target="_blank">docs.bnbchain.org</a> <span class="ex-tag">币安</span>'],
+        ['浏览器', '<a href="https://testnet.greenfieldscan.com" target="_blank">testnet.greenfieldscan.com</a>'],
+        ['Chain ID', 'greenfield_5600-1'],
+        ['RPC', '<a href="https://gnfd-testnet-fullnode-tendermint-ap.bnbchain.org" target="_blank">gnfd-testnet-fullnode</a>'],
+        ['水龙头', '通过 BSC 水龙头领取后桥接'],
+        ['领取量', '同 BSC (0.3 tBNB)'],
+      ]},
+      { name: 'X Layer Testnet', max: '2', exchange: '欧易', data: [
+        ['官网', '<a href="https://web3.okx.com/" target="_blank">web3.okx.com</a> <span class="ex-tag">欧易</span>'],
+        ['浏览器', '<a href="https://www.okx.com/web3/explorer/xlayer-test" target="_blank">okx.com/explorer</a>'],
+        ['水龙头', '<a href="https://web3.okx.com/xlayer/faucet" target="_blank">web3.okx.com/xlayer/faucet</a> (2 OKB)'],
+        ['领取量', '2 OKB / 次'],
+        ['RPC', '<a href="https://testrpc.xlayer.tech" target="_blank">testrpc.xlayer.tech</a>'],
+        ['Chain ID', '195'],
+      ]},
+      { name: 'GIWA', max: '0.005', exchange: 'Upbit', data: [
+        ['官网', '<a href="https://giwa.io/home" target="_blank">giwa.io</a> <span class="ex-tag">Upbit</span>'],
+        ['浏览器', '<a href="https://sepolia-explorer.giwa.io/" target="_blank">sepolia-explorer.giwa.io</a>'],
+        ['水龙头', '<a href="https://faucet.giwa.io/" target="_blank">faucet.giwa.io</a> (0.005)'],
+        ['领取量', '0.005 / 次'],
+        ['Chain ID', '91342'],
+        ['RPC', '<a href="https://sepolia-rpc.giwa.io" target="_blank">sepolia-rpc.giwa.io</a>'],
+      ]},
+      { name: 'Base Sepolia', max: '0.01', exchange: 'Coinbase', data: [
+        ['官网', '<a href="https://base.org/" target="_blank">base.org</a> <span class="ex-tag">Coinbase</span>'],
+        ['浏览器', '<a href="https://sepolia.basescan.org/" target="_blank">basescan.org</a> &middot; <a href="https://base-sepolia.blockscout.com/" target="_blank">blockscout</a>'],
+        ['Chain ID', '84532'],
+        ['RPC', '<a href="https://sepolia.base.org" target="_blank">sepolia.base.org</a>'],
+        ['水龙头', '<a href="https://base.org/faucet" target="_blank">base.org/faucet</a> (0.01)'],
+        ['领取量', '0.01 ETH / 次'],
+      ]},
+    ]
+  },
+    {
+    category: 'Hoodi L2s', icon: '▦',
+    items: [
+      { name: 'Morph', max: '~0.01', data: [
+        ['官网', '<a href="https://www.morphl2.io/" target="_blank">morphl2.io</a>'],
+        ['浏览器', '<a href="https://explorer-hoodi.morph.network" target="_blank">explorer-hoodi.morph.network</a>'],
+        ['水龙头', '<a href="https://morph-rails-hoodi.morph.network/faucet" target="_blank">morph-rails-hoodi.morph.network/faucet</a>'],
+        ['领取量', '少量 / 次（约 0.01 ETH）'],
+        ['Chain ID', '2910'],
+        ['RPC', '<a href="https://rpc-hoodi.morph.network" target="_blank">rpc-hoodi.morph.network</a>'],
+        ['L1', 'Ethereum Hoodi (Chain ID 17000)'],
+      ]},
+      { name: 'Taiko', max: '~0.01', data: [
+        ['官网', '<a href="https://taiko.xyz/" target="_blank">taiko.xyz</a>'],
+        ['浏览器', '<a href="https://blockscout.hoodi.taiko.xyz" target="_blank">blockscout.hoodi.taiko.xyz</a> &middot; <a href="https://hoodi.taikoscan.io" target="_blank">taikoscan.io</a>'],
+        ['水龙头', '通过 Hoodi 水龙头领取后 <a href="https://bridge.taiko.xyz/" target="_blank">桥接到 Taiko</a>'],
+        ['领取量', '同 Hoodi (0.1 ~ 33 ETH / 次)'],
+        ['Chain ID', '167013'],
+        ['RPC', '<a href="https://167013.rpc.thirdweb.com" target="_blank">167013.rpc.thirdweb.com</a>'],
+        ['L1', 'Ethereum Hoodi (Chain ID 17000)'],
+      ]},
+    ]
+  },
+  {
+    category: 'Sepolia L2s', icon: '▦',
+    items: [
+      { name: 'ARB Sepolia', max: '0.01', data: [
+        ['官网', '<a href="https://arbitrum.io/" target="_blank">arbitrum.io</a>'],
+        ['浏览器', '<a href="https://sepolia.arbiscan.io/" target="_blank">arbiscan.io</a> &middot; <a href="https://arbitrum-sepolia.blockscout.com/" target="_blank">blockscout</a>'],
+        ['Chain ID', '421614'],
+        ['RPC', '<a href="https://sepolia-rollup.arbitrum.io/rpc" target="_blank">sepolia-rollup.arbitrum.io</a>'],
+        ['领取量', '0.01 ETH / 次（桥接 Sepolia）'],
+      ]},
+      { name: 'OP Sepolia', max: '0.01', data: [
+        ['官网', '<a href="https://optimism.io/" target="_blank">optimism.io</a>'],
+        ['浏览器', '<a href="https://testnet-explorer.optimism.io/" target="_blank">optimism.io</a> &middot; <a href="https://sepolia-optimism.etherscan.io" target="_blank">etherscan.io</a>'],
+        ['Chain ID', '11155420'],
+        ['RPC', '<a href="https://sepolia.optimism.io" target="_blank">sepolia.optimism.io</a>'],
+        ['水龙头', '<a href="https://console.optimism.io/" target="_blank">console.optimism.io</a> (0.01)'],
+        ['领取量', '0.01 ETH / 次'],
+      ]},
+      { name: 'ZKsync Era', max: '0.01', data: [
+        ['官网', '<a href="https://zksync.io/" target="_blank">zksync.io</a>'],
+        ['浏览器', '<a href="https://sepolia.explorer.zksync.io/" target="_blank">explorer.zksync.io</a>'],
+        ['Chain ID', '300'],
+        ['RPC', '<a href="https://sepolia.era.zksync.dev" target="_blank">sepolia.era.zksync.dev</a>'],
+        ['水龙头', '<a href="https://faucets.chain.link/zksync-sepolia" target="_blank">chain.link</a> (0.5 ETH)'],
+        ['领取量', '0.01 ETH / 次'],
+      ]},
+      { name: 'Scroll Sepolia', max: '0.01', data: [
+        ['官网', '<a href="https://scroll.io/" target="_blank">scroll.io</a>'],
+        ['浏览器', '<a href="https://sepolia.scrollscan.com/" target="_blank">scrollscan.com</a>'],
+        ['Chain ID', '534351'],
+        ['RPC', '<a href="https://sepolia-rpc.scroll.io/" target="_blank">sepolia-rpc.scroll.io</a>'],
+        ['水龙头', '<a href="https://docs.scroll.io/en/developers/faucet/" target="_blank">Scroll Faucet</a> (0.01)'],
+        ['领取量', '0.01 ETH / 次'],
+      ]},
+      { name: 'Mantle Sepolia', max: '~0.1', data: [
+        ['官网', '<a href="https://mantle.xyz/" target="_blank">mantle.xyz</a>'],
+        ['浏览器', '<a href="https://sepolia.mantlescan.xyz/" target="_blank">mantlescan.xyz</a> &middot; <a href="https://explorer.sepolia.mantle.xyz/" target="_blank">blockscout</a>'],
+        ['Chain ID', '5003'],
+        ['RPC', '<a href="https://rpc.sepolia.mantle.xyz" target="_blank">rpc.sepolia.mantle.xyz</a>'],
+        ['水龙头', '<a href="https://faucet.sepolia.mantle.xyz/" target="_blank">faucet.sepolia.mantle.xyz</a>'],
+        ['领取量', '~0.1 MNT / 次'],
+      ]},
+      { name: 'Starknet Sepolia', max: '~0.01', data: [
+        ['官网', '<a href="https://starknet.io/" target="_blank">starknet.io</a> (非 EVM)'],
+        ['浏览器', '<a href="https://sepolia.starkscan.co/" target="_blank">starkscan.co</a>'],
+        ['水龙头', '<a href="https://faucet.starknet.io/" target="_blank">faucet.starknet.io</a>'],
+        ['领取量', '~0.01 STRK / 次'],
+      ]},
+      { name: 'Linea Sepolia', max: '~0.01', data: [
+        ['官网', '<a href="https://linea.build/" target="_blank">linea.build</a>'],
+        ['浏览器', '<a href="https://sepolia.lineascan.build/" target="_blank">lineascan.build</a> &middot; <a href="https://explorer.sepolia.linea.build/" target="_blank">blockscout</a>'],
+        ['Chain ID', '59141'],
+        ['RPC', '<a href="https://rpc.sepolia.linea.build" target="_blank">rpc.sepolia.linea.build</a>'],
+        ['领取量', '~0.01 ETH / 次'],
+      ]},
+      { name: 'Ink Sepolia', max: '~0.01', data: [
+        ['官网', '<a href="https://inkonchain.com/" target="_blank">inkonchain.com</a> (Uniswap)'],
+        ['浏览器', '<a href="https://explorer-sepolia.inkonchain.com/" target="_blank">explorer-sepolia.inkonchain.com</a>'],
+        ['Chain ID', '763373'],
+        ['RPC', '<a href="https://rpc-sepolia.inkonchain.com" target="_blank">rpc-sepolia.inkonchain.com</a>'],
+        ['领取量', '~0.01 ETH / 次（桥接 Sepolia）'],
+      ]},
+      { name: 'Unichain Sepolia', max: '~0.01', data: [
+        ['官网', '<a href="https://unichain.org/" target="_blank">unichain.org</a> (Uniswap)'],
+        ['浏览器', '<a href="https://unichain-sepolia.blockscout.com/" target="_blank">blockscout</a> &middot; <a href="https://sepolia.uniscan.xyz/" target="_blank">uniscan.xyz</a>'],
+        ['Chain ID', '1301'],
+        ['RPC', '<a href="https://sepolia.unichain.org" target="_blank">sepolia.unichain.org</a>'],
+        ['领取量', '~0.01 ETH / 次（桥接 Sepolia）'],
+      ]},
+    ]
+  }
+];
+
+const COLOR_MAP = {
+  'BTC': 'c1', 'Ethereum': 'c2', 'Solana': 'c3',
+  'TRON': 'c4', 'Polygon': 'c5', 'ARC': 'c9',
+  'CEX Testnets': 'c6', 'Hoodi L2s': 'c7', 'Sepolia L2s': 'c8'
+};
+const app = document.getElementById('app');
+NETWORKS.forEach(g => {
+  const card = document.createElement('div');
+  card.className = 'card ' + (COLOR_MAP[g.category] || 'c1');
+  let netHtml = '';
+  g.items.forEach(n => {
+    const ex = n.exchange ? `<i class="ex-tag">${n.exchange}</i>` : '';
+    netHtml += `<span class="net-item" onclick="event.stopPropagation();openModal('${g.category}', '${n.name}', this)">${n.name} <b>${n.max}</b>${ex}</span>`;
+  });
+  card.innerHTML = `<h2>${g.icon} ${g.category}</h2><div class="sub">${g.items.length} 个测试网络</div><div class="net-list">${netHtml}</div>`;
+  app.appendChild(card);
+});
+
+function openModal(category, name, el) {
+  // find data
+  for (const g of NETWORKS) {
+    if (g.category !== category) continue;
+    for (const n of g.items) {
+      if (n.name !== name) continue;
+      const exLabel = n.exchange ? ` <span class="ex-tag" style="font-size:11px">${n.exchange}</span>` : '';
+      document.getElementById('modalTitle').innerHTML = `${g.icon} ${category} — ${name}${exLabel} <span class="max-badge">${n.max}</span>`;
+      let html = '';
+      n.data.forEach(row => {
+        html += `<div class="row"><span class="label">${row[0]}</span><span>${row[1]}</span></div>`;
+      });
+      document.getElementById('modalBody').innerHTML = html;
+      document.getElementById('modalOverlay').classList.add('show');
+      document.body.style.overflow = 'hidden';
+      return;
+    }
+  }
+}
+
+function closeModal(e) {
+  if (e) {
+    if (e.target !== document.getElementById('modalOverlay')) {
+      if (!e.target.closest('.modal-close')) return;
+    }
+  }
+  document.getElementById('modalOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+</body>
+</html>
