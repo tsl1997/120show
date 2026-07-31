@@ -1,4 +1,4 @@
-const { createApp, ref, computed, onMounted, watch } = Vue;
+const { createApp, ref, computed, onMounted, onUnmounted, watch } = Vue;
 
 const COMMON_ABI = [
     "function register(string _username) public",
@@ -64,6 +64,9 @@ createApp({
         const localKeyInput = ref('');
         const lowBalance = ref(false);
         const walletBalance = ref('');
+        const balanceLoading = ref(false);
+
+        let balanceInterval = null;
 
         const checkLocalCache = () => !!localStorage.getItem(LOCAL_PK_KEY);
 
@@ -156,13 +159,29 @@ createApp({
 
         const checkBalance = async () => {
             if (!wallet.value.isConnected || !wallet.value.chainId) return;
+            balanceLoading.value = true;
             try {
                 const provider = getProvider(wallet.value.chainId);
                 const bal = await provider.getBalance(wallet.value.address);
                 const eth = ethers.formatEther(bal);
                 lowBalance.value = parseFloat(eth) < 0.0001;
                 walletBalance.value = parseFloat(eth).toFixed(4);
-            } catch (e) {}
+            } catch (e) {
+                console.warn(`[OmniVerse] Balance check failed for ${wallet.value.chainId}:`, e.message || e);
+            }
+            balanceLoading.value = false;
+        };
+
+        const startBalancePolling = () => {
+            stopBalancePolling();
+            balanceInterval = setInterval(checkBalance, 30000);
+        };
+
+        const stopBalancePolling = () => {
+            if (balanceInterval) {
+                clearInterval(balanceInterval);
+                balanceInterval = null;
+            }
         };
 
         const copyAddress = async () => {
@@ -187,6 +206,7 @@ createApp({
             if (!acc || acc.length === 0) {
                 wallet.value = { address: null, chainId: null, isConnected: false };
                 userStatus.value = { isRegistered: false };
+                stopBalancePolling();
             } else {
                 wallet.value.address = acc[0];
                 wallet.value.isConnected = true;
@@ -195,6 +215,7 @@ createApp({
                     wallet.value.chainId = cid;
                     checkUser();
                     checkBalance();
+                    startBalancePolling();
                 } catch (e) {}
             }
         };
@@ -227,6 +248,7 @@ createApp({
                 wallet.value.isConnected = true;
                 checkUser();
                 checkBalance();
+                startBalancePolling();
             } catch (e) {
                 alert("私钥格式无效");
             }
@@ -238,6 +260,8 @@ createApp({
             wallet.value = { address: null, chainId: null, isConnected: false };
             userStatus.value = { isRegistered: false, username: '', isBanned: false, isOwner: false };
             lowBalance.value = false;
+            walletBalance.value = '';
+            stopBalancePolling();
         };
 
         const autoConnect = async () => {
@@ -402,6 +426,7 @@ createApp({
                     wallet.value.isConnected = true;
                     await checkUser();
                     await checkBalance();
+                    startBalancePolling();
                 } catch (e) {
                     localStorage.removeItem(LOCAL_PK_KEY);
                 }
@@ -416,6 +441,8 @@ createApp({
             const q = new URLSearchParams(window.location.search);
             if (q.get('chain') && q.get('id')) deepLink(q.get('chain'), q.get('id'));
         });
+
+        onUnmounted(() => stopBalancePolling());
 
         watch(currentView, v => {
             if (v === 'explore') fetchExp();
@@ -437,7 +464,7 @@ createApp({
             getCardStyle, getTagColor, safeNetName, parseMd, goPost, goBack, copyLink,
             fetchExp, fetchGal, fetchHis, fetchAdmin,
             canEdit: (auth) => wallet.value.address && auth.toLowerCase() === wallet.value.address.toLowerCase(),
-            accountType, showConnectModal, localKeyInput, lowBalance, walletBalance,
+            accountType, showConnectModal, localKeyInput, lowBalance, walletBalance, balanceLoading,
             connectMetaMask, importLocalKey, logout, copyAddress
         };
     }

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>私钥转账工具 - 多测试网</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <style>
+        :root {
+            --pink: #ff7cb4;
+            --peach: #ffb37c;
+            --blue: #79b5ff;
+            --text-main: #33456f;
+            --line: #dce7ff;
+        }
+        body {
+            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(160deg, #fff8ff, #eef8ff 52%, #fffef3);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+        .card {
+            background: rgba(255,255,255,0.92);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            box-shadow: 0 12px 30px rgba(124,154,219,0.16);
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            transition: opacity 0.2s;
+        }
+        .btn-primary:hover:not(:disabled) { opacity: 0.85; }
+        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-outline {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            font-weight: 700;
+            color: var(--text-main);
+            background: #fff;
+            transition: all 0.15s;
+        }
+        .btn-outline:hover { background: #f0f4ff; border-color: var(--blue); }
+        input, select {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            outline: none;
+        }
+        input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(121,181,255,0.15); }
+    </style>
+</head>
+<body class="flex items-center justify-center p-6">
+    <div class="card w-full max-w-lg p-8">
+        <h1 class="text-3xl font-black mb-1">🔑 私钥转账</h1>
+        <p class="text-sm text-gray-500 mb-8">导入私钥即可转账测试币，支持 21 个测试网络</p>
+
+        <label class="text-xs font-bold text-gray-600 mb-1.5 block">私钥</label>
+        <input id="keyInput" type="password" class="w-full p-4 mb-5 font-mono text-sm" placeholder="0x... 或原始私钥">
+
+        <div class="flex gap-3 mb-5">
+            <div class="flex-1">
+                <label class="text-xs font-bold text-gray-600 mb-1.5 block">网络</label>
+                <select id="netSelect" class="w-full p-4 text-sm font-bold appearance-none bg-white"></select>
+            </div>
+            <div class="flex-1">
+                <label class="text-xs font-bold text-gray-600 mb-1.5 block">余额</label>
+                <div class="w-full h-[52px] flex items-center px-4 bg-gray-50 rounded-xl text-sm font-bold">
+                    <span id="balanceDisplay" class="text-gray-400">—</span>
+                    <button id="refreshBtn" class="ml-auto text-xs text-blue-500 hover:text-blue-700 font-bold">⟳</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-5">
+            <button id="customRpcToggle" class="text-xs text-gray-400 hover:text-blue-600 font-bold transition cursor-pointer">🛠 使用自定义 RPC</button>
+            <div id="customRpcWrap" class="hidden mt-2">
+                <input id="customRpcInput" class="w-full p-3 font-mono text-xs" placeholder="https://...">
+            </div>
+        </div>
+
+        <label class="text-xs font-bold text-gray-600 mb-1.5 block">接收地址</label>
+        <input id="toInput" class="w-full p-4 mb-5 font-mono text-sm" placeholder="0x...">
+
+        <label class="text-xs font-bold text-gray-600 mb-1.5 block">转账金额</label>
+        <input id="amountInput" type="number" step="0.0001" min="0" class="w-full p-4 mb-3 text-lg font-bold" placeholder="0.0">
+        <div class="flex flex-wrap gap-2 mb-6">
+            <button class="quick-btn btn-outline px-4 py-2 text-xs" data-val="1">1</button>
+            <button class="quick-btn btn-outline px-4 py-2 text-xs" data-val="0.1">0.1</button>
+            <button class="quick-btn btn-outline px-4 py-2 text-xs" data-val="0.01">0.01</button>
+            <button class="quick-btn btn-outline px-4 py-2 text-xs" data-val="25%">25%</button>
+            <button class="quick-btn btn-outline px-4 py-2 text-xs" data-val="50%">50%</button>
+            <button class="quick-btn btn-outline px-4 py-2 text-xs" data-val="100%">100%</button>
+        </div>
+
+        <button id="sendBtn" class="btn-primary w-full py-4 text-sm font-black tracking-wider" disabled>请先导入私钥</button>
+
+        <div id="resultBox" class="hidden mt-6 p-4 rounded-xl bg-green-50 border border-green-200">
+            <div class="flex items-center gap-2 text-green-700 font-bold text-sm mb-2">✅ 发送成功</div>
+            <div id="txHashDisplay" class="text-xs font-mono bg-white rounded p-2 break-all"></div>
+            <a id="explorerLink" href="#" target="_blank" class="text-blue-600 font-bold text-xs mt-2 inline-block hover:underline hidden">🔗 在浏览器查看</a>
+        </div>
+        <div id="errorBox" class="hidden mt-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-bold"></div>
+    </div>
+
+    <script>
+        const NETWORKS = [
+            { id: "0xaa36a7",name: "Sepolia",         rpc: "https://sepolia.drpc.org",                   explorer: "https://sepolia.etherscan.io/tx/", symbol: "SepoliaETH" },
+            { id: "0x88bb0", name: "Hoodi",           rpc: "https://0xrpc.io/hoodi",                     explorer: "https://hoodi.etherscan.io/tx/", symbol: "ETH" },
+            { id: "0x61",    name: "BSC Testnet",     rpc: "https://bsc-testnet-rpc.publicnode.com",     explorer: "https://testnet.bscscan.com/tx/", symbol: "tBNB" },
+            { id: "0x66eee", name: "Arbitrum Sepolia", rpc: "https://arbitrum-sepolia-rpc.publicnode.com", explorer: "https://sepolia.arbiscan.io/tx/", symbol: "ETH" },
+            { id: "0x4cef52", name: "Arc",            rpc: "https://rpc.testnet.arc.io",                explorer: "https://testnet.arcscan.app/tx/", symbol: "ARC" },
+            { id: "0xa869",  name: "Avalanche Fuji",  rpc: "https://avalanche-fuji-c-chain-rpc.publicnode.com", explorer: "https://testnet.snowtrace.io/tx/", symbol: "AVAX" },
+            { id: "0x14a34", name: "Base Sepolia",    rpc: "https://base-sepolia-rpc.publicnode.com",    explorer: "https://sepolia.basescan.org/tx/", symbol: "ETH" },
+            { id: "0x13fb",  name: "Citrea",          rpc: "https://rpc.testnet.citrea.xyz",             explorer: "https://explorer.testnet.citrea.xyz/tx/", symbol: "cBTC" },
+            { id: "0x164ce", name: "Giwa",            rpc: "https://sepolia-rpc.giwa.io",                explorer: "https://sepolia-explorer.giwa.io/tx/", symbol: "GIWA" },
+            { id: "0x350b",  name: "Intuition",       rpc: "https://testnet.rpc.intuition.systems",      explorer: "https://intuition-testnet.explorer.caldera.xyz/tx/", symbol: "INT" },
+            { id: "0x940",   name: "KiteAI",          rpc: "https://rpc-testnet.gokite.ai",              explorer: "https://testnet.kitescan.ai/tx/", symbol: "KITE" },
+            { id: "0x138b",  name: "Mantle Sepolia",  rpc: "https://rpc.sepolia.mantle.xyz",             explorer: "https://explorer.sepolia.mantle.xyz/tx/", symbol: "MNT" },
+            { id: "0xaa37dc",name: "OP Sepolia",      rpc: "https://optimism-sepolia.drpc.org",          explorer: "https://sepolia-optimism.etherscan.io/tx/", symbol: "ETH" },
+            { id: "0x15eb",  name: "opBNB T",         rpc: "https://opbnb-testnet-rpc.bnbchain.org",     explorer: "https://testnet.opbnbscan.com/tx/", symbol: "tBNB" },
+            { id: "0x18233", name: "Plume",           rpc: "https://testnet-rpc.plume.org",               explorer: "https://testnet-explorer.plume.org/tx/", symbol: "PLUME" },
+            { id: "0xaa39db",name: "RISE",            rpc: "https://testnet.riselabs.xyz",                explorer: "https://explorer.testnet.riselabs.xyz/tx/", symbol: "ETH" },
+            { id: "0x7e5",   name: "Ronin Saigon",    rpc: "https://saigon-testnet.roninchain.com/rpc",   explorer: "https://saigon-explorer.roninchain.com/tx/", symbol: "RON" },
+            { id: "0xc488",  name: "Somnia",          rpc: "https://dream-rpc.somnia.network",           explorer: "https://shannon-explorer.somnia.network/tx/", symbol: "SOM" },
+            { id: "0xdede",  name: "Sonic Blaze",     rpc: "https://sonic-blaze-rpc.publicnode.com",     explorer: "https://testnet.sonicscan.org/tx/", symbol: "S" },
+            { id: "0x899",   name: "Stable",          rpc: "https://rpc.testnet.stable.xyz",             explorer: "https://stablescan.xyz/tx/", symbol: "STABLE" },
+            { id: "0x515",   name: "Unichain Sepolia",rpc: "https://unichain-sepolia-rpc.publicnode.com", explorer: "https://sepolia.uniscan.xyz/tx/", symbol: "ETH" }
+        ];
+
+        const el = id => document.getElementById(id);
+        const keyInput = el('keyInput');
+        const netSelect = el('netSelect');
+        const balanceDisplay = el('balanceDisplay');
+        const toInput = el('toInput');
+        const amountInput = el('amountInput');
+        const sendBtn = el('sendBtn');
+        const resultBox = el('resultBox');
+        const errorBox = el('errorBox');
+        const txHashDisplay = el('txHashDisplay');
+        const explorerLink = el('explorerLink');
+        const refreshBtn = el('refreshBtn');
+        const customRpcToggle = el('customRpcToggle');
+        const customRpcWrap = el('customRpcWrap');
+        const customRpcInput = el('customRpcInput');
+
+        let provider = null;
+        let wallet = null;
+        let currentBalance = 0n;
+
+        NETWORKS.forEach(net => {
+            const opt = document.createElement('option');
+            opt.value = net.id;
+            opt.textContent = net.name + ' (' + net.symbol + ')';
+            netSelect.appendChild(opt);
+        });
+
+        const getNetwork = () => NETWORKS.find(n => n.id === netSelect.value);
+
+        const getEffectiveRpc = () => {
+            const custom = customRpcInput.value.trim();
+            return custom || getNetwork().rpc;
+        };
+
+        const initProvider = () => {
+            const net = getNetwork();
+            if (!net) return;
+            const rpc = getEffectiveRpc();
+            if (customRpcInput.value.trim()) {
+                provider = new ethers.JsonRpcProvider(rpc);
+            } else {
+                provider = new ethers.JsonRpcProvider(rpc, parseInt(net.id, 16));
+            }
+        };
+        initProvider();
+
+        const updateBalance = async () => {
+            if (!wallet) { balanceDisplay.textContent = '—'; return; }
+            try {
+                const bal = await provider.getBalance(wallet.address);
+                currentBalance = bal;
+                balanceDisplay.textContent = ethers.formatEther(bal) + ' ' + getNetwork().symbol;
+            } catch (e) {
+                console.warn('余额查询失败:', e.message);
+                balanceDisplay.textContent = '查询失败';
+            }
+        };
+
+        const connectWallet = () => {
+            const pk = keyInput.value.trim();
+            if (!pk) {
+                wallet = null;
+                sendBtn.disabled = true;
+                sendBtn.textContent = '请先导入私钥';
+                balanceDisplay.textContent = '—';
+                return;
+            }
+            try {
+                wallet = new ethers.Wallet(pk, provider);
+                sendBtn.disabled = false;
+                sendBtn.textContent = '发送';
+                updateBalance();
+                hideResult();
+            } catch (e) {
+                wallet = null;
+                sendBtn.disabled = true;
+                sendBtn.textContent = '私钥格式无效';
+                balanceDisplay.textContent = '—';
+            }
+        };
+
+        const showResult = (txHash) => {
+            const net = getNetwork();
+            resultBox.classList.remove('hidden');
+            errorBox.classList.add('hidden');
+            txHashDisplay.textContent = txHash;
+            if (net.explorer) {
+                explorerLink.href = net.explorer + txHash;
+                explorerLink.classList.remove('hidden');
+            } else {
+                explorerLink.classList.add('hidden');
+            }
+        };
+
+        const showError = (msg) => {
+            errorBox.classList.remove('hidden');
+            resultBox.classList.add('hidden');
+            errorBox.textContent = '❌ ' + msg;
+        };
+
+        const hideResult = () => {
+            resultBox.classList.add('hidden');
+            errorBox.classList.add('hidden');
+        };
+
+        const getGasCost = async () => {
+            const feeData = await provider.getFeeData();
+            const gasPrice = feeData.maxFeePerGas || feeData.gasPrice;
+            if (!gasPrice) throw new Error('无法获取 Gas 价格');
+            return gasPrice * 21000n;
+        };
+
+        keyInput.addEventListener('input', connectWallet);
+        netSelect.addEventListener('change', () => {
+            initProvider();
+            if (wallet) {
+                wallet = wallet.connect(provider);
+                updateBalance();
+            }
+            hideResult();
+        });
+        refreshBtn.addEventListener('click', updateBalance);
+
+        customRpcToggle.addEventListener('click', () => {
+            customRpcWrap.classList.toggle('hidden');
+        });
+        customRpcInput.addEventListener('input', () => {
+            initProvider();
+            if (wallet) {
+                wallet = wallet.connect(provider);
+                updateBalance();
+            }
+            hideResult();
+        });
+
+        document.querySelectorAll('.quick-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const val = btn.dataset.val;
+                if (!wallet || currentBalance === 0n) return;
+                if (val.endsWith('%')) {
+                    const pct = parseInt(val) / 100;
+                    if (pct === 1) {
+                        try {
+                            const gasCost = await getGasCost();
+                            if (currentBalance <= gasCost) {
+                                alert('余额不足以支付 Gas 费用');
+                                return;
+                            }
+                            amountInput.value = ethers.formatEther(currentBalance - gasCost);
+                        } catch (e) {
+                            alert('估算 Gas 失败: ' + e.message);
+                        }
+                    } else {
+                        const amount = currentBalance * BigInt(Math.floor(pct * 1000000)) / 1000000n;
+                        amountInput.value = ethers.formatEther(amount);
+                    }
+                } else {
+                    amountInput.value = val;
+                }
+            });
+        });
+
+        sendBtn.addEventListener('click', async () => {
+            const to = toInput.value.trim();
+            if (!ethers.isAddress(to)) { alert('请输入有效的接收地址'); return; }
+            const amountStr = amountInput.value.trim();
+            if (!amountStr || parseFloat(amountStr) <= 0) { alert('请输入有效金额'); return; }
+            const amountWei = ethers.parseEther(amountStr);
+            if (amountWei > currentBalance) { alert('余额不足'); return; }
+
+            sendBtn.disabled = true;
+            sendBtn.textContent = '⏳ 发送中...';
+            hideResult();
+
+            try {
+                const tx = await wallet.sendTransaction({ to, value: amountWei });
+                showResult(tx.hash);
+                sendBtn.textContent = '✅ 已发送';
+                setTimeout(() => {
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = '发送';
+                    updateBalance();
+                }, 2000);
+            } catch (e) {
+                showError(e.message || e.reason || '发送失败');
+                sendBtn.disabled = false;
+                sendBtn.textContent = '发送';
+            }
+        });
+    </script>
+</body>
+</html>

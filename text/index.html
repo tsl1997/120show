@@ -190,7 +190,7 @@
                     <div v-else class="wallet-chip flex items-center gap-2 pl-4 pr-2 py-2">
                         <div class="flex flex-col items-end">
                             <span @click="copyAddress" class="text-xs font-bold font-mono cursor-pointer hover:text-blue-600 transition" title="点击复制地址">{{ wallet.address.slice(0,6) }}...{{ wallet.address.slice(-4) }}</span>
-                            <span class="text-[9px] text-gray-500 font-mono">{{ walletBalance }} {{ networks[wallet.chainId]?.symbol || 'ETH' }}</span>
+                            <span class="text-[9px] text-gray-500 font-mono">{{ balanceLoading ? '...' : (walletBalance ? walletBalance + ' ' + (networks[wallet.chainId]?.symbol || 'ETH') : '—') }}</span>
                         </div>
                         <span v-if="accountType === 'local'" class="text-[9px] font-bold text-orange-500 bg-orange-50 px-2 py-0.5 rounded">KEY</span>
                         <div class="w-8 h-8 rounded-lg bg-green-500 text-white flex items-center justify-center font-bold text-xs cursor-pointer" @click="copyAddress" title="点击复制地址">{{ userStatus.username ? userStatus.username[0] : 'U' }}</div>
@@ -216,6 +216,7 @@
                     <div>
                         <input v-model="localKeyInput" type="password" class="w-full border-2 rounded-2xl p-4 font-mono text-xs outline-none focus:border-black" placeholder="粘贴私钥 (Private Key)">
                         <button @click="importLocalKey" class="w-full mt-3 py-4 rounded-2xl bg-black text-white font-bold text-sm hover:opacity-80 transition">导入私钥 (本地缓存)</button>
+                        <p class="text-[10px] text-gray-400 mt-2 text-center">⚠ 私钥仅存储在浏览器 localStorage 中，仅供测试网使用</p>
                     </div>
                 </div>
             </div>

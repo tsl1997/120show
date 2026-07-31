@@ -13,12 +13,13 @@ OmniVerse 是一个基于 Web3 的无后端、纯前端去中心化应用 (DApp)
 自动并发抓取多个区块链网络（Mainnet & Testnet）上的最新数据。
 支持动态筛选：一键过滤特定网络的内容流。
 颜色编码：不同网络拥有独立的主题色（如 Gnosis 为绿色，Tempo 为粉色）。
+默认显示 5 个网络：Gnosis、opBNB、opBNB T、Sepolia、Somnia。
 
-### 🌸 V6 增强协议 (Tempo Visuals)
+### 🖼️ 画廊 (Gallery)
 
-针对 Tempo Network 部署了升级版 V6 合约。
-支持 封面图 (Cover Image) 和 图片数量统计。
-专属的沉浸式瀑布流画廊视图。
+基于 V5 合约的 opBNB Testnet 画廊视图。
+自动从帖子内容的 Markdown 图片语法 (`![alt](url)`) 提取第一张作为封面。
+暗黑风格的瀑布流布局。
 
 ### 📝 沉浸式阅读与创作
 
@@ -32,11 +33,27 @@ Deep Linking：支持生成分享链接（如 ?chain=0x..&id=10），访客无�
 所有权控制：只有发布者可以编辑或删除（逻辑删除）自己的帖子。
 管理员后台：合约部署者拥有封禁/解封用户的权限，管理入口仅对管理员可见。
 
+### 🎭 双模式钱包连接
+
+**MetaMask 模式**: 传统浏览器插件钱包连接，自动识别账户切换和网络切换。
+**本地私钥模式**: 无需安装任何插件，直接导入私钥，私钥加密存储在浏览器 localStorage 中。
+自动登录：下次打开页面自动检测缓存私钥，一键进入。
+⚠ 私钥模式仅推荐用于测试网，主网请使用 MetaMask 插件。
+
+### 💰 余额监控
+
+实时显示当前网络的原生代币余额及单位符号（如 tBNB、BNB、xDAI、ARC 等）。
+点击钱包地址可快速复制完整地址，方便充值或领水。
+每 30 秒自动刷新余额，交易后立即更新。
+余额低于 0.0001 时右下角弹出红色充值提醒。
+切换网络时自动重置并重新查询余额，加载过程显示 `...`，失败显示 `—`。
+
 ### ⚡ 极速与稳健
 
 Zero Build：不需要 npm install 或 npm run build，纯静态 HTML/JS 运行。
-Auto Connect：智能识别钱包状态，刷新页面自动保持登录。
+Auto Connect：智能识别钱包状态，刷新页面自动保持登录（支持 MetaMask 和本地私钥）。
 Anti-Crash：静态 CSS 映射解决 CDN 渲染卡顿问题，多链读取采用 Promise.all 并发容错。
+定时刷新：余额每 30 秒自动同步，页面销毁时自动清理定时器。
 
 ### 🛠️ 技术栈 (Tech Stack)
 
@@ -84,7 +101,8 @@ window.NETWORKS = {
      rpc: "https://rpc-url...",     // 公共 RPC 节点
      type: "mainnet",               // 'mainnet' 或 'testnet'
      isV6: true,                    // 是否支持封面图合约 (V6)
-     color: "emerald",              // UI 主题色 (emerald, pink, amber...)
+     color: "#hex",                 // UI 主题色
+     symbol: "TOKEN",               // 原生代币符号 (用于余额显示)
      default: true                  // 是否在大厅默认选中
  },
  // ...
@@ -99,20 +117,21 @@ V5 (Standard):
 适用于大部分网络 (Gnosis, opBNB, Sepolia, etc.)。
 V6 (Enhanced):
 新增 coverImageUrl (字符串) 和 imageCount (uint8)。
-仅在 Tempo Testnet 上启用，用于驱动“画廊”视图。
 前端 logic.js 会根据 config.js 中的 isV6 字段自动切换 ABI (应用二进制接口) 进行交互。
 
 ### 📸 界面预览 (Screenshots)
 
 首页: 极简、大字体的不对称网格设计 (Bento Grid)。
 大厅: 根据链ID动态着色的多链信息流。
-画廊: 暗黑风格的图片瀑布流。
+画廊: 暗黑风格的图片瀑布流（opBNB Testnet）。
 阅读: 纯净的文章详情页。
 
 ### ⚠️ 注意事项
 
 CDN 依赖: 这里的 Tailwind 和 Vue 通过 CDN 加载。在生产环境中虽然方便，但极少数情况下可能会受到 CDN 网络波动影响。
 Browser Security: 请务必通过 http:// 或 https:// 协议访问，不要直接双击 index.html (file://)，否则无法连接 Metamask。
+私钥安全: 本地私钥模式将密钥存储在浏览器 localStorage 中，存在 XSS 窃取风险，**请仅用于测试网**。主网使用请选择 MetaMask 连接。
+RPC 可用性: 部分测试网 RPC 节点可能存在频率限制，余额显示为 `—` 时请检查 RPC 状态或切换网络。
 
 ### 🧭 版本与配置维护说明
 

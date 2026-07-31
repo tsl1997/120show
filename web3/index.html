@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔑 私钥转账工具集合 | Web3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --pink: #ff7cb4;
+            --peach: #ffb37c;
+            --blue: #79b5ff;
+            --mint: #71d9c4;
+            --lavender: #b59cff;
+            --text: #314069;
+            --sub: #6d7ca6;
+            --line: #dbe6ff;
+        }
+        body {
+            font-family: 'Inter','PingFang SC','Microsoft YaHei',sans-serif;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(255,179,124,0.28) 0, transparent 28%),
+                radial-gradient(circle at 86% 9%, rgba(181,156,255,0.26) 0, transparent 30%),
+                radial-gradient(circle at 76% 82%, rgba(121,181,255,0.22) 0, transparent 33%),
+                linear-gradient(160deg, #fff8ff, #eef8ff 52%, #fffef3);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        .card {
+            background: rgba(255,255,255,0.88);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            box-shadow: 0 12px 30px rgba(124,154,219,0.16);
+            transition: all 0.25s;
+        }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(124,154,219,0.26); }
+        .card.pink { background: linear-gradient(145deg, #fff4fb, #fff); }
+        .card.blue { background: linear-gradient(145deg, #eff7ff, #fff); }
+        .card.mint { background: linear-gradient(145deg, #ecfff8, #fff); }
+        .card.lavender { background: linear-gradient(145deg, #f3f0ff, #fff); }
+        .card.peach { background: linear-gradient(145deg, #fff4ea, #fff); }
+        .tag {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            border-radius: 999px;
+            padding: 4px 10px;
+            border: 1px solid #e0eaff;
+            color: #6a78a4;
+            background: rgba(255,255,255,0.92);
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            transition: opacity 0.2s;
+        }
+        .btn-primary:hover { opacity: 0.85; }
+        .net-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 4px; }
+        .net-list li {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.7);
+            border: 1px solid #e0eaff;
+            color: #5a6c9a;
+        }
+    </style>
+</head>
+<body class="p-6 flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-5xl">
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-black mb-3">🔑 私钥转账工具</h1>
+            <p class="text-lg text-gray-500 max-w-xl mx-auto">无需安装任何钱包插件，导入私钥即可在多个测试网上进行转账操作</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- EVM -->
+            <a href="./transfer.html" class="card blue p-8 flex flex-col justify-between no-underline text-inherit min-h-[280px]">
+                <div>
+                    <span class="tag">🟢 EVM</span>
+                    <h2 class="text-2xl font-black mt-4 mb-2">EVM 测试网转账</h2>
+                    <p class="text-sm text-gray-500 leading-relaxed">以太坊虚拟机兼容链<br>支持 21 个测试网络，可自定义 RPC</p>
+                    <ul class="net-list mt-4">
+                        <li>Sepolia</li>
+                        <li>Hoodi</li>
+                        <li>BSC Test</li>
+                        <li>opBNB T</li>
+                        <li>Base Sep</li>
+                        <li>+16 个更多</li>
+                    </ul>
+                </div>
+                <span class="mt-6 text-sm font-black text-blue-600">打开工具 →</span>
+            </a>
+
+            <!-- TRX -->
+            <a href="./transfer-trx.html" class="card pink p-8 flex flex-col justify-between no-underline text-inherit min-h-[280px]">
+                <div>
+                    <span class="tag">🔺 TRX</span>
+                    <h2 class="text-2xl font-black mt-4 mb-2">TRX 测试网转账</h2>
+                    <p class="text-sm text-gray-500 leading-relaxed">波场 TRON 测试链<br>支持 Shasta / Nile 双测试网</p>
+                    <ul class="net-list mt-4">
+                        <li>Shasta</li>
+                        <li>Nile</li>
+                    </ul>
+                </div>
+                <span class="mt-6 text-sm font-black text-pink-600">打开工具 →</span>
+            </a>
+
+            <!-- SOL -->
+            <a href="./transfer-sol.html" class="card lavender p-8 flex flex-col justify-between no-underline text-inherit min-h-[280px]">
+                <div>
+                    <span class="tag">◎ SOL</span>
+                    <h2 class="text-2xl font-black mt-4 mb-2">SOL 测试网转账</h2>
+                    <p class="text-sm text-gray-500 leading-relaxed">Solana 高性能链<br>支持 Devnet / Testnet 测试网</p>
+                    <ul class="net-list mt-4">
+                        <li>Devnet</li>
+                        <li>Testnet</li>
+                    </ul>
+                </div>
+                <span class="mt-6 text-sm font-black text-purple-600">打开工具 →</span>
+            </a>
+        </div>
+
+        <div class="card p-8 max-w-2xl mx-auto">
+            <h3 class="text-lg font-black mb-3">💡 使用说明</h3>
+            <ul class="text-sm text-gray-600 space-y-2 leading-relaxed">
+                <li>• 私钥仅存储在浏览器 <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono">localStorage</code> 中，请仅用于测试网</li>
+                <li>• 切换网络后会自动重新查询余额和重连</li>
+                <li>• 100% 按钮会自动预留手续费（EVM: RPC 估算, TRX: 1 TRX, SOL: 0.001 SOL）</li>
+                <li>• 如果 RPC 挂掉，EVM 工具支持粘贴自定义 RPC 地址</li>
+                <li>• 发送成功后点击蓝色链接可在区块链浏览器中查看交易详情</li>
+            </ul>
+        </div>
+
+        <div class="text-center mt-8">
+            <a href="../index.html" class="text-xs text-gray-400 hover:text-blue-600 font-bold transition">← 返回实验室主页</a>
+        </div>
+    </div>
+</body>
+</html>
