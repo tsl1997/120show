@@ -3,53 +3,141 @@
   <!-- 首页 -->
   <url>
     <loc>https://120.show/</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2026-08-01</lastmod>
     <priority>1.0</priority>
   </url>
-  
-  <!-- Web3 分类项目 -->
+
+  <!-- Web3 合集入口 -->
   <url>
-    <loc>https://120.show/web3/send.html</loc>
-    <lastmod>2025-01-01</lastmod>
+    <loc>https://120.show/web3/index.html</loc>
+    <lastmod>2026-08-01</lastmod>
     <priority>0.9</priority>
   </url>
+
+  <!-- Web3 转账 -->
+  <url>
+    <loc>https://120.show/web3/transfer.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://120.show/web3/transfer-trx.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://120.show/web3/transfer-sol.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Web3 钱包生成 -->
+  <url>
+    <loc>https://120.show/web3/wallet.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://120.show/web3/wallet-evm.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://120.show/web3/wallet-trx.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://120.show/web3/wallet-sol.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Web3 部署与实验 -->
+  <url>
+    <loc>https://120.show/web3/deploy.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://120.show/web3/deploybot.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://120.show/web3/aa.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://120.show/web3/send.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 余额检查 -->
   <url>
     <loc>https://120.show/airdrop/testnet.html</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2026-08-01</lastmod>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://120.show/airdrop/balance-trx.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://120.show/airdrop/balance-sol.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 通用工具与内容 -->
+  <url>
+    <loc>https://120.show/tool/testnet.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://120.show/tool/2fa.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://120.show/tool/opencode.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://120.show/text/index.html</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2026-08-01</lastmod>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://120.show/zlib/index.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://120.show/qing/index.html</loc>
+    <lastmod>2026-08-01</lastmod>
+    <priority>0.6</priority>
   </url>
 
   <!-- Vision 分类项目 -->
   <url>
     <loc>https://120.show/camera/picture/index.html</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2026-08-01</lastmod>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://120.show/camera/smokeflower/index3.html</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2026-08-01</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://120.show/qifu/index.html</loc>
-    <lastmod>2025-01-01</lastmod>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- 工具与内容项目 -->
-  <url>
-    <loc>https://120.show/zlib/index.html</loc>
-    <lastmod>2025-01-01</lastmod>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://120.show/qing/index.html</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2026-08-01</lastmod>
     <priority>0.7</priority>
   </url>
 </urlset>

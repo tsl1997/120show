@@ -52,15 +52,34 @@ python -m http.server 8000
 ### 主页入口
 
 - `index.html`：主导航页，按「Web3 实验 / 视觉交互 / 内容工具」分组展示。
+  - Web3 分类在主页仅保留一个合集入口（`web3/index.html`），所有 Web3 工具在合集页内分类导航。
 
 ### Web3 实验
 
-- `web3/send.html`：以太坊转账全景（含 EOA 与 CREATE2 场景展示）。
-- `web3/aa.html`：AA 账号体验台（Sepolia 相关流程）。
-- `web3/wallet.html`：离线 EVM 钱包生成与导出。
-- `web3/deploy.html`：合约部署测试台。
-- `airdrop/testnet.html`：多测试网地址余额检查。
-- `text/index.html`：全链存证与内容发布页面（独立 DApp）。
+Web3 工具统一由 `web3/index.html` 作为合集入口，按功能分类：
+
+- **转账**
+  - `web3/transfer.html`：EVM 测试网转账（21 个测试网，可自定义 RPC）。
+  - `web3/transfer-trx.html`：TRX 测试网转账（Shasta / Nile）。
+  - `web3/transfer-sol.html`：SOL 测试网转账（Devnet / Testnet）。
+- **钱包生成**
+  - `web3/wallet-evm.html`：EVM 钱包批量生成（CSV / TXT 导出）。
+  - `web3/wallet-trx.html`：TRX 钱包批量生成（CSV / TXT 导出）。
+  - `web3/wallet-sol.html`：SOL 钱包批量生成（CSV / TXT 导出）。
+  - `web3/wallet.html`：离线 EVM 钱包生成器（普通 / 前后缀定制靓号）。
+- **余额检查**
+  - `airdrop/testnet.html`：多测试网地址余额检查。
+  - `airdrop/balance-trx.html`：TRX 测试网余额检查（txt / csv 导入）。
+  - `airdrop/balance-sol.html`：SOL 测试网余额检查（txt / csv 导入）。
+- **部署与合约**
+  - `web3/deploy.html`：合约部署测试台。
+  - `web3/deploybot.html`：DeployBot 执行台（策略自动化）。
+- **协议与实验**
+  - `web3/send.html`：以太坊转账全景（含 EOA 与 CREATE2 场景展示）。
+  - `web3/aa.html`：AA 账号体验台（Sepolia 相关流程）。
+- **其他**
+  - `tool/testnet.html`：多链测试网信息速查（官网 / 浏览器 / 水龙头 / RPC）。
+  - `text/index.html`：全链存证与内容发布页面（独立 DApp）。
 
 ### 视觉交互
 
@@ -84,13 +103,13 @@ python -m http.server 8000
 ├─ sitemap.xml
 ├─ robots.txt
 ├─ CNAME
-├─ web3/
-├─ airdrop/
+├─ web3/          # Web3 工具合集（转账 / 钱包生成 / 部署 / 实验）
+├─ airdrop/       # 余额检查工具
 ├─ camera/
 ├─ qing/
 ├─ qifu/
 ├─ zlib/
-├─ tool/
+├─ tool/          # 通用工具（testnet 信息速查等）
 └─ text/
 ```
 
@@ -138,7 +157,7 @@ python 转换.py
 ## 安全与隐私提示
 
 - `tool/2fa.html` 使用本地存储保存数据，请自行保护本机环境。
-- `web3/wallet.html` 涉及私钥生成，请在可信设备和网络环境中使用。
+- `web3/wallet.html`、`web3/wallet-evm.html`、`web3/wallet-trx.html`、`web3/wallet-sol.html` 涉及私钥生成，请在可信设备和网络环境中使用。
 - 任何链上交互前请先在测试网验证流程，避免主网误操作。
 
 ## 许可

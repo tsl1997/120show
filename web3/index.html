@@ -3,45 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔑 私钥转账工具集合 | Web3</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Web3 工具合集 | XS 魔法实验室</title>
     <style>
         :root {
+            --bg1: #fff8ff;
+            --bg2: #eef8ff;
+            --bg3: #fffef3;
+            --text: #314069;
+            --sub: #6d7ca6;
+            --line: #dbe6ff;
             --pink: #ff7cb4;
             --peach: #ffb37c;
             --blue: #79b5ff;
             --mint: #71d9c4;
             --lavender: #b59cff;
-            --text: #314069;
-            --sub: #6d7ca6;
-            --line: #dbe6ff;
+            --card: rgba(255, 255, 255, 0.86);
         }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: 'Inter','PingFang SC','Microsoft YaHei',sans-serif;
-            background:
-                radial-gradient(circle at 12% 14%, rgba(255,179,124,0.28) 0, transparent 28%),
-                radial-gradient(circle at 86% 9%, rgba(181,156,255,0.26) 0, transparent 30%),
-                radial-gradient(circle at 76% 82%, rgba(121,181,255,0.22) 0, transparent 33%),
-                linear-gradient(160deg, #fff8ff, #eef8ff 52%, #fffef3);
             color: var(--text);
+            font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(255, 179, 124, 0.28) 0, transparent 28%),
+                radial-gradient(circle at 86% 9%, rgba(181, 156, 255, 0.26) 0, transparent 30%),
+                radial-gradient(circle at 76% 82%, rgba(121, 181, 255, 0.22) 0, transparent 33%),
+                linear-gradient(160deg, var(--bg1), var(--bg2) 52%, var(--bg3));
             min-height: 100vh;
         }
-        .card {
-            background: rgba(255,255,255,0.88);
-            border: 1px solid var(--line);
-            border-radius: 24px;
-            box-shadow: 0 12px 30px rgba(124,154,219,0.16);
-            transition: all 0.25s;
+
+        .wrap {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 24px 18px 70px;
+            position: relative;
+            z-index: 2;
         }
-        .card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(124,154,219,0.26); }
+
+        .hero {
+            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(248,252,255,0.86));
+            border: 1px solid var(--line);
+            border-radius: 26px;
+            box-shadow: 0 16px 40px rgba(131,152,206,0.2);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            font-size: 12px;
+            font-weight: 700;
+            color: #8d5d9d;
+            background: linear-gradient(90deg, #ffe3f2, #eaf3ff);
+            border: 1px solid #efdbff;
+            border-radius: 999px;
+            padding: 6px 12px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 700;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 8px 12px;
+            transition: 0.2s ease;
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            border-color: #cddcff;
+            box-shadow: 0 6px 14px rgba(131,152,206,0.2);
+        }
+
+        .hero-main {
+            margin-top: 16px;
+        }
+
+        h1 {
+            font-size: clamp(32px, 6vw, 52px);
+            font-weight: 900;
+            line-height: 1.08;
+            background: linear-gradient(90deg, var(--pink), var(--peach) 34%, var(--blue) 70%, var(--mint));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            margin: 8px 0 0;
+            color: var(--sub);
+            font-size: 15px;
+        }
+
+        .section {
+            margin-bottom: 28px;
+        }
+
+        .section-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: #2d3f69;
+        }
+
+        .section-desc {
+            font-size: 12px;
+            color: var(--sub);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
+        }
+
+        .item { grid-column: span 4; }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 170px;
+            border-radius: 22px;
+            padding: 20px;
+            text-decoration: none;
+            color: var(--text);
+            background: var(--card);
+            border: 1px solid #dfe9ff;
+            box-shadow: 0 12px 24px rgba(128,153,212,0.18);
+            position: relative;
+            overflow: hidden;
+            transition: 0.22s ease;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            right: -24px;
+            top: -24px;
+            background: radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,255,255,0));
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 18px 34px rgba(128,153,212,0.26);
+        }
+
         .card.pink { background: linear-gradient(145deg, #fff4fb, #fff); }
         .card.blue { background: linear-gradient(145deg, #eff7ff, #fff); }
         .card.mint { background: linear-gradient(145deg, #ecfff8, #fff); }
         .card.lavender { background: linear-gradient(145deg, #f3f0ff, #fff); }
         .card.peach { background: linear-gradient(145deg, #fff4ea, #fff); }
+
         .tag {
             display: inline-block;
-            font-size: 10px;
+            width: fit-content;
+            margin-bottom: 10px;
+            font-size: 11px;
             font-weight: 800;
             letter-spacing: 0.7px;
             text-transform: uppercase;
@@ -49,98 +187,247 @@
             padding: 4px 10px;
             border: 1px solid #e0eaff;
             color: #6a78a4;
-            background: rgba(255,255,255,0.92);
+            background: rgba(255, 255, 255, 0.92);
         }
-        .btn-primary {
-            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-weight: 800;
-            transition: opacity 0.2s;
+
+        .card h3 {
+            margin: 0;
+            font-size: 20px;
+            line-height: 1.24;
+            color: #354977;
         }
-        .btn-primary:hover { opacity: 0.85; }
-        .net-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 4px; }
-        .net-list li {
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 6px;
-            background: rgba(255,255,255,0.7);
-            border: 1px solid #e0eaff;
-            color: #5a6c9a;
+
+        .card p {
+            margin: 8px 0 0;
+            font-size: 13px;
+            line-height: 1.56;
+            color: #6b7ba7;
+        }
+
+        .link {
+            margin-top: 14px;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0.9px;
+            color: #5d6f9f;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #7c8bb5;
+        }
+
+        @media (max-width: 900px) {
+            .item { grid-column: span 12; }
         }
     </style>
 </head>
-<body class="p-6 flex items-center justify-center min-h-screen">
-    <div class="w-full max-w-5xl">
-        <div class="text-center mb-12">
-            <h1 class="text-5xl font-black mb-3">🔑 私钥转账工具</h1>
-            <p class="text-lg text-gray-500 max-w-xl mx-auto">无需安装任何钱包插件，导入私钥即可在多个测试网上进行转账操作</p>
+<body>
+<div class="wrap">
+    <header class="hero">
+        <div class="hero-top">
+            <span class="pill">Web3 工具合集 / 全部工具导航</span>
+            <a href="../index.html" class="back-link" target="_blank" rel="noopener noreferrer">← 返回实验室主页</a>
         </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <!-- EVM -->
-            <a href="./transfer.html" class="card blue p-8 flex flex-col justify-between no-underline text-inherit min-h-[280px]">
-                <div>
-                    <span class="tag">🟢 EVM</span>
-                    <h2 class="text-2xl font-black mt-4 mb-2">EVM 测试网转账</h2>
-                    <p class="text-sm text-gray-500 leading-relaxed">以太坊虚拟机兼容链<br>支持 21 个测试网络，可自定义 RPC</p>
-                    <ul class="net-list mt-4">
-                        <li>Sepolia</li>
-                        <li>Hoodi</li>
-                        <li>BSC Test</li>
-                        <li>opBNB T</li>
-                        <li>Base Sep</li>
-                        <li>+16 个更多</li>
-                    </ul>
-                </div>
-                <span class="mt-6 text-sm font-black text-blue-600">打开工具 →</span>
-            </a>
-
-            <!-- TRX -->
-            <a href="./transfer-trx.html" class="card pink p-8 flex flex-col justify-between no-underline text-inherit min-h-[280px]">
-                <div>
-                    <span class="tag">🔺 TRX</span>
-                    <h2 class="text-2xl font-black mt-4 mb-2">TRX 测试网转账</h2>
-                    <p class="text-sm text-gray-500 leading-relaxed">波场 TRON 测试链<br>支持 Shasta / Nile 双测试网</p>
-                    <ul class="net-list mt-4">
-                        <li>Shasta</li>
-                        <li>Nile</li>
-                    </ul>
-                </div>
-                <span class="mt-6 text-sm font-black text-pink-600">打开工具 →</span>
-            </a>
-
-            <!-- SOL -->
-            <a href="./transfer-sol.html" class="card lavender p-8 flex flex-col justify-between no-underline text-inherit min-h-[280px]">
-                <div>
-                    <span class="tag">◎ SOL</span>
-                    <h2 class="text-2xl font-black mt-4 mb-2">SOL 测试网转账</h2>
-                    <p class="text-sm text-gray-500 leading-relaxed">Solana 高性能链<br>支持 Devnet / Testnet 测试网</p>
-                    <ul class="net-list mt-4">
-                        <li>Devnet</li>
-                        <li>Testnet</li>
-                    </ul>
-                </div>
-                <span class="mt-6 text-sm font-black text-purple-600">打开工具 →</span>
-            </a>
+        <div class="hero-main">
+            <h1>⚡ Web3 工具合集</h1>
+            <p class="subtitle">转账 · 钱包生成 · 余额检查 · 合约部署 · 协议实验，全部离线工具一站直达。</p>
         </div>
+    </header>
 
-        <div class="card p-8 max-w-2xl mx-auto">
-            <h3 class="text-lg font-black mb-3">💡 使用说明</h3>
-            <ul class="text-sm text-gray-600 space-y-2 leading-relaxed">
-                <li>• 私钥仅存储在浏览器 <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono">localStorage</code> 中，请仅用于测试网</li>
-                <li>• 切换网络后会自动重新查询余额和重连</li>
-                <li>• 100% 按钮会自动预留手续费（EVM: RPC 估算, TRX: 1 TRX, SOL: 0.001 SOL）</li>
-                <li>• 如果 RPC 挂掉，EVM 工具支持粘贴自定义 RPC 地址</li>
-                <li>• 发送成功后点击蓝色链接可在区块链浏览器中查看交易详情</li>
-            </ul>
+    <!-- 转账 -->
+    <section class="section">
+        <div class="section-head">
+            <span class="section-title">💸 测试网转账</span>
+            <span class="section-desc">导入私钥，免插件多测试网转账</span>
         </div>
+        <div class="grid">
+            <article class="item">
+                <a class="card blue" href="./transfer.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">🟢 EVM</span>
+                        <h3>EVM 测试网转账</h3>
+                        <p>21 个测试网 · 自定义 RPC · 无需钱包插件</p>
+                    </div>
+                    <span class="link">开始转账 -></span>
+                </a>
+            </article>
+            <article class="item">
+                <a class="card pink" href="./transfer-trx.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">🔺 TRX</span>
+                        <h3>TRX 测试网转账</h3>
+                        <p>Shasta / Nile 双测试网 · 一键复制地址</p>
+                    </div>
+                    <span class="link">开始转账 -></span>
+                </a>
+            </article>
+            <article class="item">
+                <a class="card lavender" href="./transfer-sol.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">◎ SOL</span>
+                        <h3>SOL 测试网转账</h3>
+                        <p>Devnet / Testnet · 支持 CLI 与 Phantom 私钥</p>
+                    </div>
+                    <span class="link">开始转账 -></span>
+                </a>
+            </article>
+        </div>
+    </section>
 
-        <div class="text-center mt-8">
-            <a href="../index.html" class="text-xs text-gray-400 hover:text-blue-600 font-bold transition">← 返回实验室主页</a>
+    <!-- 钱包生成 -->
+    <section class="section">
+        <div class="section-head">
+            <span class="section-title">🔑 钱包生成</span>
+            <span class="section-desc">本地离线批量生成私钥与地址</span>
         </div>
-    </div>
+        <div class="grid">
+            <article class="item">
+                <a class="card blue" href="./wallet-evm.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">批量生成</span>
+                        <h3>EVM 钱包批量生成</h3>
+                        <p>离线批量生成私钥与地址，CSV / TXT 导出</p>
+                    </div>
+                    <span class="link">打开生成器 -></span>
+                </a>
+            </article>
+            <article class="item">
+                <a class="card pink" href="./wallet-trx.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">批量生成</span>
+                        <h3>TRX 钱包批量生成</h3>
+                        <p>离线批量生成私钥与 Shasta / Nile 地址</p>
+                    </div>
+                    <span class="link">打开生成器 -></span>
+                </a>
+            </article>
+            <article class="item">
+                <a class="card lavender" href="./wallet-sol.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">批量生成</span>
+                        <h3>SOL 钱包批量生成</h3>
+                        <p>离线批量生成私钥与 Devnet / Testnet 地址</p>
+                    </div>
+                    <span class="link">打开生成器 -></span>
+                </a>
+            </article>
+            <article class="item">
+                <a class="card peach" href="./wallet.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">离线生成</span>
+                        <h3>EVM 钱包生成器</h3>
+                        <p>普通 / 前后缀定制（靓号），大批量导出 CSV</p>
+                    </div>
+                    <span class="link">打开生成器 -></span>
+                </a>
+            </article>
+        </div>
+    </section>
+
+    <!-- 余额检查 -->
+    <section class="section">
+        <div class="section-head">
+            <span class="section-title">🔎 余额检查</span>
+            <span class="section-desc">批量检测测试网账户余额与空投目标</span>
+        </div>
+        <div class="grid">
+            <article class="item">
+                <a class="card mint" href="../airdrop/testnet.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">多链检查</span>
+                        <h3>多测试网余额检查</h3>
+                        <p>EVM 多测试网批量地址资产检查</p>
+                    </div>
+                    <span class="link">打开工具 -></span>
+                </a>
+            </article>
+            <article class="item">
+                <a class="card pink" href="../airdrop/balance-trx.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">🔺 TRX</span>
+                        <h3>TRX 测试网余额检查</h3>
+                        <p>Shasta / Nile 批量检测，txt / csv 导入</p>
+                    </div>
+                    <span class="link">打开工具 -></span>
+                </a>
+            </article>
+            <article class="item">
+                <a class="card lavender" href="../airdrop/balance-sol.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">◎ SOL</span>
+                        <h3>SOL 测试网余额检查</h3>
+                        <p>Devnet / Testnet 批量检测，txt / csv 导入</p>
+                    </div>
+                    <span class="link">打开工具 -></span>
+                </a>
+            </article>
+        </div>
+    </section>
+
+    <!-- 部署与合约 -->
+    <section class="section">
+        <div class="section-head">
+            <span class="section-title">🛠 部署与合约</span>
+            <span class="section-desc">合约编译、部署与分发策略</span>
+        </div>
+        <div class="grid">
+            <article class="item">
+                <a class="card mint" href="./deploy.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">部署测试</span>
+                        <h3>合约部署测试台</h3>
+                        <p>前端编译合约，MetaMask 部署到 Sepolia</p>
+                    </div>
+                    <span class="link">开始部署 -></span>
+                </a>
+            </article>
+            <article class="item">
+                <a class="card pink" href="./deploybot.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">策略自动化</span>
+                        <h3>DeployBot 执行台</h3>
+                        <p>蜻蜓点水 / 工厂分发，生成、检测、执行一体化</p>
+                    </div>
+                    <span class="link">启动执行台 -></span>
+                </a>
+            </article>
+        </div>
+    </section>
+
+    <!-- 协议与实验 -->
+    <section class="section">
+        <div class="section-head">
+            <span class="section-title">🧪 协议与实验</span>
+            <span class="section-desc">链上交互机制与前沿协议体验</span>
+        </div>
+        <div class="grid">
+            <article class="item">
+                <a class="card blue" href="./send.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">核心实验</span>
+                        <h3>以太坊转账全景</h3>
+                        <p>从 EOA 到 CREATE2，完整链上转账路径演示</p>
+                    </div>
+                    <span class="link">立即进入 -></span>
+                </a>
+            </article>
+            <article class="item">
+                <a class="card lavender" href="./aa.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">账号抽象</span>
+                        <h3>AA 账号体验台</h3>
+                        <p>Sepolia 上体验 UserOperation / Bundler / Paymaster</p>
+                    </div>
+                    <span class="link">进入体验 -></span>
+                </a>
+            </article>
+        </div>
+    </section>
+
+    <footer class="footer">© 2026 XS 魔法实验室 · Web3 工具合集</footer>
+</div>
 </body>
 </html>

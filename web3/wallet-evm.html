@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVM 钱包批量生成器</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.1/ethers.umd.min.js"></script>
+    <style>
+        :root {
+            --pink: #ff7cb4;
+            --peach: #ffb37c;
+            --blue: #79b5ff;
+            --mint: #71d9c4;
+            --text-main: #2f3f63;
+            --text-sub: #7b87ad;
+            --line: #e4ecfb;
+        }
+        body {
+            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background:
+                radial-gradient(circle at 15% 12%, rgba(255,179,124,0.22) 0, transparent 30%),
+                radial-gradient(circle at 85% 10%, rgba(181,156,255,0.2) 0, transparent 32%),
+                radial-gradient(circle at 78% 86%, rgba(121,181,255,0.18) 0, transparent 34%),
+                linear-gradient(160deg, #fff9fc, #f0f7ff 52%, #fffdf6);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 56px 24px;
+        }
+        .card {
+            margin: auto;
+            width: 100%;
+            max-width: 1120px;
+            background: rgba(255,255,255,0.9);
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            box-shadow: 0 24px 60px rgba(124,154,219,0.14);
+            padding: 48px;
+        }
+        .card-head {
+            margin-bottom: 36px;
+        }
+        .card-head h1 {
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin: 0 0 10px;
+        }
+        .card-head p {
+            margin: 0;
+            font-size: 15px;
+            color: var(--text-sub);
+            font-weight: 500;
+        }
+        .gen-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: 36px;
+            background: #f7faff;
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            padding: 24px;
+        }
+        .gen-row .field { flex: 1; }
+        .gen-row label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-sub);
+            margin-bottom: 10px;
+        }
+        input {
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            outline: none;
+            background: #fff;
+            color: var(--text-main);
+        }
+        input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(121,181,255,0.18); }
+        .btn-primary {
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-weight: 800;
+            padding: 16px 34px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s;
+            white-space: nowrap;
+        }
+        .btn-primary:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-outline {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+            background: #fff;
+            cursor: pointer;
+            padding: 10px 18px;
+            font-size: 13px;
+            transition: all 0.15s;
+        }
+        .btn-outline:hover:not(:disabled) { background: #f0f4ff; border-color: var(--blue); }
+        .btn-outline:disabled { opacity: 0.4; cursor: not-allowed; }
+        .result-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+        .result-bar .info { font-size: 14px; font-weight: 700; }
+        .result-bar .info .count { color: #e8536d; }
+        .result-bar .info .mode { color: var(--text-sub); font-weight: 600; margin-left: 10px; }
+        .result-bar .actions { display: flex; gap: 10px; }
+        .result-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .result-table th {
+            position: sticky; top: 0;
+            background: #f4f8ff;
+            color: var(--text-main);
+            font-weight: 800;
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--line);
+            z-index: 1;
+            font-size: 13px;
+        }
+        .result-table td {
+            padding: 11px 14px;
+            border-bottom: 1px solid #f0f4fe;
+            font-family: 'SFMono-Regular', Consolas, Menlo, monospace;
+            word-break: break-all;
+            font-size: 13px;
+        }
+        .result-table tr:hover td { background: #f9fbff; }
+        .result-scroll {
+            max-height: 420px;
+            overflow-y: auto;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+        }
+        .row-count { font-size: 13px; font-weight: 800; color: #e8536d; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="card-head">
+            <h1>⬡ EVM 钱包批量生成器</h1>
+            <p>本地离线生成私钥 + 测试网地址，支持 CSV / TXT 导出</p>
+        </div>
+
+        <div class="gen-row">
+            <div class="field">
+                <label for="countInput">生成数量</label>
+                <input id="countInput" type="number" min="1" max="10000" step="1" value="100" style="width:100%; padding:14px 18px; font-size:16px; font-weight:700;">
+            </div>
+            <button id="genBtn" class="btn-primary">🎲 一键生成</button>
+        </div>
+
+        <div class="hidden" id="resultPanel">
+            <div class="result-bar">
+                <div class="info">
+                    已生成 <span id="resultCount" class="count">0</span> 个
+                    <span class="mode">地址模式：<span id="addrMode">-</span></span>
+                </div>
+                <div class="actions">
+                    <button id="copyBtn" class="btn-outline">📋 复制</button>
+                    <button id="csvBtn" class="btn-outline">📄 导出 CSV</button>
+                    <button id="txtBtn" class="btn-outline">📃 导出 TXT</button>
+                </div>
+            </div>
+            <div class="result-scroll">
+                <table class="result-table">
+                    <thead id="resultHead"></thead>
+                    <tbody id="resultBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const el = id => document.getElementById(id);
+        const countInput = el('countInput');
+        const genBtn = el('genBtn');
+        const resultPanel = el('resultPanel');
+        const resultCount = el('resultCount');
+        const addrMode = el('addrMode');
+        const resultHead = el('resultHead');
+        const resultBody = el('resultBody');
+        const copyBtn = el('copyBtn');
+        const csvBtn = el('csvBtn');
+        const txtBtn = el('txtBtn');
+
+        const NETWORKS = [
+            { id: 'Sepolia' },
+            { id: 'Hoodi' }
+        ];
+
+        const CURVE_N = BigInt('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
+
+        let wallets = [];
+        let mode = 'single';
+
+        const randomWallet = () => {
+            let privateKey;
+            while (true) {
+                const bytes = crypto.getRandomValues(new Uint8Array(32));
+                privateKey = ethers.hexlify(bytes);
+                if (BigInt(privateKey) > 0n && BigInt(privateKey) < CURVE_N) break;
+            }
+            return {
+                privateKey,
+                address: ethers.computeAddress(privateKey)
+            };
+        };
+
+        const generate = (count) => {
+            const list = [];
+            for (let i = 0; i < count; i++) {
+                const w = randomWallet();
+                list.push({ privateKey: w.privateKey, addresses: [w.address, w.address] });
+            }
+            return list;
+        };
+
+        const render = (list) => {
+            const first = list[0];
+            const same = first.addresses.every(a => a === first.addresses[0]);
+            mode = same ? 'single' : 'dual';
+
+            const headers = same
+                ? ['序号', '私钥', `地址 (${NETWORKS.map(n => n.id).join('=')})`]
+                : ['序号', '私钥', ...NETWORKS.map(n => n.id + ' 地址')];
+
+            resultHead.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
+            resultBody.innerHTML = list.map((w, i) => {
+                const cells = same
+                    ? [i + 1, w.privateKey, w.addresses[0]]
+                    : [i + 1, w.privateKey, ...w.addresses];
+                return `<tr>${cells.map(c => `<td>${c}</td>`).join('')}</tr>`;
+            }).join('');
+
+            addrMode.textContent = same ? '两网地址相同（单列）' : '两网地址不同（双列）';
+            resultCount.textContent = list.length;
+        };
+
+        const filename = (ext) => {
+            const now = new Date();
+            const pad = n => String(n).padStart(2, '0');
+            const ts = now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) +
+                       '_' + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds());
+            return `${ts}_EVM_${wallets.length}.${ext}`;
+        };
+
+        const csvContent = () => {
+            const headers = mode === 'single'
+                ? ['序号', '私钥', '地址']
+                : ['序号', '私钥', ...NETWORKS.map(n => n.id + '地址')];
+            const rows = wallets.map((w, i) => {
+                const cells = mode === 'single'
+                    ? [i + 1, w.privateKey, w.addresses[0]]
+                    : [i + 1, w.privateKey, ...w.addresses];
+                return cells.join(',');
+            });
+            return '\ufeff' + [headers.join(','), ...rows].join('\r\n');
+        };
+
+        const txtContent = () => {
+            const now = new Date().toLocaleString('zh-CN');
+            const lines = [`# EVM 钱包批量生成 - ${now}`, `# 数量：${wallets.length}`];
+            if (mode === 'single') {
+                lines.push('# 私钥, 地址');
+                wallets.forEach(w => lines.push(`${w.privateKey} ${w.addresses[0]}`));
+            } else {
+                lines.push(`# 私钥, ${NETWORKS.map(n => n.id + '地址').join(', ')}`);
+                wallets.forEach(w => lines.push(`${w.privateKey} ${w.addresses.join(' ')}`));
+            }
+            return lines.join('\r\n');
+        };
+
+        const download = (content, ext, mime) => {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([content], { type: mime }));
+            a.download = filename(ext);
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+        };
+
+        genBtn.addEventListener('click', () => {
+            const count = Math.max(1, Math.min(10000, parseInt(countInput.value) || 100));
+            countInput.value = count;
+            genBtn.disabled = true;
+            genBtn.textContent = '⏳ 生成中...';
+            setTimeout(() => {
+                wallets = generate(count);
+                render(wallets);
+                resultPanel.classList.remove('hidden');
+                genBtn.disabled = false;
+                genBtn.textContent = '🎲 一键生成';
+            }, 30);
+        });
+
+        copyBtn.addEventListener('click', async () => {
+            if (!wallets.length) return;
+            try {
+                await navigator.clipboard.writeText(csvContent());
+                alert('已复制到剪贴板');
+            } catch (e) {
+                prompt('复制：', csvContent());
+            }
+        });
+
+        csvBtn.addEventListener('click', () => download(csvContent(), 'csv', 'text/csv;charset=utf-8'));
+        txtBtn.addEventListener('click', () => download(txtContent(), 'txt', 'text/plain;charset=utf-8'));
+
+        generate(3);
+        render(wallets);
+        resultPanel.classList.remove('hidden');
+    </script>
+</body>
+</html>

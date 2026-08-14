@@ -86,6 +86,12 @@
       color: var(--sub);
       margin-bottom: 14px;
     }
+    .card h2 .cn {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--sub);
+      margin-left: 6px;
+    }
 
     .card.c1 { background: linear-gradient(145deg, #fff6e0, #fffef5); }
     .card.c2 { background: linear-gradient(145deg, #e8f0ff, #f6faff); }
@@ -290,7 +296,7 @@
 <script>
 const NETWORKS = [
   {
-    category: 'BTC', icon: '₿',
+    category: 'BTC', icon: '₿', cn: '比特币',
     items: [
       { name: 'testnet3', max: '0.01', data: [
         ['官网', '<a href="https://bitcoincore.org/" target="_blank">bitcoincore.org</a>'],
@@ -307,7 +313,7 @@ const NETWORKS = [
     ]
   },
   {
-    category: 'Ethereum', icon: '◆',
+    category: 'Ethereum', icon: '◆', cn: '以太坊',
     items: [
       { name: 'Sepolia', max: '32', data: [
         ['官网', '<a href="https://sepolia.dev/" target="_blank">sepolia.dev</a>'],
@@ -324,7 +330,7 @@ const NETWORKS = [
     ]
   },
   {
-    category: 'Solana', icon: '◎',
+    category: 'Solana', icon: '◎', cn: '索拉纳',
     items: [
       { name: 'Devnet', max: '5', data: [
         ['官网', '<a href="https://solana.com/" target="_blank">solana.com</a>'],
@@ -343,7 +349,7 @@ const NETWORKS = [
     ]
   },
   {
-    category: 'TRON', icon: '◆',
+    category: 'TRON', icon: '◆', cn: '波场',
     items: [
       { name: 'Shasta', max: '2000', data: [
         ['官网', '<a href="https://www.trongrid.io/shasta" target="_blank">trongrid.io/shasta</a>'],
@@ -360,7 +366,7 @@ const NETWORKS = [
     ]
   },
   {
-    category: 'Polygon', icon: '◆',
+    category: 'Polygon', icon: '◆', cn: '印度侧链',
     items: [
       { name: 'Amoy', max: '1', data: [
         ['官网', '<a href="https://polygon.technology/" target="_blank">polygon.technology</a>'],
@@ -373,7 +379,7 @@ const NETWORKS = [
     ]
   },
   {
-    category: 'ARC', icon: '◈',
+    category: 'ARC', icon: '◈', cn: '网弧',
     items: [
       { name: 'ARC Testnet', max: '20', data: [
         ['官网', '<a href="https://www.arc.io/" target="_blank">arc.io</a>'],
@@ -386,7 +392,7 @@ const NETWORKS = [
     ]
   },
   {
-    category: 'CEX Testnets', icon: '◆',
+    category: 'CEX Testnets', icon: '◆', cn: '交易所',
     items: [
       { name: 'BSC Testnet', max: '0.3', exchange: '币安', data: [
         ['官网', '<a href="https://www.bnbchain.org/" target="_blank">bnbchain.org</a> <span class="ex-tag">币安</span>'],
@@ -439,7 +445,7 @@ const NETWORKS = [
     ]
   },
     {
-    category: 'Hoodi L2s', icon: '▦',
+    category: 'Hoodi L2s', icon: '▦', cn: 'Hoodi 二层',
     items: [
       { name: 'Morph', max: '~0.01', data: [
         ['官网', '<a href="https://www.morphl2.io/" target="_blank">morphl2.io</a>'],
@@ -462,7 +468,7 @@ const NETWORKS = [
     ]
   },
   {
-    category: 'Sepolia L2s', icon: '▦',
+    category: 'Sepolia L2s', icon: '▦', cn: 'Sepolia 二层',
     items: [
       { name: 'ARB Sepolia', max: '0.01', data: [
         ['官网', '<a href="https://arbitrum.io/" target="_blank">arbitrum.io</a>'],
@@ -548,7 +554,7 @@ NETWORKS.forEach(g => {
     const ex = n.exchange ? `<i class="ex-tag">${n.exchange}</i>` : '';
     netHtml += `<span class="net-item" onclick="event.stopPropagation();openModal('${g.category}', '${n.name}', this)">${n.name} <b>${n.max}</b>${ex}</span>`;
   });
-  card.innerHTML = `<h2>${g.icon} ${g.category}</h2><div class="sub">${g.items.length} 个测试网络</div><div class="net-list">${netHtml}</div>`;
+  card.innerHTML = `<h2>${g.icon} ${g.category} <span class="cn">${g.cn}</span></h2><div class="sub">${g.items.length} 个测试网络</div><div class="net-list">${netHtml}</div>`;
   app.appendChild(card);
 });
 
@@ -559,7 +565,7 @@ function openModal(category, name, el) {
     for (const n of g.items) {
       if (n.name !== name) continue;
       const exLabel = n.exchange ? ` <span class="ex-tag" style="font-size:11px">${n.exchange}</span>` : '';
-      document.getElementById('modalTitle').innerHTML = `${g.icon} ${category} — ${name}${exLabel} <span class="max-badge">${n.max}</span>`;
+      document.getElementById('modalTitle').innerHTML = `${g.icon} ${category} <span class="cn">${g.cn}</span> — ${name}${exLabel} <span class="max-badge">${n.max}</span>`;
       let html = '';
       n.data.forEach(row => {
         html += `<div class="row"><span class="label">${row[0]}</span><span>${row[1]}</span></div>`;

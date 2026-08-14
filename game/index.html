@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="世界首富模拟器：体验如何花掉8000亿美元。">
+  <title>世界首富模拟器</title>
+  <style>
+    :root {
+      --ink: #11130f;
+      --paper: #f2efe6;
+      --card: #faf8f1;
+      --muted: #6e7168;
+      --line: #d5d0c1;
+      --gold: #c9ff4a;
+      --gold-dark: #8dbb22;
+      --danger: #d94a3a;
+      --shadow: 0 16px 50px rgba(20, 22, 17, .1);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(17, 19, 15, .035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(17, 19, 15, .035) 1px, transparent 1px),
+        var(--paper);
+      background-size: 32px 32px;
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    button, input, select { font: inherit; }
+    button { color: inherit; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      color: white;
+      background: rgba(17, 19, 15, .96);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid #35382e;
+    }
+    .topbar-inner {
+      max-width: 1500px;
+      min-height: 68px;
+      margin: auto;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 205px; }
+    .brand-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      color: var(--ink);
+      background: var(--gold);
+      border-radius: 50%;
+      font: 900 18px Georgia, serif;
+    }
+    .brand strong { display: block; font-size: 15px; letter-spacing: .08em; }
+    .brand small { color: #9da193; font-size: 11px; }
+    .wealth { flex: 1; min-width: 0; }
+    .wealth-label { color: #aeb2a6; font-size: 11px; letter-spacing: .12em; }
+    .wealth-value {
+      margin-top: 2px;
+      overflow: hidden;
+      color: var(--gold);
+      font: 700 clamp(19px, 3vw, 30px) "Courier New", monospace;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .wealth-rate { color: #aeb2a6; font-size: 11px; white-space: nowrap; }
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+    .currency-switch { display: flex; padding: 3px; background: #292c25; border-radius: 9px; }
+    .currency-switch button, .nav-btn {
+      border: 0;
+      cursor: pointer;
+      color: #aeb2a6;
+      background: transparent;
+      border-radius: 7px;
+    }
+    .currency-switch button { padding: 7px 10px; font-size: 12px; }
+    .currency-switch button.active { color: var(--ink); background: var(--gold); font-weight: 800; }
+    .nav-btn { padding: 10px 12px; }
+    .nav-btn.active { color: white; background: #30332c; }
+    .hero {
+      max-width: 1500px;
+      margin: auto;
+      padding: 48px 24px 28px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 30px;
+    }
+    .eyebrow { margin: 0 0 8px; color: var(--gold-dark); font-size: 12px; font-weight: 900; letter-spacing: .18em; }
+    h1 { max-width: 900px; margin: 0; font: 800 clamp(38px, 7vw, 82px)/.94 Georgia, "Songti SC", serif; letter-spacing: -.045em; }
+    .hero-copy { max-width: 650px; margin: 20px 0 0; color: var(--muted); line-height: 1.75; }
+    .ticker {
+      min-width: 245px;
+      padding: 20px;
+      background: var(--ink);
+      color: white;
+      border-radius: 3px 24px 3px 3px;
+      box-shadow: var(--shadow);
+    }
+    .ticker small { color: #92978a; }
+    .ticker strong { display: block; margin: 8px 0 4px; color: var(--gold); font: 700 21px "Courier New", monospace; }
+    .ticker span { color: #c5c9bd; font-size: 12px; }
+    .app-shell { max-width: 1500px; margin: auto; padding: 0 24px 60px; }
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) 180px 180px;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .field {
+      width: 100%;
+      height: 46px;
+      padding: 0 14px;
+      color: var(--ink);
+      background: rgba(250, 248, 241, .85);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      outline: none;
+    }
+    .field:focus { border-color: var(--gold-dark); box-shadow: 0 0 0 3px rgba(141, 187, 34, .12); }
+    .shop-layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: start; }
+    .catalog-head { display: flex; justify-content: space-between; align-items: baseline; margin: 10px 0 13px; }
+    .catalog-head h2, .cart h2, .mine h2 { margin: 0; font: 700 25px Georgia, "Songti SC", serif; }
+    .catalog-head span { color: var(--muted); font-size: 12px; }
+    .products { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .product {
+      position: relative;
+      min-height: 195px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 3px 18px 3px 3px;
+      transition: transform .18s, box-shadow .18s, border-color .18s;
+    }
+    .product:hover { z-index: 1; transform: translateY(-3px); border-color: #aaa593; box-shadow: var(--shadow); }
+    .product::after {
+      content: attr(data-index);
+      position: absolute;
+      right: 9px;
+      top: 4px;
+      color: rgba(17, 19, 15, .055);
+      font: 900 55px Georgia, serif;
+    }
+    .category-tag { position: relative; z-index: 1; color: var(--gold-dark); font-size: 11px; font-weight: 900; letter-spacing: .12em; }
+    .product h3 { position: relative; z-index: 1; margin: 14px 0 7px; font-size: 17px; line-height: 1.35; }
+    .price { margin-top: auto; font: 800 16px "Courier New", monospace; }
+    .price-note { margin-top: 4px; color: var(--muted); font-size: 11px; }
+    .add-btn {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      border: 0;
+      color: var(--ink);
+      background: var(--gold);
+      border-radius: 50%;
+      font-size: 24px;
+      line-height: 1;
+      transition: transform .15s, background .15s;
+    }
+    .add-btn:hover { transform: rotate(90deg) scale(1.08); background: #b9ef37; }
+    .cart {
+      position: sticky;
+      top: 84px;
+      max-height: calc(100vh - 100px);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      color: white;
+      background: var(--ink);
+      border-radius: 3px 25px 3px 3px;
+      box-shadow: var(--shadow);
+    }
+    .cart-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid #35382e; }
+    .cart-count { padding: 5px 9px; color: var(--ink); background: var(--gold); border-radius: 99px; font-size: 11px; font-weight: 900; }
+    .cart-items { min-height: 120px; overflow: auto; scrollbar-width: thin; scrollbar-color: #55594e transparent; }
+    .empty { padding: 38px 8px; color: #858a7e; text-align: center; font-size: 13px; line-height: 1.7; }
+    .cart-item { padding: 13px 0; border-bottom: 1px solid #30332c; }
+    .cart-item-top { display: flex; justify-content: space-between; gap: 10px; }
+    .cart-item-name { font-size: 13px; font-weight: 700; }
+    .cart-item-price { color: var(--gold); font: 12px "Courier New", monospace; white-space: nowrap; }
+    .qty { display: flex; align-items: center; gap: 9px; margin-top: 9px; }
+    .qty button { width: 25px; height: 25px; padding: 0; cursor: pointer; color: white; background: #30332c; border: 1px solid #484c41; border-radius: 3px; }
+    .qty input { width: 52px; height: 25px; padding: 0 3px; color: white; text-align: center; background: #22241f; border: 1px solid #484c41; border-radius: 3px; }
+    .remove { margin-left: auto; cursor: pointer; color: #92978a; background: none; border: 0; font-size: 11px; }
+    .cart-summary { padding-top: 15px; border-top: 1px solid #35382e; }
+    .sum-row { display: flex; justify-content: space-between; color: #aeb2a6; font-size: 12px; }
+    .sum-total { display: block; margin: 8px 0 5px; color: var(--gold); font: 800 23px "Courier New", monospace; text-align: right; }
+    .sum-impact { min-height: 32px; color: #9da193; font-size: 11px; line-height: 1.5; text-align: right; }
+    .buy-btn {
+      width: 100%;
+      height: 48px;
+      margin-top: 13px;
+      cursor: pointer;
+      color: var(--ink);
+      background: var(--gold);
+      border: 0;
+      border-radius: 3px 12px 3px 3px;
+      font-weight: 900;
+    }
+    .buy-btn:hover { background: #b9ef37; }
+    .buy-btn:disabled { cursor: not-allowed; background: #4a4e43; color: #858a7e; }
+    .mine { display: none; }
+    .mine.active { display: block; }
+    .shop-view.hidden { display: none; }
+    .mine-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 18px 0 28px; }
+    .stat { padding: 20px; background: var(--card); border: 1px solid var(--line); border-radius: 3px 18px 3px 3px; }
+    .stat small { display: block; color: var(--muted); margin-bottom: 9px; }
+    .stat strong { font: 800 20px "Courier New", monospace; }
+    .mine-grid { display: grid; grid-template-columns: 1.3fr .7fr; gap: 20px; }
+    .panel { padding: 20px; background: rgba(250, 248, 241, .9); border: 1px solid var(--line); }
+    .panel h3 { margin: 0 0 16px; font: 700 20px Georgia, "Songti SC", serif; }
+    .inventory { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .owned { padding: 12px; background: white; border-left: 3px solid var(--gold-dark); }
+    .owned strong { display: block; font-size: 13px; }
+    .owned span { color: var(--muted); font-size: 11px; }
+    .history-row { padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .history-row strong { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
+    .history-row small { color: var(--muted); }
+    .reset-btn { margin-top: 18px; padding: 8px 12px; cursor: pointer; color: var(--danger); background: transparent; border: 1px solid currentColor; }
+    .no-results { grid-column: 1 / -1; padding: 70px; color: var(--muted); text-align: center; border: 1px dashed var(--line); }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 60;
+      width: min(560px, calc(100% - 32px));
+      padding: 15px 18px;
+      pointer-events: none;
+      color: white;
+      background: #272a23;
+      border-left: 5px solid var(--gold);
+      box-shadow: 0 12px 40px rgba(0,0,0,.25);
+      opacity: 0;
+      transform: translate(-50%, 20px);
+      transition: .25s;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .mobile-cart-btn { display: none; }
+
+    @media (max-width: 1100px) {
+      .products { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .shop-layout { grid-template-columns: minmax(0, 1fr) 330px; }
+      .hero { grid-template-columns: 1fr; }
+      .ticker { max-width: 350px; }
+    }
+    @media (max-width: 800px) {
+      .topbar-inner { padding: 8px 14px; gap: 10px; }
+      .brand { min-width: auto; }
+      .brand div:last-child, .wealth-rate, .nav-label { display: none; }
+      .top-actions { gap: 4px; }
+      .hero { padding: 36px 16px 22px; }
+      .app-shell { padding: 0 16px 80px; }
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      .toolbar input { grid-column: 1 / -1; }
+      .shop-layout { display: block; }
+      .cart {
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        top: auto;
+        bottom: 12px;
+        z-index: 50;
+        max-height: 75vh;
+        visibility: hidden;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: .2s;
+      }
+      .cart.open { visibility: visible; opacity: 1; transform: none; }
+      .mobile-cart-btn {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        z-index: 45;
+        display: block;
+        padding: 13px 17px;
+        cursor: pointer;
+        color: var(--ink);
+        background: var(--gold);
+        border: 0;
+        border-radius: 99px;
+        box-shadow: var(--shadow);
+        font-weight: 900;
+      }
+      .mine-stats { grid-template-columns: repeat(2, 1fr); }
+      .mine-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) {
+      .wealth-value { font-size: 17px; }
+      .currency-switch button { padding: 6px; }
+      .nav-btn { padding: 8px; }
+      .hero { padding-top: 28px; }
+      h1 { font-size: 43px; }
+      .ticker { min-width: 0; width: 100%; }
+      .toolbar { grid-template-columns: 1fr; }
+      .toolbar input { grid-column: auto; }
+      .products { grid-template-columns: 1fr; }
+      .product { min-height: 165px; }
+      .mine-stats, .inventory { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-mark">M</div>
+        <div><strong>首富实验室</strong><small>ULTRA WEALTH LAB</small></div>
+      </div>
+      <div class="wealth">
+        <div class="wealth-label">实时可支配资产</div>
+        <div class="wealth-value" id="wealthValue">$800,000,000,000.00</div>
+        <div class="wealth-rate" id="wealthRate"></div>
+      </div>
+      <div class="top-actions">
+        <div class="currency-switch">
+          <button type="button" class="active" data-currency="USD">USD</button>
+          <button type="button" data-currency="CNY">CNY</button>
+        </div>
+        <button type="button" class="nav-btn active" data-view="shop">商城 <span class="nav-label">SHOP</span></button>
+        <button type="button" class="nav-btn" data-view="mine">我的 <span class="nav-label">ASSETS</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">THE 800 BILLION CHALLENGE</p>
+        <h1>如果你拥有<br>8000亿美元</h1>
+        <p class="hero-copy">你的资产以每日万分之一持续增长。买下一杯咖啡、一座海岛或一支太空舰队，看看究竟要多久，才能真正花完世界首富的财富。</p>
+      </div>
+      <aside class="ticker" aria-label="实时收益">
+        <small>自你打开页面后，资产已增长</small>
+        <strong id="sessionEarned">$0.00</strong>
+        <span id="secondIncome">每秒收入 $925.93</span>
+      </aside>
+    </section>
+
+    <div class="app-shell">
+      <section class="shop-view" id="shopView">
+        <div class="toolbar">
+          <input class="field" id="searchInput" type="search" placeholder="搜索咖啡、豪宅、游艇、火箭……">
+          <select class="field" id="categorySelect"><option value="all">全部分类</option></select>
+          <select class="field" id="sortSelect">
+            <option value="default">综合排序</option>
+            <option value="price-asc">价格从低到高</option>
+            <option value="price-desc">价格从高到低</option>
+            <option value="name">名称排序</option>
+          </select>
+        </div>
+        <div class="shop-layout">
+          <div>
+            <div class="catalog-head"><h2>财富采购目录</h2><span id="resultCount"></span></div>
+            <div class="products" id="productGrid"></div>
+          </div>
+          <aside class="cart" id="cartPanel" aria-label="购物清单">
+            <div class="cart-head"><h2>购物清单</h2><span class="cart-count" id="cartCount">0 件</span></div>
+            <div class="cart-items" id="cartItems"></div>
+            <div class="cart-summary">
+              <div class="sum-row"><span>清单总额</span><span id="cartKinds">0 种商品</span></div>
+              <strong class="sum-total" id="cartTotal">$0.00</strong>
+              <div class="sum-impact" id="cartImpact">选择商品，查看它相当于多少时间的利息。</div>
+              <button type="button" class="buy-btn" id="buyButton" disabled>确认购买</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="mine" id="mineView">
+        <div class="catalog-head"><h2>我的资产仓库</h2><span>所有数据仅保存在当前浏览器</span></div>
+        <div class="mine-stats">
+          <div class="stat"><small>当前余额</small><strong id="statBalance">-</strong></div>
+          <div class="stat"><small>累计消费</small><strong id="statSpent">-</strong></div>
+          <div class="stat"><small>拥有物品</small><strong id="statItems">0 件</strong></div>
+          <div class="stat"><small>购物次数</small><strong id="statOrders">0 次</strong></div>
+        </div>
+        <div class="mine-grid">
+          <div class="panel"><h3>已购物品</h3><div class="inventory" id="inventory"></div></div>
+          <div class="panel"><h3>消费账单</h3><div id="history"></div><button type="button" class="reset-btn" id="resetButton">重置全部游戏数据</button></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <button type="button" class="mobile-cart-btn" id="mobileCartButton">购物车 <span id="mobileCartCount">0</span></button>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const INITIAL_WEALTH = 800_000_000_000;
+      const DAILY_RATE = 0.0001;
+      const USD_CNY = 7.2;
+      const STORAGE_KEY = 'wealthSimulatorStateV1';
+      const SESSION_START = Date.now();
+
+      const catalogs = [
+        { category: '日用百货', range: [1, 1200], names: ['瓶装水','抽纸一包','牙刷','香皂','中性笔','笔记本','折叠雨伞','保温杯','双肩背包','机械闹钟','香薰蜡烛','真丝眼罩','旅行收纳箱','手工木梳','银质餐具套装','高端床品四件套','人体工学枕','全自动咖啡机','智能扫地机器人','专业保险柜','纯银茶具','手工羊毛地毯','整屋智能灯具','私人酒窖恒温柜','顶级床垫','家庭桑拿房','定制衣帽间','全屋净水系统','家庭影院系统','管家服务一年'] },
+        { category: '服装配饰', range: [8, 180000], names: ['纯棉袜子','基础款T恤','帆布鞋','牛仔裤','羊毛围巾','真皮皮带','商务衬衫','设计师连衣裙','手工皮鞋','羊绒大衣','定制西装','经典手袋','高级珠宝胸针','瑞士机械腕表','限量运动鞋','高级定制礼服','鳄鱼皮旅行箱','钻石项链','祖母绿戒指','红宝石耳环','收藏级古董表','天然珍珠套装','高珠钻石手镯','私人裁缝年卡','时装周全套造型','百年品牌典藏包','稀有蓝钻戒指','皇家古董王冠','顶级珠宝套装','私人服装博物馆'] },
+        { category: '数码家电', range: [20, 900000], names: ['充电宝','无线耳机','机械键盘','智能手环','平板电脑','旗舰手机','游戏主机','轻薄笔记本','专业相机','无人机','电竞电脑','超大屏电视','全屋智能家居','专业录音设备','电影级摄影机','高端音响系统','家用服务器','全息投影设备','机器人管家','小型数据中心','量子计算机时段','AI训练服务器','动作捕捉影棚','虚拟制作摄影棚','卫星通信终端','超级计算机机柜','私人云计算集群','半导体实验室','整座数据中心','消费电子研发中心'] },
+        { category: '美食餐饮', range: [2, 2000000], names: ['街角咖啡','手工冰淇淋','双人火锅','精品寿司套餐','米其林餐厅晚餐','年份香槟','顶级和牛宴','蓝鳍金枪鱼宴','白松露套餐','百年干邑','鱼子酱品鉴会','私人厨师一周','米其林餐厅包场','葡萄酒庄品鉴','宫廷国宴复刻','私人厨师一年','全球美食旅行','顶级酒窖藏品','珍稀威士忌一桶','可可庄园一年收成','私人餐厅经营权','城市屋顶餐厅','米其林三星餐厅','百年葡萄园','法国精品酒庄','海岛生态农场','高端餐饮集团','食品研发实验室','全球连锁咖啡品牌','私人美食小镇'] },
+        { category: '出行载具', range: [300, 50000000], names: ['城市自行车','电动滑板车','通勤电动车','复古摩托车','家用轿车','越野车','豪华商务车','纯电跑车','经典跑车','顶级豪华轿车','限量超级跑车','防弹行政座驾','收藏级老爷车','专业拉力赛车','方程式赛车','豪车车库十台','双层观光巴士','加长礼宾车队','矿山巨型卡车','装甲越野车','超级跑车车队','电动卡车车队','城市出租车队','跨国物流车队','私人赛道及车库','汽车设计工作室','电动汽车工厂','自动驾驶研发中心','国际赛车车队','豪华汽车品牌'] },
+        { category: '住宅地产', range: [6000, 800000000], names: ['乡村小木屋','城市单身公寓','海景两居室','市中心大平层','郊区独栋别墅','山景度假屋','湖畔庄园','城市顶层公寓','私人庭院四合院','葡萄园城堡','历史名人故居','滨海现代豪宅','阿尔卑斯山庄','纽约顶层豪宅','伦敦古典庄园','迪拜空中宫殿','私人马术庄园','热带雨林庄园','悬崖海景城堡','私人高尔夫社区','城市地标写字楼','五星级度假酒店','历史古堡群','整栋摩天公寓','豪华住宅街区','海滨度假村','欧洲私人村庄','城市中央商业体','地标摩天大楼','未来智慧新城'] },
+        { category: '旅行体验', range: [50, 30000000], names: ['周末露营','温泉度假','国内环线旅行','雪山徒步之旅','五星酒店一周','极光观测之旅','非洲草原探险','南极邮轮之旅','环球商务舱机票','私人导游欧洲行','深海潜水考察','珠峰登山远征','环球旅行一年','豪华列车包厢','私人海岛婚礼','电影节贵宾之旅','世界杯决赛包厢','奥运会全程贵宾席','私人邮轮环球航行','包下一座主题乐园','太空边缘旅行','南极科考站冠名','全球酒店套房年卡','私人探险团队一年','环球艺术博览之旅','七大洲极限挑战','海底科研站体验','私人岛屿度假十年','近地轨道旅行','月球环绕旅行名额'] },
+        { category: '飞机游艇', range: [15000, 600000000], names: ['双人帆船','豪华房车','小型快艇','水上飞机','私人直升机','商务喷气机','豪华双体帆船','远洋钓鱼艇','中型私人飞机','探险游艇','大型公务机','定制超级游艇','空中宫殿客机','破冰探险船','深海潜水艇','私人飞机机队','水上飞机舰队','豪华邮轮','海洋科考船','超大型游艇','复古帆船舰队','洲际私人航空公司','海上移动实验室','极地破冰船队','私人航空港','豪华邮轮公司','海洋救援船队','超音速私人飞机','未来飞行汽车舰队','海上浮动宫殿'] },
+        { category: '艺术收藏', range: [30, 500000000], names: ['独立画家版画','手工陶瓷作品','限量摄影作品','青年艺术家油画','古董留声机','名家签名初版书','古典小提琴','当代艺术雕塑','古董怀表','大师素描手稿','博物馆级瓷器','印象派风景画','文艺复兴手稿','稀有古籍善本','古典大师油画','恐龙化石标本','传奇球星纪念品','电影经典道具','完整古董家具套装','私人当代艺术馆','古代钱币收藏','稀有邮票全集','世界名画收藏','历史珠宝典藏','私人自然博物馆','现代艺术基金会','古典乐器博物馆','整座画廊街区','世界级综合博物馆','人类文明数字档案馆'] },
+        { category: '商业投资', range: [1000, 3000000000], names: ['社区便利店','流动咖啡车','独立书店','精品民宿','街角餐厅','社区健身房','小型农场','独立电影院','精品酒店','软件创业公司','小型游戏工作室','区域物流中心','连锁餐饮品牌','职业体育俱乐部','海上风电场','大型购物中心','电影制片公司','国际连锁酒店','生物科技公司','大型云计算公司','商业卫星公司','新能源汽车公司','全球物流集团','国际传媒集团','半导体制造厂','国际银行股份','顶级足球俱乐部','全球能源集团','大型航空公司','跨国科技集团'] },
+        { category: '未来与太空', range: [5000, 8000000000], names: ['天文望远镜','业余观测站','高空气球实验','火箭发动机模型','立方体卫星','科研无人机群','私人天文台','小型实验卫星','亚轨道飞行票','商业卫星发射','月球车原型','火星温室实验室','可回收火箭试验','深空通信天线','轨道实验舱时段','小行星探测器','月球着陆器','空间站私人舱段','重型运载火箭','月球科研基地模块','火星探测任务','卫星互联网星座','轨道空间酒店','小行星采矿试验','月球货运系统','私人航天发射场','商业空间站','深空探测舰队','月球永久基地','火星殖民先遣计划'] }
+      ];
+
+      const products = catalogs.flatMap((group, categoryIndex) => {
+        const [min, max] = group.range;
+        return group.names.map((name, index) => ({
+          id: `p-${categoryIndex}-${index}`,
+          name,
+          category: group.category,
+          price: Math.round(min * Math.pow(max / min, index / (group.names.length - 1)))
+        }));
+      });
+      const productMap = new Map(products.map(product => [product.id, product]));
+
+      const defaults = () => ({
+        checkpointBalance: INITIAL_WEALTH,
+        checkpointTime: Date.now(),
+        currency: 'USD',
+        inventory: {},
+        history: [],
+        totalSpent: 0
+      });
+
+      let state;
+      try {
+        state = { ...defaults(), ...JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') };
+      } catch (_) {
+        state = defaults();
+      }
+      let cart = {};
+      let toastTimer;
+
+      const $ = selector => document.querySelector(selector);
+      const $$ = selector => [...document.querySelectorAll(selector)];
+      const formatMoney = usd => new Intl.NumberFormat(state.currency === 'USD' ? 'en-US' : 'zh-CN', {
+        style: 'currency',
+        currency: state.currency,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(usd * (state.currency === 'CNY' ? USD_CNY : 1));
+      const compactMoney = usd => {
+        const value = usd * (state.currency === 'CNY' ? USD_CNY : 1);
+        const symbol = state.currency === 'USD' ? '$' : '¥';
+        return symbol + new Intl.NumberFormat('zh-CN', { notation: 'compact', maximumFractionDigits: 2 }).format(value);
+      };
+      const currentBalance = () => state.checkpointBalance * Math.exp(DAILY_RATE * (Date.now() - state.checkpointTime) / 86_400_000);
+      const save = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+      function duration(seconds) {
+        if (!Number.isFinite(seconds) || seconds <= 0) return '不到1秒';
+        if (seconds < 60) return `${Math.max(1, Math.round(seconds))}秒`;
+        if (seconds < 3600) return `${Math.round(seconds / 60)}分钟`;
+        if (seconds < 86400) return `${(seconds / 3600).toFixed(1)}小时`;
+        if (seconds < 31_536_000) return `${(seconds / 86400).toFixed(seconds < 864000 ? 1 : 0)}天`;
+        return `${(seconds / 31_536_000).toFixed(1)}年`;
+      }
+
+      function impactText(amount, balance = currentBalance()) {
+        if (!amount) return '选择商品，查看它相当于多少时间的利息。';
+        const percentage = amount / balance * 100;
+        const interestPerSecond = balance * DAILY_RATE / 86400;
+        return `占当前资产 ${percentage < 0.000001 ? percentage.toExponential(2) : percentage.toFixed(6)}%，约等于 ${duration(amount / interestPerSecond)} 的利息。`;
+      }
+
+      function renderProducts() {
+        const query = $('#searchInput').value.trim().toLowerCase();
+        const category = $('#categorySelect').value;
+        const sort = $('#sortSelect').value;
+        let shown = products.filter(product => (category === 'all' || product.category === category) && (!query || `${product.name}${product.category}`.toLowerCase().includes(query)));
+        if (sort === 'price-asc') shown.sort((a, b) => a.price - b.price);
+        if (sort === 'price-desc') shown.sort((a, b) => b.price - a.price);
+        if (sort === 'name') shown.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'));
+        $('#resultCount').textContent = `显示 ${shown.length} / ${products.length} 种商品`;
+        $('#productGrid').innerHTML = shown.length ? shown.map((product, index) => `
+          <article class="product" data-index="${String(index + 1).padStart(2, '0')}">
+            <span class="category-tag">${product.category}</span>
+            <h3>${product.name}</h3>
+            <div class="price">${formatMoney(product.price)}</div>
+            <div class="price-note">约 ${duration(product.price / (currentBalance() * DAILY_RATE / 86400))} 利息</div>
+            <button type="button" class="add-btn" data-add="${product.id}" aria-label="将${product.name}加入购物车">+</button>
+          </article>`).join('') : '<div class="no-results">没有找到相关商品，换个关键词试试。</div>';
+      }
+
+      function cartTotal() {
+        return Object.entries(cart).reduce((sum, [id, quantity]) => sum + productMap.get(id).price * quantity, 0);
+      }
+
+      function renderCart() {
+        const entries = Object.entries(cart).filter(([, quantity]) => quantity > 0);
+        const count = entries.reduce((sum, [, quantity]) => sum + quantity, 0);
+        const total = cartTotal();
+        $('#cartCount').textContent = `${count} 件`;
+        $('#mobileCartCount').textContent = count;
+        $('#cartKinds').textContent = `${entries.length} 种商品`;
+        $('#cartTotal').textContent = formatMoney(total);
+        $('#cartImpact').textContent = impactText(total);
+        $('#buyButton').disabled = !count || total > currentBalance();
+        $('#buyButton').textContent = total > currentBalance() ? '余额不足' : '确认购买';
+        $('#cartItems').innerHTML = entries.length ? entries.map(([id, quantity]) => {
+          const product = productMap.get(id);
+          return `<div class="cart-item">
+            <div class="cart-item-top"><span class="cart-item-name">${product.name}</span><span class="cart-item-price">${formatMoney(product.price * quantity)}</span></div>
+            <div class="qty">
+              <button type="button" data-qty="${id}" data-delta="-1" aria-label="减少数量">−</button>
+              <input data-input-qty="${id}" type="number" min="1" max="99999" value="${quantity}" aria-label="${product.name}数量">
+              <button type="button" data-qty="${id}" data-delta="1" aria-label="增加数量">+</button>
+              <button type="button" class="remove" data-remove="${id}">移除</button>
+            </div>
+          </div>`;
+        }).join('') : '<div class="empty">购物清单还是空的。<br>8000亿美元正在等待被花掉。</div>';
+      }
+
+      function updateLiveNumbers() {
+        const balance = currentBalance();
+        const perSecond = balance * DAILY_RATE / 86400;
+        const sessionGrowth = balance * (1 - Math.exp(-DAILY_RATE * (Date.now() - SESSION_START) / 86_400_000));
+        $('#wealthValue').textContent = formatMoney(balance);
+        $('#wealthRate').textContent = `每日 +0.01% · 每秒约 +${formatMoney(perSecond)}`;
+        $('#sessionEarned').textContent = formatMoney(Math.max(0, sessionGrowth));
+        $('#secondIncome').textContent = `每秒收入 ${formatMoney(perSecond)}`;
+        if ($('#mineView').classList.contains('active')) updateMineStats();
+      }
+
+      function showToast(message) {
+        const toast = $('#toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 5000);
+      }
+
+      function buy() {
+        const total = cartTotal();
+        const balance = currentBalance();
+        if (!total || total > balance) return;
+        const purchased = Object.entries(cart).map(([id, quantity]) => ({ id, quantity }));
+        purchased.forEach(({ id, quantity }) => state.inventory[id] = (state.inventory[id] || 0) + quantity);
+        state.checkpointBalance = balance - total;
+        state.checkpointTime = Date.now();
+        state.totalSpent += total;
+        state.history.unshift({ time: Date.now(), total, items: purchased });
+        state.history = state.history.slice(0, 100);
+        save();
+        cart = {};
+        renderCart();
+        renderMine();
+        $('#cartPanel').classList.remove('open');
+        showToast(`购买成功：消费 ${formatMoney(total)}，${impactText(total, balance)}`);
+      }
+
+      function updateMineStats() {
+        $('#statBalance').textContent = compactMoney(currentBalance());
+        $('#statSpent').textContent = compactMoney(state.totalSpent);
+        $('#statItems').textContent = `${Object.values(state.inventory).reduce((a, b) => a + b, 0).toLocaleString()} 件`;
+        $('#statOrders').textContent = `${state.history.length} 次`;
+      }
+
+      function renderMine() {
+        updateMineStats();
+        const owned = Object.entries(state.inventory).filter(([, quantity]) => quantity > 0);
+        $('#inventory').innerHTML = owned.length ? owned.map(([id, quantity]) => {
+          const product = productMap.get(id);
+          if (!product) return '';
+          return `<div class="owned"><strong>${product.name} × ${quantity.toLocaleString()}</strong><span>${product.category} · 购入价值 ${compactMoney(product.price * quantity)}</span></div>`;
+        }).join('') : '<div class="empty">还没有购买任何物品。</div>';
+        $('#history').innerHTML = state.history.length ? state.history.map(order => {
+          const quantity = order.items.reduce((sum, item) => sum + item.quantity, 0);
+          return `<div class="history-row"><strong><span>${new Date(order.time).toLocaleString('zh-CN')}</span><span>${compactMoney(order.total)}</span></strong><small>${order.items.length} 种，共 ${quantity.toLocaleString()} 件</small></div>`;
+        }).join('') : '<div class="empty">暂无消费账单。</div>';
+      }
+
+      function setView(view) {
+        const mine = view === 'mine';
+        $('#shopView').classList.toggle('hidden', mine);
+        $('#mineView').classList.toggle('active', mine);
+        $$('.nav-btn').forEach(button => button.classList.toggle('active', button.dataset.view === view));
+        $('#mobileCartButton').style.display = mine ? 'none' : '';
+        if (mine) renderMine();
+      }
+
+      catalogs.forEach(group => $('#categorySelect').insertAdjacentHTML('beforeend', `<option value="${group.category}">${group.category}</option>`));
+
+      $('#productGrid').addEventListener('click', event => {
+        const button = event.target.closest('[data-add]');
+        if (!button) return;
+        cart[button.dataset.add] = (cart[button.dataset.add] || 0) + 1;
+        renderCart();
+      });
+      $('#cartItems').addEventListener('click', event => {
+        const quantityButton = event.target.closest('[data-qty]');
+        const removeButton = event.target.closest('[data-remove]');
+        if (quantityButton) {
+          const id = quantityButton.dataset.qty;
+          cart[id] = Math.max(0, (cart[id] || 0) + Number(quantityButton.dataset.delta));
+          if (!cart[id]) delete cart[id];
+        }
+        if (removeButton) delete cart[removeButton.dataset.remove];
+        renderCart();
+      });
+      $('#cartItems').addEventListener('change', event => {
+        if (!event.target.matches('[data-input-qty]')) return;
+        cart[event.target.dataset.inputQty] = Math.min(99999, Math.max(1, Math.floor(Number(event.target.value) || 1)));
+        renderCart();
+      });
+      ['#searchInput', '#categorySelect', '#sortSelect'].forEach(selector => $(selector).addEventListener(selector === '#searchInput' ? 'input' : 'change', renderProducts));
+      $$('.currency-switch button').forEach(button => button.addEventListener('click', () => {
+        state.currency = button.dataset.currency;
+        $$('.currency-switch button').forEach(item => item.classList.toggle('active', item === button));
+        save();
+        renderProducts();
+        renderCart();
+        renderMine();
+        updateLiveNumbers();
+      }));
+      $$('.nav-btn').forEach(button => button.addEventListener('click', () => setView(button.dataset.view)));
+      $('#buyButton').addEventListener('click', buy);
+      $('#mobileCartButton').addEventListener('click', () => $('#cartPanel').classList.toggle('open'));
+      $('#resetButton').addEventListener('click', () => {
+        if (!confirm('确定重置余额、库存和全部购买记录吗？此操作不可恢复。')) return;
+        state = defaults();
+        cart = {};
+        save();
+        $$('.currency-switch button').forEach(button => button.classList.toggle('active', button.dataset.currency === 'USD'));
+        renderProducts();
+        renderCart();
+        renderMine();
+        showToast('游戏数据已重置，资产恢复为8000亿美元。');
+      });
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') $('#cartPanel').classList.remove('open');
+      });
+
+      $$('.currency-switch button').forEach(button => button.classList.toggle('active', button.dataset.currency === state.currency));
+      renderProducts();
+      renderCart();
+      renderMine();
+      updateLiveNumbers();
+      setInterval(updateLiveNumbers, 100);
+    })();
+  </script>
+</body>
+</html>

@@ -17,7 +17,7 @@ window.NETWORKS = {
         type: "mainnet", 
         color: "#f59e0b", 
         symbol: "BNB",
-        default: true 
+        default: false 
     },
     "0xa5bd": { 
         name: "Tempo", 
@@ -36,7 +36,7 @@ window.NETWORKS = {
         type: "testnet", 
         color: "#6366f1", 
         symbol: "SepoliaETH",
-        default: true 
+        default: false 
     },
     "0xc488": { 
         name: "Somnia", 
@@ -45,7 +45,7 @@ window.NETWORKS = {
         type: "testnet", 
         color: "#8b5cf6", 
         symbol: "SOM",
-        default: true 
+        default: false 
     },
     
     // === 新增/其他测试网 (可选, 颜色已预配) ===

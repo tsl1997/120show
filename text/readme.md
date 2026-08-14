@@ -72,10 +72,11 @@ GitHub Pages (推荐)
 Vercel
 Netlify
 AWS S3
-只需上传以下三个文件即可：
+只需上传以下文件即可：
 index.html
 logic.js
 config.js
+vendor/tailwind.min.js
 
 ### 本地运行 (Local Development)
 
@@ -128,7 +129,7 @@ V6 (Enhanced):
 
 ### ⚠️ 注意事项
 
-CDN 依赖: 这里的 Tailwind 和 Vue 通过 CDN 加载。在生产环境中虽然方便，但极少数情况下可能会受到 CDN 网络波动影响。
+CDN 依赖: 前端依赖优先使用国内 CDN（BootCDN），Tailwind Play CDN 运行时已本地化为 `vendor/tailwind.min.js`，不依赖外网。
 Browser Security: 请务必通过 http:// 或 https:// 协议访问，不要直接双击 index.html (file://)，否则无法连接 Metamask。
 私钥安全: 本地私钥模式将密钥存储在浏览器 localStorage 中，存在 XSS 窃取风险，**请仅用于测试网**。主网使用请选择 MetaMask 连接。
 RPC 可用性: 部分测试网 RPC 节点可能存在频率限制，余额显示为 `—` 时请检查 RPC 状态或切换网络。

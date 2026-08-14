@@ -50,15 +50,34 @@ Note: several pages load dependencies from CDN, so restricted/offline environmen
 ### Main entry
 
 - `index.html`: central navigation page grouped by Web3 / Visual Interaction / Tools.
+  - The Web3 category on the homepage keeps a single hub entry (`web3/index.html`); all Web3 tools are categorized inside the hub.
 
 ### Web3 pages
 
-- `web3/send.html`: Ethereum transfer playground (EOA and CREATE2 scenarios).
-- `web3/aa.html`: Account Abstraction playground (Sepolia-related flow).
-- `web3/wallet.html`: offline EVM wallet generator and export.
-- `web3/deploy.html`: contract deployment test page.
-- `airdrop/testnet.html`: multi-testnet address balance checker.
-- `text/index.html`: multi-chain content registry and publishing DApp.
+Web3 tools are unified under `web3/index.html` as a hub, grouped by function:
+
+- **Transfer**
+  - `web3/transfer.html`: EVM testnet transfer (21 testnets, custom RPC).
+  - `web3/transfer-trx.html`: TRX testnet transfer (Shasta / Nile).
+  - `web3/transfer-sol.html`: SOL testnet transfer (Devnet / Testnet).
+- **Wallet generation**
+  - `web3/wallet-evm.html`: EVM wallet batch generator (CSV / TXT export).
+  - `web3/wallet-trx.html`: TRX wallet batch generator (CSV / TXT export).
+  - `web3/wallet-sol.html`: SOL wallet batch generator (CSV / TXT export).
+  - `web3/wallet.html`: offline EVM wallet generator (vanity prefix/suffix).
+- **Balance checker**
+  - `airdrop/testnet.html`: multi-testnet address balance checker.
+  - `airdrop/balance-trx.html`: TRX testnet balance checker (txt / csv import).
+  - `airdrop/balance-sol.html`: SOL testnet balance checker (txt / csv import).
+- **Deployment & contracts**
+  - `web3/deploy.html`: contract deployment test page.
+  - `web3/deploybot.html`: DeployBot execution console (automated strategies).
+- **Protocols & experiments**
+  - `web3/send.html`: Ethereum transfer playground (EOA and CREATE2 scenarios).
+  - `web3/aa.html`: Account Abstraction playground (Sepolia-related flow).
+- **Others**
+  - `tool/testnet.html`: multi-chain testnet info lookup (official site / explorer / faucet / RPC).
+  - `text/index.html`: multi-chain content registry and publishing DApp.
 
 ### Visual interaction pages
 
@@ -83,13 +102,13 @@ Note: several pages load dependencies from CDN, so restricted/offline environmen
 |- sitemap.xml
 |- robots.txt
 |- CNAME
-|- web3/
-|- airdrop/
+|- web3/          # Web3 tool hub (transfer / wallet / deploy / experiments)
+|- airdrop/       # balance checker tools
 |- camera/
 |- qing/
 |- qifu/
 |- zlib/
-|- tool/
+|- tool/          # general tools (testnet info lookup, etc.)
 `- text/
 ```
 
@@ -137,7 +156,7 @@ The script parses source text and regenerates `data.json`.
 ## Security Notes
 
 - `tool/2fa.html` stores data in browser local storage; secure your local device.
-- `web3/wallet.html` can generate private keys; use only in a trusted environment.
+- `web3/wallet.html`, `web3/wallet-evm.html`, `web3/wallet-trx.html`, `web3/wallet-sol.html` can generate private keys; use only in a trusted environment.
 - Test every on-chain flow on testnets before using mainnet.
 
 ## License

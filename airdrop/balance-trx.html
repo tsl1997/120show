@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRX 测试网余额检查 | XS 魔法实验室</title>
+    <style>
+        :root {
+            --bg1: #fff8ff;
+            --bg2: #eef8ff;
+            --bg3: #fffef3;
+            --text-main: #33456f;
+            --text-muted: #6f7ea8;
+            --line: #dce7ff;
+            --pink: #ff7cb4;
+            --peach: #ffb37c;
+            --blue: #79b5ff;
+            --mint: #71d9c4;
+            --green: #17b67b;
+            --red: #e35c7a;
+            --card-shadow: 0 12px 30px rgba(124, 154, 219, 0.16);
+            --card-shadow-hover: 0 18px 36px rgba(124, 154, 219, 0.24);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(255, 179, 124, 0.28) 0, transparent 28%),
+                radial-gradient(circle at 86% 9%, rgba(181, 156, 255, 0.26) 0, transparent 30%),
+                radial-gradient(circle at 76% 82%, rgba(121, 181, 255, 0.22) 0, transparent 33%),
+                linear-gradient(160deg, var(--bg1), var(--bg2) 52%, var(--bg3));
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 28px 16px 56px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .sparkles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.45;
+            background-image:
+                radial-gradient(circle, rgba(255, 124, 180, 0.58) 1px, transparent 1px),
+                radial-gradient(circle, rgba(121, 181, 255, 0.58) 1px, transparent 1px);
+            background-size: 44px 44px, 60px 60px;
+            background-position: 0 0, 18px 22px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 980px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero {
+            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(248,252,255,0.88));
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            padding: 18px;
+            margin-bottom: 16px;
+        }
+
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            font-size: 12px;
+            font-weight: 700;
+            color: #8d5d9d;
+            background: linear-gradient(90deg, #ffe3f2, #eaf3ff);
+            border: 1px solid #efdbff;
+            border-radius: 999px;
+            padding: 6px 12px;
+        }
+
+        .home-link {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 700;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 8px 12px;
+            transition: 0.2s ease;
+        }
+
+        .home-link:hover {
+            transform: translateY(-2px);
+            border-color: #cddcff;
+            box-shadow: 0 6px 14px rgba(131, 152, 206, 0.2);
+        }
+
+        h1 {
+            margin: 12px 0 4px;
+            font-size: clamp(34px, 6vw, 52px);
+            font-weight: 900;
+            line-height: 1.08;
+            background: linear-gradient(90deg, var(--pink), var(--peach) 34%, var(--blue) 70%, var(--mint));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+        }
+
+        .form-group { margin-bottom: 16px; }
+
+        label {
+            display: block;
+            color: #7587b5;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            border: 1px solid #dbe8ff;
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: 0.2s ease;
+            background: #fff;
+        }
+
+        input[type="text"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #b9ceff;
+            box-shadow: 0 0 0 4px rgba(121, 181, 255, 0.16);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 180px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        }
+
+        .helper-text {
+            text-align: right;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .file-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .file-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(90deg, #eaf3ff, #ffe3f2);
+            border: 1px solid #d7e6ff;
+            color: #6a78a4;
+            font-size: 13px;
+            font-weight: 800;
+            padding: 11px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .file-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(131, 152, 206, 0.18);
+        }
+
+        .file-label input { display: none; }
+
+        .control-panel {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        #checkBtn {
+            color: #fff;
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            box-shadow: 0 10px 18px rgba(134, 164, 227, 0.35);
+        }
+
+        #checkBtn:hover { transform: translateY(-2px); }
+        #checkBtn:disabled { background: #b8c5e6; cursor: not-allowed; opacity: 0.75; transform: none; box-shadow: none; }
+
+        #downloadBtn {
+            background: rgba(23, 182, 123, 0.1);
+            border: 1px solid #8ae2c2;
+            color: #16895f;
+            display: none;
+        }
+
+        #downloadBtn:hover { background: rgba(23, 182, 123, 0.16); }
+
+        .progress-container {
+            margin-top: 8px;
+            display: none;
+            background: #fff;
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background: #edf3ff;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            transition: width 0.3s ease;
+        }
+
+        .stats-grid {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .stat-card {
+            background: #fff;
+            padding: 14px;
+            border-radius: 14px;
+            text-align: center;
+            border: 1px solid #dbe8ff;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 900;
+            color: #42578c;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        .table-container {
+            margin-top: 18px;
+            overflow-x: auto;
+            max-height: 500px;
+            background: #fff;
+            border: 1px solid #dbe8ff;
+            border-radius: 14px;
+        }
+
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+        th {
+            text-align: left;
+            padding: 12px;
+            position: sticky;
+            top: 0;
+            background: #f8fbff;
+            z-index: 2;
+            color: #7081af;
+            font-weight: 800;
+            border-bottom: 1px solid #e7efff;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f1f5ff;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            color: #4d5f92;
+        }
+
+        .val-eth { color: var(--green); font-weight: 800; }
+        .val-zero { color: #9caad0; }
+        .addr-invalid { color: var(--red); opacity: 0.75; text-decoration: line-through; }
+        .status-error { color: var(--peach); font-weight: 700; }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 760px) {
+            .panel { padding: 14px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            th, td { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+<div class="sparkles" aria-hidden="true"></div>
+
+<div class="container">
+    <header class="hero">
+        <div class="hero-top">
+            <span class="pill">Web3 实验 / TRX 测试网地址检查</span>
+            <a href="../index.html" class="home-link" target="_blank" rel="noopener noreferrer">返回主页</a>
+        </div>
+        <h1>🔺 TRX 测试网余额检查</h1>
+        <p class="subtitle">批量检测 Shasta / Nile 测试网账户余额，支持 txt / csv 导入，快速统计有余额账户和 TRX 总量。</p>
+    </header>
+
+    <div class="panel">
+        <div class="form-group">
+            <label>测试网</label>
+            <select id="networkSelect">
+                <option value="shasta">Shasta</option>
+                <option value="nile">Nile</option>
+                <option value="custom">自定义 RPC</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>RPC 节点地址</label>
+            <input type="text" id="rpcUrl" value="https://api.shasta.trongrid.io" placeholder="Network Endpoint">
+        </div>
+
+        <div class="form-group">
+            <label>钱包地址导入（txt / csv）</label>
+            <div class="file-row">
+                <label class="file-label" for="fileInput">📁 选择文件导入</label>
+                <span class="helper-text" style="text-align:left;">支持钱包生成器导出的 txt / csv，自动提取 T... 地址</span>
+            </div>
+            <input type="file" id="fileInput" accept=".txt,.csv" style="display:none;">
+        </div>
+
+        <div class="form-group">
+            <label>钱包地址列表（最多 10000 行，每行一个或粘贴文件内容）</label>
+            <textarea id="addressInput" placeholder="请粘贴 T... 地址，每行一个..."></textarea>
+            <div class="helper-text" id="counter">0 / 10000 行</div>
+        </div>
+
+        <div class="form-group">
+            <label>线程数量</label>
+            <input type="text" id="concurrencyInput" value="30" placeholder="请输入线程数量">
+            <div class="helper-text">默认 30，建议不超过 80</div>
+        </div>
+
+        <div class="control-panel">
+            <button id="checkBtn" onclick="startCheck()">开始扫描</button>
+
+            <div class="progress-container" id="progressWrapper">
+                <div class="progress-header">
+                    <span id="progressStatus">正在初始化...</span>
+                    <span id="progressText">0/0</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-grid" id="statsPanel">
+            <div class="stat-card">
+                <span class="stat-value" id="totalFunded" style="color: var(--green)">0</span>
+                <span class="stat-label">有余额账户</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="totalBalance">0</span>
+                <span class="stat-label">TRX 总额</span>
+            </div>
+        </div>
+
+        <div class="control-panel" style="margin-top: 12px;">
+            <button id="downloadBtn" onclick="downloadCSV()">导出有余额结果（CSV）</button>
+        </div>
+
+        <div class="table-container" id="resultArea"></div>
+    </div>
+</div>
+
+<script>
+    const MAX_LINES = 10000;
+    const NETWORK_PRESETS = {
+        shasta: { label: 'Shasta', rpc: 'https://api.shasta.trongrid.io' },
+        nile: { label: 'Nile', rpc: 'https://nile.trongrid.io' }
+    };
+
+    const networkSelect = document.getElementById('networkSelect');
+    const rpcInput = document.getElementById('rpcUrl');
+    const fileInput = document.getElementById('fileInput');
+    const addressInput = document.getElementById('addressInput');
+    const concurrencyInput = document.getElementById('concurrencyInput');
+    const counterEl = document.getElementById('counter');
+    const checkBtn = document.getElementById('checkBtn');
+    const resultArea = document.getElementById('resultArea');
+    const statsPanel = document.getElementById('statsPanel');
+    const totalFundedEl = document.getElementById('totalFunded');
+    const totalBalanceEl = document.getElementById('totalBalance');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const progressWrapper = document.getElementById('progressWrapper');
+    const progressText = document.getElementById('progressText');
+    const progressBar = document.getElementById('progressBar');
+    const progressStatus = document.getElementById('progressStatus');
+
+    let csvData = [];
+    let isRunning = false;
+
+    networkSelect.addEventListener('change', () => {
+        applyNetworkPreset(networkSelect.value);
+    });
+
+    applyNetworkPreset(networkSelect.value);
+
+    addressInput.addEventListener('input', () => {
+        const lines = addressInput.value.split('\n').filter(l => l.trim() !== '').length;
+        counterEl.textContent = `${lines} / ${MAX_LINES} 行`;
+        if (lines > MAX_LINES) {
+            counterEl.style.color = 'var(--red)';
+            checkBtn.disabled = true;
+            counterEl.textContent += ' (已超限)';
+        } else {
+            counterEl.style.color = 'var(--text-muted)';
+            checkBtn.disabled = false;
+        }
+    });
+
+    fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const text = await file.text();
+        const parsed = parseImported(text);
+        if (parsed.length === 0) {
+            alert('未在文件中识别到有效的 T... 地址');
+            return;
+        }
+        addressInput.value = parsed.join('\n');
+        addressInput.dispatchEvent(new Event('input'));
+        alert(`已从文件导入 ${parsed.length} 个地址`);
+        fileInput.value = '';
+    });
+
+    function parseImported(text) {
+        const found = new Set();
+        const lines = text.split(/\r?\n/);
+        for (const line of lines) {
+            const matches = line.match(/T[1-9A-HJ-NP-Za-km-z]{33}/g);
+            if (matches) matches.forEach(m => found.add(m));
+        }
+        return Array.from(found);
+    }
+
+    async function startCheck() {
+        if (isRunning) return;
+
+        const networkLabel = getNetworkLabel(networkSelect.value);
+        const rpc = rpcInput.value.trim();
+        const batchSize = getBatchSize();
+        const rawText = addressInput.value;
+        if (!rpc) { alert('RPC 地址不能为空'); return; }
+        if (!batchSize) return;
+
+        const addresses = rawText.split('\n').map(l => l.trim()).filter(l => l !== '');
+        if (addresses.length === 0) { alert('请输入地址'); return; }
+        if (addresses.length > MAX_LINES) { alert('地址数量超过限制'); return; }
+
+        isRunning = true;
+        setLoading(true);
+        resultArea.innerHTML = '';
+        statsPanel.style.display = 'none';
+        downloadBtn.style.display = 'none';
+        csvData = [];
+
+        const table = document.createElement('table');
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th style="width:18%">网络</th>
+                    <th style="width:56%">钱包地址</th>
+                    <th style="width:26%">余额（TRX）</th>
+                </tr>
+            </thead>
+            <tbody id="resultBody"></tbody>
+        `;
+        resultArea.appendChild(table);
+        const tbody = document.getElementById('resultBody');
+
+        let fundedCount = 0;
+        let totalBalanceSun = BigInt(0);
+        let processedCount = 0;
+        const totalCount = addresses.length;
+
+        progressWrapper.style.display = 'block';
+        updateProgress(0, totalCount);
+        progressStatus.textContent = `扫描中... ${networkLabel}`;
+
+        for (let i = 0; i < totalCount; i += batchSize) {
+            const batch = addresses.slice(i, i + batchSize);
+
+            const batchPromises = batch.map(async (addr) => {
+                const row = document.createElement('tr');
+                if (!isValidTronAddress(addr)) {
+                    row.innerHTML = `<td>${networkLabel}</td><td class="addr-invalid">${addr}</td><td><span style="font-size:12px;color:#9caad0">无效格式</span></td>`;
+                    return row;
+                }
+                try {
+                    const balanceSun = await fetchBalance(rpc, addr);
+                    const trxVal = formatSunToTrx(balanceSun);
+                    if (balanceSun > 0n) {
+                        fundedCount++;
+                        totalBalanceSun += balanceSun;
+                        csvData.push({ network: networkLabel, address: addr, balance: trxVal });
+                        row.innerHTML = `<td>${networkLabel}</td><td>${addr}</td><td class="val-eth">${trxVal}</td>`;
+                    } else {
+                        row.innerHTML = `<td>${networkLabel}</td><td style="opacity:0.75">${addr}</td><td class="val-zero">0</td>`;
+                    }
+                } catch (error) {
+                    console.error(`Error fetching ${addr}:`, error);
+                    row.innerHTML = `<td>${networkLabel}</td><td>${addr}</td><td class="status-error">RPC Error</td>`;
+                }
+                return row;
+            });
+
+            const rows = await Promise.all(batchPromises);
+            rows.forEach(row => tbody.appendChild(row));
+
+            processedCount += batch.length;
+            if (processedCount > totalCount) processedCount = totalCount;
+            updateProgress(processedCount, totalCount);
+
+            totalFundedEl.textContent = fundedCount;
+            totalBalanceEl.textContent = formatSunToTrx(totalBalanceSun);
+            statsPanel.style.display = 'grid';
+
+            if (i + batchSize < totalCount) {
+                await sleep(80);
+            }
+        }
+
+        if (csvData.length > 0) downloadBtn.style.display = 'block';
+        progressStatus.textContent = '检测完成';
+        setLoading(false);
+        isRunning = false;
+    }
+
+    function updateProgress(current, total) {
+        progressText.textContent = `${current}/${total}`;
+        const pct = Math.round((current / total) * 100);
+        progressBar.style.width = `${pct}%`;
+        progressStatus.textContent = `扫描中... (${pct}%)`;
+    }
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function fetchBalance(rpc, addr) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), 10000);
+        try {
+            const res = await fetch(`${rpc}/v1/accounts/${addr}`, {
+                method: 'GET',
+                signal: controller.signal
+            });
+            clearTimeout(id);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            if (data.error) throw new Error(data.error.message);
+            if (!data.data || data.data.length === 0) return 0n;
+            return BigInt(data.data[0].balance || 0);
+        } catch (e) {
+            clearTimeout(id);
+            throw e;
+        }
+    }
+
+    function downloadCSV() {
+        if (csvData.length === 0) return alert('暂无数据可导出');
+        let csvContent = 'Network,Address,Balance(TRX)\n';
+        csvData.forEach(i => { csvContent += `${i.network},${i.address},${i.balance}\n`; });
+        const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        const dateStr = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+        link.download = `TRX_Balances_${dateStr}.csv`;
+        link.click();
+    }
+
+    function applyNetworkPreset(networkKey) {
+        if (networkKey === 'custom') {
+            rpcInput.readOnly = false;
+            rpcInput.placeholder = 'https://your-testnet-rpc.example';
+            if (NETWORK_PRESETS.shasta.rpc === rpcInput.value.trim()) {
+                rpcInput.value = '';
+            }
+            return;
+        }
+        const preset = NETWORK_PRESETS[networkKey];
+        rpcInput.value = preset ? preset.rpc : '';
+        rpcInput.readOnly = false;
+    }
+
+    function getBatchSize() {
+        const value = concurrencyInput.value.trim();
+        const parsed = Number(value);
+        const isInteger = Number.isInteger(parsed);
+        if (!isInteger || parsed <= 0) {
+            alert('输入错误，请重新输入。线程数量必须是正整数。');
+            concurrencyInput.focus();
+            return null;
+        }
+        if (parsed > 100) {
+            const shouldContinue = confirm('线程数量过大，是否要继续？');
+            if (!shouldContinue) {
+                concurrencyInput.focus();
+                return null;
+            }
+        }
+        return parsed;
+    }
+
+    function getNetworkLabel(networkKey) {
+        if (networkKey === 'custom') return 'Custom RPC';
+        return NETWORK_PRESETS[networkKey]?.label || networkKey;
+    }
+
+    function isValidTronAddress(addr) {
+        return /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(addr);
+    }
+
+    function formatSunToTrx(sun) {
+        if (sun === 0n) return '0';
+        const div = 1000000n;
+        const intPart = sun / div;
+        const decPart = (sun % div).toString().padStart(6, '0').substring(0, 6).replace(/0+$/, '');
+        return decPart ? `${intPart}.${decPart}` : intPart.toString();
+    }
+
+    function setLoading(isLoading) {
+        if (isLoading) {
+            checkBtn.disabled = true;
+            checkBtn.innerHTML = '<span class="spinner"></span> 扫描中...';
+        } else {
+            checkBtn.disabled = false;
+            checkBtn.innerHTML = '开始扫描';
+        }
+    }
+</script>
+</body>
+</html>
