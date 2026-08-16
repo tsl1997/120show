@@ -2,70 +2,98 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#111713">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4efe4">
   <title>两界搬运工 · 重制版</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="modern-world">
-  <header class="mast">
+  <header class="topbar">
     <div class="brand">
-      <div class="seal" aria-hidden="true">界</div>
-      <div>
-        <h1>两界搬运工</h1>
-        <div class="subtitle">一扇门，两本账，四十六年的价差</div>
-      </div>
+      <div class="seal">界</div>
+      <div class="brand-text"><h1>两界搬运工</h1><span class="subtitle">一扇门 · 两本账 · 四十六年的价差</span></div>
     </div>
-    <nav class="world-switch" aria-label="世界状态">
-      <button type="button" class="world-tab active" data-world="modern" disabled>现代 · 2026</button>
-      <button type="button" class="world-tab" data-world="old" disabled>旧时 · 1980</button>
-    </nav>
-    <div class="savebox">
-      <strong id="topWealth">现代净资产 ¥3,000</strong>
-      <span id="saveIndicator">两界时间加载中……</span>
-      <span class="tiny">所有数据仅保存在此浏览器</span>
+    <div class="money">
+      <span class="chip" id="cashChip">现金</span>
+      <span class="chip" id="bankChip">存款</span>
+      <span class="chip chip-extra" id="extraChip"></span>
+    </div>
+    <div class="top-actions">
+      <span id="worldTab" class="world-tab">🌐 现代 · 2026</span>
+      <span id="cooldownChip" class="cooldown">🌀 传送门就绪</span>
+      <button id="crossBtn" class="btn-cross">🌀 穿越</button>
+      <button id="settingsBtn" class="btn-icon" title="设置 / AI">⚙</button>
     </div>
   </header>
 
-  <main class="dash">
-    <aside class="rail" aria-label="地点地图">
-      <div class="section-title"><span id="mapTitle">北京 · 街巷</span><small id="mapCount"></small></div>
-      <div class="map-list" id="mapList"></div>
-      <div class="route">
-        <strong>当前落脚点</strong><br><span id="homeText"></span><br><span id="homeStats"></span>
-      </div>
+  <div class="timebar" id="timebar">时间加载中…</div>
+
+  <div class="status-wrap">
+    <div class="statusline" id="statusline"></div>
+    <div id="survivalWarn" class="survival-warn">&nbsp;</div>
+    <div class="quick-actions">
+      <button id="sleepBtn" title="睡8小时，恢复全部体力并跳过时间">😴 睡觉(8h)</button>
+      <button id="restBtn" title="小憩1小时，体力+15">☕ 休整(1h)</button>
+      <button id="waitBtn" title="等待N小时（凑穿越冷却、等到深夜黑市）">⏳ 等待…</button>
+    </div>
+  </div>
+
+  <main class="layout">
+    <aside class="map-panel">
+      <div class="city-head"><h2 id="cityName">北京</h2><p id="cityIntro"></p></div>
+      <div class="place-list" id="placeList"></div>
+      <div class="ai-status"><span id="aiChip">AI 未配置</span></div>
     </aside>
 
-    <section class="workbench" aria-label="经营终端">
-      <div class="status-line" id="statusLine"></div>
-      <div id="survivalWarn" class="survival-warn"></div>
-      <div class="location-head">
-        <div><h2 id="locationName">当前位置</h2><p id="locationDesc"></p></div>
-        <div class="actions" id="quickActions"></div>
+    <section class="main-panel">
+      <div class="place-head">
+        <h2 id="placeName">当前位置</h2>
+        <p id="placeDesc"></p>
+        <small id="placeCost" class="cost-line"></small>
       </div>
-      <div id="content"></div>
+      <div id="content" class="content"></div>
     </section>
 
-    <aside class="cargo" aria-label="行李与记录">
-      <section aria-label="物品管理">
+    <aside class="side-panel">
+      <div class="inv-panel">
         <div class="section-title"><span>物品流转</span><small id="bagSummary"></small></div>
         <div id="inventory"></div>
-      </section>
-      <section class="cross-box" aria-label="穿越控制">
-        <strong id="crossTitle">衣柜后的门</strong>
-        <p id="crossHint"></p>
-        <button type="button" class="primary" id="crossBtn">穿越至 1980 年</button>
-      </section>
-      <section class="logbook" aria-label="行动日志">
+      </div>
+      <div class="log-panel">
         <div class="section-title"><span>双界日志</span><small>最近 30 条</small></div>
         <ol class="logs" id="logs"></ol>
         <div class="footer-tools">
-          <button type="button" id="manualSave">立即存档</button>
-          <button type="button" class="danger" id="resetGame">重置存档</button>
+          <button id="manualSave">立即存档</button>
+          <button class="danger" id="resetGame">重置存档</button>
         </div>
-      </section>
+      </div>
     </aside>
   </main>
+
+  <dialog id="settingsModal" class="modal">
+    <div class="modal-body">
+      <h3>⚙ 设置 · AI 接入</h3>
+      <p class="tiny">接入大模型后，NPC 的「深谈」会由 AI 扮演（OpenAI 兼容接口）。密钥只保存在本浏览器。</p>
+      <label>接口地址（Base URL）<input id="setBaseUrl" placeholder="https://…/v1"></label>
+      <label>API 密钥<input id="setKey" type="password" placeholder="sk-…"></label>
+      <label>模型名称<input id="setModel" placeholder="deepseek-v4-flash-0731"></label>
+      <div class="modal-actions">
+        <button id="settingsCancel">取消</button>
+        <button id="settingsSave" class="primary">保存</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="chatModal" class="modal">
+    <div class="modal-body chat-modal">
+      <div class="chat-head"><h3 id="chatTitle">💬 深谈</h3><button id="chatClose" class="btn-icon">✕</button></div>
+      <div id="chatBox" class="chat-box"></div>
+      <div class="chat-input-row">
+        <input id="chatInput" placeholder="说点什么…（Enter 发送）">
+        <button id="chatSend">发送</button>
+      </div>
+    </div>
+  </dialog>
 
   <div id="toast" role="status" aria-live="polite"></div>
 
@@ -73,6 +101,7 @@
   <script src="js/data/world.js"></script>
   <script src="js/data/culture.js"></script>
   <script src="js/data/markets.js"></script>
+  <script src="js/data/population.js"></script>
   <script src="js/core/state.js"></script>
   <script src="js/core/engine.js"></script>
   <script src="js/core/ui.js"></script>
@@ -83,6 +112,7 @@
   <script src="js/modules/career.js"></script>
   <script src="js/modules/antique.js"></script>
   <script src="js/modules/social.js"></script>
+  <script src="js/modules/ai.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

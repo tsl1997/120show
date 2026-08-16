@@ -1,4 +1,4 @@
-/* 两界搬运工 · UI 渲染核心 */
+/* 两界搬运工 · UI 渲染（新：明亮、响应式、任何设备可见金额） */
 (function () {
   'use strict';
   const LJ = (window.LJ = window.LJ || {});
@@ -22,190 +22,171 @@
     toastTimer = setTimeout(() => node.classList.remove('show'), ms || 3200);
   }
 
-  function barHtml(label, val, max, color) {
-    const pct = Math.max(0, Math.min(100, val / max * 100));
-    const cls = pct < 25 ? 'low' : '';
-    return `<div class="meter"><b>${label} ${Math.round(val)}/${max}</b><div class="bar ${cls}"><i style="width:${pct}%;background:${color || ''}"></i></div></div>`;
+  function bar(label, val, color) {
+    const pct = Math.max(0, Math.min(100, val));
+    const low = pct < 25;
+    return `<div class="stat ${low ? 'low' : ''}">
+      <span class="stat-label">${label}</span>
+      <div class="stat-track"><i style="width:${pct}%;background:${color}"></i></div>
+      <b>${Math.round(val)}</b>
+    </div>`;
   }
 
-  /* ========== 顶部 & 状态栏 ========== */
-  function renderHeader() {
+  /* ============ 顶栏：金额永远可见 ============ */
+  function renderTop() {
     const s = LJ.Sys.state;
-    const E = LJ.Engine;
     const w = s.world;
-    const o = w === 'modern' ? 'old' : 'modern';
+    const E = LJ.Engine;
     document.body.className = w === 'old' ? 'old-world' : 'modern-world';
-    $('#topWealth').textContent = E.currentWorld() === 'modern'
-      ? `现代资产 ${E.fmtMoney(s.money.modern.CNY + s.bank.modern.CNY)}`
-      : `旧时资产 ${E.fmtMoney(s.money.old.CNY + s.bank.old.CNY)}`;
-    $('#saveIndicator').textContent = `两界时间：${E.formatDate('modern')}　|　${E.formatDate('old')}`;
-    // 世界选项卡
-    $all('.world-tab').forEach((t) => t.classList.toggle('active', t.dataset.world === w));
+    // 当前世界现金 + 存款
+    const m = w === 'modern' ? s.money.modern : s.money.old;
+    const bank = s.bank[w].CNY || 0;
+    const cur = LJ.CityCurrency[s.city] || 'CNY';
+    const curName = cur === 'CNY' ? '元' : cur;
+    $('#cashChip').innerHTML = `现金 <b>${E.money(m.CNY || 0)}</b>${curName === '元' ? '' : ' (' + curName + ')'}`;
+    $('#bankChip').innerHTML = `存款 <b>${E.money(bank)}</b>元`;
+    const extra = [];
+    if (w === 'old' && s.money.old.FEC > 0) extra.push(`外汇券 <b>${E.money(s.money.old.FEC)}</b>`);
+    if (w === 'modern' && (m.USD || m.HKD || m.JPY || m.EUR || m.GBP || m.KES)) {
+      const has = ['USD', 'HKD', 'JPY', 'EUR', 'GBP', 'KES'].filter((c) => (m[c] || 0) > 0);
+      extra.push('外币 ' + has.map((c) => `${c}${E.money(m[c])}`).join(' '));
+    }
+    $('#extraChip').innerHTML = extra.join(' · ') || '';
+    $('#worldTab').textContent = w === 'modern' ? '🌐 现代 · 2026' : '📻 旧时 · 1980';
+    // 时间条
+    $('#timebar').textContent = `${E.formatDate(w)}　·　另一界：${E.formatDate(w === 'modern' ? 'old' : 'modern')}`;
+    // 穿越冷却
+    if (!LJ.Engine.crossReady(w)) {
+      $('#cooldownChip').textContent = `🌀 穿越冷却：还需 ${LJ.Engine.cooldownLeft(w)} 天`;
+      $('#cooldownChip').classList.add('on');
+    } else {
+      $('#cooldownChip').textContent = '🌀 传送门就绪';
+      $('#cooldownChip').classList.remove('on');
+    }
   }
 
   function renderStatus() {
     const p = LJ.Sys.state.player;
-    $('#statusLine').innerHTML =
-      barHtml('体力', p.energy, 100, '#71b98b') +
-      barHtml('饱腹', p.hunger, 100, '#e6b94d') +
-      barHtml('口渴', p.thirst, 100, '#5aa9e6') +
-      barHtml('心情', p.spirit, 100, '#c58bf0');
-    // 生存预警
+    $('#statusline').innerHTML =
+      bar('体力', p.energy, '#2fa46a') +
+      bar('饱腹', p.hunger, '#c98a16') +
+      bar('口渴', p.thirst, '#2b8fd6') +
+      bar('心情', p.spirit, '#8b5cc7');
     const warn = [];
-    if (p.thirst < 25) warn.push('💧 口干舌燥，快去找水喝！');
+    if (p.thirst < 25) warn.push('💧 口干舌燥，快去找水！');
     if (p.hunger < 25) warn.push('🍚 肚子咕咕叫了。');
-    if (p.energy < 25) warn.push('😴 筋疲力尽，该休息了。');
-    $('#survivalWarn').innerHTML = warn.map((x) => `<span>${x}</span>`).join('') || '';
+    if (p.energy < 25) warn.push('😴 筋疲力尽，该歇歇了。');
+    $('#survivalWarn').innerHTML = warn.join('　') || '&nbsp;';
   }
 
-  /* ========== 左侧地图 ========== */
+  /* ============ 地图（街巷列表，含到访消耗） ============ */
   function renderMap() {
     const s = LJ.Sys.state;
-    const E = LJ.Engine;
-    const city = E.currentCityDef();
-    const mapTitle = $('#mapTitle');
-    const zoneNames = { north: '城北', south: '城南', east: '城东', west: '城西', center: '城区', far: '远郊', outer: '近郊' };
-    mapTitle.textContent = `${city.name} · 街巷`;
-    $('#mapCount').textContent = '';
-
-    const list = $('#mapList');
+    const city = LJ.Engine.currentCityDef();
+    const list = $('#placeList');
     list.innerHTML = '';
+    $('#cityName').textContent = `${city.name} · ${s.world === 'modern' ? '2026' : '1980'}`;
+    let intro = city.intro || '';
+    if (LJ.Pop) {
+      const prof = LJ.Pop.profile(s.world, s.city);
+      intro = `👥 人口 ${LJ.Pop.fmt(prof.pop)}（${LJ.Pop.fmt(prof.classes.low)}平民 / ${LJ.Pop.fmt(prof.classes.mid)}中产 / ${LJ.Pop.fmt(prof.classes.high)}权贵）· ${prof.lean}`;
+    }
+    $('#cityIntro').textContent = intro;
     Object.keys(city.places).forEach((pid) => {
       const pl = city.places[pid];
-      const locked = pl.locked && !s.flags[pl.locked];
-      const btn = el(`<button class="map-btn ${s.location === pid ? 'active' : ''} ${locked ? 'locked' : ''}" data-pid="${pid}">
-        <b>${pl[0]}${locked ? ' 🔒' : ''}</b>
-        <small>${zoneNames[pl[4]] || ''}${locked ? ' · ' + (pl.lockHint || '未解锁') : ''}</small>
+      const cost = pl[6] || { time: 15, energy: 2 };
+      const active = s.location === pid ? 'active' : '';
+      const btn = el(`<button class="place-btn ${active}" data-pid="${pid}">
+        <span class="pb-name">${pl[0]}</span>
+        <span class="pb-cost">${cost.time}分 · 体力-${cost.energy}${cost.hunger ? ' · 饿' : ''}${cost.thirst ? ' · 渴' : ''}</span>
       </button>`);
-      if (!locked) btn.addEventListener('click', () => E.gotoPlace(pid));
+      btn.addEventListener('click', () => LJ.Engine.gotoPlace(pid));
       list.appendChild(btn);
     });
-
-    $('#homeText').textContent = `${city.name} · ${city.places.home ? city.places.home[0] : '落脚点'}`;
-    $('#homeStats').textContent = `${city.intro || ''}`;
   }
 
-  /* ========== 位置标题与操作 ========== */
-  function renderLocationHead() {
-    const E = LJ.Engine;
-    const place = E.currentPlaceDef();
-    $('#locationName').textContent = place[0];
-    $('#locationDesc').textContent = place[1];
-    const acts = $('#quickActions');
-    acts.innerHTML = '';
-    const type = place[2];
-    if (type === 'station') {
-      acts.appendChild(el(`<button data-nav="travel">🚂 前往其他城市</button>`)).addEventListener('click', () => LJ.Travel.renderIntercity());
-    }
-    if (type === 'airport') {
-      acts.appendChild(el(`<button data-nav="fly">✈️ 国际航班</button>`)).addEventListener('click', () => LJ.Travel.renderFlights());
-    }
-    if (type === 'restaurant' || type === 'hotel') {
-      acts.appendChild(el(`<button data-nav="eat">🍽️ 用餐喝水</button>`)).addEventListener('click', () => LJ.Survival.renderDining());
-    }
-    if (type === 'bank') {
-      acts.appendChild(el(`<button data-nav="bank">🏦 银行服务</button>`)).addEventListener('click', () => LJ.Finance.renderBank());
-    }
-    if (type === 'home') {
-      acts.appendChild(el(`<button data-nav="rest">😴 睡觉休息</button>`)).addEventListener('click', () => LJ.Survival.rest());
-      acts.appendChild(el(`<button data-nav="eat">🍜 吃家里存粮</button>`)).addEventListener('click', () => LJ.Survival.renderHomeEating());
-    }
-    if (type === 'training') {
-      acts.appendChild(el(`<button data-nav="train">🎓 职业培训</button>`)).addEventListener('click', () => LJ.Career.renderTraining());
-    }
-    if (type === 'office') {
-      acts.appendChild(el(`<button data-nav="office">📋 街道办事务</button>`)).addEventListener('click', () => LJ.Career.renderOffice());
-    }
-    if (type === 'antique' || type === 'auction' || type === 'friendship') {
-      acts.appendChild(el(`<button data-nav="antique">🔍 鉴定古玩</button>`)).addEventListener('click', () => LJ.Antique.renderAppraise());
-    }
-    if (type === 'blackmarket') {
-      acts.appendChild(el(`<button data-nav="bm">🌙 黑市交易</button>`)).addEventListener('click', () => LJ.Trade.renderBlackMarket());
-    }
-    if (type === 'warehouse') {
-      acts.appendChild(el(`<button data-nav="wh">📦 仓库与配送</button>`)).addEventListener('click', () => LJ.Trade.renderWarehouse());
-    }
-    if (type === 'service') {
-      acts.appendChild(el(`<button data-nav="svc">🪪 行政服务</button>`)).addEventListener('click', () => LJ.Career.renderService());
-    }
-    if (type === 'stock') {
-      acts.appendChild(el(`<button data-nav="stock">📈 证券交易</button>`)).addEventListener('click', () => LJ.Finance.renderStock());
-    }
-    if (type === 'culture' || type === 'park') {
-      acts.appendChild(el(`<button data-nav="stroll">🚶 散步</button>`)).addEventListener('click', () => LJ.Survival.stroll());
-    }
-    if (type === 'street') {
-      acts.appendChild(el(`<button data-nav="sell">🛒 兜售货物</button>`)).addEventListener('click', () => LJ.Trade.renderStreet());
-    }
-  }
-
-  /* ========== 主内容 ========== */
-  function renderContent() {
+  /* ============ 位置标题与内容 ============ */
+  function renderPlace() {
     const place = LJ.Engine.currentPlaceDef();
-    const type = place[2];
+    const cost = place[6] || {};
+    $('#placeName').textContent = place[0];
+    $('#placeDesc').textContent = place[1];
+    $('#placeCost').textContent = cost.time
+      ? `到访：${cost.time}分钟 · 体力-${cost.energy} · 饥饿-${cost.hunger} · 口渴-${cost.thirst}`
+      : '';
     const content = $('#content');
     content.innerHTML = '';
-    content.className = 'place-content ' + type;
-    const r = LJ.PlaceRenderers[type];
+    const r = LJ.PlaceRenderers[place[2]];
     if (r) r(content, place);
-    else content.appendChild(el(`<div class="empty">${place[1]}<br>（此地点暂无专属界面）</div>`));
+    else content.appendChild(el(`<div class="empty">${place[1]}</div>`));
   }
 
-  /* ========== 背包 / 仓库 ========== */
-  const INV_TABS = [
-    ['bag', '背包'],
-    ['home', '家仓'],
-    ['warehouse', '货仓']
-  ];
+  /* ============ 背包 / 家中 / 货仓 ============ */
+  const INV_TABS = ['bag', 'home', 'warehouse'];
   let invTab = 'bag';
+  function setTab(t) { invTab = t; }
 
   function renderInventory() {
     const s = LJ.Sys.state;
-    const E = LJ.Engine;
+    const w = s.world;
     const wrap = $('#inventory');
     wrap.innerHTML = '';
-    const tabs = el(`<div class="inv-tabs">${INV_TABS.map(([k, n]) => `<button data-tab="${k}" class="${invTab === k ? 'active' : ''}">${n}</button>`).join('')}</div>`);
+    const homeName = LJ.Engine.homeName(w);
+    const tabs = el(`<div class="inv-tabs">
+      <button data-tab="bag" class="${invTab === 'bag' ? 'active' : ''}">🎒 背包</button>
+      <button data-tab="home" class="${invTab === 'home' ? 'active' : ''}">🏠 ${homeName}</button>
+      <button data-tab="warehouse" class="${invTab === 'warehouse' ? 'active' : ''}">📦 货仓</button>
+    </div>`);
     $all('button', tabs).forEach((b) => b.addEventListener('click', () => { invTab = b.dataset.tab; LJ.UI.renderInventory(); }));
     wrap.appendChild(tabs);
 
-    const list = el(`<div class="inv-list"></div>`);
-    let items, cap, title;
+    let items = [], cap, title;
     if (invTab === 'bag') {
-      items = s.bag; cap = E.bagCap(); title = `背包 ${E.money(E.bagWeight())}/${E.money(cap)} kg`;
+      items = s.bag; cap = LJ.Engine.bagCap();
+      title = `背包 ${LJ.Engine.money(LJ.Engine.bagWeight())}/${LJ.Engine.money(cap)} kg`;
     } else if (invTab === 'home') {
-      items = s.home; cap = E.homeCap(); title = `家仓 ${E.money(E.homeWeight())}/${E.money(cap)} kg`;
+      items = s.home[w]; cap = LJ.Engine.homeCap(w);
+      title = `${homeName} ${LJ.Engine.money(LJ.Engine.homeWeight(w))}/${LJ.Engine.money(cap)} kg（按世界隔离）`;
     } else {
       const city = s.city;
-      s.warehouses[city] = s.warehouses[city] || [];
-      items = s.warehouses[city];
+      s.warehouses[w][city] = s.warehouses[w][city] || [];
+      items = s.warehouses[w][city];
       const wt = items.reduce((a, it) => a + (LJ.Items[it.id] ? LJ.Items[it.id].size * it.qty : 0), 0);
-      cap = 500; title = `${currentCityName()}货仓 ${E.money(wt)}/${E.money(cap)} kg`;
+      cap = 500; title = `${LJ.Engine.currentCityDef().name}货仓 ${LJ.Engine.money(wt)}/${LJ.Engine.money(cap)} kg`;
     }
     $('#bagSummary').textContent = title;
 
+    const list = el(`<div class="inv-list"></div>`);
     if (!items.length) {
       list.appendChild(el(`<div class="empty">空空如也</div>`));
     } else {
       items.forEach((it) => {
         const def = LJ.Items[it.id];
         if (!def) return;
+        const mvBtns = invTab === 'bag'
+          ? `<button data-a="tohome" title="转移输入的数量到家中">→家</button><button data-a="tostore" title="转移输入的数量到货仓">→仓</button>${def.consume ? `<button data-a="use">使用1</button>` : ''}`
+          : `<button data-a="tobag" title="转移输入的数量到背包">→背包</button>`;
         const row = el(`<div class="inv-row">
-          <div><strong>${def.name}</strong><small>${LJ.catName(def.cat)} · ${def.size}kg · ${def.desc}</small></div>
+          <div class="inv-main"><strong>${def.name} <span class="qty">×${it.qty}</span></strong>
+            <small>${LJ.catName(def.cat)} · ${def.size}kg/件 · ${def.desc}</small></div>
           <div class="inv-ops">
-            <span class="qty">×${it.qty}</span>
-            ${invTab === 'bag' ? `<button data-i="${it.id}" data-a="tohome">→家</button><button data-i="${it.id}" data-a="tostore">→仓</button><button data-i="${it.id}" data-a="use" ${def.consume ? '' : 'style="display:none"'} data-consume="${!!def.consume}">使用</button>` : ''}
-            ${invTab === 'home' ? `<button data-i="${it.id}" data-a="tobag">→背包</button><button data-i="${it.id}" data-a="drop">丢弃</button>` : ''}
-            ${invTab === 'warehouse' ? `<button data-i="${it.id}" data-a="tobag">→背包</button>` : ''}
+            ${invTab === 'bag' || invTab === 'home' || invTab === 'warehouse' ? `<input type="number" min="1" max="${it.qty}" value="${it.qty}" data-mv="${it.id}" title="要转移的数量（留空=全部）">` : ''}
+            ${mvBtns}
           </div>
         </div>`);
-        $all('button', row).forEach((b) => b.addEventListener('click', () => LJ.Trade.invAction(b.dataset.i, b.dataset.a)));
+        $all('button', row).forEach((b) => b.addEventListener('click', () => {
+          const qtyInput = $(`[data-mv="${it.id}"]`, row);
+          let q = 0;
+          if (qtyInput) q = parseInt(qtyInput.value, 10);
+          LJ.Trade.invAction(it.id, b.dataset.a, (q && q > 0) ? q : 9999);
+        }));
         list.appendChild(row);
       });
     }
     wrap.appendChild(list);
   }
 
-  /* ========== 日志 ========== */
+  /* ============ 日志 ============ */
   function renderLog() {
     const logs = $('#logs');
     const s = LJ.Sys.state;
@@ -218,34 +199,19 @@
     });
   }
 
-  function currentCityName() {
-    return LJ.Engine.currentCityDef().name;
-  }
-
-  function renderCross() {
-    const s = LJ.Sys.state;
-    const w = s.world;
-    $('#crossTitle').textContent = w === 'modern' ? '衣柜后的门' : '回到2026的门';
-    $('#crossHint').textContent = w === 'modern'
-      ? '穿过门，踏入1980年的北京。现代相对静止，旧时岁月如梭。每次穿越消耗5点体力。'
-      : '带着旧时的收获回到2026年变现。每一次穿越都消耗体力。';
-    $('#crossBtn').textContent = w === 'modern' ? '穿越至 1980 年' : '穿越回 2026 年';
-  }
-
   function renderAll() {
-    renderHeader();
+    renderTop();
     renderStatus();
     renderMap();
-    renderLocationHead();
-    renderContent();
+    renderPlace();
     renderInventory();
     renderLog();
-    renderCross();
+    if (LJ.AI) LJ.AI.renderStatus && LJ.AI.renderStatus();
   }
 
   LJ.UI = {
-    $, $all, el, toast, renderAll, renderHeader, renderStatus,
-    renderMap, renderLocationHead, renderContent, renderInventory, renderLog,
-    barHtml, currentCityName, get invTab() { return invTab; }, set invTab(v) { invTab = v; }
+    $, $all, el, toast, renderAll, renderTop, renderStatus,
+    renderMap, renderPlace, renderInventory, renderLog, bar,
+    setTab, get invTab() { return invTab; }, set invTab(v) { invTab = v; }
   };
 })();
