@@ -1,109 +1,190 @@
-/* 两界搬运工 · 状态管理（存档/读档/迁移）
- * v5: 背包是两界唯一通道；家庭/仓库按世界隔离；市场饱和度经济；穿越7天冷却。
- */
 (function () {
-  'use strict';
-  const LJ = (window.LJ = window.LJ || {});
-  const SAVE_KEY = 'liangjie-banyungong-v5';
+  "use strict";
+  window.LJ = window.LJ || {};
+  const U = window.LJ.util;
 
-  function fresh() {
+  const SAVE_KEY = "liangjie_save_v1";
+  const VERSION = 8;
+
+  function defaultWorld(which) {
     return {
-      version: 5,
-      world: 'modern',
-      city: 'beijing',
-      location: 'home',
-      time: { modern: 0, old: 0 },
-      flags: {
-        arrival: { modern: -7, old: -7 },  // 各世界上次到达时间（冷却基准）
-        stockLimit: {},
-        bagCap: 20,
-        home: {
-          modern: { cap: 30, name: '城中村出租屋' },
-          old: { cap: 30, name: '南锣鼓巷四合院' }
-        },
-        registered: { modern: { beijing: true }, old: { beijing: true } }, // 经商登记（户籍城市默认登记）
-        talkDay: {},
-        booted: false
+      id: which,
+      clock: {
+        year: which === "modern" ? 2026 : 1980,
+        month: 1,
+        day: 1,
+        hour: 8,
+        minute: 0
       },
-      player: {
-        name: '阿诚',
-        energy: 100, hunger: 100, thirst: 100, spirit: 100,
-        skills: { english: 0, japanese: 0, appraisal: 0, machinery: 0 },
-        certs: [],
-        job: null,
-        reputation: 0,
-        wanted: 0,
-        passport: false,
-        hkPermit: false,
-        visited: {}
-      },
-      money: {
-        modern: { CNY: 3000, USD: 0, HKD: 0, JPY: 0, EUR: 0, GBP: 0, KES: 0 },
-        old: { CNY: 20, FEC: 0 },
-        fxQuota: { USD: 0 }
-      },
-      bank: { modern: { CNY: 0 }, old: { CNY: 0 } },
-      stock: { cash: 0, pos: {}, boughtAt: {} },
-      bag: [],                     // 背包：两界唯一随身通道
-      home: { modern: [], old: [] },// 家庭储物按世界隔离
-      warehouses: { modern: {}, old: {} },
-      deliveries: [],
-      market: { modern: {}, old: {} }, // world -> city -> cat -> 饱和度0..1
-      relationships: {},
-      romance: {},
-      ai: null,                    // { baseUrl, apiKey, model }
-      stats: { trips: 0, trades: 0, daysOld: 0, earnModern: 0, earnOld: 0, taxPaid: 0 },
-      log: []
+      paused: false,
+      cityId: which === "modern" ? "bj_modern" : "bj_1980",
+      districtId: "south",
+      locationId: which === "modern" ? "bj_modern_chengyuan" : "bj_1980_dazayuan",
+      wallet: {},
+      bank: {},
+      stocks: [],
+      properties: [],
+      warehouse: {},
+      queued: []
     };
   }
 
-  function migrate(s) {
-    if (!s || typeof s !== 'object') return fresh();
-    // 大版本不兼容：保留基础数据，重建结构
-    const n = fresh();
-    n.world = s.world === 'old' ? 'old' : 'modern';
-    if (s.money) {
-      if (s.money.modern) n.money.modern = Object.assign(n.money.modern, s.money.modern);
-      if (s.money.old) n.money.old = Object.assign(n.money.old, s.money.old);
-      if (s.money.fxQuota) n.money.fxQuota = s.money.fxQuota;
-    }
-    if (s.bank) {
-      if (s.bank.modern) n.bank.modern = s.bank.modern;
-      if (s.bank.old) n.bank.old = s.bank.old;
-    }
-    if (s.player) {
-      n.player.name = s.player.name || n.player.name;
-      n.player.certs = s.player.certs || [];
-      n.player.skills = Object.assign(n.player.skills, s.player.skills);
-      n.player.job = s.player.job || null;
-      n.player.passport = !!s.player.passport;
-      n.player.hkPermit = !!s.player.hkPermit;
-      n.player.reputation = s.player.reputation || 0;
-    }
-    if (s.ai) n.ai = s.ai;
-    return n;
+  function defaultPlayer() {
+    return {
+      name: "主角",
+      gender: "男",
+      age: 28,
+      hometown: "北京",
+      inventory: [],
+      carryWeight: 30,
+      carryVolume: 60,
+      skills: {},
+      certificates: {},
+      reputation: {},
+      relationships: {},
+      flags: {},
+      quests: [],
+      stats: {
+        energy: 100,
+        satiety: 100,
+        health: 100,
+        mood: 80
+      }
+    };
   }
 
-  let state = null;
+  function defaultState() {
+    return {
+      version: VERSION,
+      seed: Math.floor(Math.random() * 1e9),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      player: defaultPlayer(),
+      worlds: {
+        modern: defaultWorld("modern"),
+        old: defaultWorld("old")
+      },
+      travel: {
+        level: "7d",
+        cooldownDays: 7,
+        lastCrossOld: null,
+        crossCount: 0
+      },
+      settings: {
+        ai: {
+          enabled: true,
+          url: "https://api.siliconflow.cn",
+          model: "deepseek-ai/DeepSeek-V4-Flash",
+          key: "sk-ugfucoamcdqueicunqhqugynccatnllxksdmmsfucbatpdbt",
+          temperature: 0.8,
+          maxTokens: 400
+        },
+        pace: "normal",
+        tutorials: true,
+        autosave: true
+      },
+      log: [],
+      priceCache: {},
+      supplyCache: {}
+    };
+  }
 
-  LJ.Sys = {
-    fresh,
-    load() {
-      try {
-        const raw = localStorage.getItem(SAVE_KEY);
-        state = raw ? migrate(JSON.parse(raw)) : fresh();
-      } catch (e) { state = fresh(); }
-      return state;
-    },
-    get state() { return state; },
-    set state(s) { state = s; },
-    save() {
-      try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (e) { /* 忽略 */ }
-    },
-    reset() {
-      localStorage.removeItem(SAVE_KEY);
-      state = fresh();
-      return state;
+  let _state = null;
+
+  function get() {
+    if (!_state) {
+      _state = load() || defaultState();
     }
+    return _state;
+  }
+
+  function set(s) {
+    _state = s;
+  }
+
+  function save() {
+    const s = get();
+    s.updatedAt = Date.now();
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify(s));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (!raw) return null;
+      const s = JSON.parse(raw);
+      if (s && s.version === VERSION) return s;
+      return migrate(s);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function migrate(old) {
+    return old || defaultState();
+  }
+
+  function newGame(opts) {
+    const s = defaultState();
+    s.seed = Math.floor(Math.random() * 1e9);
+    if (opts) {
+      if (opts.name) s.player.name = opts.name;
+      if (opts.gender) s.player.gender = opts.gender;
+      if (opts.age) s.player.age = opts.age;
+      if (opts.travelLevel) {
+        s.travel.level = opts.travelLevel;
+        s.travel.cooldownDays = opts.travelLevel === "15d" ? 15 : opts.travelLevel === "30d" ? 30 : 7;
+      }
+      if (opts.ai) Object.assign(s.settings.ai, opts.ai);
+    }
+    _state = s;
+    save();
+    return s;
+  }
+
+  function reset() {
+    localStorage.removeItem(SAVE_KEY);
+    _state = null;
+  }
+
+  function hasSave() {
+    try {
+      return !!localStorage.getItem(SAVE_KEY);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function world(which) {
+    return get().worlds[which];
+  }
+
+  function clock(which) {
+    return world(which).clock;
+  }
+
+  function pushLog(s) {
+    const g = get();
+    g.log.unshift({ t: Date.now(), s: s });
+    if (g.log.length > 500) g.log.length = 500;
+  }
+
+  window.LJ.state = {
+    get,
+    set,
+    save,
+    load,
+    newGame,
+    reset,
+    hasSave,
+    world,
+    clock,
+    pushLog,
+    VERSION
   };
 })();

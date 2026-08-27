@@ -1,118 +1,94 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f4efe4">
-  <title>两界搬运工 · 重制版</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="两界搬运工：1980 冷战年代与现代 2026 双世界穿梭、倒买倒卖、大国博弈与人生模拟。">
+  <title>两界搬运工 · 1980</title>
+  <link rel="stylesheet" href="css/main.css">
 </head>
-<body class="modern-world">
-  <header class="topbar">
-    <div class="brand">
-      <div class="seal">界</div>
-      <div class="brand-text"><h1>两界搬运工</h1><span class="subtitle">一扇门 · 两本账 · 四十六年的价差</span></div>
-    </div>
-    <div class="money">
-      <span class="chip" id="cashChip">现金</span>
-      <span class="chip" id="bankChip">存款</span>
-      <span class="chip chip-extra" id="extraChip"></span>
-    </div>
-    <div class="top-actions">
-      <span id="worldTab" class="world-tab">🌐 现代 · 2026</span>
-      <span id="cooldownChip" class="cooldown">🌀 传送门就绪</span>
-      <button id="crossBtn" class="btn-cross">🌀 穿越</button>
-      <button id="settingsBtn" class="btn-icon" title="设置 / AI">⚙</button>
+<body>
+  <header class="topbar" id="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="seal">两界</span>
+        <span class="brand-text">
+          <b>两界搬运工</b>
+          <small>1980 ⇄ 2026</small>
+        </span>
+      </div>
+      <div class="hud" id="hud"></div>
+      <div class="top-actions">
+        <button class="btn ghost" id="btnSettings" title="设置">⚙ 设置</button>
+        <button class="btn ghost" id="btnHelp" title="帮助">? 帮助</button>
+      </div>
     </div>
   </header>
 
-  <div class="timebar" id="timebar">时间加载中…</div>
-
-  <div class="status-wrap">
-    <div class="statusline" id="statusline"></div>
-    <div id="survivalWarn" class="survival-warn">&nbsp;</div>
-    <div class="quick-actions">
-      <button id="sleepBtn" title="睡8小时，恢复全部体力并跳过时间">😴 睡觉(8h)</button>
-      <button id="restBtn" title="小憩1小时，体力+15">☕ 休整(1h)</button>
-      <button id="waitBtn" title="等待N小时（凑穿越冷却、等到深夜黑市）">⏳ 等待…</button>
-    </div>
-  </div>
-
-  <main class="layout">
-    <aside class="map-panel">
-      <div class="city-head"><h2 id="cityName">北京</h2><p id="cityIntro"></p></div>
-      <div class="place-list" id="placeList"></div>
-      <div class="ai-status"><span id="aiChip">AI 未配置</span></div>
-    </aside>
-
-    <section class="main-panel">
-      <div class="place-head">
-        <h2 id="placeName">当前位置</h2>
-        <p id="placeDesc"></p>
-        <small id="placeCost" class="cost-line"></small>
+  <main class="layout" id="layout">
+    <section class="main-col">
+      <div class="panel scene" id="scenePanel">
+        <div class="scene-head" id="sceneHead"></div>
+        <div class="scene-body" id="sceneBody"></div>
       </div>
-      <div id="content" class="content"></div>
+      <div class="panel log-panel" id="logPanel">
+        <div class="panel-title">流水</div>
+        <div class="log-list" id="logList"></div>
+      </div>
     </section>
 
-    <aside class="side-panel">
-      <div class="inv-panel">
-        <div class="section-title"><span>物品流转</span><small id="bagSummary"></small></div>
-        <div id="inventory"></div>
-      </div>
-      <div class="log-panel">
-        <div class="section-title"><span>双界日志</span><small>最近 30 条</small></div>
-        <ol class="logs" id="logs"></ol>
-        <div class="footer-tools">
-          <button id="manualSave">立即存档</button>
-          <button class="danger" id="resetGame">重置存档</button>
-        </div>
-      </div>
+    <aside class="side-col">
+      <nav class="tabs" id="sideTabs">
+        <button class="tab active" data-tab="travel">穿越</button>
+        <button class="tab" data-tab="backpack">背包</button>
+        <button class="tab" data-tab="wallet">资金</button>
+        <button class="tab" data-tab="bus">公交</button>
+        <button class="tab" data-tab="npc">人脉</button>
+      </nav>
+      <div class="panel side-panel" id="sidePanel"></div>
     </aside>
   </main>
 
-  <dialog id="settingsModal" class="modal">
-    <div class="modal-body">
-      <h3>⚙ 设置 · AI 接入</h3>
-      <p class="tiny">接入大模型后，NPC 的「深谈」会由 AI 扮演（OpenAI 兼容接口）。密钥只保存在本浏览器。</p>
-      <label>接口地址（Base URL）<input id="setBaseUrl" placeholder="https://…/v1"></label>
-      <label>API 密钥<input id="setKey" type="password" placeholder="sk-…"></label>
-      <label>模型名称<input id="setModel" placeholder="deepseek-v4-flash-0731"></label>
-      <div class="modal-actions">
-        <button id="settingsCancel">取消</button>
-        <button id="settingsSave" class="primary">保存</button>
-      </div>
-    </div>
-  </dialog>
+  <div class="modal-root" id="modalRoot" hidden></div>
 
-  <dialog id="chatModal" class="modal">
-    <div class="modal-body chat-modal">
-      <div class="chat-head"><h3 id="chatTitle">💬 深谈</h3><button id="chatClose" class="btn-icon">✕</button></div>
-      <div id="chatBox" class="chat-box"></div>
-      <div class="chat-input-row">
-        <input id="chatInput" placeholder="说点什么…（Enter 发送）">
-        <button id="chatSend">发送</button>
-      </div>
-    </div>
-  </dialog>
+  <noscript>本游戏需要启用 JavaScript 才能运行。</noscript>
 
-  <div id="toast" role="status" aria-live="polite"></div>
-
-  <script src="js/data/items.js"></script>
-  <script src="js/data/world.js"></script>
-  <script src="js/data/culture.js"></script>
-  <script src="js/data/markets.js"></script>
-  <script src="js/data/population.js"></script>
+  <script src="js/core/util.js"></script>
   <script src="js/core/state.js"></script>
+  <script src="js/core/eventbus.js"></script>
+  <script src="js/core/data.js"></script>
+
+  <script src="js/data/tags.js"></script>
+  <script src="js/data/timeline.js"></script>
+  <script src="js/data/currencies.js"></script>
+  <script src="js/data/items_core.js"></script>
+  <script src="js/data/items_consumable.js"></script>
+  <script src="js/data/items_appliance.js"></script>
+  <script src="js/data/items_luxury.js"></script>
+  <script src="js/data/items_province.js"></script>
+  <script src="js/data/items_commodity.js"></script>
+  <script src="js/data/items_daily.js"></script>
+  <script src="js/data/vehicles.js"></script>
+  <script src="js/data/cities.js"></script>
+  <script src="js/data/locations.js"></script>
+  <script src="js/data/locations_bj.js"></script>
+  <script src="js/data/npcs.js"></script>
+  <script src="js/data/npcs_bj.js"></script>
+  <script src="js/data/finance.js"></script>
+  <script src="js/data/culture.js"></script>
+
   <script src="js/core/engine.js"></script>
-  <script src="js/core/ui.js"></script>
-  <script src="js/modules/survival.js"></script>
+  <script src="js/modules/clock.js"></script>
+  <script src="js/modules/economy.js"></script>
+  <script src="js/modules/inventory.js"></script>
   <script src="js/modules/travel.js"></script>
-  <script src="js/modules/trade.js"></script>
+  <script src="js/modules/shopping.js"></script>
   <script src="js/modules/finance.js"></script>
-  <script src="js/modules/career.js"></script>
-  <script src="js/modules/antique.js"></script>
-  <script src="js/modules/social.js"></script>
+  <script src="js/modules/interaction.js"></script>
+  <script src="js/modules/gift.js"></script>
+  <script src="js/modules/passers.js"></script>
   <script src="js/modules/ai.js"></script>
+  <script src="js/modules/ui.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

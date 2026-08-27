@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>储蓄所Demo - 存折 / 存钱 / 取钱 / 交易记录</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei",sans-serif;background:#f5f6f8;color:#1f2937;padding:20px}
+  .wrap{max-width:980px;margin:0 auto}
+  h1{font-size:22px;margin-bottom:4px}
+  .sub{color:#6b7280;font-size:13px;margin-bottom:18px}
+  .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;align-items:start}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  section{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:14px;min-height:220px}
+  section h2{font-size:15px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #eef0f3}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1px solid #d1d5db;background:#f9fafb;border-radius:8px;padding:4px 10px;font-size:13px}
+  .chip b{color:#b45309}
+  .total{margin-top:12px;font-size:13px;color:#374151}
+  .total b{color:#dc2626}
+  .sub-h{font-size:13px;color:#6b7280;margin:14px 0 6px}
+  .empty{color:#9ca3af;font-size:13px;padding:20px 0;text-align:center}
+  .item{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px dashed #eef0f3}
+  .item:last-child{border-bottom:none}
+  .item .nm{flex:1;font-size:13px}
+  .item .nm small{display:block;color:#9ca3af;font-size:11px}
+  .item .pr{color:#b45309;font-weight:700;font-size:13px;white-space:nowrap}
+  .item .sp{color:#9ca3af;font-size:12px}
+  .btn{border:1px solid #d1d5db;background:#fff;border-radius:8px;padding:4px 12px;font-size:13px;cursor:pointer}
+  .btn:hover{background:#f3f4f6}
+  .btn.prim{background:#2563eb;color:#fff;border-color:#2563eb}
+  .btn.prim:hover{background:#1d4ed8}
+  .btn.warn{background:#f59e0b;color:#fff;border-color:#f59e0b}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .qty{width:60px;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;text-align:center}
+  select{padding:4px;border:1px solid #d1d5db;border-radius:6px;font-size:13px}
+  .clock{font-size:12px;color:#6b7280;margin-bottom:10px;padding:6px 10px;background:#eef2ff;border-radius:8px;display:inline-block}
+  .flow{max-height:420px;overflow-y:auto}
+  .flow-item{padding:7px 2px;border-bottom:1px dashed #eef0f3;font-size:12px}
+  .flow-item .t{color:#9ca3af;font-size:11px}
+  .flow-item b{color:#b45309}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:10}
+  .modal.hidden{display:none}
+  .box{background:#fff;border-radius:12px;width:min(460px,92vw);max-height:86vh;display:flex;flex-direction:column;overflow:hidden}
+  .box h3{padding:14px 16px;font-size:15px;border-bottom:1px solid #eef0f3}
+  .bills{overflow-y:auto;padding:10px 16px;flex:1}
+  .bill-row{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px}
+  .bill-row b{color:#b45309;font-weight:700}
+  .bill-row span{color:#9ca3af;font-size:11px}
+  .bill-row input{accent-color:#2563eb}
+  .wd-row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px}
+  .wd-row .nm{flex:1}
+  .wd-row b{color:#b45309}
+  .sums{padding:10px 16px;border-top:1px solid #eef0f3;font-size:13px;line-height:1.8}
+  .need{color:#dc2626;font-weight:700}
+  .ok{color:#16a34a;font-weight:700}
+  .acts{display:flex;gap:8px;justify-content:flex-end;padding:0 16px 14px}
+  .recs{overflow-y:auto;padding:10px 16px;flex:1}
+  .rec{padding:7px 0;border-bottom:1px dashed #eef0f3;font-size:13px}
+  .rec .t{color:#9ca3af;font-size:11px}
+  .rec .in{color:#16a34a;font-weight:700}
+  .rec .out{color:#dc2626;font-weight:700}
+  #toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;opacity:0;transition:.3s;pointer-events:none;z-index:20;max-width:80vw}
+  #toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>储蓄所 Demo</h1>
+  <div class="sub">办理存折免费。存钱：把钱包里的纸币存进银行；取钱：从银行取出指定金额（可取时自选面额）。每一笔交易都会记在存折上（含时间），随时可在钱包里查看。</div>
+  <div><span class="clock" id="clock"></span></div>
+  <div class="grid">
+    <section>
+      <h2>我的钱包</h2>
+      <div class="chips" id="walletChips"></div>
+      <div class="total">合计：<b id="walletTotal"></b></div>
+      <div class="sub-h">我的存折（点击查看明细）</div>
+      <div id="walletBooks"></div>
+    </section>
+    <section>
+      <h2>储蓄所柜台</h2>
+      <div class="sub-h">办理存折（免费）</div>
+      <div class="item">
+        <select id="bkType">
+          <option value="活期存折">活期存折</option>
+          <option value="定期存折">定期存折</option>
+        </select>
+        <button class="btn prim" id="openBook">办理</button>
+      </div>
+      <div class="sub-h">存折</div>
+      <div id="bookOps"></div>
+    </section>
+    <section>
+      <h2>交易流水</h2>
+      <div class="flow" id="flow"></div>
+    </section>
+  </div>
+</div>
+
+<!-- 存钱 -->
+<div id="depModal" class="modal hidden">
+  <div class="box">
+    <h3 id="depTitle"></h3>
+    <div class="bills" id="depBills"></div>
+    <div class="sums"><div id="depMsg"></div></div>
+    <div class="acts">
+      <button class="btn" id="depCancel">取消</button>
+      <button class="btn prim" id="depOk" disabled>确认存入</button>
+    </div>
+  </div>
+</div>
+
+<!-- 取钱 -->
+<div id="wdModal" class="modal hidden">
+  <div class="box">
+    <h3 id="wdTitle"></h3>
+    <div class="sums">
+      <div class="item">
+        <span class="nm">取款金额</span>
+        <input class="qty" id="wdAmt" type="number" step="0.01" min="0.01" placeholder="0.00" oninput="pickWd()">
+        <span>元</span>
+      </div>
+    </div>
+    <div class="bills" id="wdRows"></div>
+    <div class="sums"><div id="wdMsg"></div></div>
+    <div class="acts">
+      <button class="btn" id="wdCancel">取消</button>
+      <button class="btn prim" id="wdOk" disabled>确认取出</button>
+    </div>
+  </div>
+</div>
+
+<!-- 存折明细 -->
+<div id="recModal" class="modal hidden">
+  <div class="box">
+    <h3 id="recTitle"></h3>
+    <div class="recs" id="recList"></div>
+    <div class="acts"><button class="btn" id="recClose">关闭</button></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  var wallet = [1000, 1000, 500, 200, 100, 100, 50, 20, 10, 5, 5, 2, 1]; // 单位：分（最大10元，最小1分）
+  var books = []; // 存折：{id,name,balance(分),records:[{t,type,amt,detail}]}
+  var bookSeq = 1;
+
+  /* 80年代面额（分） */
+  var DENOMS = [
+    {v:1000, name:"10元纸币"},
+    {v:500,  name:"5元纸币"},
+    {v:200,  name:"2元纸币"},
+    {v:100,  name:"1元硬币"},
+    {v:50,   name:"5角硬币"},
+    {v:20,   name:"2角硬币"},
+    {v:10,   name:"1角硬币"},
+    {v:5,    name:"5分硬币"},
+    {v:2,    name:"2分硬币"},
+    {v:1,    name:"1分硬币"}
+  ];
+
+  /* 模拟时钟 */
+  var day = 0, hour = 6, minute = 0;
+  function passTime(m){
+    minute += m;
+    while(minute >= 60){ minute -= 60; hour++; }
+    while(hour >= 24){ hour -= 24; day++; }
+  }
+  function fmtTime(){
+    return "第" + day + "天 " + (hour<10?"0":"") + hour + ":" + (minute<10?"0":"") + minute;
+  }
+
+  function fmt(v){
+    var y = Math.floor(v/100), r = v%100;
+    var j = Math.floor(r/10), f = r%10;
+    var s = "";
+    if(y) s += y + "元";
+    if(j) s += j + "角";
+    if(f) s += f + "分";
+    return s || "0元";
+  }
+  function walletTotal(){ return wallet.reduce(function(a,b){return a+b;},0); }
+  function decompose(fen){
+    var out = [];
+    DENOMS.forEach(function(d){ while(fen >= d.v){ out.push(d.v); fen -= d.v; } });
+    return out;
+  }
+  function desc(pieces){
+    var count = {};
+    pieces.forEach(function(v){ count[v] = (count[v]||0)+1; });
+    return Object.keys(count).sort(function(a,b){return b-a;}).map(function(v){
+      return fmt(Number(v)) + (count[v]>1 ? "×" + count[v] : "");
+    }).join("、");
+  }
+
+  /* ---------------- 渲染 ---------------- */
+  function renderClock(){ document.getElementById("clock").textContent = "当前时间：" + fmtTime() + "（每笔业务约半小时）"; }
+
+  function renderWallet(){
+    var count = {};
+    wallet.forEach(function(v){ count[v] = (count[v]||0)+1; });
+    var html = "";
+    Object.keys(count).sort(function(a,b){return b-a;}).forEach(function(v){
+      html += '<span class="chip">' + fmt(Number(v)) + ' <b>×' + count[v] + '</b></span>';
+    });
+    document.getElementById("walletChips").innerHTML = html || '<div class="empty">钱包空了</div>';
+    document.getElementById("walletTotal").textContent = fmt(walletTotal());
+  }
+
+  function renderWalletBooks(){
+    document.getElementById("walletBooks").innerHTML = books.length ? books.map(function(b){
+      return '<div class="item"><span class="nm">' + b.name + '<small>余额 ' + fmt(b.balance) + ' · 共' + b.records.length + '笔</small></span>' +
+        '<button class="btn" onclick="openRecs(' + b.id + ')">明细</button></div>';
+    }).join("") : '<div class="empty">还没有存折，去柜台免费办一本</div>';
+  }
+
+  function renderBookOps(){
+    document.getElementById("bookOps").innerHTML = books.length ? books.map(function(b){
+      return '<div class="item"><span class="nm">' + b.name + '<small>余额 ' + fmt(b.balance) + '</small></span>' +
+        '<button class="btn" onclick="openDep(' + b.id + ')">存钱</button>' +
+        '<button class="btn warn" onclick="openWd(' + b.id + ')">取钱</button></div>';
+    }).join("") : '<div class="empty">请先办理存折</div>';
+  }
+
+  function renderFlow(){
+    var all = [];
+    books.forEach(function(b){
+      b.records.forEach(function(r){
+        all.push({book:b.name, t:r.t, type:r.type, amt:r.amt, detail:r.detail});
+      });
+    });
+    all.sort(function(a,b){ return a.t < b.t ? 1 : -1; });
+    document.getElementById("flow").innerHTML = all.length ? all.map(function(r){
+      return '<div class="flow-item"><span class="t">' + r.t + ' · ' + r.book + '</span><br>' +
+        (r.type==="存入" ? '<b class="in">+' : '<b class="out">-') + fmt(r.amt) + '</b> ' + r.detail + '</div>';
+    }).join("") : '<div class="empty">暂无交易</div>';
+  }
+
+  function renderAll(){ renderClock(); renderWallet(); renderWalletBooks(); renderBookOps(); renderFlow(); }
+
+  /* ---------------- 办理存折（免费） ---------------- */
+  document.getElementById("openBook").addEventListener("click", function(){
+    var type = document.getElementById("bkType").value;
+    var name = type;
+    var n = books.filter(function(b){ return b.name.indexOf(type) === 0; }).length + 1;
+    if(n > 1) name = type + " " + n;
+    var b = { id: bookSeq++, name:name, balance:0, records:[] };
+    books.push(b);
+    passTime(20);
+    toast("已免费办理「" + name + "」");
+    renderAll();
+  });
+
+  /* ---------------- 存钱（选票存入） ---------------- */
+  var depId = null, depSel = [];
+
+  function openDep(id){
+    depId = id; depSel = [];
+    var b = books.filter(function(x){ return x.id === id; })[0];
+    document.getElementById("depTitle").textContent = "存入「" + b.name + "」——选择要存的纸币";
+    var idx = wallet.map(function(_,i){ return i; }).sort(function(a,c){ return wallet[c]-wallet[a]; });
+    var rows = idx.map(function(i){
+      return '<label class="bill-row"><input type="checkbox" data-i="' + i + '" onchange="pickDep()">' +
+        '<b>' + fmt(wallet[i]) + '</b></label>';
+    }).join("");
+    document.getElementById("depBills").innerHTML = rows || '<div class="empty">钱包里没有钱</div>';
+    document.getElementById("depMsg").innerHTML = '请勾选要存入的纸币（可多选）';
+    document.getElementById("depOk").disabled = true;
+    document.getElementById("depModal").classList.remove("hidden");
+  }
+
+  function pickDep(){
+    depSel = [];
+    var boxes = document.querySelectorAll("#depBills input:checked");
+    for(var i=0;i<boxes.length;i++) depSel.push(Number(boxes[i].dataset.i));
+    var sum = 0; depSel.forEach(function(i){ sum += wallet[i]; });
+    var msg = document.getElementById("depMsg");
+    var ok = document.getElementById("depOk");
+    if(sum === 0){ msg.innerHTML = '请勾选要存入的纸币'; ok.disabled = true; }
+    else { msg.innerHTML = '本次存入 <b class="ok">' + fmt(sum) + '</b>'; ok.disabled = false; }
+  }
+
+  document.getElementById("depOk").addEventListener("click", function(){
+    var b = books.filter(function(x){ return x.id === depId; })[0];
+    var sum = 0, pieces = [];
+    depSel.forEach(function(i){ sum += wallet[i]; pieces.push(wallet[i]); });
+    depSel.slice().sort(function(a,b){ return b-a; }).forEach(function(i){ wallet.splice(i,1); });
+    b.balance += sum;
+    b.records.push({ t:fmtTime(), type:"存入", amt:sum, detail:"存入纸币 " + desc(pieces) });
+    document.getElementById("depModal").classList.add("hidden");
+    passTime(30);
+    toast("已存入 " + fmt(sum) + " 到「" + b.name + "」");
+    renderAll();
+  });
+
+  document.getElementById("depCancel").addEventListener("click", function(){
+    document.getElementById("depModal").classList.add("hidden");
+  });
+
+  /* ---------------- 取钱（指定金额 + 自选面额） ---------------- */
+  var wdId = null;
+
+  function openWd(id){
+    wdId = id;
+    var b = books.filter(function(x){ return x.id === id; })[0];
+    document.getElementById("wdTitle").textContent = "取出「" + b.name + "」余额 " + fmt(b.balance);
+    document.getElementById("wdAmt").value = "";
+    renderWdRows(b, 0);
+    document.getElementById("wdMsg").innerHTML = '输入要取的金额，银行会按面额给钱，也可自行调整数量';
+    document.getElementById("wdOk").disabled = true;
+    document.getElementById("wdModal").classList.remove("hidden");
+  }
+
+  function renderWdRows(b, fen){
+    var pieces = fen > 0 ? decompose(fen) : [];
+    var count = {};
+    pieces.forEach(function(v){ count[v] = (count[v]||0)+1; });
+    document.getElementById("wdRows").innerHTML = DENOMS.map(function(d){
+      var val = count[d.v] || 0;
+      return '<div class="wd-row"><span class="nm">' + d.name + '</span>' +
+        '<input class="qty" data-v="' + d.v + '" type="number" min="0" value="' + val + '" oninput="pickWd()"></div>';
+    }).join("");
+  }
+
+  function pickWd(){
+    var b = books.filter(function(x){ return x.id === wdId; })[0];
+    var amtFen = Math.round(Number(document.getElementById("wdAmt").value||0) * 100);
+    var inputs = document.querySelectorAll("#wdRows input");
+    var combo = 0;
+    inputs.forEach(function(inp){ combo += Number(inp.dataset.v) * Math.max(0, Math.floor(Number(inp.value)||0)); });
+    if(amtFen > 0 && combo === 0){
+      // 刚输入金额还没生成面额：按默认拆分填表
+      renderWdRows(b, amtFen);
+      return;
+    }
+    var msg = document.getElementById("wdMsg");
+    var ok = document.getElementById("wdOk");
+    if(amtFen <= 0){ msg.innerHTML = '请输入要取的金额'; ok.disabled = true; }
+    else if(amtFen > b.balance){ msg.innerHTML = '余额不足（余额 <b class="need">' + fmt(b.balance) + '</b>）'; ok.disabled = true; }
+    else if(combo !== amtFen){ msg.innerHTML = '面额合计 <b class="need">' + fmt(combo) + '</b> ≠ 金额 ' + fmt(amtFen) + '，请调整'; ok.disabled = true; }
+    else { msg.innerHTML = '将取出 <b class="ok">' + fmt(amtFen) + '</b>（' + desc(decompose(combo)) + '）'; ok.disabled = false; }
+  }
+
+  document.getElementById("wdOk").addEventListener("click", function(){
+    var b = books.filter(function(x){ return x.id === wdId; })[0];
+    var amtFen = Math.round(Number(document.getElementById("wdAmt").value||0) * 100);
+    var inputs = document.querySelectorAll("#wdRows input");
+    var pieces = [];
+    inputs.forEach(function(inp){
+      var n = Math.max(0, Math.floor(Number(inp.value)||0));
+      for(var k=0;k<n;k++) pieces.push(Number(inp.dataset.v));
+    });
+    b.balance -= amtFen;
+    pieces.forEach(function(v){ wallet.push(v); });
+    b.records.push({ t:fmtTime(), type:"取出", amt:amtFen, detail:"取出纸币 " + desc(pieces) });
+    document.getElementById("wdModal").classList.add("hidden");
+    passTime(30);
+    toast("已取出 " + fmt(amtFen) + " 元");
+    renderAll();
+  });
+
+  document.getElementById("wdCancel").addEventListener("click", function(){
+    document.getElementById("wdModal").classList.add("hidden");
+  });
+
+  /* ---------------- 存折明细 ---------------- */
+  function openRecs(id){
+    var b = books.filter(function(x){ return x.id === id; })[0];
+    document.getElementById("recTitle").textContent = b.name + " · 余额 " + fmt(b.balance);
+    document.getElementById("recList").innerHTML = b.records.length ? b.records.map(function(r){
+      return '<div class="rec"><span class="t">' + r.t + '</span><br>' +
+        (r.type==="存入" ? '<span class="in">+'+fmt(r.amt)+'</span>' : '<span class="out">-'+fmt(r.amt)+'</span>') +
+        ' ' + r.detail + '</div>';
+    }).reverse().join("") : '<div class="empty">暂无交易记录</div>';
+    document.getElementById("recModal").classList.remove("hidden");
+  }
+  document.getElementById("recClose").addEventListener("click", function(){
+    document.getElementById("recModal").classList.add("hidden");
+  });
+
+  /* ---------------- 提示 ---------------- */
+  var toastTimer;
+  function toast(msg){
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2600);
+  }
+
+  renderAll();
+</script>
+</body>
+</html>

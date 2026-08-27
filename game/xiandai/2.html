@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>两界搬运工 · 核心玩法原型</title>
+<style>
+  :root {
+    --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+    --panel:#fff; --bg:#f3f4f6; --accent:#2563eb;
+    --good:#16a34a; --bad:#dc2626; --warn:#f59e0b;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; color:var(--ink); background:var(--bg);
+    font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui,sans-serif; }
+  button,input,select { font:inherit; }
+  button { cursor:pointer; }
+
+  .topbar { position:sticky; top:0; z-index:30; background:var(--ink); color:#fff; }
+  .topbar-inner { max-width:1200px; margin:auto; padding:10px 16px; display:flex; flex-wrap:wrap; gap:10px 20px; align-items:center; }
+  .topbar h1 { margin:0; font-size:16px; }
+  .stat { font-size:13px; }
+  .stat b { color:#fbbf24; font-family:"Courier New",monospace; }
+  .stat .lbl { color:#9ca3af; font-size:11px; }
+
+  .layout { max-width:1200px; margin:20px auto 40px; padding:0 16px; display:grid; grid-template-columns:1fr 360px; gap:16px; align-items:start; }
+
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:12px; margin-bottom:14px; overflow:hidden; }
+  .panel h2 { margin:0; padding:10px 14px; font-size:14px; border-bottom:1px solid var(--line); background:#fafafa; }
+  .panel .body { padding:12px 14px; }
+
+  .channel-tabs { display:flex; gap:6px; margin-bottom:10px; }
+  .channel-tabs button { border:1px solid var(--line); background:#fafafa; border-radius:8px; padding:6px 12px; font-size:12px; }
+  .channel-tabs button.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+  .row { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px dashed var(--line); }
+  .row:last-child { border-bottom:0; }
+  .row .nm { flex:1; min-width:0; font-size:13px; }
+  .row .nm small { display:block; color:var(--muted); }
+  .qty { width:58px; padding:5px 4px; border:1px solid var(--line); border-radius:6px; text-align:center; }
+  .btn { border:0; border-radius:7px; padding:6px 10px; font-size:12px; font-weight:600; color:#fff; }
+  .btn:active { transform:scale(.97); }
+  .btn-blue { background:var(--accent); }
+  .btn-green { background:var(--good); }
+  .btn-orange { background:var(--warn); }
+  .btn-red { background:var(--bad); }
+  .btn-gray { background:#e5e7eb; color:var(--ink); }
+  .btn:disabled { opacity:.45; cursor:not-allowed; }
+
+  .badge { font-size:11px; padding:1px 7px; border-radius:999px; background:#eef2ff; color:#4338ca; white-space:nowrap; }
+  .badge.b80 { background:#fef3c7; color:#92400e; }
+  .badge.b26 { background:#dcfce7; color:#166534; }
+  .badge.rk { background:#fee2e2; color:#b91c1c; }
+
+  .log { max-height:260px; overflow-y:auto; font-size:12px; }
+  .log p { margin:3px 0; line-height:1.5; }
+  .log .news { color:var(--bad); font-weight:600; }
+  .log .ok { color:var(--good); }
+  .log .err { color:var(--bad); }
+
+  .empty { color:var(--muted); font-size:12px; padding:8px 0; }
+
+  .gauge { height:8px; border-radius:999px; background:#e5e7eb; overflow:hidden; margin-top:3px; }
+  .gauge > div { height:100%; background:var(--good); }
+  .gauge.high > div { background:var(--warn); }
+  .gauge.danger > div { background:var(--bad); }
+
+  .npc-card { border:1px solid var(--line); border-radius:10px; padding:10px; margin-bottom:10px; background:#fafafa; }
+  .npc-card h3 { margin:0 0 4px; font-size:14px; }
+  .npc-card .tier { font-size:12px; color:var(--accent); font-weight:700; }
+  .npc-card .mem { font-size:12px; color:var(--muted); margin-top:6px; }
+  .npc-card .mem ul { margin:4px 0 0; padding-left:16px; }
+
+  @media (max-width:900px){ .layout{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <h1>两界搬运工</h1>
+    <span class="stat">当前：<b id="curEra"></b> <b id="curDate"></b> · <b id="curCity"></b></span>
+    <span class="stat"><span class="lbl">现代钱包</span> <b id="w26">¥0</b></span>
+    <span class="stat"><span class="lbl">1980钱包</span> <b id="w80">¥0</b></span>
+    <span class="stat"><span class="lbl">负重</span> <b id="cap">0/30</b></span>
+    <span class="stat"><span class="lbl">通缉度</span> <b id="risk80">0</b></span>
+    <span class="stat"><span class="lbl">洗钱风险</span> <b id="risk26">0</b></span>
+    <span class="stat"><button class="btn btn-red" id="resetBtn">重置</button></span>
+  </div>
+</header>
+
+<div class="layout">
+  <div>
+    <section class="panel">
+      <h2 id="marketTitle">市场</h2>
+      <div class="body" id="marketBox"></div>
+    </section>
+
+    <section class="panel">
+      <h2>行动</h2>
+      <div class="body" id="actBox"></div>
+    </section>
+
+    <section class="panel">
+      <h2>新闻 / 日志</h2>
+      <div class="body"><div class="log" id="log"></div></div>
+    </section>
+  </div>
+
+  <aside>
+    <section class="panel">
+      <h2>背包（随身）</h2>
+      <div class="body" id="packBox"></div>
+    </section>
+
+    <section class="panel">
+      <h2>任务板（拉货单）</h2>
+      <div class="body" id="questBox"></div>
+    </section>
+
+    <section class="panel">
+      <h2>人脉 / 恋爱</h2>
+      <div class="body" id="npcBox"></div>
+    </section>
+  </aside>
+</div>
+
+<script>
+"use strict";
+
+/* ============ 基础数据 ============ */
+const CITIES80 = { beijing:"北京", guangzhou:"广州", shenzhen:"深圳", harbin:"哈尔滨" };
+const CITIES26 = { beijing:"北京", guangzhou:"广州", shenzhen:"深圳", hongkong:"香港" };
+const PAIR = { beijing:true, guangzhou:true, shenzhen:true };
+const CAPACITY = 30;
+
+const ITEMS = [
+  /* 现代→1980 工业品 */
+  { id:"rope",    name:"尼龙绳",   w:0.5,  p26:3,   p80:30,   cat:"ind", prodEra:"26", prod:"beijing",   hotEra:"80", hot:"harbin" },
+  { id:"watch",   name:"电子表",   w:0.3,  p26:15,  p80:120,  cat:"ind", prodEra:"26", prod:"shenzhen",  hotEra:"80", hot:"guangzhou" },
+  { id:"flash",   name:"强光手电", w:1.0,  p26:20,  p80:100,  cat:"ind", prodEra:"26", prod:"beijing",   hotEra:"80", hot:"harbin" },
+  { id:"noodle",  name:"方便面",   w:0.4,  p26:3,   p80:25,   cat:"ind", prodEra:"26", prod:"guangzhou", hotEra:"80", hot:"harbin" },
+  { id:"med",     name:"抗生素药", w:0.2,  p26:10,  p80:200,  cat:"ind", prodEra:"26", prod:"guangzhou", hotEra:"80", hot:"guangzhou" },
+  { id:"sock",    name:"尼龙丝袜", w:0.2,  p26:5,   p80:40,   cat:"ind", prodEra:"26", prod:"shenzhen",  hotEra:"80", hot:"beijing" },
+  { id:"calc",    name:"计算器",   w:0.5,  p26:25,  p80:150,  cat:"ind", prodEra:"26", prod:"shenzhen",  hotEra:"80", hot:"harbin" },
+  /* 1980 本地流动品 */
+  { id:"sugar",   name:"白糖",     w:1.0,  p80:1,   p26:5,    cat:"local", prodEra:"80", prod:"guangzhou", hotEra:"80", hot:"harbin" },
+  { id:"cotton",  name:"棉花",     w:1.0,  p80:1.5, p26:8,    cat:"local", prodEra:"80", prod:"beijing",   hotEra:"80", hot:"harbin" },
+  { id:"rice",    name:"大米",     w:1.0,  p80:0.6, p26:4,    cat:"local", prodEra:"80", prod:"guangzhou", hotEra:"80", hot:"beijing" },
+  { id:"wood",    name:"木材",     w:3.0,  p80:2,   p26:20,   cat:"local", prodEra:"80", prod:"harbin",    hotEra:"80", hot:"guangzhou" },
+  { id:"fert",    name:"化肥",     w:5.0,  p80:3,   p26:25,   cat:"local", prodEra:"80", prod:"beijing",   hotEra:"80", hot:"guangzhou" },
+  /* 1980→2026 收藏品 */
+  { id:"monkey",  name:"猴票",     w:0.01, p80:0.08, p26:3000, cat:"ant", prodEra:"80", prod:"beijing",  hotEra:"26", hot:"beijing", stock:200 },
+  { id:"stamp",   name:"成套邮票", w:0.01, p80:1,   p26:2000, cat:"ant", prodEra:"80", prod:"beijing",  hotEra:"26", hot:"beijing", stock:300 },
+  { id:"maotai",  name:"老茅台",   w:2.0,  p80:15,  p26:8000, cat:"ant", prodEra:"80", prod:"guangzhou", hotEra:"26", hot:"beijing", stock:80 },
+  { id:"coin",    name:"民国银元", w:0.02, p80:8,   p26:1500, cat:"ant", prodEra:"80", prod:"guangzhou", hotEra:"26", hot:"beijing", stock:200 },
+  { id:"porc",    name:"青花瓷瓶", w:5.0,  p80:50,  p26:30000, cat:"ant", prodEra:"80", prod:"beijing",  hotEra:"26", hot:"beijing", stock:40 },
+  { id:"ration",  name:"全国粮票", w:0.01, p80:0.2, p26:300,  cat:"ant", prodEra:"80", prod:"beijing",  hotEra:"26", hot:"beijing", stock:1000 },
+];
+const itemMap = Object.fromEntries(ITEMS.map(i => [i.id, i]));
+
+/* 历史事件 */
+const EVENTS = [
+  { era:"80", y:1980, m:8, d:1,  text:"深圳经济特区成立！现代工业品在深圳、广州需求大涨。", on(){
+      bump("80:guangzhou","ind",1.6); bump("80:shenzhen","ind",1.6); news("[1980.8.1] 深圳特区成立，工业品行情看涨！"); } },
+  { era:"80", y:1983, m:8, d:15, text:"全国严打开始！黑市关闭，风声鹤唳。", on(){
+      S.blackClosed = true; news("[1983.8.15] 全国严打，黑市关闭，注意避风头！"); } },
+  { era:"80", y:1985, m:9, d:22, text:"广场协议签署！日元升值，港币走强。", on(){
+      bump("26:hongkong","ind",0.7); news("[1985.9.22] 广场协议签署，香港电子商品更便宜了。"); } },
+];
+function bump(key, cat, f){
+  const m = S.markets[key] = S.markets[key] || {};
+  ITEMS.forEach(it => { if(it.cat === cat && m[it.id]) m[it.id].mul *= f; });
+}
+
+/* ============ 状态 ============ */
+let S;
+function newState(){
+  return {
+    era:"26", city:"beijing",
+    d26:{ y:2026, m:1, d:1 }, d80:{ y:1980, m:1, d:1 },
+    w26:2000, w80:0,
+    pack:[], cap:CAPACITY,
+    risk26:0, risk80:0,
+    markets:{}, stocks:{},
+    board:[], quests:[],
+    npc:{
+      xiaofang:{ name:"小芳", era:"80", city:"beijing", job:"供销社售货员", aff:0, trust:0, heart:0, mem:[], likes:["sock","calc","watch"] },
+      xiaoyu: { name:"小雨", era:"26", city:"beijing", job:"咖啡店店员",   aff:0, trust:0, heart:0, mem:[], likes:["monkey","maotai","coin"] },
+    },
+    fired:{}, blackClosed:false,
+    log:[],
+  };
+}
+S = load() || newState();
+
+/* ============ 存档 ============ */
+function save(){ localStorage.setItem("xiandai2", JSON.stringify(S)); }
+function load(){ try { return JSON.parse(localStorage.getItem("xiandai2")); } catch(e){ return null; } }
+
+/* ============ 工具 ============ */
+const logEl = document.getElementById("log");
+function log(msg, cls){ S.log.push({t:msg,c:cls||"info"}); if(S.log.length>60) S.log.shift(); renderLog(); save(); }
+function news(msg){ S.log.push({t:msg,c:"news"}); if(S.log.length>60) S.log.shift(); renderLog(); save(); }
+
+function curDate(){ return S.era==="26" ? S.d26 : S.d80; }
+function wallet(){ return S.era==="26" ? S.w26 : S.w80; }
+function setWallet(v){ if(S.era==="26") S.w26=v; else S.w80=v; }
+function cityName(){ return (S.era==="26"?CITIES26:CITIES80)[S.city]; }
+function eraName(){ return S.era==="26" ? "2026·现代" : "1980·旧时"; }
+function fmt(d){ return d.y+"年"+d.m+"月"+d.d+"日"; }
+function dateKey(d){ return d.y+"-"+d.m+"-"+d.d; }
+
+function addDays(d, n){
+  let t = new Date(d.y, d.m-1, d.d);
+  t.setDate(t.getDate()+n);
+  return { y:t.getFullYear(), m:t.getMonth()+1, d:t.getDate() };
+}
+function cmpDate(a,b){ // -1 a<b 0 eq 1 a>b
+  if(a.y!==b.y) return a.y<b.y?-1:1;
+  if(a.m!==b.m) return a.m<b.m?-1:1;
+  if(a.d!==b.d) return a.d<b.d?-1:1;
+  return 0;
+}
+
+function packWeight(){ return S.pack.reduce((s,it)=> s+itemMap[it.id].w*it.qty, 0); }
+function packQty(id){ const s=S.pack.find(x=>x.id===id); return s?s.qty:0; }
+function addPack(id, n){ const s=S.pack.find(x=>x.id===id); if(s) s.qty+=n; else S.pack.push({id, qty:n}); }
+function subPack(id, n){ const s=S.pack.find(x=>x.id===id); if(s){ s.qty-=n; if(s.qty<=0) S.pack=S.pack.filter(x=>x.id!==id);} }
+
+function mk(era,city){ const k=era+":"+city; if(!S.markets[k]) S.markets[k]={}; return S.markets[k]; }
+function baseMul(item){
+  if(item.prodEra===S.era && item.prod===S.city) return 0.6;
+  if(item.hotEra===S.era && item.hot===S.city) return 1.2;
+  return 1.0;
+}
+function mulOf(item){
+  const m=mk(S.era,S.city);
+  if(!m[item.id]) m[item.id]={ mul:baseMul(item) };
+  return m[item.id].mul;
+}
+function itemBase(item){ return S.era==="26" ? item.p26 : item.p80; }
+function itemPrice(item){ return Math.max(1, Math.round(itemBase(item)*mulOf(item))); }
+function sellPrice(item, black){ return Math.max(1, Math.round(itemPrice(item)*(black?1.5:1))); }
+
+function stockOf(item){ if(S.stocks[item.id]===undefined) S.stocks[item.id]=item.stock80; return S.stocks[item.id]; }
+function buyable(){
+  const list=[];
+  for(const it of ITEMS){
+    if(S.era==="26"){ if(it.prodEra==="26") list.push(it); }
+    else {
+      if(it.prodEra!=="80") continue;
+      if(it.cat==="ant"){ if(it.prod===S.city && stockOf(it)>0) list.push(it); }
+      else list.push(it);
+    }
+  }
+  return list;
+}
+
+/* ============ 时间推进 ============ */
+function advanceDays(n){
+  for(let i=0;i<n;i++){
+    S.d26=addDays(S.d26,1); S.d80=addDays(S.d80,1);
+    Object.values(S.markets).forEach(c=> Object.values(c).forEach(x=> x.mul += (1-x.mul)*0.02 ));
+    S.risk26=Math.max(0,S.risk26-2); S.risk80=Math.max(0,S.risk80-2);
+  }
+  checkEvents(); checkQuests();
+  if(S.board.length<3) genBoard();
+  if(S.blackClosed && cmpDate(S.d80,{y:1984,m:1,d:1})>=0){ S.blackClosed=false; news("[1984.1.1] 严打结束，黑市重新开张。"); }
+}
+
+function checkEvents(){
+  for(const e of EVENTS){
+    const key=e.era+e.y+e.m+e.d;
+    if(!S.fired[key] && S.era===e.era && cmpDate(curDate(), {y:e.y,m:e.m,d:e.d})>=0){ S.fired[key]=true; e.on(); }
+  }
+}
+
+/* ============ 风险 ============ */
+function addRisk(gain, black){
+  const rate = black?50:200;
+  if(S.era==="26") S.risk26 += Math.round(gain/rate); else S.risk80 += Math.round(gain/rate);
+}
+function riskCur(){ return S.era==="26"?S.risk26:S.risk80; }
+function riskTrouble(){
+  const r=riskCur();
+  if(r<60) return false;
+  const p = r>=90?1:0.3;
+  if(Math.random()>p) return false;
+  if(S.era==="26"){
+    const fine=Math.min(S.w26,500); S.w26-=fine; S.risk26=20;
+    log("税务与银行联合调查！冻结并罚款 "+fine+" 元，洗钱风险归零。","err");
+  } else {
+    const lose=Math.round(S.pack.reduce((s,it)=>s+it.qty,0)*0.3);
+    let left=lose;
+    while(left>0 && S.pack.length){ const s=S.pack[0]; const take=Math.min(s.qty,left); subPack(s.id,take); left-=take; }
+    const fine=Math.min(S.w80,80); S.w80-=fine; S.risk80=20;
+    log("被联防队抓住（投机倒把）！没收 "+lose+" 件货物、罚款 "+fine+" 元，通缉度归零。","err");
+  }
+  return true;
+}
+
+/* ============ 交易 ============ */
+function buy(id, qty){
+  qty=Math.max(1,Math.floor(qty)||1);
+  const it=itemMap[id], price=itemPrice(it), cost=price*qty;
+  if(wallet()<cost){ log("钱不够。","err"); return; }
+  if(packWeight()+it.w*qty>S.cap){ log("负重不够，带不下了。","err"); return; }
+  const st=stockOf(it);
+  if(it.cat==="ant" && st<qty){ log("货源有限，只剩 "+st+" 件。","err"); return; }
+  setWallet(wallet()-cost); addPack(id,qty);
+  if(it.cat==="ant"){ S.stocks[it.id]=st-qty; }
+  const m=mk(S.era,S.city); const me=m[it.id] || (m[it.id]={mul:baseMul(it)}); me.mul=Math.min(3,me.mul*Math.pow(1.08,qty));
+  log("买入 "+it.name+" ×"+qty+"，花费 "+cost+" 元。","ok"); render(); save();
+}
+function sell(id, qty, black){
+  qty=Math.max(1,Math.floor(qty)||1);
+  const it=itemMap[id];
+  if(packQty(id)<qty){ log("没有那么多 "+it.name+"。","err"); return; }
+  if(S.era==="80" && black && S.blackClosed){ log("严打期间黑市关门了！","err"); return; }
+  const gain=sellPrice(it,black)*qty;
+  addRisk(gain,black);
+  if(riskTrouble()){ render(); save(); return; }
+  subPack(id,qty); setWallet(wallet()+gain);
+  const m=mk(S.era,S.city); const me=m[it.id] || (m[it.id]={mul:baseMul(it)});
+  me.mul=Math.max(0.3, me.mul*(it.cat==="ant"?Math.pow(0.9,qty):Math.pow(0.94,qty)));
+  log("出售 "+it.name+" ×"+qty+(black?"（黑市）":"")+"，进账 "+gain+" 元。","ok"); render(); save();
+}
+
+/* ============ 行动 ============ */
+function travelTo(city){
+  if(city===S.city) return;
+  const fare = S.era==="26" ? 30 : 5;
+  if(wallet()<fare){ log("路费不够。","err"); return; }
+  setWallet(wallet()-fare);
+  advanceDays(1);
+  S.city=city;
+  log("乘"+(S.era==="26"?"高铁":"火车")+"来到 "+(S.era==="26"?CITIES26:CITIES80)[city]+"，耗时 1 天。","info");
+  render(); save();
+}
+function cross(){
+  if(!PAIR[S.city]){ log("这里没有穿越点，先回到北京/广州/深圳。","err"); return; }
+  advanceDays(3);
+  S.era = S.era==="26" ? "80" : "26";
+  log("穿越时空之门……耗时 3 天，来到 "+eraName()+" 的 "+cityName()+"。","info");
+  render(); save();
+}
+function rest(n){
+  advanceDays(n);
+  log("休息 "+n+" 天。现在是 "+fmt(curDate())+"。","info");
+  render(); save();
+}
+
+/* ============ 任务 ============ */
+const QUEST_TPL = [
+  { era:"80", item:"rope",  qty:20, from:"guangzhou", to:"harbin",   days:12, giver:"纺织厂采购员" },
+  { era:"80", item:"watch", qty:10, from:"shenzhen",  to:"beijing",  days:10, giver:"倒爷老王" },
+  { era:"80", item:"med",   qty:8,  from:"guangzhou", to:"guangzhou",days:7,  giver:"县医院院长" },
+  { era:"80", item:"sugar", qty:15, from:"guangzhou", to:"harbin",   days:10, giver:"供销社主任" },
+  { era:"80", item:"sock",  qty:12, from:"shenzhen",  to:"harbin",   days:12, giver:"黑市掮客" },
+  { era:"26", item:"monkey",qty:2,  from:"beijing",   to:"beijing",  days:20, giver:"古玩店老板" },
+  { era:"26", item:"maotai",qty:2,  from:"guangzhou", to:"beijing",  days:20, giver:"拍卖行经理" },
+  { era:"26", item:"coin",  qty:5,  from:"beijing",   to:"beijing",  days:15, giver:"收藏家" },
+];
+function genBoard(){
+  S.board = QUEST_TPL.slice();
+  S.board.forEach((q,i)=>{
+    const it=itemMap[q.item];
+    q.id="q"+i+"_"+Date.now();
+    q.reward = q.era==="80"
+      ? Math.max(60, Math.round(it.p80*q.qty*1.8))
+      : Math.max(200, Math.round(it.p26*q.qty*0.6));
+  });
+}
+function takeQuest(id){
+  const q=S.board.find(x=>x.id===id); if(!q) return;
+  q.deadline = addDays(q.era==="26"?S.d26:S.d80, q.days);
+  S.quests.push(q); S.board=S.board.filter(x=>x.id!==id);
+  log("接下订单：给"+q.giver+"送 "+itemMap[q.item].name+" ×"+q.qty+"，送到"+(q.era==="26"?CITIES26:CITIES80)[q.to]+"。","info");
+  render(); save();
+}
+function deliverQuest(id){
+  const q=S.quests.find(x=>x.id===id); if(!q) return;
+  if(S.era!==q.era || S.city!==q.to){ log("还没到交货地点。","err"); return; }
+  if(packQty(q.item)<q.qty){ log("货物不足（需要 "+itemMap[q.item].name+" ×"+q.qty+"）。","err"); return; }
+  subPack(q.item,q.qty);
+  setWallet(wallet()+q.reward);
+  const n=S.npc;
+  const g=n[q.era==="80"?"xiaofang":"xiaoyu"];
+  g.aff+=6;
+  S.quests=S.quests.filter(x=>x.id!==id);
+  log("完成订单！进账 "+q.reward+" 元，"+g.name+"对你的好感提升。","ok");
+  render(); save();
+}
+function checkQuests(){
+  S.quests.forEach(q=>{
+    const ref = q.era==="26" ? S.d26 : S.d80;
+    if(cmpDate(ref, q.deadline)>0) log("订单超时，"+q.giver+"找别人了。","err");
+  });
+  S.quests = S.quests.filter(q=>{
+    const ref = q.era==="26" ? S.d26 : S.d80;
+    return cmpDate(ref, q.deadline)<=0;
+  });
+}
+
+/* ============ 恋爱 ============ */
+function tierOf(n){ return n.aff>=80?3:n.aff>=50?2:n.aff>=20?1:0; }
+const TIERS=["陌生人","熟人","亲近","心动"];
+const TALK=[
+  ["你好，同志，今天柜台里的货都在这里了。","欢迎光临，今天喝点什么？"],
+  ["你来了呀，听说南方那边东西挺多的？","你最近总是往外面跑，小心点呀。"],
+  ["跟你说话总觉得踏实，你见过世面。","这几天没见到你，我还以为你走了。"],
+  ["（她看着你，脸微微发红）其实……我一直想跟你多说说话。","（她小声）下次回来，先来找我好不好？"],
+];
+const DATE_TEXT=[
+  "你约她去人民公园散步，气氛有些生疏。",
+  "你们一起逛了庙会，她买了个糖人，笑得很开心。",
+  "你们在河边看了很久的落日，说了很多话。",
+  "她挽着你的手臂，声音很轻：要是能一直这样就好了。",
+];
+function curNpc(){ return S.npc[S.era==="80"?"xiaofang":"xiaoyu"]; }
+function atNpcCity(n){ return S.city===n.city && S.era===n.era; }
+function talk(n){
+  if(!atNpcCity(n)){ log(n.name+"不在这个城市。","err"); return; }
+  const t=tierOf(n);
+  n.aff=Math.min(100,n.aff+2);
+  n.lastTalk=S.d26.y; // cooldown marker
+  const idx=Math.floor(Math.random()*TALK[t].length);
+  n.mem.push("你对她说：「"+TALK[t][idx]+"」");
+  log("你与"+n.name+"交谈："+TALK[t][idx],"info");
+  render(); save();
+}
+function gift(n, id, qty){
+  if(!atNpcCity(n)){ log(n.name+"不在这里。","err"); return; }
+  qty=Math.max(1,Math.floor(qty)||1);
+  if(packQty(id)<qty){ log("没有这个礼物。","err"); return; }
+  subPack(id,qty);
+  const it=itemMap[id];
+  if(n.likes.includes(id)){ n.aff=Math.min(100,n.aff+10); n.heart+=2; n.mem.push("你送了 "+n.name+" 一份"+it.name+"，她眼睛都亮了。"); log(n.name+"很喜欢你送的"+it.name+"！","ok"); }
+  else { n.aff=Math.min(100,n.aff+3); n.mem.push("你送了 "+n.name+" 一些"+it.name+"，她礼貌地道了谢。"); log(n.name+"收下了"+it.name+"。","info"); }
+  render(); save();
+}
+function date(n){
+  if(!atNpcCity(n)){ log(n.name+"不在这里。","err"); return; }
+  if(n.heart<15){ log("关系还不够，她婉拒了。","err"); return; }
+  advanceDays(1);
+  const t=tierOf(n);
+  n.aff=Math.min(100,n.aff+5); n.heart+=3;
+  n.mem.push(DATE_TEXT[t]);
+  log(DATE_TEXT[t],"ok");
+  render(); save();
+}
+
+/* ============ 渲染 ============ */
+function render(){
+  document.getElementById("curEra").textContent=eraName();
+  document.getElementById("curDate").textContent=fmt(curDate());
+  document.getElementById("curCity").textContent=cityName();
+  document.getElementById("w26").textContent="¥"+S.w26.toLocaleString("zh-CN");
+  document.getElementById("w80").textContent="¥"+S.w80.toLocaleString("zh-CN");
+  document.getElementById("cap").textContent=packWeight().toFixed(1)+"/"+S.cap;
+  document.getElementById("risk80").textContent=S.risk80;
+  document.getElementById("risk26").textContent=S.risk26;
+  renderMarket(); renderActions(); renderPack(); renderQuest(); renderNpc(); renderLog(); save();
+}
+
+function chTabs(){ return `
+  <div class="channel-tabs">
+    <button class="btn-blue" id="chLegal">合法渠道</button>
+    ${S.era==="80" && S.blackClosed ? "" : `<button class="btn-orange" id="chBlack">黑市(1.5倍)</button>`}
+  </div>`; }
+
+function renderMarket(){
+  const t=S.era==="26"?"2026 现代市场 · "+cityName():"1980 市场 · "+cityName()+"（双轨制）";
+  document.getElementById("marketTitle").textContent=t;
+  const bl=buyable();
+  let html=chTabs()+"<b>购买</b>";
+  if(bl.length===0) html+='<div class="empty">这里没什么可买的。</div>';
+  html+=bl.map(it=>`
+    <div class="row">
+      <div class="nm">${it.name} <small>${itemPrice(it)} 元${it.cat==="ant"?" · 余量 "+stockOf(it):""}</small></div>
+      <input class="qty" id="bq-${it.id}" type="number" min="1" value="1">
+      <button class="btn btn-blue" data-act="buy" data-id="${it.id}">买</button>
+    </div>`).join("");
+  html+="<br><b>出售</b>";
+  if(S.pack.length===0) html+='<div class="empty">背包是空的。</div>';
+  html+=S.pack.map(it=>{
+    const item=itemMap[it.id];
+    return `
+    <div class="row">
+      <div class="nm">${item.name} ×${it.qty} <small>合法 ${sellPrice(item,false)} 元 | 黑市 ${sellPrice(item,true)} 元</small></div>
+      <input class="qty" id="sq-${it.id}" type="number" min="1" max="${it.qty}" value="1">
+      <button class="btn btn-green" data-act="sell" data-id="${it.id}" data-bk="0">卖</button>
+      ${(S.era==="80"&&S.blackClosed)?"":`<button class="btn btn-orange" data-act="sell" data-id="${it.id}" data-bk="1">黑市</button>`}
+    </div>`; }).join("");
+  document.getElementById("marketBox").innerHTML=html;
+}
+
+function renderActions(){
+  const cities=S.era==="26"?CITIES26:CITIES80;
+  const sel=Object.keys(cities).map(c=>`<option value="${c}" ${c===S.city?"selected":""}>${cities[c]}</option>`).join("");
+  const canCross=PAIR[S.city];
+  document.getElementById("actBox").innerHTML=`
+    <div class="row"><span class="nm">出行（1天 + 路费）</span>
+      <select class="qty" style="width:120px" id="dest">${sel}</select>
+      <button class="btn btn-blue" id="goBtn">出发</button></div>
+    <div class="row"><span class="nm">休息</span>
+      <button class="btn btn-gray" id="rest1">1天</button>
+      <button class="btn btn-gray" id="rest7">7天</button></div>
+    <div class="row"><span class="nm">穿越时空之门（耗时3天）</span>
+      <button class="btn btn-red" id="crossBtn" ${canCross?"":"disabled"}>${canCross?"穿越 → "+(S.era==="26"?"1980":"2026"):"需先到北京/广州/深圳"}</button></div>
+    <div class="row" style="font-size:12px;color:var(--muted)">
+      ${S.era==="80"?"提示：现代工业品在旧时很抢手，旧时的票证/古董在现代是天价。":"提示：把旧时的收藏品带回现代变现，但小心洗钱风险。"}
+    </div>`;
+}
+
+function renderPack(){
+  document.getElementById("packBox").innerHTML =
+    (S.pack.length===0?'<div class="empty">背包空空如也。</div>':S.pack.map(it=>{
+      const item=itemMap[it.id];
+      return `<div class="row"><span class="nm">${item.name} ×${it.qty} <small>重 ${(item.w*it.qty).toFixed(2)}</small></span>
+        <span class="badge ${item.cat==="ant"?"b26":"b80"}">${item.cat==="ant"?"收藏品":item.cat==="ind"?"工业品":"土产"}</span></div>`;
+    }).join(""))+
+    '<div class="row"><span class="nm">负重：'+packWeight().toFixed(1)+' / '+S.cap+'</span>'+
+    '<div class="gauge" style="flex:1"><div style="width:'+Math.min(100,packWeight()/S.cap*100)+'%"></div></div></div>';
+}
+
+function renderQuest(){
+  let html="<b>进行中的订单</b>";
+  if(S.quests.length===0) html+='<div class="empty">没有进行中的订单。</div>';
+  html+=S.quests.map(q=>{
+    const it=itemMap[q.item];
+    const canDel = S.era===q.era && S.city===q.to && packQty(q.item)>=q.qty;
+    return `<div class="row"><span class="nm"><span class="badge ${q.era==="80"?"b80":"b26"}">${q.era==="80"?"1980":"2026"}</span> ${it.name} ×${q.qty} → ${(q.era==="26"?CITIES26:CITIES80)[q.to]}<small>${q.giver} · 截止 ${fmt(q.deadline)}</small></span>
+      <button class="btn btn-green" data-act="deliver" data-id="${q.id}" ${canDel?"":"disabled"}>交货</button></div>`;
+  }).join("");
+  html+="<br><b>可接订单</b>";
+  if(S.board.length===0) html+='<div class="empty">暂时没有新订单。</div>';
+  html+=S.board.map(q=>{
+    const it=itemMap[q.item];
+    return `<div class="row"><span class="nm"><span class="badge ${q.era==="80"?"b80":"b26"}">${q.era==="80"?"1980":"2026"}</span> ${it.name} ×${q.qty} → ${(q.era==="26"?CITIES26:CITIES80)[q.to]}<small>${q.giver} · 报酬 ¥${q.reward} · ${q.days}天</small></span>
+      <button class="btn btn-blue" data-act="take" data-id="${q.id}">接单</button></div>`;
+  }).join("");
+  document.getElementById("questBox").innerHTML=html;
+}
+
+function renderNpc(){
+  const cands=S.era==="80"?["xiaofang"]:["xiaoyu"];
+  let html=cands.map(k=>{
+    const np=S.npc[k];
+    const here=atNpcCity(np);
+    return `<div class="npc-card">
+      <h3>${np.name} <span class="badge ${np.era==="80"?"b80":"b26"}">${np.era==="80"?"1980":"2026"}</span>
+        <span class="tier">${TIERS[tierOf(np)]}</span></h3>
+      <div>${np.job} · 好感 ${np.aff} / 心动 ${np.heart}</div>
+      <div class="gauge ${np.aff>70?"danger":np.aff>40?"high":""}"><div style="width:${np.aff}%"></div></div>
+      <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-gray" data-act="talk" data-npc="${k}" ${here?"":"disabled"}>交谈</button>
+        <button class="btn btn-blue" data-act="date" data-npc="${k}" ${(here&&np.heart>=15)?"":"disabled"}>约会</button>
+      </div>
+      <div class="mem">最近的事：<ul>${np.mem.slice(-3).map(m=>"<li>"+m+"</li>").join("")||"<li>还没有什么交集。</li>"}</ul></div>
+    </div>`;
+  }).join("");
+  const giftKey=S.era==="80"?"xiaofang":"xiaoyu";
+  html+='<div class="row"><span class="nm">送礼：</span><select class="qty" style="width:110px" id="giftSel">'+
+    (S.pack.length===0?'<option value="">（背包空）</option>':S.pack.map(s=>`<option value="${s.id}">${itemMap[s.id].name}×${s.qty}</option>`).join(""))+
+    '</select><input class="qty" id="giftQty" type="number" min="1" value="1">'+
+    '<button class="btn btn-green" data-act="gift" data-npc="'+giftKey+'">送</button></div>';
+  document.getElementById("npcBox").innerHTML=html;
+}
+
+function renderLog(){
+  logEl.innerHTML=S.log.map(x=>`<p class="${x.c}">${x.t}</p>`).join("");
+  logEl.scrollTop=logEl.scrollHeight;
+}
+
+/* ============ 事件绑定 ============ */
+document.addEventListener("click", e=>{
+  const b=e.target.closest("[data-act]");
+  if(b){
+    const a=b.dataset.act, id=b.dataset.id;
+    if(a==="buy"){ const v=document.getElementById("bq-"+id); buy(id, Number(v&&v.value)); }
+    else if(a==="sell"){ const v=document.getElementById("sq-"+id); sell(id, Number(v&&v.value), b.dataset.bk==="1"); }
+    else if(a==="take") takeQuest(id);
+    else if(a==="deliver") deliverQuest(id);
+    else if(a==="talk"){ const n=S.npc[b.dataset.npc]; talk(n); }
+    else if(a==="gift"){ const n=S.npc[b.dataset.npc]; const sel=document.getElementById("giftSel"); gift(n, sel.value, Number(document.getElementById("giftQty").value)); }
+    else if(a==="date"){ const n=S.npc[b.dataset.npc]; date(n); }
+    return;
+  }
+  if(e.target.id==="goBtn"){ travelTo(document.getElementById("dest").value); }
+  else if(e.target.id==="rest1") rest(1);
+  else if(e.target.id==="rest7") rest(7);
+  else if(e.target.id==="crossBtn") cross();
+  else if(e.target.id==="resetBtn"){ localStorage.removeItem("xiandai2"); S=newState(); logEl.innerHTML=""; log("已重置。","info"); render(); }
+});
+
+/* ============ 启动 ============ */
+if(!S.log) S.log=[];
+if(S.board.length===0) genBoard();
+render();
+log("欢迎！你是两界搬运工：现代钱包 ¥2000 起家。","info");
+log("玩法：2026 买工业品 → 穿越到 1980 卖出赚旧币 → 买票证/古董 → 回 2026 变现。","info");
+log("小心！黑市利润高但涨通缉度/洗钱风险，高到一定值会被抓。","info");
+log("任务板有拉货单，完成可赚报酬和好感。","info");
+</script>
+</body>
+</html>

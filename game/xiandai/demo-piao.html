@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>钱票Demo2 - 钱包 / 商店+购物车 / 兑换零钱</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei",sans-serif;background:#f5f6f8;color:#1f2937;padding:20px}
+  .wrap{max-width:980px;margin:0 auto}
+  h1{font-size:22px;margin-bottom:4px}
+  .sub{color:#6b7280;font-size:13px;margin-bottom:18px}
+  .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;align-items:start}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  section{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:14px;min-height:220px}
+  section h2{font-size:15px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #eef0f3}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1px solid #d1d5db;background:#f9fafb;border-radius:8px;padding:4px 10px;font-size:13px}
+  .chip b{color:#b45309}
+  .total{margin-top:12px;font-size:13px;color:#374151}
+  .total b{color:#dc2626}
+  .item{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px dashed #eef0f3}
+  .item:last-child{border-bottom:none}
+  .item .nm{flex:1;font-size:14px}
+  .item .nm small{display:block;color:#9ca3af;font-size:11px}
+  .item .pr{color:#dc2626;font-weight:700;font-size:13px;white-space:nowrap}
+  .btn{border:1px solid #d1d5db;background:#fff;border-radius:8px;padding:4px 12px;font-size:13px;cursor:pointer}
+  .btn:hover{background:#f3f4f6}
+  .btn.prim{background:#2563eb;color:#fff;border-color:#2563eb}
+  .btn.prim:hover{background:#1d4ed8}
+  .btn.danger{color:#dc2626}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .qty{width:56px;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;text-align:center}
+  .sub-h{font-size:13px;color:#6b7280;margin:14px 0 6px}
+  .empty{color:#9ca3af;font-size:13px;padding:20px 0;text-align:center}
+  .cart-foot{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #eef0f3;font-size:13px}
+  .cart-foot .sp{flex:1}
+  .cart-foot b{color:#dc2626}
+  .rm{color:#9ca3af;cursor:pointer;border:none;background:none;font-size:16px;line-height:1}
+  .rm:hover{color:#dc2626}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:10}
+  .modal.hidden{display:none}
+  .box{background:#fff;border-radius:12px;width:min(460px,92vw);max-height:86vh;display:flex;flex-direction:column;overflow:hidden}
+  .box h3{padding:14px 16px;font-size:15px;border-bottom:1px solid #eef0f3}
+  .bills{overflow-y:auto;padding:10px 16px;flex:1}
+  .bill-row{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px}
+  .bill-row b{color:#b45309;font-weight:700}
+  .bill-row span{color:#9ca3af;font-size:11px}
+  .bill-row input{accent-color:#2563eb}
+  .sums{padding:10px 16px;border-top:1px solid #eef0f3;font-size:13px;line-height:1.8}
+  .need{color:#dc2626;font-weight:700}
+  .change{color:#16a34a;font-weight:700}
+  .acts{display:flex;gap:8px;justify-content:flex-end;padding:0 16px 14px}
+  .ex-wrap{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px;overflow-y:auto;flex:1}
+  @media(max-width:600px){.ex-wrap{grid-template-columns:1fr}}
+  .ex-title{font-size:12px;color:#6b7280;margin-bottom:6px}
+  .ex-to-row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px}
+  .ex-to-row .nm{flex:1}
+  .ex-to-row b{color:#b45309}
+  .ex-sum{font-size:12px;color:#6b7280;margin-top:8px}
+  #toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;opacity:0;transition:.3s;pointer-events:none;z-index:20;max-width:80vw}
+  #toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>钱票 Demo2</h1>
+  <div class="sub">每张钱票都是独立物品。商店：加入购物车后一次性付款，不够提示还缺，多了自动找零。兑换零钱：支出与获得两边总账相等即可兑换。</div>
+  <div class="grid">
+    <section>
+      <h2>我的钱包</h2>
+      <div class="chips" id="walletChips"></div>
+      <div class="total">合计：<b id="walletTotal"></b></div>
+    </section>
+    <section>
+      <h2>商店</h2>
+      <div id="shopItems"></div>
+      <div class="sub-h">购物车</div>
+      <div id="cartList"></div>
+      <div class="cart-foot"><span class="sp">合计：<b id="cartTotal">0元</b></span>
+        <button class="btn danger" id="cartClear">清空</button>
+        <button class="btn prim" id="cartPay">去结算</button></div>
+    </section>
+    <section>
+      <h2>背包</h2>
+      <div id="packList"></div>
+    </section>
+  </div>
+  <div style="margin-top:14px">
+    <section>
+      <h2>兑换零钱</h2>
+      <div class="sub" style="margin:0 0 8px">从钱包支出若干钱票，换成想要的组合（大票换小票、小票拼大票都行），只要两边总账相等即可。</div>
+      <button class="btn prim" id="exOpen">打开兑换窗口</button>
+    </section>
+  </div>
+</div>
+
+<!-- 支付 -->
+<div id="payModal" class="modal hidden">
+  <div class="box">
+    <h3 id="pmTitle"></h3>
+    <div class="bills" id="pmBills"></div>
+    <div class="sums">
+      <div>已选：<b id="pmPaid">0</b></div>
+      <div id="pmMsg"></div>
+    </div>
+    <div class="acts">
+      <button class="btn" id="pmCancel">取消</button>
+      <button class="btn prim" id="pmOk" disabled>确认支付</button>
+    </div>
+  </div>
+</div>
+
+<!-- 兑换零钱 -->
+<div id="exModal" class="modal hidden">
+  <div class="box">
+    <h3>兑换零钱</h3>
+    <div class="ex-wrap">
+      <div>
+        <div class="ex-title">支出（我的钱包，可多选）</div>
+        <div id="exFrom"></div>
+        <div class="ex-sum">已选合计：<b id="exFromSum">0元</b></div>
+      </div>
+      <div>
+        <div class="ex-title">获得（商店，填数量）</div>
+        <div id="exTo"></div>
+        <div class="ex-sum">获得合计：<b id="exToSum">0元</b></div>
+      </div>
+    </div>
+    <div class="sums"><div id="exMsg"></div></div>
+    <div class="acts">
+      <button class="btn" id="exCancel">取消</button>
+      <button class="btn prim" id="exOk" disabled>确认兑换</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  var wallet = [10000, 5000, 5000, 1000, 1000, 1000, 1000, 1000]; // 初始：1张100、2张50、5张10（单位：分）
+  var pack = {};   // itemId -> 数量
+  var cart = {};   // itemId -> 数量
+
+  var ITEMS = [
+    {id:"water",    name:"矿泉水",     price:300, unit:"瓶"},
+    {id:"mian",     name:"康师傅泡面", price:450, unit:"桶"},
+    {id:"waha",     name:"娃哈哈",     price:990, unit:"瓶"},
+    {id:"lollipop", name:"棒棒糖",     price:5,   unit:"支"}
+  ];
+  var DENOMS = [
+    {id:"c100", name:"纸币100元", v:10000},
+    {id:"c50",  name:"纸币50元",  v:5000},
+    {id:"c20",  name:"纸币20元",  v:2000},
+    {id:"c5",   name:"纸币5元",   v:500},
+    {id:"y1",   name:"硬币1元",   v:100},
+    {id:"j5",   name:"硬币5角",   v:50},
+    {id:"j1",   name:"硬币1角",   v:10},
+    {id:"f5",   name:"硬币5分",   v:5},
+    {id:"f1",   name:"硬币1分",   v:1}
+  ];
+  var CHANGE_DENOMS = [10000,5000,2000,500,100,50,10,5,1]; // 商店找零可用面额
+
+  function fmt(v){
+    var y = Math.floor(v/100), r = v%100;
+    var j = Math.floor(r/10), f = r%10;
+    var s = "";
+    if(y) s += y + "元";
+    if(j) s += j + "角";
+    if(f) s += f + "分";
+    return s || "0元";
+  }
+  function denomById(id){ return DENOMS.filter(function(x){return x.id===id;})[0]; }
+  function itemById(id){ return ITEMS.filter(function(x){return x.id===id;})[0]; }
+  function walletTotal(){ return wallet.reduce(function(a,b){return a+b;},0); }
+  function cartTotal(){ return Object.keys(cart).reduce(function(a,id){ return a + itemById(id).price * cart[id]; },0); }
+
+  /* ---------------- 钱包 ---------------- */
+  function renderWallet(){
+    var count = {};
+    wallet.forEach(function(v){ count[v] = (count[v]||0)+1; });
+    var html = "";
+    Object.keys(count).sort(function(a,b){return b-a;}).forEach(function(v){
+      html += '<span class="chip">' + fmt(Number(v)) + ' <b>×' + count[v] + '</b></span>';
+    });
+    document.getElementById("walletChips").innerHTML = html || '<div class="empty">钱包空了</div>';
+    document.getElementById("walletTotal").textContent = fmt(walletTotal());
+  }
+
+  /* ---------------- 商店 ---------------- */
+  function renderShop(){
+    document.getElementById("shopItems").innerHTML = ITEMS.map(function(it){
+      return '<div class="item"><span class="nm">' + it.name + '<small>' + it.unit + '装</small></span>' +
+        '<span class="pr">' + fmt(it.price) + '</span>' +
+        '<input class="qty" id="q-' + it.id + '" type="number" min="1" value="1">' +
+        '<button class="btn prim" onclick="addCart(\'' + it.id + '\')">加购</button></div>';
+    }).join("");
+  }
+
+  function addCart(id){
+    var n = Math.max(1, Math.floor(Number(document.getElementById("q-" + id).value)||1));
+    cart[id] = (cart[id]||0) + n;
+    renderCart();
+    toast("已加入购物车：" + itemById(id).name + " ×" + n);
+  }
+
+  function renderCart(){
+    var keys = Object.keys(cart);
+    document.getElementById("cartList").innerHTML = keys.length ? keys.map(function(id){
+      var it = itemById(id);
+      return '<div class="item"><span class="nm">' + it.name + ' <small>×' + cart[id] + '</small></span>' +
+        '<span class="pr">' + fmt(it.price * cart[id]) + '</span>' +
+        '<button class="rm" onclick="removeCart(\'' + id + '\')">×</button></div>';
+    }).join("") : '<div class="empty">购物车是空的</div>';
+    document.getElementById("cartTotal").textContent = fmt(cartTotal());
+    document.getElementById("cartPay").disabled = !keys.length;
+  }
+
+  function removeCart(id){ delete cart[id]; renderCart(); }
+
+  document.getElementById("cartClear").addEventListener("click", function(){ cart = {}; renderCart(); });
+  document.getElementById("cartPay").addEventListener("click", function(){
+    openPayFor("结算购物车（" + Object.keys(cart).length + "种商品）", cartTotal(), function(){
+      var lines = [];
+      Object.keys(cart).forEach(function(id){
+        pack[id] = (pack[id]||0) + cart[id];
+        lines.push(itemById(id).name + "×" + cart[id]);
+      });
+      cart = {};
+      renderCart(); renderPack();
+      toast("已购买：" + lines.join("、"));
+    });
+  });
+
+  /* ---------------- 背包 ---------------- */
+  function renderPack(){
+    var keys = Object.keys(pack);
+    document.getElementById("packList").innerHTML = keys.length ? keys.map(function(id){
+      var it = itemById(id);
+      return '<div class="item"><span class="nm">' + it.name + '</span><span class="pr">×' + pack[id] + '</span></div>';
+    }).join("") : '<div class="empty">背包是空的，去买点东西吧</div>';
+  }
+
+  /* ---------------- 支付（选票 + 找零） ---------------- */
+  var pmPrice = 0, pmSel = [], pmCb = null;
+
+  function openPayFor(title, price, cb){
+    pmPrice = price; pmSel = []; pmCb = cb;
+    document.getElementById("pmTitle").textContent = title + "（" + fmt(price) + "）";
+    var rows = wallet.map(function(v,i){
+      return '<label class="bill-row"><input type="checkbox" data-i="' + i + '" onchange="onPick()">' +
+        '<b>' + fmt(v) + '</b><span>第' + (i+1) + '张</span></label>';
+    }).join("");
+    document.getElementById("pmBills").innerHTML = rows || '<div class="empty">钱包里没有钱</div>';
+    document.getElementById("payModal").classList.remove("hidden");
+    updateSums();
+  }
+
+  function onPick(){
+    pmSel = [];
+    var boxes = document.querySelectorAll("#pmBills input:checked");
+    for(var i=0;i<boxes.length;i++) pmSel.push(Number(boxes[i].dataset.i));
+    updateSums();
+  }
+
+  function updateSums(){
+    var paid = 0;
+    pmSel.forEach(function(i){ paid += wallet[i]; });
+    document.getElementById("pmPaid").textContent = fmt(paid);
+    var diff = paid - pmPrice;
+    var msg = document.getElementById("pmMsg");
+    var ok = document.getElementById("pmOk");
+    if(paid === 0){ msg.innerHTML = '请选择要支付的钱票'; ok.disabled = true; }
+    else if(diff < 0){ msg.innerHTML = '还缺 <span class="need">' + fmt(-diff) + '</span>'; ok.disabled = true; }
+    else if(diff === 0){ msg.innerHTML = '刚好够，无需找零'; ok.disabled = false; }
+    else { msg.innerHTML = '需找零 <span class="change">' + fmt(diff) + '</span>'; ok.disabled = false; }
+  }
+
+  function giveChange(diff){
+    var out = [];
+    CHANGE_DENOMS.forEach(function(d){
+      while(diff >= d){ out.push(d); diff -= d; }
+    });
+    return out;
+  }
+
+  function chgDesc(chg){
+    var count = {};
+    chg.forEach(function(c){ count[c] = (count[c]||0)+1; });
+    return Object.keys(count).sort(function(a,b){return b-a;}).map(function(c){
+      return fmt(Number(c)) + (count[c]>1 ? '×' + count[c] : '');
+    }).join("、");
+  }
+
+  document.getElementById("pmOk").addEventListener("click", function(){
+    var paid = 0;
+    pmSel.forEach(function(i){ paid += wallet[i]; });
+    pmSel.slice().sort(function(a,b){return b-a;}).forEach(function(i){ wallet.splice(i,1); });
+    var diff = paid - pmPrice;
+    var chg = diff > 0 ? giveChange(diff) : [];
+    chg.forEach(function(c){ wallet.push(c); });
+    document.getElementById("payModal").classList.add("hidden");
+    renderWallet();
+    var msg = '已支付 ' + fmt(paid);
+    if(chg.length) msg += '，找零 ' + fmt(diff) + '（' + chgDesc(chg) + '）';
+    toast(msg);
+    pmCb && pmCb();
+  });
+
+  document.getElementById("pmCancel").addEventListener("click", function(){
+    document.getElementById("payModal").classList.add("hidden");
+  });
+
+  /* ---------------- 兑换零钱（两边总账相等） ---------------- */
+  var exFrom = [], exTo = {};
+
+  document.getElementById("exOpen").addEventListener("click", function(){
+    exFrom = []; exTo = {};
+    var rows = wallet.map(function(v,i){
+      return '<label class="bill-row"><input type="checkbox" data-i="' + i + '" onchange="exPick()">' +
+        '<b>' + fmt(v) + '</b><span>第' + (i+1) + '张</span></label>';
+    }).join("");
+    document.getElementById("exFrom").innerHTML = rows || '<div class="empty">钱包里没有钱</div>';
+    document.getElementById("exTo").innerHTML = DENOMS.map(function(d){
+      return '<div class="ex-to-row"><span class="nm">' + d.name + '</span>' +
+        '<input class="qty" id="exq-' + d.id + '" type="number" min="0" value="0" oninput="exPick()"></div>';
+    }).join("");
+    document.getElementById("exModal").classList.remove("hidden");
+    exPick();
+  });
+
+  function exPick(){
+    exFrom = [];
+    var boxes = document.querySelectorAll("#exFrom input:checked");
+    for(var i=0;i<boxes.length;i++) exFrom.push(Number(boxes[i].dataset.i));
+    exTo = {};
+    DENOMS.forEach(function(d){
+      exTo[d.id] = Math.max(0, Math.floor(Number(document.getElementById("exq-" + d.id).value)||0));
+    });
+    var fromSum = 0; exFrom.forEach(function(i){ fromSum += wallet[i]; });
+    var toSum = 0; DENOMS.forEach(function(d){ toSum += d.v * exTo[d.id]; });
+    document.getElementById("exFromSum").textContent = fmt(fromSum);
+    document.getElementById("exToSum").textContent = fmt(toSum);
+    var msg = document.getElementById("exMsg");
+    var ok = document.getElementById("exOk");
+    if(fromSum === 0 && toSum === 0){ msg.innerHTML = '请选择要支出的钱票和要获得的组合'; ok.disabled = true; }
+    else if(fromSum > toSum){ msg.innerHTML = '差额：支出多出 <span class="need">' + fmt(fromSum - toSum) + '</span>，请调整获得数量'; ok.disabled = true; }
+    else if(fromSum < toSum){ msg.innerHTML = '差额：还缺 <span class="need">' + fmt(toSum - fromSum) + '</span>，请调整支出或获得'; ok.disabled = true; }
+    else { msg.innerHTML = '两边总账相等，可以兑换'; ok.disabled = false; }
+  }
+
+  document.getElementById("exOk").addEventListener("click", function(){
+    var fromSum = 0; exFrom.forEach(function(i){ fromSum += wallet[i]; });
+    exFrom.slice().sort(function(a,b){return b-a;}).forEach(function(i){ wallet.splice(i,1); });
+    var got = [];
+    DENOMS.forEach(function(d){
+      for(var k=0;k<exTo[d.id];k++){ wallet.push(d.v); got.push(d.v); }
+    });
+    document.getElementById("exModal").classList.add("hidden");
+    renderWallet();
+    toast("兑换成功：支出 " + fmt(fromSum) + "，获得 " + fmt(got.reduce(function(a,b){return a+b;},0)));
+  });
+
+  document.getElementById("exCancel").addEventListener("click", function(){
+    document.getElementById("exModal").classList.add("hidden");
+  });
+
+  /* ---------------- 提示 ---------------- */
+  var toastTimer;
+  function toast(msg){
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2600);
+  }
+
+  renderWallet(); renderShop(); renderCart(); renderPack();
+</script>
+</body>
+</html>

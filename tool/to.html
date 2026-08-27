@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML一键上传转网页链接</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        h2 {
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            color: #1a1a1a;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+        input[type="text"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            background-color: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input[type="text"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+        }
+        textarea {
+            height: 180px;
+            resize: vertical;
+            font-family: "Courier New", Courier, monospace;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #2b6cb0;
+        }
+        button:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+        .result-box {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            word-break: break-all;
+        }
+        .result-box a {
+            color: #3182ce;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .result-box a:hover {
+            text-decoration: underline;
+        }
+        .error {
+            color: #e53e3e;
+            font-size: 0.9rem;
+        }
+        .footer-nav {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px dashed #e2e8f0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #718096;
+        }
+        .footer-nav a {
+            color: #3182ce;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .footer-nav a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>HTML一键上传转网页链接</h2>
+    
+    <div class="form-group">
+        <label for="title">标题 (Title)</label>
+        <input type="text" id="title" placeholder="例如: Untitled">
+    </div>
+
+    <div class="form-group">
+        <label for="format">格式 (Format)</label>
+        <select id="format">
+            <option value="html" selected>HTML</option>
+            <option value="markdown">Markdown</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="content">内容 (Content)</label>
+        <textarea id="content" placeholder="输入内容..."></textarea>
+    </div>
+
+    <button id="submitBtn" onclick="submitArtifact()">提交</button>
+
+    <div id="result" class="result-box" style="display: none;"></div>
+
+    <div class="footer-nav">
+        前往部署源头站：<a href="https://artidrop.ai/" target="_blank" rel="noopener noreferrer">https://artidrop.ai/</a>
+    </div>
+</div>
+
+<script>
+    async function submitArtifact() {
+        const titleInput = document.getElementById('title');
+        const formatSelect = document.getElementById('format');
+        const contentInput = document.getElementById('content');
+        const submitBtn = document.getElementById('submitBtn');
+        const resultDiv = document.getElementById('result');
+
+        const title = titleInput.value.trim() || "Untitled";
+        const format = formatSelect.value;
+        const content = contentInput.value;
+
+        if (!content) {
+            alert('请填写内容！');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerText = '提交中...';
+        resultDiv.style.display = 'none';
+
+        const payload = {
+            content: content,
+            format: format,
+            title: title
+        };
+
+        try {
+            const workerUrl = 'https://html.2335.cn';
+
+            const response = await fetch(workerUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`请求失败，状态码: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data && data.url) {
+                resultDiv.innerHTML = `<strong>URL:</strong> <a href="${data.url}" target="_blank">${data.url}</a>`;
+                resultDiv.style.display = 'block';
+            } else {
+                resultDiv.innerHTML = `<span class="error">响应失败: ${JSON.stringify(data)}</span>`;
+                resultDiv.style.display = 'block';
+            }
+        } catch (error) {
+            resultDiv.innerHTML = `<span class="error">发生错误: ${error.message}</span>`;
+            resultDiv.style.display = 'block';
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = '提交';
+        }
+    }
+</script>
+
+</body>
+</html>

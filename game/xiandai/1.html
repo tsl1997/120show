@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>现代模拟游戏 - 购物原型</title>
+<style>
+  :root {
+    --bg: #f3f4f6;
+    --panel: #ffffff;
+    --line: #e5e7eb;
+    --ink: #111827;
+    --muted: #6b7280;
+    --accent: #2563eb;
+    --accent-soft: #eff6ff;
+    --good: #16a34a;
+    --good-soft: #f0fdf4;
+    --bad: #dc2626;
+    --bad-soft: #fef2f2;
+    --shadow: 0 10px 30px rgba(17, 24, 39, .08);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--bg);
+    font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  }
+  button, input, select { font: inherit; }
+  button { cursor: pointer; }
+
+  /* ---------- header ---------- */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: rgba(255, 255, 255, .92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar-inner {
+    max-width: 1100px;
+    margin: auto;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand h1 { margin: 0; font-size: 17px; letter-spacing: .04em; }
+  .brand small { color: var(--muted); font-size: 12px; }
+
+  .money {
+    margin-left: auto;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    background: var(--ink);
+    color: #fff;
+  }
+  .money .label { font-size: 12px; color: #9ca3af; letter-spacing: .08em; }
+  .money .value {
+    font: 700 20px "Courier New", monospace;
+    color: #fbbf24;
+  }
+
+  .loc-switch {
+    display: flex;
+    padding: 4px;
+    gap: 4px;
+    background: #eef0f3;
+    border-radius: 12px;
+  }
+  .loc-switch button {
+    border: 0;
+    padding: 8px 18px;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--muted);
+    font-weight: 600;
+    transition: all .15s;
+  }
+  .loc-switch button.active {
+    background: var(--panel);
+    color: var(--ink);
+    box-shadow: var(--shadow);
+  }
+
+  /* ---------- layout ---------- */
+  .layout {
+    max-width: 1100px;
+    margin: 24px auto 48px;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    align-items: start;
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .panel-head {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .panel-head h2 { margin: 0; font-size: 15px; }
+  .panel-head .count { font-size: 12px; color: var(--muted); }
+
+  /* ---------- shop cards ---------- */
+  .shop-wrap { padding: 16px; }
+  .cat-block { margin-bottom: 18px; }
+  .cat-block:last-child { margin-bottom: 0; }
+  .cat-title {
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: .06em;
+  }
+  .shop-grid {
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .item-card {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+    background: #fafbfc;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .item-card .name { font-weight: 700; font-size: 14px; }
+  .item-card .price { font-size: 13px; color: var(--bad); font-weight: 600; }
+  .item-actions {
+    margin-top: 2px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .qty {
+    width: 62px;
+    padding: 7px 6px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    text-align: center;
+    background: var(--panel);
+  }
+  .qty:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+  .btn {
+    border: 0;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: filter .15s, transform .05s;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-good { background: var(--good); color: #fff; }
+  .btn-ghost { background: #eef0f3; color: var(--ink); }
+  .btn-sell { background: #f59e0b; color: #fff; }
+  .btn:hover { filter: brightness(1.07); }
+
+  /* ---------- storage rows ---------- */
+  .store-list { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .store-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fafbfc;
+  }
+  .store-row .name { flex: 1; min-width: 0; font-weight: 600; font-size: 14px; }
+  .store-row .name .meta { display: block; margin-top: 2px; font-size: 12px; color: var(--muted); font-weight: 400; }
+  .store-row .meta { font-size: 12px; color: var(--muted); }
+  .store-row .qty-badge {
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .store-row .actions { display: flex; gap: 8px; align-items: center; }
+
+  .empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  /* ---------- backpack ---------- */
+  .bag { position: sticky; top: 92px; }
+  .bag-slots {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 120px;
+  }
+  .slot {
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fafbfc;
+  }
+  .slot.empty { color: var(--muted); font-size: 12px; justify-content: center; border-style: dashed; }
+  .slot.filled { border-style: solid; }
+  .slot .name { flex: 1; font-size: 13px; font-weight: 600; }
+  .slot .count { font-size: 12px; color: var(--muted); }
+
+  /* ---------- log ---------- */
+  .log-panel { margin-top: 16px; }
+  .log {
+    max-height: 180px;
+    overflow-y: auto;
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+  .log p { margin: 4px 0; line-height: 1.5; }
+  .log .ok { color: var(--good); }
+  .log .err { color: var(--bad); }
+  .log .info { color: var(--muted); }
+
+  .toolbar { display: flex; gap: 8px; }
+  .toolbar .btn-small {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--muted);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+  }
+  .toolbar .btn-small:hover { color: var(--ink); border-color: var(--muted); }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    .bag { position: static; }
+    .topbar-inner { flex-wrap: wrap; }
+    .money { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <h1>现代模拟游戏</h1>
+      <small>购物原型 v0.2</small>
+    </div>
+    <div class="loc-switch">
+      <button data-loc="shop" class="active">商店</button>
+      <button data-loc="room">房间</button>
+      <button data-loc="scrap">废品回收站</button>
+    </div>
+    <div class="money">
+      <span class="label">现金</span>
+      <span class="value" id="money">¥300</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="left">
+    <section class="panel" id="locPanel">
+      <div class="panel-head">
+        <h2 id="locTitle">商店</h2>
+        <span class="count" id="locCount"></span>
+      </div>
+      <div id="locBody"></div>
+    </section>
+
+    <section class="panel log-panel">
+      <div class="panel-head">
+        <h2>消息</h2>
+        <div class="toolbar">
+          <button class="btn-small" id="resetBtn">重置游戏</button>
+        </div>
+      </div>
+      <div class="log" id="log"></div>
+    </section>
+  </div>
+
+  <aside class="panel bag">
+    <div class="panel-head">
+      <h2>背包</h2>
+      <span class="count" id="bagCount"></span>
+    </div>
+    <div class="bag-slots" id="bagSlots"></div>
+  </aside>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- 商品目录 ---------------- */
+const CATS = [
+  { id: "food",      name: "食品饮料" },
+  { id: "daily",     name: "日用百货" },
+  { id: "appliance", name: "家用电器" },
+];
+
+const ITEMS = [
+  { id: "water",      name: "矿泉水",   price: 2,   unit: "瓶", cat: "food" },
+  { id: "bread",      name: "面包",     price: 5,   unit: "个", cat: "food" },
+  { id: "milk",       name: "牛奶",     price: 6,   unit: "盒", cat: "food" },
+  { id: "apple",      name: "苹果",     price: 4,   unit: "个", cat: "food" },
+  { id: "cola",       name: "可乐",     price: 3,   unit: "瓶", cat: "food" },
+  { id: "noodle",     name: "方便面",   price: 5,   unit: "袋", cat: "food" },
+  { id: "egg",        name: "鸡蛋",     price: 2,   unit: "枚", cat: "food" },
+  { id: "notebook",   name: "笔记本",   price: 8,   unit: "本", cat: "daily" },
+  { id: "towel",      name: "毛巾",     price: 12,  unit: "条", cat: "daily" },
+  { id: "umbrella",   name: "雨伞",     price: 18,  unit: "把", cat: "daily" },
+  { id: "lamp",       name: "台灯",     price: 45,  unit: "盏", cat: "appliance" },
+  { id: "ricecooker", name: "电饭煲",   price: 120, unit: "台", cat: "appliance" },
+  { id: "laptop",     name: "笔记本电脑", price: 2599, unit: "台", cat: "appliance" },
+];
+const itemMap = Object.fromEntries(ITEMS.map(i => [i.id, i]));
+
+const MAX_BAG_SLOTS = 3;   // 背包可容纳 3 种物品
+const MAX_ROOM_SLOTS = 30; // 房间可容纳 30 种物品
+
+/* ---------------- 游戏状态 ---------------- */
+let state = {
+  money: 300,
+  loc: "shop",
+  bag: [],   // [{ id, qty }]
+  room: [],  // [{ id, qty }]
+};
+
+const logEl = document.getElementById("log");
+
+function log(msg, type) {
+  const p = document.createElement("p");
+  p.className = type || "info";
+  p.textContent = msg;
+  logEl.appendChild(p);
+  while (logEl.children.length > 40) logEl.removeChild(logEl.firstChild);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+/* ---------------- 工具函数 ---------------- */
+function findStack(arr, id) { return arr.find(s => s.id === id); }
+
+function slotCount(arr) { return arr.length; }
+
+function totalQty(arr) {
+  return arr.reduce((s, it) => s + it.qty, 0);
+}
+
+function moneyText() {
+  return "¥" + state.money.toLocaleString("zh-CN");
+}
+
+/* 空间检查：向容器放入 qty 件 id 物品，返回错误信息或 null */
+function spaceError(container, maxSlots, id, qty) {
+  if (qty <= 0) return "数量必须大于 0";
+  const hasStack = !!findStack(container, id);
+  if (!hasStack && slotCount(container) >= maxSlots) {
+    return (maxSlots === MAX_BAG_SLOTS ? "背包" : "房间") + "已满（" + maxSlots + " 种物品），无法放入新品种";
+  }
+  return null;
+}
+
+/* ---------------- 操作 ---------------- */
+function buy(id, qty) {
+  qty = Math.floor(qty);
+  const item = itemMap[id];
+  if (!item || qty <= 0) { log("购买数量无效", "err"); return; }
+  const cost = item.price * qty;
+  if (cost > state.money) { log("现金不足，还差 " + moneyTextDiff(cost) + " 元", "err"); return; }
+  const err = spaceError(state.bag, MAX_BAG_SLOTS, id, qty);
+  if (err) { log(err + "，请先到房间存放物品", "err"); return; }
+
+  state.money -= cost;
+  addStack(state.bag, id, qty);
+  log("购买 " + item.name + " ×" + qty + "，花费 " + cost.toLocaleString("zh-CN") + " 元", "ok");
+  render();
+}
+
+function moneyTextDiff(cost) {
+  return (cost - state.money).toLocaleString("zh-CN");
+}
+
+function addStack(container, id, qty) {
+  const s = findStack(container, id);
+  if (s) s.qty += qty; else container.push({ id, qty });
+}
+
+function storeToRoom(id, qty) {
+  qty = Math.floor(qty);
+  const item = itemMap[id];
+  if (!item || qty <= 0) { log("存放数量无效", "err"); return; }
+  const s = findStack(state.bag, id);
+  if (!s || s.qty < qty) { log("背包里没有足够的 " + item.name, "err"); return; }
+  const err = spaceError(state.room, MAX_ROOM_SLOTS, id, qty);
+  if (err) { log(err, "err"); return; }
+
+  s.qty -= qty;
+  if (s.qty === 0) state.bag = state.bag.filter(x => x !== s);
+  addStack(state.room, id, qty);
+  log("已将 " + item.name + " ×" + qty + " 存放进房间", "ok");
+  render();
+}
+
+function takeToBag(id, qty) {
+  qty = Math.floor(qty);
+  const item = itemMap[id];
+  if (!item || qty <= 0) { log("取出数量无效", "err"); return; }
+  const s = findStack(state.room, id);
+  if (!s || s.qty < qty) { log("房间里没有足够的 " + item.name, "err"); return; }
+  const err = spaceError(state.bag, MAX_BAG_SLOTS, id, qty);
+  if (err) { log(err, "err"); return; }
+
+  s.qty -= qty;
+  if (s.qty === 0) state.room = state.room.filter(x => x !== s);
+  addStack(state.bag, id, qty);
+  log("已从房间取出 " + item.name + " ×" + qty + " 放入背包", "ok");
+  render();
+}
+
+/* 回收价：原价 1 折（向下取整，最低 1 元） */
+function scrapPrice(item) {
+  return Math.max(1, Math.floor(item.price * 0.1));
+}
+
+function sell(src, id, qty) {
+  qty = Math.floor(qty);
+  const item = itemMap[id];
+  if (!item || qty <= 0) { log("出售数量无效", "err"); return; }
+  const container = src === "bag" ? state.bag : state.room;
+  const s = findStack(container, id);
+  if (!s || s.qty < qty) { log("没有足够的 " + item.name + " 可以出售", "err"); return; }
+
+  const gain = scrapPrice(item) * qty;
+  s.qty -= qty;
+  if (s.qty === 0) {
+    if (src === "bag") state.bag = state.bag.filter(x => x !== s);
+    else state.room = state.room.filter(x => x !== s);
+  }
+  state.money += gain;
+  log("出售 " + item.name + " ×" + qty + "，获得 " + gain.toLocaleString("zh-CN") + " 元（回收价 " + scrapPrice(item) + " 元/" + item.unit + "）", "ok");
+  render();
+}
+
+function resetGame() {
+  state = { money: 300, loc: "shop", bag: [], room: [] };
+  logEl.innerHTML = "";
+  log("游戏已重置", "info");
+  render();
+}
+
+/* ---------------- 渲染 ---------------- */
+const locTitle = document.getElementById("locTitle");
+const locCount = document.getElementById("locCount");
+const locBody = document.getElementById("locBody");
+const bagCount = document.getElementById("bagCount");
+const bagSlots = document.getElementById("bagSlots");
+
+function render() {
+  document.getElementById("money").textContent = moneyText();
+
+  document.querySelectorAll(".loc-switch button").forEach(b => {
+    b.classList.toggle("active", b.dataset.loc === state.loc);
+  });
+
+  if (state.loc === "shop") renderShop();
+  else if (state.loc === "room") renderRoom();
+  else renderScrap();
+  renderBag();
+}
+
+function renderShop() {
+  locTitle.textContent = "商店";
+  locCount.textContent = "共 " + ITEMS.length + " 种商品";
+  locBody.innerHTML =
+    '<div class="shop-wrap">' + CATS.map(cat => {
+      const list = ITEMS.filter(i => i.cat === cat.id);
+      if (list.length === 0) return "";
+      return `
+        <div class="cat-block">
+          <div class="cat-title">${cat.name}</div>
+          <div class="shop-grid">` + list.map(item => `
+            <div class="item-card">
+              <div class="name">${item.name}</div>
+              <div class="price">${item.price} 元/${item.unit}</div>
+              <div class="item-actions">
+                <input class="qty" id="qty-${item.id}" type="number" min="1" max="99" value="1">
+                <button class="btn btn-primary" data-act="buy" data-id="${item.id}">购买</button>
+              </div>
+            </div>`).join("") + `
+          </div>
+        </div>`;
+    }).join("") + '</div>';
+}
+
+function renderRoom() {
+  locTitle.textContent = "房间";
+  locCount.textContent = `已用 ${state.room.length}/${MAX_ROOM_SLOTS} 种 · 共 ${totalQty(state.room)} 件`;
+  if (state.room.length === 0) {
+    locBody.innerHTML = '<div class="empty">房间是空的。先去商店买点东西，再存进来吧。</div>';
+    return;
+  }
+  locBody.innerHTML =
+    '<div class="store-list">' + state.room.map(s => {
+      const item = itemMap[s.id];
+      return `
+        <div class="store-row">
+          <div class="name">${item.name}</div>
+          <span class="qty-badge">×${s.qty}</span>
+          <div class="actions">
+            <input class="qty" id="tqty-${s.id}" type="number" min="1" max="${s.qty}" value="1">
+            <button class="btn btn-ghost" data-act="take" data-id="${s.id}">取出</button>
+          </div>
+        </div>`;
+    }).join("") +
+    '</div>';
+}
+
+function renderBag() {
+  bagCount.textContent = `已用 ${state.bag.length}/${MAX_BAG_SLOTS} 种 · 共 ${totalQty(state.bag)} 件`;
+  if (state.bag.length === 0) {
+    bagSlots.innerHTML =
+      '<div class="slot empty">背包空空如也</div>' +
+      '<div class="slot empty">空</div>' +
+      '<div class="slot empty">空</div>';
+    return;
+  }
+  bagSlots.innerHTML = state.bag.map(s => {
+    const item = itemMap[s.id];
+    return `
+      <div class="slot filled">
+        <span class="name">${item.name}</span>
+        <span class="qty-badge">×${s.qty}</span>
+        <div class="actions">
+          <input class="qty" id="sqty-${s.id}" type="number" min="1" max="${s.qty}" value="1">
+          <button class="btn btn-good" data-act="store" data-id="${s.id}">存房</button>
+        </div>
+      </div>`;
+  }).join("") +
+    Array.from({ length: MAX_BAG_SLOTS - state.bag.length },
+      () => '<div class="slot empty">空</div>').join("");
+}
+
+function scrapSection(title, container, src, emptyText) {
+  const body = container.length === 0
+    ? '<div class="empty">' + emptyText + '</div>'
+    : container.map(s => {
+        const item = itemMap[s.id];
+        return `
+          <div class="store-row">
+            <div class="name">${item.name}<span class="meta">回收价 ${scrapPrice(item)} 元/${item.unit}</span></div>
+            <span class="qty-badge">×${s.qty}</span>
+            <div class="actions">
+              <input class="qty" id="${src === "bag" ? "sqty-" : "tqty-"}${s.id}" type="number" min="1" max="${s.qty}" value="1">
+              <button class="btn btn-sell" data-act="sell" data-src="${src}" data-id="${s.id}">出售</button>
+            </div>
+          </div>`;
+      }).join("");
+  return `
+    <div class="cat-block">
+      <div class="cat-title">${title}</div>
+      <div class="shop-grid" style="grid-template-columns:1fr">${body}</div>
+    </div>`;
+}
+
+function renderScrap() {
+  locTitle.textContent = "废品回收站";
+  locCount.textContent = "回收价 = 原价 1 折（最低 1 元）";
+  locBody.innerHTML =
+    '<div class="shop-wrap">' +
+    scrapSection("背包里的物品", state.bag, "bag", "背包空空如也，先去商店买点东西吧。") +
+    scrapSection("房间里的物品", state.room, "room", "房间是空的，把不想要的东西存进来再卖掉。") +
+    '</div>';
+}
+
+/* ---------------- 事件 ---------------- */
+document.addEventListener("click", e => {
+  const btn = e.target.closest("[data-act]");
+  if (btn) {
+    const act = btn.dataset.act;
+    const id = btn.dataset.id;
+    const prefix = act === "buy" ? "qty-"
+      : (act === "store" || (act === "sell" && btn.dataset.src === "bag")) ? "sqty-" : "tqty-";
+    const qty = Math.floor(Number(document.getElementById(prefix + id).value)) || 0;
+    if (act === "buy") buy(id, qty);
+    else if (act === "store") storeToRoom(id, qty);
+    else if (act === "take") takeToBag(id, qty);
+    else if (act === "sell") sell(btn.dataset.src, id, qty);
+    return;
+  }
+  const loc = e.target.closest("[data-loc]");
+  if (loc) { state.loc = loc.dataset.loc; render(); return; }
+  if (e.target.id === "resetBtn") resetGame();
+});
+
+/* ---------------- 启动 ---------------- */
+render();
+log("欢迎！你有 300 元现金。背包最多 3 种物品，房间最多存放 30 种物品。", "info");
+log("去商店购买商品 → 背包 → 存入房间；不想要的东西可以到废品回收站按原价 1 折卖掉。", "info");
+</script>
+</body>
+</html>

@@ -1,146 +1,124 @@
-/* 两界搬运工 · 交通系统
- * 城际铁路（1980绿皮车要一两天）、国际航班；长途按天自动吃喝。
- */
 (function () {
-  'use strict';
-  const LJ = (window.LJ = window.LJ || {});
-  const $ = LJ.UI.$, el = LJ.UI.el, $all = LJ.UI.$all;
+  "use strict";
+  window.LJ = window.LJ || {};
+  const S = window.LJ.state;
+  const R = window.LJ.reg;
+  const U = window.LJ.util;
+  const CL = window.LJ.clock;
 
-  function reachableFrom(cityId) {
-    const s = LJ.Sys.state;
-    const w = s.world;
-    const out = [];
-    if (w === 'old') {
-      Object.keys(LJ.World.oldRoutes).forEach((key) => {
-        const [a, b] = key.split('|');
-        if (a === cityId) out.push({ city: b, route: LJ.World.oldRoutes[key], mode: '绿皮火车', cond: null });
-        if (b === cityId) out.push({ city: a, route: LJ.World.oldRoutes[key], mode: '绿皮火车', cond: null });
-      });
-      if (cityId === 'guangzhou') out.push({ city: 'hongkong', route: { hours: 3, cost: 5 }, mode: '罗湖过境', cond: 'hkPermit' });
-      if (cityId === 'beijing') out.push({ city: 'tokyo', route: { hours: 6, cost: 150 }, mode: '飞机（首都机场）', cond: 'tokyo' });
-      if (cityId === 'hongkong') out.push({ city: 'guangzhou', route: { hours: 3, cost: 5 }, mode: '罗湖过境', cond: 'hkPermit' });
-      if (cityId === 'tokyo') out.push({ city: 'beijing', route: { hours: 6, cost: 150 }, mode: '飞机（成田机场）', cond: 'tokyo' });
-    } else {
-      Object.keys(LJ.World.modernRoutes).forEach((key) => {
-        const [a, b] = key.split('|');
-        if (a === cityId) out.push({ city: b, route: LJ.World.modernRoutes[key], mode: LJ.World.modernRoutes[key].mode, cond: null });
-        if (b === cityId) out.push({ city: a, route: LJ.World.modernRoutes[key], mode: LJ.World.modernRoutes[key].mode, cond: null });
-      });
-    }
-    const seen = {};
-    return out.filter((o) => (seen[o.city] ? false : (seen[o.city] = true)));
+  function current() {
+    const st = S.get();
+    if (!st.currentWorld) st.currentWorld = "modern";
+    return st.currentWorld;
   }
 
-  function condUnlocked(cond) {
-    const s = LJ.Sys.state;
-    if (!cond) return true;
-    if (cond === 'hkPermit') return !!s.player.hkPermit;
-    if (cond === 'tokyo') return s.player.certs.includes('japanese') && !!s.player.job;
-    return false;
+  function other(w) { return w === "modern" ? "old" : "modern"; }
+
+  function cooldownInfo() {
+    const st = S.get();
+    const w = S.world("old").clock;
+    const last = st.travel.lastEnterOld;
+    const now = { year: w.year, month: w.month, day: w.day };
+    if (!last) return { ready: true, remain: 0, days: st.travel.cooldownDays };
+    const elapsed = CL.elapsedDays(last, now);
+    const remain = Math.max(0, st.travel.cooldownDays - elapsed);
+    return { ready: remain <= 0, remain, days: st.travel.cooldownDays, elapsed };
   }
 
-  function cityLabel(cityId) {
-    const s = LJ.Sys.state;
-    const pool = s.world === 'old' ? (LJ.World.old[cityId] || LJ.World.intlOld[cityId]) : (LJ.World.modern[cityId] || LJ.World.intlModern[cityId]);
-    return pool ? pool.name : cityId;
+  function crossWorld() {
+    const st = S.get();
+    const from = current();
+    const to = other(from);
+    if (from === "old") {
+      const cd = cooldownInfo();
+      if (!cd.ready) {
+        return { ok: false, reason: "穿越冷却中：还需在旧世界待 " + cd.remain + " 天（共 " + cd.days + " 天）" };
+      }
+    }
+    st.currentWorld = to;
+    st.travel.crossCount = (st.travel.crossCount || 0) + 1;
+    if (to === "old") {
+      const w = S.world("old").clock;
+      st.travel.lastEnterOld = { year: w.year, month: w.month, day: w.day };
+    }
+    S.pushLog("穿越到" + (to === "old" ? "1980年代旧世界" : "2026现代世界"));
+    return { ok: true, to };
   }
 
-  function renderIntercity(content) {
-    const s = LJ.Sys.state;
-    const list = reachableFrom(s.city);
-    if (s.world === 'old' && !s.player.introLetter) {
-      content.appendChild(el(`<div class="panel-note">🚫 没有介绍信，售票员不卖你票。1980年出远门必须有单位或街道办开的介绍信。<br>→ 去「街道办」想办法（需要职业或声望8+）。</div>`));
-    }
-    if (!list.length) {
-      content.appendChild(el(`<div class="empty">从这里没有直达线路。</div>`));
-      return;
-    }
-    const grid = el(`<div class="cards">${list.map((o) => {
-      const locked = !condUnlocked(o.cond);
-      return `<div class="card"><h3>${locked ? '🔒' : ''}${cityLabel(o.city)}</h3>
-        <p>${o.mode} · ${o.route.hours}小时 · 车票${o.route.cost}元<br>途中消耗：体力约25 · 需吃喝${o.cond && locked ? '<br>· ' + (o.cond === 'hkPermit' ? '需港澳通行证' : '需日语证书与翻译身份') : ''}</p>
-        <div class="trade-ops"><button data-go="${o.city}" ${locked ? 'disabled' : ''}>出发</button></div></div>`;
-    }).join('')}</div>`);
-    $all('button', grid).forEach((b) => b.addEventListener('click', () => LJ.Travel.travelTo(b.dataset.go)));
-    content.appendChild(grid);
+  function hasDoc(docKind, id) {
+    const p = S.get().player;
+    if (!p.documents) p.documents = { intro: {}, passport: {}, batch: {} };
+    return p.documents[docKind] && !!p.documents[docKind][id];
   }
 
-  function travelTo(toCity) {
-    const s = LJ.Sys.state;
-    const w = s.world;
-    const from = s.city;
-    const item = reachableFrom(from).find((o) => o.city === toCity);
-    if (!item) { LJ.Engine.toast('没有这条线路。'); return; }
-    if (!condUnlocked(item.cond)) { LJ.Engine.toast('条件未满足，无法前往。'); return; }
-    if (s.world === 'old' && !s.player.introLetter) { LJ.Engine.toast('没有介绍信，买不到车票。'); return; }
-    const wallet = s.world === 'modern' ? s.money.modern : s.money.old;
-    if (wallet.CNY < item.route.cost) { LJ.Engine.toast('买不起车票。'); return; }
-    if (s.player.energy < 20) { LJ.Engine.toast('太累了，出不了远门，先休息。'); return; }
-    wallet.CNY -= item.route.cost;
-    LJ.Engine.log(`你乘${item.mode}从${cityLabel(from)}前往${cityLabel(toCity)}，约${item.route.hours}小时。`);
-    LJ.Engine.toast(`🚂 ${item.mode}，一路摇晃……`);
-    let hoursLeft = item.route.hours;
-    while (hoursLeft > 0) {
-      const step = Math.min(hoursLeft, 24);
-      LJ.Engine.advance(step, { energy: Math.round(25 * step / item.route.hours) });
-      if (step >= 24) LJ.Survival.autoNourish(true);
-      hoursLeft -= step;
-    }
-    s.city = toCity;
-    const target = s.world === 'old'
-      ? (LJ.World.old[toCity] || LJ.World.intlOld[toCity])
-      : (LJ.World.modern[toCity] || LJ.World.intlModern[toCity]);
-    s.location = (target && target.places.station) ? 'station' : (target && target.places.airport) ? 'airport' : 'home';
-    LJ.Engine.visitCity(toCity);
-    LJ.Engine.log(`抵达${cityLabel(toCity)}。`);
-    LJ.Engine.toast(`🏙️ 到达${cityLabel(toCity)}`);
-    LJ.Sys.save(); LJ.UI.renderAll();
+  function grantDoc(docKind, id, kind) {
+    const p = S.get().player;
+    if (!p.documents) p.documents = { intro: {}, passport: {}, batch: {} };
+    p.documents[docKind][id] = kind || "once";
   }
 
-  function renderFlights(content) {
-    const s = LJ.Sys.state;
-    if (!s.player.passport) {
-      content.appendChild(el(`<div class="panel-note">🚫 没有护照，无法出境。→ 去「行政服务中心」办理护照。</div>`));
-      return;
+  function cityUnlock(city) {
+    if (!city) return { ok: true };
+    if (city.era === "modern") return { ok: true };
+    const u = city.unlock || {};
+    if (u.type === "open" || u.type === "none") return { ok: true };
+    if (u.type === "event") {
+      const y = S.clock("old").year;
+      const m = S.clock("old").month;
+      const [ey, em] = (u.event || "1980-01").split("-").map(Number);
+      if (y * 100 + m < ey * 100 + em) {
+        return { ok: false, reason: u.desc || ("该地需在 " + u.event + " 后解锁") };
+      }
+      return { ok: true };
     }
-    const isHub = !!LJ.World.intlModern[s.city];
-    const options = isHub
-      ? [{ id: 'beijing', name: '北京', hours: LJ.World.intlModern[s.city].flightHours, cost: LJ.World.intlModern[s.city].flightCost }]
-      : Object.keys(LJ.World.intlModern).map((k) => ({ id: k, name: LJ.World.intlModern[k].name, hours: LJ.World.intlModern[k].flightHours, cost: LJ.World.intlModern[k].flightCost }));
-    const grid = el(`<div class="cards">${options.map((o) =>
-      `<div class="card"><h3>✈️ ${o.name}</h3><p>飞行约${o.hours}小时 · 经济舱${o.cost}元</p><div class="trade-ops"><button data-fly="${o.id}">购票乘机</button></div></div>`
-    ).join('')}</div>`);
-    $all('button', grid).forEach((b) => b.addEventListener('click', () => LJ.Travel.flyTo(b.dataset.fly)));
-    content.appendChild(grid);
+    if (u.type === "intro") {
+      if (hasDoc("intro", city.id)) return { ok: true };
+      return { ok: false, reason: "需要介绍信才能前往" + city.name + "。" + (u.desc || "") };
+    }
+    if (u.type === "passport") {
+      if (hasDoc("passport", city.id)) return { ok: true };
+      return { ok: false, reason: "需要公派护照/批文才能出国。" + (u.desc || "") };
+    }
+    return { ok: true };
   }
 
-  function flyTo(toCity) {
-    const s = LJ.Sys.state;
-    if (!s.player.passport) { LJ.Engine.toast('没有护照。'); return; }
-    let o;
-    if (s.world === 'modern') {
-      if (LJ.World.intlModern[s.city]) o = { id: 'beijing', hours: LJ.World.intlModern[s.city].flightHours, cost: LJ.World.intlModern[s.city].flightCost };
-      else o = { id: toCity, hours: LJ.World.intlModern[toCity].flightHours, cost: LJ.World.intlModern[toCity].flightCost };
-    } else {
-      o = { id: toCity, hours: 6, cost: 150 };
-    }
-    if (s.money.modern.CNY < o.cost) { LJ.Engine.toast('买不起机票。'); return; }
-    s.money.modern.CNY -= o.cost;
-    let hoursLeft = o.hours;
-    while (hoursLeft > 0) {
-      const step = Math.min(hoursLeft, 24);
-      LJ.Engine.advance(step, { energy: Math.round(20 * step / o.hours) });
-      if (step >= 24) LJ.Survival.autoNourish(true);
-      hoursLeft -= step;
-    }
-    s.city = o.id;
-    const target = s.world === 'modern' ? (LJ.World.intlModern[o.id] || LJ.World.modern[o.id]) : LJ.World.intlOld[o.id];
-    s.location = (target && target.places.airport) ? 'airport' : 'home';
-    LJ.Engine.visitCity(o.id);
-    LJ.Engine.log(`✈️ 你飞抵${cityLabel(o.id)}。`);
-    LJ.Engine.toast(`✈️ 已抵达${cityLabel(o.id)}`);
-    LJ.Sys.save(); LJ.UI.renderAll();
+  function travelCity(destCityId) {
+    return { ok: false, reason: "跨城运输体系暂未开放，目前只在北京市内测试公交系统" };
   }
 
-  LJ.Travel = { renderIntercity, travelTo, renderFlights, flyTo, reachableFrom, condUnlocked, cityLabel };
+  function busTo(destDistrict) {
+    const w = current();
+    const world = S.world(w);
+    const cityId = world.cityId;
+    const dists = R.get("districts");
+    const cityDists = dists && dists[cityId];
+    if (!cityDists || !cityDists[destDistrict]) return { ok: false, reason: "无此片区" };
+    if (destDistrict === world.districtId) return { ok: false, reason: "你已在该片区" };
+    const cost = w === "old" ? 0.1 : 2;
+    if (!window.LJ.wallet.spend(w, "CNY", cost)) return { ok: false, reason: "现金不足" };
+    const CL = window.LJ.clock;
+    CL.advance(w, 30 + Math.round(Math.random() * 20));
+    world.districtId = destDistrict;
+    const busStop = window.LJ.reg.locationList().find((l) => l.city === cityId && l.district === destDistrict && l.type === "bus_stop");
+    world.locationId = busStop ? busStop.id : world.locationId;
+    const p = S.get().player;
+    p.stats.energy = window.LJ.util.clamp((p.stats.energy || 100) - 3, 0, 100);
+    S.pushLog("乘公交抵达" + cityDists[destDistrict].name + "（车费" + (w === "old" ? "¥0.1" : "¥2") + "）");
+    return { ok: true, dest: destDistrict };
+  }
+
+  function setLocation(locId) {
+    const w = current();
+    const loc = R.locationById(locId);
+    if (!loc) return { ok: false, reason: "无此地点" };
+    S.world(w).locationId = locId;
+    S.world(w).cityId = loc.city;
+    if (loc.district) S.world(w).districtId = loc.district;
+    return { ok: true };
+  }
+
+  window.LJ.travel = {
+    current, other, crossWorld, cooldownInfo, travelCity, setLocation, busTo,
+    hasDoc, grantDoc, cityUnlock
+  };
 })();

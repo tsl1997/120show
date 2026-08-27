@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>两界人生 · 1980/2026</title>
+<style>
+  :root{
+    --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+    --panel:#fff; --bg:#f3f4f6; --accent:#2563eb;
+    --good:#16a34a; --bad:#dc2626; --warn:#f59e0b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;color:var(--ink);background:var(--bg);
+    font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  button,input,select{font:inherit}
+  button{cursor:pointer}
+  .lbl{color:var(--muted);font-size:11px}
+  .note{font-size:12px;color:var(--muted);margin-top:6px}
+  .good{color:var(--good)} .bad{color:var(--bad)}
+  .hidden{display:none!important}
+
+  #topbar{position:sticky;top:0;z-index:20;background:#111827;color:#fff;
+    display:flex;gap:14px;align-items:center;padding:8px 16px;flex-wrap:wrap}
+  #topbar .brand{font-weight:700;margin-right:4px}
+  #topbar .brand small{color:#9ca3af;font-weight:400}
+  #topbar .stat{font-size:12px;white-space:nowrap}
+  #topbar .stat b{color:#fbbf24;font-family:"Courier New",monospace}
+
+  #layout{display:grid;grid-template-columns:200px 1fr 280px;gap:14px;padding:14px;max-width:1280px;margin:auto}
+  @media(max-width:900px){#layout{grid-template-columns:1fr}}
+
+  #navlist{display:flex;flex-direction:column;gap:4px}
+  .navgrp{font-size:12px;color:var(--muted);margin:6px 2px;letter-spacing:.05em}
+  .loc{border:1px solid var(--line);background:var(--panel);border-radius:8px;
+    padding:8px 10px;text-align:left;font-size:13px}
+  .loc.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  #worldSwitch{display:flex;gap:6px;margin-top:10px}
+  #worldSwitch .btn{flex:1}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:12px;overflow:hidden}
+  .panel h2,.panel h3{margin:0;padding:9px 12px;font-size:14px;border-bottom:1px solid var(--line);background:#fafafa}
+  .panel h2 span{font-weight:400;font-size:12px}
+  .pd{padding:10px 12px;font-size:13px}
+  .empty{color:var(--muted);font-size:12px;padding:6px 0}
+  .row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)}
+  .row:last-child{border-bottom:0}
+  .row .nm{flex:1;min-width:0}
+  .net-row{flex-wrap:wrap}
+  .net-row .nm{flex:1 1 220px;min-width:180px}
+  .row .nm small{display:block;color:var(--muted);font-size:11px}
+  .price{color:var(--bad);font-weight:600;font-size:12px;white-space:nowrap}
+  .qty{width:54px;padding:4px;border:1px solid var(--line);border-radius:6px;text-align:center}
+  .btn{border:0;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:600;background:var(--accent);color:#fff;white-space:nowrap}
+  .btn:hover{filter:brightness(1.08)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn.prim{background:var(--accent)}
+  .btn.warn{background:var(--warn)}
+  .btn.danger{background:var(--bad)}
+  .btn.ghost{background:#374151}
+  .btn.sm{padding:4px 8px;font-size:11px}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:700px){.grid2{grid-template-columns:1fr}}
+  .ck{display:inline-flex;align-items:center;gap:4px;margin-right:10px;font-size:12px}
+  select{padding:4px;border:1px solid var(--line);border-radius:6px;font-size:12px;max-width:100%}
+
+  #side .tk{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px dashed var(--line)}
+  #side .mini-h{font-size:11px;color:var(--muted);margin-bottom:2px}
+  .affrow{display:flex;align-items:center;gap:6px;font-size:12px;padding:3px 0}
+  .affrow .bar{flex:1;height:6px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+  .affrow .bar i{display:block;height:100%;background:var(--good)}
+
+  #log{max-height:240px;overflow-y:auto;padding:10px 12px;font-size:12px}
+  .logi{padding:2px 0;border-bottom:1px dashed #f0f0f0}
+  .logi.good{color:var(--good)} .logi.err{color:var(--bad)} .logi.warn{color:var(--warn)}
+
+  #modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:50}
+  #modal.show{display:flex}
+  .modal{background:#fff;border-radius:14px;padding:22px 26px;min-width:320px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  .modal h2{margin:0 0 12px}
+  .modal .row{font-size:14px}
+  .modal .btn{margin-top:12px;width:100%}
+
+  #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);
+    background:#111827;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;
+    transition:.25s;opacity:0;z-index:60;max-width:80vw}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #toast.err{background:#dc2626} #toast.good{background:#16a34a}
+
+  /* 饭店外卖点餐 */
+  .dish{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line)}
+  .dish-name{flex:1;font-size:13px}
+  .dish-name small{display:block;color:var(--muted);font-size:11px}
+  .dish-name em{font-style:normal;font-size:10px;color:#b45309;background:#fef3c7;border-radius:4px;padding:0 4px}
+  .dish-price{color:var(--bad);font-weight:600;font-size:12px;white-space:nowrap}
+  .dish-qty{display:flex;align-items:center;gap:6px}
+  .dish-qty span{min-width:18px;text-align:center;font-weight:700}
+
+  /* 票据管理 */
+  .tkt{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px;background:#fafafa}
+  .tkt-name{font-weight:700;font-size:13px;margin-bottom:2px}
+  .tkt-loc{font-size:12px;color:var(--muted);margin:2px 0}
+  .tkt-loc b{color:var(--ink)}
+  .tkt-acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;font-size:12px;color:var(--muted)}
+
+  /* 存钱罐/钱包容器行 */
+  .co-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13px}
+
+  /* 存折明细 */
+  .rec{padding:7px 0;border-bottom:1px dashed var(--line);font-size:12px}
+  .rec .t{color:var(--muted);font-size:11px}
+  .rec .in{color:var(--good);font-weight:700}
+  .rec .out{color:var(--bad);font-weight:700}
+
+  /* 图鉴 */
+  .modal.codex{width:min(760px,92vw);max-height:84vh;display:flex;flex-direction:column;padding:16px 20px}
+  .codex-scroll{overflow-y:auto;flex:1;padding-right:6px}
+  .modal.codex h3{margin:14px 0 6px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:4px}
+  .codex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+  .codex-item{border:1px solid var(--line);border-radius:8px;padding:8px;font-size:12px;background:#fafafa}
+  .codex-item b{display:block;font-size:13px}
+  .codex-item span{color:var(--muted);font-size:11px}
+  .codex-item small{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+  .codex-item.off{opacity:.4;background:#f3f4f6;border-style:dashed}
+
+  /* 选票支付弹窗 */
+  .modal.pay{width:min(420px,92vw);max-height:84vh;display:flex;flex-direction:column;padding:18px 20px}
+  .modal.pay h2{font-size:15px;margin-bottom:4px}
+  .bp-list{overflow-y:auto;max-height:280px;margin:10px 0;border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+  .bp-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:14px}
+  .bp-row:last-child{border-bottom:0}
+  .bp-row b{color:#b45309;font-weight:700}
+  .bp-row input{accent-color:var(--accent)}
+  .pay-sum{margin:8px 0 4px;font-size:13px;line-height:1.7}
+  .modal.pay .btn{margin:0}
+  .modal.pay .btnrow{display:flex;gap:8px}
+  .modal.pay .btnrow .btn{flex:1}
+
+  /* ---------- 刮刮乐 ---------- */
+  .lotto-cells{display:flex;gap:10px;align-items:center}
+  .lotto-cell{width:64px;height:64px;border:2px solid #e5e7eb;border-radius:10px;background:#eceff1;
+    position:relative;cursor:pointer;overflow:hidden;user-select:none}
+  .lotto-cell::after{content:"刮";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    color:#9aa3ad;font-size:14px;letter-spacing:.2em;
+    background:repeating-linear-gradient(45deg,#e0e4e8,#f3f5f7 8px)}
+  .lotto-cell:hover::after{color:#6b7280}
+  .lotto-num{width:64px;height:64px;display:flex;align-items:center;justify-content:center;
+    border:2px solid #c7cdd4;border-radius:10px;background:#fff;color:#000;
+    font:900 40px "Courier New",monospace;text-align:center}
+  .lotto-reveal{animation:lottoReveal .5s ease-out}
+  @keyframes lottoReveal{from{transform:scale(.15) rotate(-90deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+  .lotto-ticket{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#fafafa;
+    display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .lotto-ticket .lotto-id{font-size:12px;color:var(--muted);width:100%}
+  .lotto-ticket .lotto-result{font-size:14px;font-weight:700}
+  .lotto-ticket .lotto-result.win{color:var(--good)}
+  .lotto-ticket .lotto-result.lose{color:var(--muted)}
+</style>
+</head>
+<body>
+<header id="topbar"></header>
+<div id="layout">
+  <nav>
+    <div id="navlist"></div>
+  </nav>
+  <main id="main"></main>
+  <aside id="side"></aside>
+</div>
+<div id="log" style="max-width:1280px;margin:0 auto 30px;background:var(--panel);border:1px solid var(--line);border-radius:10px"></div>
+<div id="modal"></div>
+<div id="toast"></div>
+
+<script src="js/data/items.js"></script>
+<script src="js/data/npcs.js"></script>
+<script src="js/data/tickets.js"></script>
+<script src="js/data/world.js"></script>
+<script src="js/data/shops.js"></script>
+<script src="js/data/quests.js"></script>
+<script src="js/data/heishi.js"></script>
+<script src="js/data/net.js"></script>
+<script src="js/lottery.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/ui.js"></script>
+<script>
+  loadState();
+  refreshAllShops();
+  U.init();
+  U.toast("欢迎来到两界人生！先去小卖铺进货，回老家穿越去1980年试试。","good");
+</script>
+</body>
+</html>
