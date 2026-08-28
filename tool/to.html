@@ -3,219 +3,373 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML一键上传转网页链接</title>
+    <title>HTML 转网页链接 | XS 魔法实验室</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        :root {
+            --bg1: #fff8ff;
+            --bg2: #eef8ff;
+            --bg3: #fffef3;
+            --text-main: #33456f;
+            --text-muted: #6f7ea8;
+            --line: #dce7ff;
+            --pink: #ff7cb4;
+            --peach: #ffb37c;
+            --blue: #79b5ff;
+            --mint: #71d9c4;
+            --card-shadow: 0 12px 30px rgba(124, 154, 219, 0.16);
+            --card-shadow-hover: 0 18px 36px rgba(124, 154, 219, 0.24);
+            --danger: #ea5b7a;
         }
+
+        * { box-sizing: border-box; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f5f7fa;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            margin: 0;
             min-height: 100vh;
-            padding: 20px;
+            color: var(--text-main);
+            font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(255, 179, 124, 0.28) 0, transparent 28%),
+                radial-gradient(circle at 86% 9%, rgba(181, 156, 255, 0.26) 0, transparent 30%),
+                radial-gradient(circle at 76% 82%, rgba(121, 181, 255, 0.22) 0, transparent 33%),
+                linear-gradient(160deg, var(--bg1), var(--bg2) 52%, var(--bg3));
+            padding: 26px 14px 60px;
+            -webkit-font-smoothing: antialiased;
         }
-        .container {
-            background: #ffffff;
-            width: 100%;
-            max-width: 600px;
-            padding: 30px;
+
+        .sparkles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.45;
+            background-image:
+                radial-gradient(circle, rgba(255, 124, 180, 0.58) 1px, transparent 1px),
+                radial-gradient(circle, rgba(121, 181, 255, 0.58) 1px, transparent 1px);
+            background-size: 44px 44px, 60px 60px;
+            background-position: 0 0, 18px 22px;
+        }
+
+        .app {
+            position: relative;
+            z-index: 2;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .hero,
+        .panel {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .hero {
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            font-size: 12px;
+            font-weight: 700;
+            color: #8d5d9d;
+            background: linear-gradient(90deg, #ffe3f2, #eaf3ff);
+            border: 1px solid #efdbff;
+            border-radius: 999px;
+            padding: 6px 12px;
+        }
+
+        .home-link {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 700;
+            background: #fff;
+            border: 1px solid var(--line);
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 8px 12px;
         }
-        h2 {
-            margin-bottom: 20px;
-            font-size: 1.4rem;
-            color: #1a1a1a;
-            text-align: center;
+
+        h1 {
+            margin: 10px 0 5px;
+            font-size: clamp(28px, 5vw, 44px);
+            font-weight: 900;
+            line-height: 1.08;
+            background: linear-gradient(90deg, var(--pink), var(--peach) 34%, var(--blue) 70%, var(--mint));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
-        .form-group {
-            margin-bottom: 20px;
+
+        .sub { margin: 0; color: var(--text-muted); font-size: 14px; }
+
+        .panel {
+            padding: 18px;
+            margin-bottom: 14px;
         }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #4a5568;
-        }
-        input[type="text"],
+
+        .form-group { margin-bottom: 16px; }
+        .form-group:last-of-type { margin-bottom: 0; }
+
+        label { display: block; font-size: 12px; font-weight: 700; color: #7384b1; margin-bottom: 6px; }
+
+        input,
         select,
         textarea {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #cbd5e0;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            background-color: #fff;
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            padding: 10px 11px;
+            font-size: 14px;
+            outline: none;
+            color: var(--text-main);
+            background: #fff;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
-        input[type="text"]:focus,
+
+        input:focus,
         select:focus,
         textarea:focus {
-            outline: none;
-            border-color: #3182ce;
-            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+            border-color: #b9ceff;
+            box-shadow: 0 0 0 4px rgba(121, 181, 255, 0.16);
         }
+
         textarea {
-            height: 180px;
+            height: 200px;
             resize: vertical;
-            font-family: "Courier New", Courier, monospace;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
         }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #3182ce;
-            color: white;
+
+        .btn {
             border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 600;
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 14px;
+            font-weight: 800;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: 0.2s ease;
+            width: 100%;
         }
-        button:hover {
-            background-color: #2b6cb0;
+
+        .btn-primary {
+            color: #fff;
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            box-shadow: 0 10px 18px rgba(134, 164, 227, 0.35);
         }
-        button:disabled {
-            background-color: #a0aec0;
+
+        .btn-primary:hover:not(:disabled) { transform: translateY(-1px); }
+        .btn-primary:disabled {
+            background: linear-gradient(90deg, #f3c7dc, #f3d5b8, #c6dcf5);
+            box-shadow: none;
             cursor: not-allowed;
         }
-        .result-box {
-            margin-top: 25px;
-            padding: 15px;
-            background-color: #f7fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
+
+        .result {
+            margin-top: 16px;
+            border: 1px dashed #dce7ff;
+            border-radius: 14px;
+            background: #f8fbff;
+            padding: 12px;
+            display: none;
             word-break: break-all;
         }
-        .result-box a {
-            color: #3182ce;
+
+        .result .item {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 8px 6px;
+        }
+
+        .result .k {
+            font-size: 12px;
+            font-weight: 700;
+            color: #8d9cc4;
+            min-width: 46px;
+        }
+
+        .result .v {
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            font-size: 13px;
+            font-weight: 800;
+            color: #41558d;
+        }
+
+        .result a {
+            color: var(--blue);
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 800;
         }
-        .result-box a:hover {
-            text-decoration: underline;
+
+        .result a:hover { text-decoration: underline; }
+
+        .copy {
+            border: 1px solid #dbe8ff;
+            border-radius: 10px;
+            background: #fff;
+            color: #5d6f9f;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 10px;
+            cursor: pointer;
         }
-        .error {
-            color: #e53e3e;
-            font-size: 0.9rem;
-        }
+
+        .copy:hover { background: #f3f8ff; }
+
+        .result .error { color: var(--danger); font-size: 13px; font-weight: 700; }
+
         .footer-nav {
-            margin-top: 25px;
-            padding-top: 15px;
-            border-top: 1px dashed #e2e8f0;
             text-align: center;
-            font-size: 0.85rem;
-            color: #718096;
+            font-size: 12px;
+            color: var(--text-muted);
         }
+
         .footer-nav a {
-            color: #3182ce;
+            color: var(--blue);
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 700;
         }
-        .footer-nav a:hover {
-            text-decoration: underline;
-        }
+
+        .footer-nav a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
+    <div class="sparkles" aria-hidden="true"></div>
 
-<div class="container">
-    <h2>HTML一键上传转网页链接</h2>
-    
-    <div class="form-group">
-        <label for="title">标题 (Title)</label>
-        <input type="text" id="title" placeholder="例如: Untitled">
+    <div class="app">
+        <header class="hero">
+            <div class="hero-top">
+                <span class="pill">内容工具 / HTML 转网页链接</span>
+                <a class="home-link" href="../index.html" target="_blank" rel="noopener noreferrer">返回主页</a>
+            </div>
+            <h1>HTML 一键转网页链接</h1>
+            <p class="sub">粘贴 HTML 内容，一键上传生成可访问的网页链接。</p>
+        </header>
+
+        <section class="panel">
+            <div class="form-group">
+                <label for="title">标题 (Title)</label>
+                <input type="text" id="title" placeholder="例如: Untitled">
+            </div>
+
+            <div class="form-group">
+                <label for="format">格式 (Format)</label>
+                <select id="format">
+                    <option value="html" selected>HTML</option>
+                    <option value="markdown">Markdown</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="content">内容 (Content)</label>
+                <textarea id="content" placeholder="粘贴 HTML 或 Markdown 内容..."></textarea>
+            </div>
+
+            <button id="submitBtn" class="btn btn-primary" type="button">上传生成链接</button>
+
+            <div id="result" class="result"></div>
+        </section>
+
+        <div class="footer-nav">
+            前往部署源头站：<a href="https://artidrop.ai/" target="_blank" rel="noopener noreferrer">https://artidrop.ai/</a>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label for="format">格式 (Format)</label>
-        <select id="format">
-            <option value="html" selected>HTML</option>
-            <option value="markdown">Markdown</option>
-        </select>
-    </div>
+    <script>
+        (function () {
+            var titleInput = document.getElementById('title');
+            var formatSelect = document.getElementById('format');
+            var contentInput = document.getElementById('content');
+            var submitBtn = document.getElementById('submitBtn');
+            var resultDiv = document.getElementById('result');
 
-    <div class="form-group">
-        <label for="content">内容 (Content)</label>
-        <textarea id="content" placeholder="输入内容..."></textarea>
-    </div>
+            function copyText(text) {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(null, function () {
+                        fallbackCopy(text);
+                    });
+                } else {
+                    fallbackCopy(text);
+                }
+            }
 
-    <button id="submitBtn" onclick="submitArtifact()">提交</button>
+            function fallbackCopy(text) {
+                var ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                try { document.execCommand('copy'); } catch (e) {}
+                document.body.removeChild(ta);
+            }
 
-    <div id="result" class="result-box" style="display: none;"></div>
+            function setResult(html) {
+                resultDiv.innerHTML = html;
+                resultDiv.style.display = 'block';
+            }
 
-    <div class="footer-nav">
-        前往部署源头站：<a href="https://artidrop.ai/" target="_blank" rel="noopener noreferrer">https://artidrop.ai/</a>
-    </div>
-</div>
+            submitBtn.addEventListener('click', function () {
+                var title = titleInput.value.trim() || 'Untitled';
+                var format = formatSelect.value;
+                var content = contentInput.value;
 
-<script>
-    async function submitArtifact() {
-        const titleInput = document.getElementById('title');
-        const formatSelect = document.getElementById('format');
-        const contentInput = document.getElementById('content');
-        const submitBtn = document.getElementById('submitBtn');
-        const resultDiv = document.getElementById('result');
+                if (!content) {
+                    setResult('<div class="error">请填写内容后再上传。</div>');
+                    return;
+                }
 
-        const title = titleInput.value.trim() || "Untitled";
-        const format = formatSelect.value;
-        const content = contentInput.value;
+                submitBtn.disabled = true;
+                submitBtn.textContent = '上传中...';
+                resultDiv.style.display = 'none';
 
-        if (!content) {
-            alert('请填写内容！');
-            return;
-        }
+                var payload = { content: content, format: format, title: title };
 
-        submitBtn.disabled = true;
-        submitBtn.innerText = '提交中...';
-        resultDiv.style.display = 'none';
-
-        const payload = {
-            content: content,
-            format: format,
-            title: title
-        };
-
-        try {
-            const workerUrl = 'https://html.2335.cn';
-
-            const response = await fetch(workerUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
+                fetch('https://html.2335.cn', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }).then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('请求失败，状态码: ' + response.status);
+                    }
+                    return response.json();
+                }).then(function (data) {
+                    if (data && data.url) {
+                        var url = data.url;
+                        setResult(
+                            '<div class="item"><span class="k">URL</span>' +
+                            '<span class="v"><a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + '</a></span>' +
+                            '<button class="copy" data-copy="' + url + '">复制</button></div>'
+                        );
+                    } else {
+                        setResult('<div class="error">响应失败: ' + JSON.stringify(data) + '</div>');
+                    }
+                }).catch(function (error) {
+                    setResult('<div class="error">发生错误: ' + error.message + '</div>');
+                }).finally(function () {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '上传生成链接';
+                });
             });
 
-            if (!response.ok) {
-                throw new Error(`请求失败，状态码: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            if (data && data.url) {
-                resultDiv.innerHTML = `<strong>URL:</strong> <a href="${data.url}" target="_blank">${data.url}</a>`;
-                resultDiv.style.display = 'block';
-            } else {
-                resultDiv.innerHTML = `<span class="error">响应失败: ${JSON.stringify(data)}</span>`;
-                resultDiv.style.display = 'block';
-            }
-        } catch (error) {
-            resultDiv.innerHTML = `<span class="error">发生错误: ${error.message}</span>`;
-            resultDiv.style.display = 'block';
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerText = '提交';
-        }
-    }
-</script>
-
+            document.addEventListener('click', function (e) {
+                var btn = e.target.closest('.copy[data-copy]');
+                if (!btn) return;
+                copyText(btn.getAttribute('data-copy'));
+                btn.textContent = '已复制 ✓';
+                setTimeout(function () { btn.textContent = '复制'; }, 1200);
+            });
+        })();
+    </script>
 </body>
 </html>

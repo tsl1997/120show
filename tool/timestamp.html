@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时间戳转换工具 | XS 魔法实验室</title>
+    <style>
+        :root {
+            --bg1: #fff8ff;
+            --bg2: #eef8ff;
+            --bg3: #fffef3;
+            --text-main: #33456f;
+            --text-muted: #6f7ea8;
+            --line: #dce7ff;
+            --pink: #ff7cb4;
+            --peach: #ffb37c;
+            --blue: #79b5ff;
+            --mint: #71d9c4;
+            --card-shadow: 0 12px 30px rgba(124, 154, 219, 0.16);
+            --card-shadow-hover: 0 18px 36px rgba(124, 154, 219, 0.24);
+            --danger: #ea5b7a;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--text-main);
+            font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(255, 179, 124, 0.28) 0, transparent 28%),
+                radial-gradient(circle at 86% 9%, rgba(181, 156, 255, 0.26) 0, transparent 30%),
+                radial-gradient(circle at 76% 82%, rgba(121, 181, 255, 0.22) 0, transparent 33%),
+                linear-gradient(160deg, var(--bg1), var(--bg2) 52%, var(--bg3));
+            padding: 26px 14px 60px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .sparkles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.45;
+            background-image:
+                radial-gradient(circle, rgba(255, 124, 180, 0.58) 1px, transparent 1px),
+                radial-gradient(circle, rgba(121, 181, 255, 0.58) 1px, transparent 1px);
+            background-size: 44px 44px, 60px 60px;
+            background-position: 0 0, 18px 22px;
+        }
+
+        .app {
+            position: relative;
+            z-index: 2;
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+
+        .hero,
+        .panel,
+        .now-strip {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .hero {
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            font-size: 12px;
+            font-weight: 700;
+            color: #8d5d9d;
+            background: linear-gradient(90deg, #ffe3f2, #eaf3ff);
+            border: 1px solid #efdbff;
+            border-radius: 999px;
+            padding: 6px 12px;
+        }
+
+        .home-link {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 700;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 8px 12px;
+        }
+
+        h1 {
+            margin: 10px 0 5px;
+            font-size: clamp(30px, 5vw, 50px);
+            font-weight: 900;
+            line-height: 1.08;
+            background: linear-gradient(90deg, var(--pink), var(--peach) 34%, var(--blue) 70%, var(--mint));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sub { margin: 0; color: var(--text-muted); font-size: 14px; }
+
+        .now-strip {
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 4px 18px;
+            align-items: center;
+        }
+
+        .now-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #8d9cc4;
+        }
+
+        .now-value {
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            font-size: 15px;
+            font-weight: 800;
+            color: #41558d;
+            word-break: break-all;
+        }
+
+        .now-clock {
+            grid-column: 1 / -1;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .panel {
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 4px;
+            font-size: 15px;
+            font-weight: 800;
+            color: #41558d;
+        }
+
+        .panel-title .emoji { font-size: 18px; }
+
+        .panel-desc {
+            margin: 0 0 14px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        label { display: block; font-size: 12px; font-weight: 700; color: #7384b1; margin-bottom: 6px; }
+
+        input,
+        select {
+            width: 100%;
+            border: 1px solid #dbe8ff;
+            border-radius: 12px;
+            padding: 10px 11px;
+            font-size: 14px;
+            outline: none;
+            color: var(--text-main);
+            background: #fff;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #b9ceff;
+            box-shadow: 0 0 0 4px rgba(121, 181, 255, 0.16);
+        }
+
+        .row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
+        .row + .row { margin-top: 12px; }
+
+        .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 11px 14px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            color: #fff;
+            background: linear-gradient(90deg, var(--pink), var(--peach), var(--blue));
+            box-shadow: 0 10px 18px rgba(134, 164, 227, 0.35);
+        }
+
+        .btn-ghost {
+            border: 1px solid #dbe8ff;
+            background: #fff;
+            color: #5d6f9f;
+        }
+
+        .btn:hover { transform: translateY(-1px); }
+
+        .result {
+            margin-top: 14px;
+            border: 1px dashed #dce7ff;
+            border-radius: 14px;
+            background: #f8fbff;
+            padding: 12px;
+            display: none;
+        }
+
+        .result .item {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 8px 6px;
+            border-bottom: 1px dashed #e3ecff;
+        }
+
+        .result .item:last-child { border-bottom: none; }
+
+        .result .k {
+            font-size: 12px;
+            font-weight: 700;
+            color: #8d9cc4;
+            min-width: 70px;
+        }
+
+        .result .v {
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            font-size: 14px;
+            font-weight: 800;
+            color: #41558d;
+            word-break: break-all;
+        }
+
+        .result .v.big { font-size: 17px; }
+
+        .copy {
+            border: 1px solid #dbe8ff;
+            border-radius: 10px;
+            background: #fff;
+            color: #5d6f9f;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+
+        .copy:hover { background: #f3f8ff; }
+
+        .hint {
+            margin-top: 8px;
+            font-size: 11px;
+            color: #97a6cd;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 800;
+            color: #fff;
+            border-radius: 999px;
+            padding: 2px 8px;
+            margin-left: 6px;
+            vertical-align: 2px;
+        }
+
+        .badge-sec { background: var(--blue); }
+        .badge-ms { background: var(--pink); }
+        .badge-auto { background: var(--mint); }
+
+        @media (max-width: 640px) {
+            .now-strip { grid-template-columns: 1fr; }
+            .result .item { grid-template-columns: 1fr auto; }
+            .row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sparkles" aria-hidden="true"></div>
+
+    <div class="app">
+        <header class="hero">
+            <div class="hero-top">
+                <span class="pill">内容工具 / 时间戳转换</span>
+                <a class="home-link" href="../index.html" target="_blank" rel="noopener noreferrer">返回主页</a>
+            </div>
+            <h1>时间戳转换工具</h1>
+            <p class="sub">秒级 / 毫秒级时间戳与北京时间互转，实时显示当前时间。</p>
+        </header>
+
+        <section class="now-strip">
+            <span class="now-label">当前北京时间</span>
+            <span class="now-value" id="nowBeijing">--</span>
+            <span class="now-label">秒级时间戳</span>
+            <span class="now-value" id="nowSec">--</span>
+            <span class="now-label">毫秒时间戳</span>
+            <span class="now-value" id="nowMs">--</span>
+            <span class="now-clock" id="nowClock"></span>
+        </section>
+
+        <section class="panel">
+            <h2 class="panel-title"><span class="emoji">🕰️</span> 时间戳 → 北京时间</h2>
+            <p class="panel-desc">输入秒级（10 位）或毫秒级（13 位）时间戳，自动识别单位并转换为北京时间。</p>
+            <div class="row">
+                <div>
+                    <label for="tsInput">时间戳</label>
+                    <input id="tsInput" type="text" placeholder="例如：1700000000 或 1700000000000">
+                </div>
+                <button id="tsConvert" class="btn btn-primary" type="button">转换</button>
+            </div>
+            <div class="hint" id="tsHint"></div>
+            <div class="result" id="tsResult"></div>
+        </section>
+
+        <section class="panel">
+            <h2 class="panel-title"><span class="emoji">📅</span> 北京时间 → 时间戳</h2>
+            <p class="panel-desc">选择或输入北京时间，一键生成对应的秒级与毫秒级时间戳。</p>
+            <div class="row">
+                <div>
+                    <label for="bjInput">北京时间</label>
+                    <input id="bjInput" type="datetime-local" step="1">
+                </div>
+                <button id="bjNow" class="btn btn-ghost" type="button">使用当前时间</button>
+                <button id="bjConvert" class="btn btn-primary" type="button">转换</button>
+            </div>
+            <div class="hint" id="bjHint"></div>
+            <div class="result" id="bjResult"></div>
+        </section>
+    </div>
+
+    <script>
+        (function () {
+            var el = function (id) { return document.getElementById(id); };
+
+            var nowBeijingEl = el('nowBeijing');
+            var nowSecEl = el('nowSec');
+            var nowMsEl = el('nowMs');
+            var nowClockEl = el('nowClock');
+
+            function pad(n) { return String(n).padStart(2, '0'); }
+
+            function formatBeijing(d) {
+                return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate()) +
+                    ' ' + pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds());
+            }
+
+            function formatWeekday(dayNum) {
+                var weeks = ['日', '一', '二', '三', '四', '五', '六'];
+                return '星期' + weeks[dayNum];
+            }
+
+            function beijingOf(ms) {
+                return new Date(ms + 8 * 3600 * 1000);
+            }
+
+            function copyText(text) {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(function () {
+                        flashCopyDone();
+                    }).catch(function () {
+                        fallbackCopy(text);
+                    });
+                } else {
+                    fallbackCopy(text);
+                }
+            }
+
+            function fallbackCopy(text) {
+                var ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                try { document.execCommand('copy'); } catch (e) {}
+                document.body.removeChild(ta);
+                flashCopyDone();
+            }
+
+            var doneTimer = null;
+            function flashCopyDone() {
+                var btn = document.getElementById('copyFlash');
+                if (!btn) return;
+                btn.textContent = '已复制 ✓';
+                if (doneTimer) clearTimeout(doneTimer);
+                doneTimer = setTimeout(function () {
+                    var btns = document.querySelectorAll('.copy[data-original]');
+                    btns.forEach(function (b) { b.textContent = b.getAttribute('data-original'); });
+                }, 1200);
+            }
+
+            function tick() {
+                var ms = Date.now();
+                var sec = Math.floor(ms / 1000);
+                var bj = beijingOf(ms);
+                nowBeijingEl.textContent = formatBeijing(bj);
+                nowSecEl.textContent = sec;
+                nowMsEl.textContent = ms;
+                nowClockEl.textContent = '今天是 ' + formatBeijing(bj) + ' ' + formatWeekday(bj.getUTCDay());
+            }
+            tick();
+            setInterval(tick, 1000);
+
+            function parseTimestamp(raw) {
+                raw = (raw || '').trim().replace(/[,\s]/g, '');
+                if (!/^-?\d+$/.test(raw)) return null;
+                var num = parseInt(raw, 10);
+                var abs = Math.abs(num);
+                if (abs >= 1e12) return { value: num, unit: 'ms' };
+                if (abs >= 1e8) return { value: num, unit: 'sec' };
+                return { value: num, unit: 'sec' };
+            }
+
+            function renderTsResult(data, unit) {
+                var ms = unit === 'sec' ? data.value * 1000 : data.value;
+                var d = new Date(ms);
+                if (isNaN(d.getTime())) return null;
+
+                var bj = beijingOf(ms);
+                var sec = Math.floor(ms / 1000);
+
+                var badgeClass = unit === 'ms' ? 'badge-ms' : 'badge-sec';
+                var badgeText = unit === 'ms' ? '毫秒级' : '秒级';
+
+                var html = '';
+                html += '<div class="item"><span class="k">北京时间</span><span class="v big">' + formatBeijing(bj) + ' ' + formatWeekday(bj.getUTCDay()) + '</span></div>';
+                html += '<div class="item"><span class="k">UTC 时间</span><span class="v">' + formatBeijing(d) + ' UTC</span></div>';
+                html += '<div class="item"><span class="k">秒级时间戳</span><span class="v">' + sec + '</span><button class="copy" data-original="复制" data-copy="' + sec + '">复制</button></div>';
+                html += '<div class="item"><span class="k">毫秒时间戳</span><span class="v">' + ms + '</span><button class="copy" data-original="复制" data-copy="' + ms + '">复制</button></div>';
+
+                return { html: html, badge: '<span class="badge ' + badgeClass + '">' + badgeText + '</span>', sec: sec, ms: ms };
+            }
+
+            el('tsConvert').addEventListener('click', function () {
+                var input = el('tsInput');
+                var hint = el('tsHint');
+                var res = el('tsResult');
+                var parsed = parseTimestamp(input.value);
+
+                if (!parsed) {
+                    hint.innerHTML = '<span style="color:var(--danger)">请输入有效的时间戳（纯数字，10 位秒级或 13 位毫秒级）。</span>';
+                    res.style.display = 'none';
+                    return;
+                }
+
+                var out = renderTsResult(parsed, parsed.unit);
+                if (!out) {
+                    hint.innerHTML = '<span style="color:var(--danger)">时间戳超出可表示范围，无法转换。</span>';
+                    res.style.display = 'none';
+                    return;
+                }
+
+                hint.innerHTML = '已识别为 ' + out.badge + ' 时间戳。';
+                res.innerHTML = out.html;
+                res.style.display = 'block';
+            });
+
+            el('tsInput').addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') { e.preventDefault(); el('tsConvert').click(); }
+            });
+
+            function toBeijingTs(str) {
+                var m = str.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?$/);
+                if (!m) return null;
+                var y = +m[1], mo = +m[2], d = +m[3], h = +m[4], mi = +m[5], s = +(m[6] || 0);
+                var date = new Date(Date.UTC(y, mo - 1, d, h - 8, mi, s));
+                return isNaN(date.getTime()) ? null : date.getTime();
+            }
+
+            el('bjConvert').addEventListener('click', function () {
+                var input = el('bjInput');
+                var hint = el('bjHint');
+                var res = el('bjResult');
+
+                if (!input.value) {
+                    hint.innerHTML = '<span style="color:var(--danger)">请先选择或输入北京时间。</span>';
+                    res.style.display = 'none';
+                    return;
+                }
+
+                var ms = toBeijingTs(input.value);
+                if (ms === null) {
+                    hint.innerHTML = '<span style="color:var(--danger)">时间格式无效，请重新选择。</span>';
+                    res.style.display = 'none';
+                    return;
+                }
+
+                var sec = Math.floor(ms / 1000);
+                var bj = beijingOf(ms);
+
+                hint.innerHTML = '已按北京时间（UTC+8）计算。';
+                res.innerHTML =
+                    '<div class="item"><span class="k">北京时间</span><span class="v">' + formatBeijing(bj) + ' ' + formatWeekday(bj.getUTCDay()) + '</span></div>' +
+                    '<div class="item"><span class="k">秒级时间戳</span><span class="v">' + sec + '</span><button class="copy" data-original="复制" data-copy="' + sec + '">复制</button></div>' +
+                    '<div class="item"><span class="k">毫秒时间戳</span><span class="v">' + ms + '</span><button class="copy" data-original="复制" data-copy="' + ms + '">复制</button></div>';
+                res.style.display = 'block';
+            });
+
+            el('bjNow').addEventListener('click', function () {
+                var bj = beijingOf(Date.now());
+                el('bjInput').value = formatBeijing(bj).replace(' ', 'T');
+                el('bjHint').textContent = '已填入当前北京时间。';
+                el('bjResult').style.display = 'none';
+            });
+
+            document.addEventListener('click', function (e) {
+                var btn = e.target.closest('.copy[data-copy]');
+                if (!btn) return;
+                btn.setAttribute('id', 'copyFlash');
+                copyText(btn.getAttribute('data-copy'));
+                setTimeout(function () { btn.removeAttribute('id'); }, 50);
+            });
+        })();
+    </script>
+</body>
+</html>
