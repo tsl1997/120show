@@ -140,4 +140,17 @@
     <lastmod>2026-08-01</lastmod>
     <priority>0.7</priority>
   </url>
+  <!-- Life 分类项目 -->
+  <url>
+    <loc>https://120.show/life/cook/index.html</loc>
+    <lastmod>2026-09-05</lastmod>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 文档转换器 -->
+  <url>
+    <loc>https://120.show/docconvert/index.html</loc>
+    <lastmod>2026-09-06</lastmod>
+    <priority>0.8</priority>
+  </url>
 </urlset>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>陶氏族谱</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-name">陶氏族谱</span>
+        <span class="brand-sub" id="subtitle"></span>
+      </div>
+      <div class="legend">
+        <span class="lg"><i class="dot male"></i>男</span>
+        <span class="lg"><i class="dot female"></i>女</span>
+        <span class="lg"><i class="dot spouse"></i>配偶</span>
+        <span class="lg"><i class="dot ended"></i>无后</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <div class="tree-wrap">
+        <div id="tree" class="tree"></div>
+      </div>
+
+      <div id="backdrop" class="backdrop"></div>
+      <aside id="detail" class="detail">
+        <div class="detail-headbar">
+          <span class="detail-title">人物详情</span>
+          <button id="closeDetail" class="close" title="关闭 (Esc)">×</button>
+        </div>
+        <div id="detailContent" class="detail-body"></div>
+      </aside>
+    </main>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

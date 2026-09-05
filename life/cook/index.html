@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>懒人营养厨房 | 一键生成地域均衡套餐</title>
+<meta name="description" content="选一个中国地域，按当地蔬菜和作物一键生成荤素汤主食均衡套餐，点开菜品查看具体用量与做法。">
+<style>
+    :root {
+        --bg: #f6f4ec;
+        --card: #ffffff;
+        --ink: #26332a;
+        --sub: #71806f;
+        --line: #e7e3d5;
+        --green: #2e7d4f;
+        --green-soft: #e6f3ea;
+        --orange: #e87c2b;
+        --orange-soft: #fdf0e3;
+        --red: #d25a43;
+        --red-soft: #fbeae5;
+        --blue: #4a8fc2;
+        --blue-soft: #e7f1f8;
+        --gold: #b98b22;
+        --gold-soft: #faf3e0;
+        --shadow: 0 12px 32px rgba(38, 51, 42, 0.08);
+        --r: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+        background:
+            radial-gradient(circle at 10% 8%, rgba(46, 125, 79, 0.09), transparent 32%),
+            radial-gradient(circle at 92% 4%, rgba(232, 124, 43, 0.09), transparent 30%),
+            var(--bg);
+        min-height: 100vh;
+    }
+
+    button { font-family: inherit; cursor: pointer; }
+    h1, h2, h3 { margin: 0; }
+
+    /* ---------- 地域选择遮罩 ---------- */
+    #gate {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        overflow-y: auto;
+        background:
+            radial-gradient(circle at 85% 10%, rgba(232, 124, 43, 0.14), transparent 34%),
+            radial-gradient(circle at 8% 90%, rgba(46, 125, 79, 0.14), transparent 36%),
+            linear-gradient(165deg, #fbfaf4, #f2f6ef);
+        display: flex;
+        flex-direction: column;
+    }
+
+    #gate.hide { display: none; }
+
+    .gate-head { text-align: center; padding: clamp(40px, 8vh, 76px) 20px 8px; }
+
+    .gate-kicker {
+        display: inline-block;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: var(--green);
+        background: var(--green-soft);
+        border: 1px solid #d3e9db;
+        border-radius: 999px;
+        padding: 6px 14px;
+    }
+
+    .gate-head h1 {
+        margin-top: 18px;
+        font-size: clamp(30px, 5vw, 46px);
+        font-weight: 900;
+    }
+
+    .gate-head p { margin: 12px auto 0; color: var(--sub); font-size: 15px; max-width: 460px; line-height: 1.7; }
+
+    .gate-grid {
+        width: 100%;
+        max-width: 1040px;
+        margin: 26px auto 0;
+        padding: 0 20px 76px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
+        gap: 16px;
+    }
+
+    .region-card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 20px;
+        text-align: left;
+        box-shadow: var(--shadow);
+        transition: 0.2s ease;
+        position: relative;
+    }
+
+    .region-card:hover { transform: translateY(-4px); border-color: #bcd8c6; }
+
+    .region-card .emoji { font-size: 34px; line-height: 1; }
+    .region-card h3 { margin-top: 12px; font-size: 20px; }
+    .region-card .slogan { margin-top: 4px; font-size: 12.5px; color: var(--green); font-weight: 700; }
+    .region-card .desc { margin-top: 8px; font-size: 12.5px; color: var(--sub); line-height: 1.65; }
+    .region-card .prod { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .region-card .prod span {
+        font-size: 11px;
+        color: #8a7a4f;
+        background: var(--gold-soft);
+        border-radius: 999px;
+        padding: 3px 9px;
+    }
+
+    .gate-actions { text-align: center; margin-top: 4px; }
+
+    .ghost-btn {
+        background: transparent;
+        border: 1px dashed #b8c9b9;
+        color: var(--sub);
+        border-radius: 999px;
+        padding: 10px 20px;
+        font-size: 13.5px;
+        font-weight: 700;
+        transition: 0.2s;
+    }
+
+    .ghost-btn:hover { color: var(--green); border-color: var(--green); }
+    .gate-back { margin-top: 14px; display: none; }
+    .gate-back.show { display: inline-block; }
+
+    /* ---------- 主体 ---------- */
+    #app { display: none; padding-bottom: 70px; }
+    #app.ready { display: block; }
+
+    .appbar {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        background: rgba(246, 244, 236, 0.88);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--line);
+    }
+
+    .appbar-in {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 12px 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .brand { font-size: 17px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    .brand small { color: var(--sub); font-weight: 600; font-size: 12px; }
+
+    .spacer { flex: 1; }
+
+    .region-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--ink);
+        transition: 0.2s;
+    }
+
+    .region-chip:hover { border-color: var(--green); color: var(--green); }
+
+    .stepper {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 4px;
+    }
+
+    .stepper button {
+        width: 28px;
+        height: 28px;
+        border: none;
+        background: var(--green-soft);
+        color: var(--green);
+        border-radius: 50%;
+        font-size: 15px;
+        font-weight: 900;
+        line-height: 1;
+    }
+
+    .stepper b { min-width: 44px; text-align: center; font-size: 13px; }
+
+    .modes { display: inline-flex; background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 4px; gap: 2px; }
+
+    .modes button {
+        border: none;
+        background: transparent;
+        color: var(--sub);
+        font-size: 12.5px;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 7px 12px;
+        transition: 0.15s;
+    }
+
+    .modes button.on { background: var(--green); color: #fff; }
+
+    .tpls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+
+    .tpls button {
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--sub);
+        font-size: 12.5px;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 8px 14px;
+        transition: 0.15s;
+    }
+
+    .tpls button:hover { border-color: var(--orange); color: var(--orange); }
+    .tpls button.on { background: var(--orange); color: #fff; border-color: var(--orange); }
+
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 18px; }
+
+    .hero {
+        margin-top: 22px;
+        background: linear-gradient(135deg, #ffffff, #f4faf4);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 22px;
+        box-shadow: var(--shadow);
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .hero .big-emoji { font-size: 44px; }
+
+    .hero h2 { font-size: 22px; }
+    .hero .slogan { color: var(--green); font-size: 13px; font-weight: 800; margin-top: 3px; }
+    .hero .desc { color: var(--sub); font-size: 13.5px; margin-top: 8px; line-height: 1.7; }
+    .hero .prod { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .hero .prod span {
+        font-size: 11.5px;
+        color: #8a7a4f;
+        background: var(--gold-soft);
+        border: 1px solid #f0e6c8;
+        border-radius: 999px;
+        padding: 4px 10px;
+    }
+
+    .section-head {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin: 30px 0 14px;
+    }
+
+    .section-head h2 { font-size: 20px; }
+    .section-head .hint { color: var(--sub); font-size: 12.5px; }
+
+    .main-btn {
+        margin-left: auto;
+        border: none;
+        color: #fff;
+        background: linear-gradient(90deg, var(--green), #4f9e6f);
+        border-radius: 999px;
+        padding: 11px 22px;
+        font-size: 14px;
+        font-weight: 800;
+        box-shadow: 0 8px 18px rgba(46, 125, 79, 0.28);
+        transition: 0.2s;
+    }
+
+    .main-btn:hover { transform: translateY(-2px); }
+
+    /* 套餐槽位 */
+    .slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+    .slot {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-top: 4px solid var(--cat-color, var(--green));
+        border-radius: var(--r);
+        padding: 16px;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        animation: pop 0.3s ease;
+    }
+
+    @keyframes pop { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    .slot .cat {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        align-self: flex-start;
+        font-size: 11.5px;
+        font-weight: 800;
+        color: var(--cat-color, var(--green));
+        background: var(--cat-soft, var(--green-soft));
+        border-radius: 999px;
+        padding: 4px 10px;
+    }
+
+    .slot h3 { font-size: 17.5px; line-height: 1.4; }
+    .slot .meta { color: var(--sub); font-size: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .slot .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .slot .tags i { font-style: normal; font-size: 11px; color: var(--sub); background: #f4f2e9; border-radius: 999px; padding: 3px 8px; }
+    .slot .acts { margin-top: auto; display: flex; gap: 8px; }
+
+    .slot .acts button {
+        flex: 1;
+        border-radius: 10px;
+        font-size: 12.5px;
+        font-weight: 800;
+        padding: 9px 0;
+        transition: 0.15s;
+    }
+
+    .btn-swap { border: 1px solid var(--line); background: #faf9f3; color: var(--sub); }
+    .btn-swap:hover { border-color: var(--green); color: var(--green); }
+    .btn-view { border: none; background: var(--ink); color: #fff; }
+    .btn-view:hover { background: #000; }
+
+    /* 均衡面板 */
+    .balance {
+        margin-top: 14px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--r);
+        padding: 18px;
+        box-shadow: var(--shadow);
+        display: flex;
+        gap: 18px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .kcal { text-align: center; min-width: 120px; }
+    .kcal b { font-size: 32px; color: var(--orange); }
+    .kcal span { display: block; color: var(--sub); font-size: 12px; margin-top: 2px; }
+
+    .bal-items { flex: 1; min-width: 220px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+    .bal-item {
+        background: #fafbf7;
+        border: 1px solid #eef0e6;
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-size: 12px;
+        color: var(--sub);
+        line-height: 1.5;
+    }
+
+    .bal-item b { display: block; color: var(--ink); font-size: 13px; }
+    .bal-note { flex-basis: 100%; color: var(--sub); font-size: 12.5px; border-top: 1px dashed var(--line); padding-top: 12px; line-height: 1.7; }
+    .bal-note b { color: var(--green); }
+
+    /* 菜谱库 */
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .filters button {
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--sub);
+        font-size: 12.5px;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 8px 14px;
+        transition: 0.15s;
+    }
+
+    .filters button.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+    .lib { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 14px; }
+
+    .lib-card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--r);
+        padding: 16px;
+        text-align: left;
+        box-shadow: var(--shadow);
+        transition: 0.18s;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .lib-card:hover { transform: translateY(-3px); border-color: #c9d8c9; }
+    .lib-card .cat { font-size: 11px; font-weight: 800; color: var(--cat-color); }
+    .lib-card h3 { font-size: 16.5px; }
+    .lib-card .meta { color: var(--sub); font-size: 12px; }
+    .lib-card .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .lib-card .tags i { font-style: normal; font-size: 11px; color: var(--sub); background: #f4f2e9; border-radius: 999px; padding: 3px 8px; }
+
+    /* 弹窗 */
+    .mask {
+        position: fixed;
+        inset: 0;
+        z-index: 60;
+        background: rgba(28, 38, 30, 0.5);
+        display: none;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 4vh 16px;
+        overflow-y: auto;
+    }
+
+    .mask.show { display: flex; }
+
+    .modal {
+        background: #fff;
+        border-radius: 22px;
+        width: 100%;
+        max-width: 600px;
+        padding: 26px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+        animation: pop 0.25s ease;
+    }
+
+    .modal-top { display: flex; align-items: flex-start; gap: 12px; }
+    .modal .cat-pill {
+        font-size: 11.5px;
+        font-weight: 800;
+        color: var(--cat-color);
+        background: var(--cat-soft);
+        border-radius: 999px;
+        padding: 4px 10px;
+    }
+    .modal h2 { font-size: 24px; margin-top: 10px; }
+    .modal .meta { color: var(--sub); font-size: 13px; margin-top: 8px; display: flex; flex-wrap: wrap; gap: 12px; }
+    .modal .tags { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .modal .tags i { font-style: normal; font-size: 11.5px; color: var(--sub); background: #f4f2e9; border-radius: 999px; padding: 4px 10px; }
+
+    .close-x {
+        margin-left: auto;
+        border: none;
+        background: #f1efe6;
+        color: var(--sub);
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        font-size: 16px;
+        line-height: 1;
+    }
+
+    .modal h4 {
+        margin: 22px 0 10px;
+        font-size: 14px;
+        letter-spacing: 1px;
+        color: var(--green);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .modal h4::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+    .ing-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    .ing-table td { padding: 8px 4px; border-bottom: 1px dashed var(--line); }
+    .ing-table tr:last-child td { border-bottom: none; }
+    .ing-table td:last-child { text-align: right; color: var(--sub); white-space: nowrap; }
+
+    .steps { margin: 0; padding-left: 0; list-style: none; counter-reset: st; }
+    .steps li {
+        counter-increment: st;
+        position: relative;
+        padding: 0 0 14px 38px;
+        font-size: 13.5px;
+        line-height: 1.75;
+        color: #3d4a41;
+    }
+    .steps li::before {
+        content: counter(st);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--green-soft);
+        color: var(--green);
+        font-size: 12.5px;
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .tip-box {
+        background: var(--orange-soft);
+        border: 1px solid #f5e3cc;
+        border-radius: 12px;
+        padding: 12px 14px;
+        font-size: 12.5px;
+        color: #8a6a3c;
+        line-height: 1.7;
+    }
+
+    .modal-foot { margin-top: 22px; display: flex; gap: 10px; }
+    .modal-foot .main-btn { margin-left: 0; flex: 1; }
+    .modal-foot .ghost-btn { flex: 1; border-style: solid; }
+
+    .footer { margin-top: 46px; text-align: center; color: var(--sub); font-size: 12px; }
+
+    /* 购物清单 */
+    .shop { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+
+    .shop-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 11px 14px;
+        font-size: 13.5px;
+        font-weight: 600;
+        text-align: left;
+        width: 100%;
+        transition: 0.15s;
+    }
+
+    .shop-row:hover { border-color: var(--green); }
+
+    .shop-row .cb {
+        width: 22px;
+        height: 22px;
+        border: 2px solid #c9c9bd;
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 900;
+        color: transparent;
+        flex: none;
+        transition: 0.15s;
+    }
+
+    .shop-row .n { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .shop-row .amt { margin-left: auto; color: var(--sub); white-space: nowrap; font-size: 12.5px; font-weight: 500; padding-left: 8px; }
+    .shop-row.done { border-color: #bcd8c6; background: #f4faf4; }
+    .shop-row.done .cb { background: var(--green); border-color: var(--green); color: #fff; }
+    .shop-row.done .n { text-decoration: line-through; color: var(--sub); font-weight: 500; }
+
+    .shop-empty { color: var(--sub); font-size: 13px; text-align: center; padding: 18px 0; }
+
+    /* 响应式 */
+    @media (max-width: 1020px) {
+        .slots { grid-template-columns: repeat(2, 1fr); }
+        .bal-items { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 620px) {
+        .slots { grid-template-columns: 1fr; }
+        .stepper b { min-width: 36px; }
+        .modal { padding: 18px; }
+        .appbar-in { padding: 10px 12px; gap: 8px; }
+        .brand { font-size: 15px; }
+        .brand small { display: none; }
+        .modes { max-width: 100%; overflow-x: auto; }
+        .hero { padding: 16px; }
+        .hero .big-emoji { font-size: 34px; }
+        .section-head { margin: 24px 0 12px; }
+        .section-head .hint { flex-basis: 100%; }
+        .section-head .main-btn { margin-left: 0; flex: 1; }
+        .gate-grid { grid-template-columns: 1fr; padding-bottom: 60px; }
+        .shop { grid-template-columns: 1fr; }
+        .shop-row { padding: 10px 12px; }
+        .modal-foot { flex-direction: column; }
+    }
+</style>
+</head>
+<body>
+
+    <!-- 首次进入：选择地域 -->
+    <div id="gate">
+        <div class="gate-head">
+            <span class="gate-kicker">均衡套餐 · 自动配齐</span>
+            <h1>今天吃点好的 🥬</h1>
+            <p>先告诉我你在哪个地域——我会按当地的蔬菜、作物和口味，为你自动配好「一荤一素一汤一主食」，用量和做法都写好了，照做就行。</p>
+        </div>
+        <div class="gate-grid" id="regionGrid"></div>
+        <div class="gate-actions" style="padding-bottom:70px">
+            <button class="ghost-btn" id="randomRegionBtn" type="button">🎲 选不出来？随机来一个</button>
+            <button class="ghost-btn gate-back" id="gateBackBtn" type="button">← 先不换了，回去看套餐</button>
+        </div>
+    </div>
+
+    <!-- 主应用 -->
+    <div id="app">
+        <header class="appbar">
+            <div class="appbar-in">
+                <div class="brand">🥬 懒人营养厨房 <small>地域均衡套餐</small></div>
+                <div class="spacer"></div>
+                <div class="modes" id="modeChips" aria-label="偷懒程度"></div>
+                <div class="stepper" aria-label="用餐人数">
+                    <button type="button" id="svMinus">−</button>
+                    <b id="svLabel">2 人份</b>
+                    <button type="button" id="svPlus">＋</button>
+                </div>
+                <button class="region-chip" id="regionChipBtn" type="button">📍 切换地域</button>
+            </div>
+        </header>
+
+        <div class="wrap">
+            <section class="hero" id="hero"></section>
+
+            <div class="section-head">
+                <h2>今日套餐</h2>
+                <span class="hint" id="tplHint">一荤一素一汤一主食，营养不打架</span>
+                <button class="main-btn" id="regenBtn" type="button">🔄 再生成一组</button>
+            </div>
+
+            <div class="tpls" id="tplChips"></div>
+
+            <section class="slots" id="slots"></section>
+
+            <section class="balance" id="balance"></section>
+
+            <div class="section-head">
+                <h2>🛒 购物清单</h2>
+                <span class="hint" id="shopHint">今日套餐需要的食材都在这，买齐一样勾一样</span>
+                <button class="ghost-btn" id="shopClearBtn" type="button">🧹 清空勾选</button>
+            </div>
+
+            <section class="shop" id="shopBox"></section>
+
+            <div class="section-head">
+                <h2>本地菜谱库</h2>
+                <span class="hint">都是这个地域容易买到的食材</span>
+            </div>
+
+            <div class="filters" id="libFilters"></div>
+            <section class="lib" id="libGrid"></section>
+
+            <footer class="footer">懒人营养厨房 · 数据仅供日常参考 · 用心吃饭，好好生活</footer>
+        </div>
+    </div>
+
+    <!-- 菜品详情弹窗 -->
+    <div class="mask" id="mask">
+        <div class="modal" id="modalBox"></div>
+    </div>
+
+<script src="data.js"></script>
+<script>
+    (function () {
+        'use strict';
+
+        var CATS = {
+            meat:   { label: '荤主菜',  emoji: '🍖', color: 'var(--red)',   soft: 'var(--red-soft)' },
+            veg:    { label: '时令素菜', emoji: '🥬', color: 'var(--green)', soft: 'var(--green-soft)' },
+            soup:   { label: '例汤',    emoji: '🍲', color: 'var(--blue)',  soft: 'var(--blue-soft)' },
+            staple: { label: '主食',    emoji: '🍚', color: 'var(--gold)',  soft: 'var(--gold-soft)' }
+        };
+        var CAT_ORDER = ['meat', 'veg', 'soup', 'staple'];
+
+        var MODES = {
+            fast: { limit: 20,  label: '极速 ≤20分' },
+            std:  { limit: 35,  label: '标准 ≤35分' },
+            free: { limit: 999, label: '不限时' }
+        };
+
+        var TEMPLATES = {
+            std:    { label: '标准晚餐',   emoji: '🍽️', slots: ['meat', 'veg', 'soup', 'staple'],         hint: '一荤一素一汤一主食，营养不打架' },
+            hard:   { label: '硬菜管饱',   emoji: '💪', slots: ['meat', 'meat', 'veg', 'staple'],         hint: '双荤硬菜配素菜主食，浓油赤酱过把瘾' },
+            light:  { label: '轻食少负担', emoji: '🥗', slots: ['veg', 'veg', 'soup', 'staple'],          hint: '双素配清汤，睡前也不胀' },
+            solo:   { label: '一人食快手', emoji: '⚡', slots: ['meat', 'veg', 'staple'], maxTime: 20,    hint: '每个槽位都挑最快的，尽量 20 分钟开饭' },
+            rice:   { label: '下饭组合',   emoji: '🍛', slots: ['meat', 'veg', 'staple'],                 hint: '有荤有素配主食，专治米饭不够' },
+            veggie: { label: '素食日',     emoji: '🌱', slots: ['veg', 'veg', 'veg', 'soup', 'staple'],   hint: '无肉也丰盛，肠胃放个假' },
+            feast:  { label: '周末家宴',   emoji: '🥂', slots: ['meat', 'meat', 'veg', 'soup', 'staple'], hint: '五菜一汤待客配置，周末露一手' }
+        };
+
+        var state = {
+            regionId: null,
+            servings: 2,
+            mode: 'std',
+            template: 'std',
+            combo: [],
+            filter: 'all'
+        };
+
+        try {
+            state.regionId = localStorage.getItem('ck_region') || null;
+            state.servings = Math.min(6, Math.max(1, parseInt(localStorage.getItem('ck_servings') || '2', 10) || 2));
+            var savedMode = localStorage.getItem('ck_mode');
+            if (savedMode && MODES[savedMode]) state.mode = savedMode;
+            var savedTpl = localStorage.getItem('ck_template');
+            if (savedTpl && TEMPLATES[savedTpl]) state.template = savedTpl;
+        } catch (e) { /* 隐私模式等场景下忽略 */ }
+
+        function $ (id) { return document.getElementById(id); }
+        function region() {
+            for (var i = 0; i < REGIONS.length; i++) {
+                if (REGIONS[i].id === state.regionId) return REGIONS[i];
+            }
+            return null;
+        }
+        /* 本地菜谱 + 全国通用家常菜合并成完整菜池 */
+        function allDishes() {
+            var r = region();
+            return r ? r.dishes.concat(COMMON_DISHES) : [];
+        }
+        function isCommon(dish) { return COMMON_DISHES.indexOf(dish) >= 0; }
+        function persist() {
+            try {
+                localStorage.setItem('ck_region', state.regionId || '');
+                localStorage.setItem('ck_servings', String(state.servings));
+                localStorage.setItem('ck_mode', state.mode);
+                localStorage.setItem('ck_template', state.template);
+            } catch (e) {}
+        }
+
+        /* ---------- 工具 ---------- */
+        function poolOf(cat) {
+            if (!region()) return [];
+            var tpl = TEMPLATES[state.template];
+            var limit = (tpl && tpl.maxTime) ? tpl.maxTime : MODES[state.mode].limit;
+            var all = allDishes();
+            var pool = all.filter(function (d) { return d.cat === cat && d.time <= limit; });
+            if (!pool.length && tpl && tpl.maxTime) {
+                pool = all.filter(function (d) { return d.cat === cat; })
+                    .sort(function (a, b) { return a.time - b.time; })
+                    .slice(0, 1);
+            }
+            if (!pool.length) pool = all.filter(function (d) { return d.cat === cat; });
+            return pool;
+        }
+        function pickDish(cat, avoidName, takenNames) {
+            var pool = poolOf(cat);
+            var free = takenNames ? pool.filter(function (d) { return takenNames.indexOf(d.name) < 0; }) : pool;
+            var src = free.length ? free : pool;
+            if (src.length === 1) return src[0];
+            var d = src[Math.floor(Math.random() * src.length)];
+            var guard = 0;
+            while (avoidName && d.name === avoidName && guard++ < 20) {
+                d = src[Math.floor(Math.random() * src.length)];
+            }
+            return d;
+        }
+        function fmtAmt(n) {
+            var scaled = n * state.servings;
+            return Number.isInteger(scaled) ? String(scaled) : String(Math.round(scaled * 10) / 10);
+        }
+        function ingText(item) {
+            var name = item[0], amt = item[1], unit = item[2];
+            if (amt === null || amt === undefined) return '适量';
+            return fmtAmt(amt) + unit;
+        }
+
+        /* ---------- 渲染：地域选择 ---------- */
+        function renderGate() {
+            var grid = $('regionGrid');
+            grid.innerHTML = '';
+            REGIONS.forEach(function (r) {
+                var card = document.createElement('button');
+                card.type = 'button';
+                card.className = 'region-card';
+                var prod = r.produce.slice(0, 4).map(function (p) { return '<span>' + p + '</span>'; }).join('');
+                card.innerHTML =
+                    '<div class="emoji">' + r.emoji + '</div>' +
+                    '<h3>' + r.name + '</h3>' +
+                    '<div class="slogan">' + r.slogan + '</div>' +
+                    '<div class="desc">' + r.desc + '</div>' +
+                    '<div class="prod">' + prod + '</div>';
+                card.addEventListener('click', function () { enterApp(r.id); });
+                grid.appendChild(card);
+            });
+            $('gateBackBtn').classList.toggle('show', !!region());
+        }
+
+        function enterApp(id) {
+            state.regionId = id;
+            persist();
+            $('gate').classList.add('hide');
+            $('app').classList.add('ready');
+            genCombo();
+            renderAll();
+            window.scrollTo(0, 0);
+        }
+
+        /* ---------- 渲染：主界面 ---------- */
+        function renderHero() {
+            var r = region();
+            $('hero').innerHTML =
+                '<div class="big-emoji">' + r.emoji + '</div>' +
+                '<div>' +
+                    '<h2>当前地域：' + r.name + '</h2>' +
+                    '<div class="slogan">' + r.slogan + '</div>' +
+                    '<div class="desc">' + r.desc + '　推荐用到的本地蔬菜与作物如下，菜市场随手就能买齐。</div>' +
+                    '<div class="prod">' + r.produce.map(function (p) { return '<span>' + p + '</span>'; }).join('') + '</div>' +
+                '</div>';
+        }
+
+        function renderModes() {
+            var box = $('modeChips');
+            box.innerHTML = '';
+            Object.keys(MODES).forEach(function (k) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.textContent = MODES[k].label;
+                b.classList.toggle('on', k === state.mode);
+                b.addEventListener('click', function () {
+                    state.mode = k;
+                    persist();
+                    renderModes();
+                    genCombo();
+                    renderAll();
+                });
+                box.appendChild(b);
+            });
+        }
+
+        function renderTemplateChips() {
+            var box = $('tplChips');
+            box.innerHTML = '';
+            Object.keys(TEMPLATES).forEach(function (k) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.textContent = TEMPLATES[k].emoji + ' ' + TEMPLATES[k].label;
+                b.classList.toggle('on', k === state.template);
+                b.addEventListener('click', function () {
+                    state.template = k;
+                    switchTemplate(k);
+                    persist();
+                    renderTemplateChips();
+                    renderSlots();
+                    renderBalance();
+                });
+                box.appendChild(b);
+            });
+            $('tplHint').textContent = TEMPLATES[state.template].hint;
+        }
+
+        function renderServings() {
+            $('svLabel').textContent = state.servings + ' 人份';
+        }
+
+        function slotHTML(idx, dish) {
+            var meta = CATS[dish.cat];
+            return (
+                '<article class="slot" style="--cat-color:' + meta.color + ';--cat-soft:' + meta.soft + '">' +
+                    '<span class="cat">' + meta.emoji + ' ' + meta.label + '</span>' +
+                    '<h3>' + dish.name + '</h3>' +
+                    '<div class="meta"><span>⏱ ' + dish.time + ' 分钟</span><span>🔥 约 ' + dish.kcal + ' 千卡</span><span>🥄 ' + dish.diff + '</span></div>' +
+                    '<div class="tags">' + dish.tags.map(function (t) { return '<i>' + t + '</i>'; }).join('') + '</div>' +
+                    '<div class="acts">' +
+                        '<button type="button" class="btn-swap" data-idx="' + idx + '">🔄 换一道</button>' +
+                        '<button type="button" class="btn-view" data-idx="' + idx + '">📖 看做法</button>' +
+                    '</div>' +
+                '</article>'
+            );
+        }
+
+        function renderSlots() {
+            var html = '';
+            state.combo.forEach(function (dish, idx) {
+                html += slotHTML(idx, dish);
+            });
+            $('slots').innerHTML = html;
+            var buttons = $('slots').querySelectorAll('button');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].addEventListener('click', function (e) {
+                    var idx = parseInt(e.currentTarget.getAttribute('data-idx'), 10);
+                    var dish = state.combo[idx];
+                    if (e.currentTarget.classList.contains('btn-view')) {
+                        openDish(dish, idx);
+                    } else {
+                        state.combo[idx] = pickDish(dish.cat, dish.name, [dish.name]);
+                        persist();
+                        renderSlots();
+                        renderBalance();
+                    }
+                });
+            }
+        }
+
+        function renderBalance() {
+            var total = 0, timeSum = 0;
+            var cnt = { meat: 0, veg: 0, soup: 0, staple: 0 };
+            var n = state.combo.length;
+            state.combo.forEach(function (d) {
+                total += d.kcal;
+                timeSum += d.time;
+                cnt[d.cat]++;
+            });
+            var avgTime = timeSum / n;
+            var lazy = avgTime <= 18 ? '无脑跟做' : (avgTime <= 32 ? '轻松拿捏' : '需要点耐心');
+            var per = total / n;
+            var advice;
+            if (per >= 330) advice = '热量充裕，干饭人狂喜；怕胖可以把主食减半。';
+            else if (per >= 260) advice = '荤素汤饭均衡，一顿标准的营养晚餐刚刚好。';
+            else if (per >= 200) advice = '轻负担搭配，吃得很舒服，睡前也不胀。';
+            else advice = '整体偏清淡，可以再加个水果或一个蛋。';
+
+            var items = [];
+            if (cnt.meat) items.push('<div class="bal-item"><b>🍖 蛋白质 ×' + cnt.meat + '</b>荤菜提供优质蛋白</div>');
+            if (cnt.veg) items.push('<div class="bal-item"><b>🥬 膳食纤维 ×' + cnt.veg + '</b>时蔬补充纤维与维生素</div>');
+            if (cnt.staple) items.push('<div class="bal-item"><b>🍚 碳水能量 ×' + cnt.staple + '</b>主食给足一天的干劲</div>');
+            if (cnt.soup) items.push('<div class="bal-item"><b>🍲 汤水暖胃 ×' + cnt.soup + '</b>一汤润喉，饱腹不腻</div>');
+
+            $('balance').innerHTML =
+                '<div class="kcal"><b>' + total + '</b><span>千卡 / 人（估算）</span></div>' +
+                '<div class="bal-items">' + items.join('') + '</div>' +
+                '<div class="bal-note"><b>省心指数：' + lazy + '</b>（' + n + ' 道菜平均用时约 ' + Math.round(avgTime) + ' 分钟）。' + advice + '</div>';
+            renderShop();
+        }
+
+        /* ---------- 购物清单 ---------- */
+        var shopChecked = {};
+        try {
+            shopChecked = JSON.parse(localStorage.getItem('ck_shop') || '{}') || {};
+        } catch (e) { shopChecked = {}; }
+
+        /* 汇总今日套餐所有食材：同单位合并总量，适量标记，单位不同并列展示 */
+        function computeShop() {
+            var map = {};
+            state.combo.forEach(function (d) {
+                d.ing.forEach(function (it) {
+                    var name = it[0], amt = it[1], unit = it[2];
+                    if (!map[name]) map[name] = { units: {}, any: false };
+                    if (amt === null || amt === undefined) { map[name].any = true; }
+                    else { map[name].units[unit] = (map[name].units[unit] || 0) + amt * state.servings; }
+                });
+            });
+            return map;
+        }
+
+        function renderShop() {
+            var map = computeShop();
+            var names = Object.keys(map);
+
+            /* 清掉已不在当前清单里的勾选 */
+            var changed = false;
+            Object.keys(shopChecked).forEach(function (k) {
+                if (names.indexOf(k) < 0) { delete shopChecked[k]; changed = true; }
+            });
+            if (changed) persistShop();
+
+            names.sort(function (a, b) {
+                var ca = shopChecked[a] ? 1 : 0, cb = shopChecked[b] ? 1 : 0;
+                return ca - cb;
+            });
+
+            if (!names.length) {
+                $('shopBox').innerHTML = '<div class="shop-empty">先生成今日套餐，这里会自动列出要买的食材 🧺</div>';
+                $('shopHint').textContent = '今日套餐需要的食材都在这，买齐一样勾一样';
+                return;
+            }
+
+            var doneCount = 0;
+            var html = '';
+            names.forEach(function (name) {
+                var info = map[name];
+                var parts = Object.keys(info.units).map(function (u) {
+                    /* computeShop 已按人数缩放，这里直接格式化，别再乘一遍 */
+                    var v = Math.round(info.units[u] * 10) / 10;
+                    return v + u;
+                });
+                if (info.any) parts.push('适量');
+                var done = !!shopChecked[name];
+                if (done) doneCount++;
+                html +=
+                    '<button type="button" class="shop-row' + (done ? ' done' : '') + '" data-name="' + name + '">' +
+                        '<span class="cb">✓</span>' +
+                        '<span class="n">' + name + '</span>' +
+                        '<span class="amt">' + parts.join(' + ') + '</span>' +
+                    '</button>';
+            });
+            $('shopBox').innerHTML = html;
+            $('shopHint').textContent = '共 ' + names.length + ' 样，已买 ' + doneCount + ' 样' + (doneCount === names.length ? ' 🎉 买齐了！' : '');
+
+            var rows = $('shopBox').querySelectorAll('.shop-row');
+            for (var i = 0; i < rows.length; i++) {
+                rows[i].addEventListener('click', function (e) {
+                    var name = e.currentTarget.getAttribute('data-name');
+                    if (shopChecked[name]) delete shopChecked[name];
+                    else shopChecked[name] = true;
+                    persistShop();
+                    renderShop();
+                });
+            }
+        }
+
+        function persistShop() {
+            try { localStorage.setItem('ck_shop', JSON.stringify(shopChecked)); } catch (e) {}
+        }
+
+        function renderLib() {
+            var chips = [{ id: 'all', label: '全部' }].concat(CAT_ORDER.map(function (c) {
+                return { id: c, label: CATS[c].emoji + ' ' + CATS[c].label };
+            }));
+            var box = $('libFilters');
+            box.innerHTML = '';
+            chips.forEach(function (c) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.textContent = c.label;
+                b.classList.toggle('on', c.id === state.filter);
+                b.addEventListener('click', function () { state.filter = c.id; renderLib(); });
+                box.appendChild(b);
+            });
+
+            var r = region();
+            var list = allDishes().filter(function (d) { return state.filter === 'all' || d.cat === state.filter; });
+            var html = '';
+            list.forEach(function (d) {
+                var commonTag = isCommon(d) ? '<i style="background:var(--green-soft);color:var(--green)">🏠 全国家常</i>' : '';
+                html +=
+                    '<button type="button" class="lib-card" data-name="' + d.name + '">' +
+                        '<span class="cat" style="--cat-color:' + CATS[d.cat].color + '">' + CATS[d.cat].emoji + ' ' + CATS[d.cat].label + '</span>' +
+                        '<h3>' + d.name + '</h3>' +
+                        '<div class="meta">⏱ ' + d.time + ' 分钟 · 🔥 约 ' + d.kcal + ' 千卡 · ' + d.diff + '</div>' +
+                        '<div class="tags">' + commonTag + '</div>' +
+                        '<div class="meta">点击查看用量与做法 →</div>' +
+                    '</button>';
+            });
+            $('libGrid').innerHTML = html;
+            var cards = $('libGrid').querySelectorAll('.lib-card');
+            for (var i = 0; i < cards.length; i++) {
+                cards[i].addEventListener('click', function (e) {
+                    var name = e.currentTarget.getAttribute('data-name');
+                    var all = allDishes();
+                    for (var j = 0; j < all.length; j++) {
+                        if (all[j].name === name) { openDish(all[j]); return; }
+                    }
+                });
+            }
+        }
+
+        function renderAll() {
+            renderTemplateChips();
+            renderHero();
+            renderServings();
+            renderSlots();
+            renderBalance();
+            renderLib();
+        }
+
+        /* ---------- 生成 ---------- */
+        function genCombo() {
+            var taken = [];
+            state.combo = TEMPLATES[state.template].slots.map(function (cat) {
+                var d = pickDish(cat, null, taken);
+                taken.push(d.name);
+                return d;
+            });
+        }
+
+        /* 切换模板时尽量保留已选菜品，缺的槽位再补抽 */
+        function switchTemplate(k) {
+            var old = state.combo.slice();
+            var tpl = TEMPLATES[k];
+            var limit = tpl.maxTime ? tpl.maxTime : MODES[state.mode].limit;
+            var taken = [];
+            state.combo = tpl.slots.map(function (cat) {
+                for (var i = 0; i < old.length; i++) {
+                    var d = old[i];
+                    if (d && d.cat === cat && taken.indexOf(d.name) < 0 && d.time <= limit) {
+                        taken.push(d.name);
+                        return d;
+                    }
+                }
+                var nd = pickDish(cat, null, taken);
+                taken.push(nd.name);
+                return nd;
+            });
+        }
+
+        /* ---------- 弹窗 ---------- */
+        function openDish(dish, slotIdx) {
+            var meta = CATS[dish.cat];
+            var ingRows = dish.ing.map(function (item) {
+                return '<tr><td>' + item[0] + '</td><td>' + ingText(item) + '</td></tr>';
+            }).join('');
+            var stepItems = dish.steps.map(function (s) { return '<li>' + s + '</li>'; }).join('');
+            $('modalBox').innerHTML =
+                '<div class="modal-top" style="--cat-color:' + meta.color + ';--cat-soft:' + meta.soft + '">' +
+                    '<div>' +
+                        '<span class="cat-pill">' + meta.emoji + ' ' + meta.label + '</span>' +
+                        '<h2>' + dish.name + '</h2>' +
+                        '<div class="meta"><span>⏱ 约 ' + dish.time + ' 分钟</span><span>🥄 ' + dish.diff + '</span><span>🔥 约 ' + dish.kcal + ' 千卡/人</span><span>👥 ' + state.servings + ' 人份</span></div>' +
+                        '<div class="tags">' + dish.tags.map(function (t) { return '<i>' + t + '</i>'; }).join('') + '</div>' +
+                    '</div>' +
+                    '<button type="button" class="close-x" id="closeModal">✕</button>' +
+                '</div>' +
+                '<h4>🧺 食材清单（' + state.servings + ' 人份）</h4>' +
+                '<table class="ing-table">' + ingRows + '</table>' +
+                '<h4>👩‍🍳 做法</h4>' +
+                '<ol class="steps">' + stepItems + '</ol>' +
+                '<div class="tip-box">💡 ' + dish.tips + '</div>' +
+                '<div class="modal-foot">' +
+                    '<button type="button" class="main-btn" id="useInCombo">✅ 放进今日套餐</button>' +
+                    '<button type="button" class="ghost-btn" id="closeModal2">关闭</button>' +
+                '</div>';
+
+            $('mask').classList.add('show');
+            $('closeModal').addEventListener('click', closeModal);
+            $('closeModal2').addEventListener('click', closeModal);
+            $('useInCombo').addEventListener('click', function () {
+                if (slotIdx !== null && slotIdx !== undefined) {
+                    state.combo[slotIdx] = dish;
+                } else {
+                    var target = -1;
+                    for (var i = 0; i < state.combo.length; i++) {
+                        if (state.combo[i].cat === dish.cat) { target = i; break; }
+                    }
+                    if (target < 0) target = 0;
+                    state.combo[target] = dish;
+                }
+                renderSlots();
+                renderBalance();
+                closeModal();
+            });
+        }
+        function closeModal() { $('mask').classList.remove('show'); }
+
+        /* ---------- 事件 ---------- */
+        $('svMinus').addEventListener('click', function () {
+            state.servings = Math.max(1, state.servings - 1);
+            persist(); renderServings(); renderLib(); renderBalance();
+        });
+        $('svPlus').addEventListener('click', function () {
+            state.servings = Math.min(6, state.servings + 1);
+            persist(); renderServings(); renderLib(); renderBalance();
+        });
+        $('shopClearBtn').addEventListener('click', function () {
+            shopChecked = {};
+            persistShop();
+            renderShop();
+        });
+        $('regenBtn').addEventListener('click', function () {
+            genCombo(); renderSlots(); renderBalance();
+        });
+        $('regionChipBtn').addEventListener('click', function () {
+            renderGate();
+            $('gate').classList.remove('hide');
+            window.scrollTo(0, 0);
+        });
+        $('gateBackBtn').addEventListener('click', function () {
+            $('gate').classList.add('hide');
+        });
+        $('randomRegionBtn').addEventListener('click', function () {
+            var r = REGIONS[Math.floor(Math.random() * REGIONS.length)];
+            enterApp(r.id);
+        });
+        $('mask').addEventListener('click', function (e) {
+            if (e.target === $('mask')) closeModal();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        /* ---------- 启动 ---------- */
+        renderGate();
+        renderModes();
+        renderTemplateChips();
+        if (state.regionId && region()) {
+            $('gate').classList.add('hide');
+            $('app').classList.add('ready');
+            genCombo();
+            renderAll();
+        }
+    })();
+</script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+// 由 csv2json.js 自动生成,勿手改;修改 CSV 后重新执行转换。
+// 数据与 data.json 保持一致;file:// 直接双击打开时使用本文件。
+window.TAO_DATA = {
+  "meta": {
+    "surname": "陶",
+    "title": "陶氏族谱",
+    "version": "0.1",
+    "updated": "2026-08-30"
+  },
+  "persons": [
+    {
+      "id": 1,
+      "name": "陶启",
+      "gender": "男",
+      "generation": 1,
+      "father_id": null,
+      "zi": "字端本",
+      "hao": "",
+      "spouse": "陈氏",
+      "notes": "一世祖,明初自江右迁来,务农起家。"
+    },
+    {
+      "id": 3,
+      "name": "陶守仁",
+      "gender": "男",
+      "generation": 2,
+      "father_id": 1,
+      "zi": "字从之",
+      "hao": "",
+      "spouse": "王氏",
+      "notes": "二世长房,生一子。"
+    },
+    {
+      "id": 4,
+      "name": "陶守义",
+      "gender": "男",
+      "generation": 2,
+      "father_id": 1,
+      "zi": "字从正",
+      "hao": "",
+      "spouse": "李氏",
+      "notes": "二世二房,生一子一女。"
+    },
+    {
+      "id": 5,
+      "name": "陶守礼",
+      "gender": "男",
+      "generation": 2,
+      "father_id": 1,
+      "zi": "字从文",
+      "hao": "",
+      "spouse": "赵氏",
+      "notes": "二世三房,绝后。据传明末战乱中失散,失考。"
+    },
+    {
+      "id": 9,
+      "name": "陶承宗",
+      "gender": "男",
+      "generation": 3,
+      "father_id": 3,
+      "zi": "",
+      "hao": "",
+      "spouse": "",
+      "notes": "三世长房。"
+    },
+    {
+      "id": 10,
+      "name": "陶承祖",
+      "gender": "男",
+      "generation": 3,
+      "father_id": 4,
+      "zi": "",
+      "hao": "",
+      "spouse": "",
+      "notes": "三世二房。"
+    },
+    {
+      "id": 11,
+      "name": "陶承庆",
+      "gender": "女",
+      "generation": 3,
+      "father_id": 4,
+      "zi": "",
+      "hao": "",
+      "spouse": "",
+      "notes": "三世二房之女,嫁外乡。"
+    }
+  ]
+};

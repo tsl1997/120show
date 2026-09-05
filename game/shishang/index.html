@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <title>万界楼 · 史上最强店主（试玩版）</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <h1 id="gameTitle">万界楼 · 史上最强店主</h1>
+        <p class="eyebrow">商通万界，让所有人给我打工 · 试玩版（前期）</p>
+      </div>
+      <div class="actions">
+        <button id="resetBtn" class="btn ghost" type="button">重开一局</button>
+      </div>
+    </header>
+
+    <div class="scorebar">
+      <div class="stat"><span>价值点</span><strong id="rVp">0</strong></div>
+      <div class="stat"><span>华夏币</span><strong id="rCny">0</strong></div>
+      <div class="stat"><span>武道境界</span><strong id="rRealm">凡人</strong></div>
+      <div class="stat"><span>店主</span><strong id="rShop">一星</strong></div>
+      <div class="stat"><span>商品种类</span><strong id="rItems">0</strong></div>
+      <div class="stat"><span>交易笔数</span><strong id="rTrades">0</strong></div>
+      <div class="stat"><span>采购令</span><strong id="rTokens">2 / 3</strong></div>
+    </div>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="lobby" type="button">🏪 万界楼大堂</button>
+      <button class="tab" data-tab="store" type="button">📦 仓库 · 现代采购</button>
+      <button class="tab" data-tab="study" type="button">🥋 修炼</button>
+      <button class="tab" data-tab="plane" type="button">🌍 位面采购</button>
+      <button class="tab" data-tab="quest" type="button">📜 任务 · 大事记</button>
+    </nav>
+
+    <!-- 大堂 -->
+    <section class="panel active" data-panel="lobby">
+      <div class="shop-banner">
+        <span class="shop-emoji" id="shopEmoji">🏠</span>
+        <div>
+          <h2 id="shopName">万界楼 · 出租房（20㎡）</h2>
+          <p id="shopDesc">不足二十平的出租房，泡面箱子还没搬走。</p>
+        </div>
+      </div>
+      <div class="lobby-actions">
+        <button id="greetBtn" class="btn primary" type="button">主动迎客（意念捕捉）</button>
+        <span class="hint">系统会自动捕捉万千位面的「意念」，把客户送上门。</span>
+      </div>
+      <div id="lobbyQueue" class="queue"></div>
+    </section>
+
+    <!-- 仓库 -->
+    <section class="panel" data-panel="store">
+      <h3 class="sec-title">🛒 现代采购（华夏币进货，卖给位面客户赚价值点）</h3>
+      <div id="buyList" class="grid"></div>
+      <h3 class="sec-title">📦 仓库（古物可送拍卖行变现华夏币）</h3>
+      <div id="invList" class="grid"></div>
+    </section>
+
+    <!-- 修炼 -->
+    <section class="panel" data-panel="study">
+      <div class="realm-box">
+        <h3>🥋 武道境界：<span id="realmNow">凡人</span></h3>
+        <p id="realmNext">下一境界：后天初期</p>
+        <p class="muted" id="realmPts">境界点：0</p>
+      </div>
+      <h3 class="sec-title">📖 修炼秘籍（价值点购买重数，境界越高议价越强）</h3>
+      <div id="studyList" class="grid"></div>
+    </section>
+
+    <!-- 位面 -->
+    <section class="panel" data-panel="plane">
+      <div class="realm-box">
+        <h3>🌍 位面采购</h3>
+        <p class="muted">一星店主每月拥有一次位面采购权（游戏内以「采购令」结算，每 3 分钟回复 1 枚）。每次出行 3 天，见好就收。</p>
+      </div>
+      <div id="worldList" class="world-grid"></div>
+    </section>
+
+    <!-- 任务 -->
+    <section class="panel" data-panel="quest">
+      <h3 class="sec-title">📜 主线任务（对应原作前期剧情）</h3>
+      <div id="questList" class="quests"></div>
+      <div id="villaBox" class="realm-box villa"></div>
+      <h3 class="sec-title">🗒️ 大事记</h3>
+      <div id="logList" class="logs"></div>
+    </section>
+
+    <footer class="footer">改编自南极烈日《史上最强店主》前期剧情 · 仅供试玩 · XS 魔法实验室</footer>
+  </main>
+
+  <!-- 交易弹窗 -->
+  <div id="dealModal" class="modal">
+    <div class="modal-card">
+      <h3 id="dealTitle">接待</h3>
+      <div id="dealInfo" class="deal-info"></div>
+      <div class="deal-price" id="dealPrice"></div>
+      <div id="dealItems" class="grid scroll"></div>
+      <div class="modal-acts">
+        <button id="dealCancel" class="btn ghost" type="button">送客</button>
+        <button id="dealConfirm" class="btn primary" type="button">成交！</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 位面弹窗 -->
+  <div id="tripModal" class="modal">
+    <div class="modal-card">
+      <h3 id="tripTitle">位面采购</h3>
+      <p class="muted" id="tripDay">第 1 天 / 共 3 天</p>
+      <div id="tripBody" class="scroll"></div>
+    </div>
+  </div>
+
+  <!-- 开场剧情 -->
+  <div id="introModal" class="modal">
+    <div class="modal-card intro">
+      <div id="introEmoji" class="intro-emoji">☄️</div>
+      <p id="introText"></p>
+      <div class="modal-acts">
+        <span class="muted" id="introStep"></span>
+        <button id="introBtn" class="btn primary" type="button">继续</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 结局 -->
+  <div id="endModal" class="modal">
+    <div class="modal-card intro">
+      <div class="intro-emoji">🏯</div>
+      <h3 id="endTitle">二星店主 · 试玩版完</h3>
+      <p id="endText"></p>
+      <div class="modal-acts">
+        <button id="endClose" class="btn primary" type="button">继续经营</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toasts" class="toasts"></div>
+
+  <script src="./data.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

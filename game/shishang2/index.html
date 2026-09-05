@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>万界店主 · 史上最强店主</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ 标题画面 ============ -->
+  <div id="screen-title" class="screen">
+    <div class="title-wrap">
+      <h1 class="logo">万界店主</h1>
+      <p class="logo-sub">—— 史上最强店主 · 三星之路 ——</p>
+      <p class="logo-desc">商通万界 · 交易万千位面</p>
+      <div class="menu-btns">
+        <button class="btn big" data-cmd="newgame">新 游 戏</button>
+        <button class="btn big" data-cmd="continue">继 续</button>
+        <button class="btn" data-cmd="loadslot">读 档</button>
+        <button class="btn" data-cmd="collection">图鉴 & 成就</button>
+      </div>
+      <div id="slotpicker" class="slotpicker hidden">
+        <div class="slotpick-title">选择存档槽</div>
+        <div id="slotlist"></div>
+      </div>
+      <p class="credit">改编自小说《史上最强店主》（南极烈日）· 同人游戏 · 离线可玩</p>
+    </div>
+  </div>
+
+  <!-- ============ 主游戏画面 ============ -->
+  <div id="screen-game" class="screen hidden">
+    <header id="topbar">
+      <div class="brand" data-cmd="menu">🏮 万界楼</div>
+      <div class="stats">
+        <span class="chip star" id="stat-star">★一星</span>
+        <span class="chip vp" id="stat-vp">价值点 0</span>
+        <span class="chip rmb" id="stat-rmb">华夏币 0</span>
+        <span class="chip gd" id="stat-gd">功德 0</span>
+        <span class="chip wb" id="stat-wb">武道 ·</span>
+        <span class="chip emp" id="stat-emp">员工 -</span>
+      </div>
+      <div class="head-actions">
+        <button class="btn small" data-cmd="shop">经营</button>
+        <button class="btn small" data-cmd="practice">修炼</button>
+        <button class="btn small" data-cmd="collection">图鉴</button>
+        <button class="btn small" data-cmd="menu">菜单</button>
+      </div>
+    </header>
+
+    <div id="story-area">
+      <div id="locbar">
+        <span id="loc-icon">🌍</span>
+        <span id="loc-text">—</span>
+      </div>
+      <div id="actbar">
+        <span id="act-title">—</span>
+      </div>
+
+      <div id="stage">
+        <div id="avatar"><span id="avatar-letter">?</span></div>
+        <div id="dialog">
+          <div id="speaker"></div>
+          <div id="text"></div>
+        </div>
+      </div>
+
+      <div id="choices"></div>
+      <div id="next-hint" class="hidden">▽ 点击继续</div>
+    </div>
+
+    <!-- 过场演出（升星/章节） -->
+    <div id="overlay" class="overlay hidden">
+      <div id="overlay-card"></div>
+    </div>
+  </div>
+
+  <!-- ============ 模态面板 ============ -->
+  <div id="modal-root" class="hidden"></div>
+  <div id="toast"></div>
+</div>
+
+<script src="js/data_core.js"></script>
+<script src="js/data_acts/e01_05.js"></script>
+<script src="js/data_acts/e06_10.js"></script>
+<script src="js/data_acts/e11_15.js"></script>
+<script src="js/data_acts/e16_20.js"></script>
+<script src="js/data_acts/e21_25.js"></script>
+<script src="js/engine.js"></script>
+</body>
+</html>

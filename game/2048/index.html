@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <title>金榜2048</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <h1 id="gameTitle">金榜2048</h1>
+        <p class="eyebrow" id="themeEyebrow">古风益智 · 2048 变体</p>
+      </div>
+      <div class="actions">
+        <button id="themeBtn" class="btn" type="button">切换妃位</button>
+        <button id="undoBtn" class="btn" type="button">撤销</button>
+        <button id="restartBtn" class="btn primary" type="button">再开一局</button>
+      </div>
+    </header>
+
+    <div class="scorebar">
+      <div class="stat">
+        <span>分数</span>
+        <strong id="score">0</strong>
+      </div>
+      <div class="stat">
+        <span>最高</span>
+        <strong id="bestScore">0</strong>
+      </div>
+      <div class="stat state" id="statePill">未开局</div>
+    </div>
+
+    <div class="board-wrap">
+      <div id="board" class="board" aria-label="金榜2048棋盘"></div>
+      <div id="overlay" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="overlayTitle">金榜题名</h2>
+          <p id="overlayText">你已经合出了状元。</p>
+          <button id="overlayBtn" class="btn primary" type="button">继续游玩</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="hint">
+      <span>方向键 / WASD 操作</span>
+      <span>手机可直接滑动</span>
+      <span id="mergeHint">合成同级读书人</span>
+    </div>
+
+    <details class="legend">
+      <summary>等级表</summary>
+      <ul class="rank-list" id="rankList"></ul>
+    </details>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
