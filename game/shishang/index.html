@@ -11,7 +11,7 @@
     <header class="topbar">
       <div>
         <h1 id="gameTitle">万界楼 · 史上最强店主</h1>
-        <p class="eyebrow">商通万界，让所有人给我打工 · 试玩版（前期）</p>
+        <p class="eyebrow">商通万界，让所有人给我打工 · 从一星到六星店主</p>
       </div>
       <div class="actions">
         <button id="resetBtn" class="btn ghost" type="button">重开一局</button>
@@ -33,6 +33,7 @@
       <button class="tab" data-tab="store" type="button">📦 仓库 · 现代采购</button>
       <button class="tab" data-tab="study" type="button">🥋 修炼</button>
       <button class="tab" data-tab="plane" type="button">🌍 位面采购</button>
+      <button class="tab" data-tab="staff" type="button">🏷️ 货架 · 员工</button>
       <button class="tab" data-tab="quest" type="button">📜 任务 · 大事记</button>
     </nav>
 
@@ -47,6 +48,7 @@
       </div>
       <div class="lobby-actions">
         <button id="greetBtn" class="btn primary" type="button">主动迎客（意念捕捉）</button>
+        <button id="auctionBtn" class="btn" type="button">🏮 举办万界拍卖会</button>
         <span class="hint">系统会自动捕捉万千位面的「意念」，把客户送上门。</span>
       </div>
       <div id="lobbyQueue" class="queue"></div>
@@ -54,9 +56,10 @@
 
     <!-- 仓库 -->
     <section class="panel" data-panel="store">
-      <h3 class="sec-title">🛒 现代采购（华夏币进货，卖给位面客户赚价值点）</h3>
+      <h3 class="sec-title">🛒 现代采购（华夏币进货，可设数量批量购买）</h3>
       <div id="buyList" class="grid"></div>
-      <h3 class="sec-title">📦 仓库（古物可送拍卖行变现华夏币）</h3>
+      <h3 class="sec-title">📦 仓库 <span class="muted" id="invCap"></span></h3>
+      <div id="catFilter" class="chips"></div>
       <div id="invList" class="grid"></div>
     </section>
 
@@ -73,11 +76,27 @@
 
     <!-- 位面 -->
     <section class="panel" data-panel="plane">
+      <div id="accelBox" class="realm-box" style="display:none;"></div>
       <div class="realm-box">
         <h3>🌍 位面采购</h3>
-        <p class="muted">一星店主每月拥有一次位面采购权（游戏内以「采购令」结算，每 3 分钟回复 1 枚）。每次出行 3 天，见好就收。</p>
+        <p class="muted">采购令每 3 分钟回复 1 枚，星级越高上限越高。每次出行 3 天，见好就收。</p>
       </div>
       <div id="worldList" class="world-grid"></div>
+    </section>
+
+    <!-- 员工 -->
+    <section class="panel" data-panel="staff">
+      <div id="shelfLock" class="realm-box" style="display:none;">
+        <h3>🏷️ 万界货架（三星解锁）</h3>
+        <p class="muted">晋升三星店主、凝聚万界商城后，可以上架商品让散客自动购买。</p>
+      </div>
+      <div class="realm-box">
+        <h3>🏷️ 万界货架 · 自动交易</h3>
+        <p class="muted">上架商品并自定价格与目标分类，各世界的随机散客会自动购买。定价低于系统估价更好卖，过高会滞销；功法类拥有一份即可无限售卖。</p>
+      </div>
+      <div id="shelfList" class="grid"></div>
+      <h3 class="sec-title">👔 位面代理人（三星解锁）</h3>
+      <div id="staffList" class="grid"></div>
     </section>
 
     <!-- 任务 -->
@@ -89,7 +108,7 @@
       <div id="logList" class="logs"></div>
     </section>
 
-    <footer class="footer">改编自南极烈日《史上最强店主》前期剧情 · 仅供试玩 · XS 魔法实验室</footer>
+    <footer class="footer">改编自南极烈日《史上最强店主》（一星至六星）· 仅供试玩 · XS 魔法实验室</footer>
   </main>
 
   <!-- 交易弹窗 -->
@@ -123,6 +142,43 @@
       <div class="modal-acts">
         <span class="muted" id="introStep"></span>
         <button id="introBtn" class="btn primary" type="button">继续</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 拍卖会弹窗 -->
+  <div id="auctionModal" class="modal">
+    <div class="modal-card">
+      <h3>🏮 万界拍卖会</h3>
+      <div id="auctionBody" class="scroll"></div>
+    </div>
+  </div>
+
+  <!-- 星级升级弹窗 -->
+  <div id="starModal" class="modal">
+    <div class="modal-card intro">
+      <div class="intro-emoji">🌟</div>
+      <h3 id="starTitle">「叮咚！系统满足升级需求」</h3>
+      <p id="starText"></p>
+      <div class="modal-acts">
+        <button id="starNo" class="btn ghost" type="button">暂不升级</button>
+        <button id="starYes" class="btn primary" type="button">立即升级</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 五星系统摊牌抉择 -->
+  <div id="choiceModal" class="modal">
+    <div class="modal-card intro">
+      <div class="intro-emoji">💠</div>
+      <h3>系统的摊牌</h3>
+      <p>「三周年庆典结束，系统将升级到五级。我有两个选择给你——<br><br>
+      一、放弃成为宿主，把系统移交给陈峰，你带着一百万灵点的商品回现实世界养老。<br>
+      二、在<b>恢复本性</b>的前提下执掌系统。万界商铺系统的宿主，必须是一个拥有喜怒哀乐的人。<br><br>
+      把手放在天晶上，结果会判定出来。」</p>
+      <div class="modal-acts">
+        <button id="choiceLeave" class="btn ghost" type="button">移交陈峰，落叶归根</button>
+        <button id="choiceKeep" class="btn primary" type="button">执掌系统，恢复本性</button>
       </div>
     </div>
   </div>

@@ -188,6 +188,51 @@ body {
 }
 .tagchip.story { background: #fdeeee; color: var(--red); border-color: #f2c9c5; }
 
+.customer.order {
+  border-left-color: var(--blue);
+  background: linear-gradient(135deg, #f2f7ff, #fffdf8);
+}
+.customer.random {
+  border-left-color: var(--green);
+  background: linear-gradient(135deg, #f0faf0, #fffdf8);
+}
+
+/* ---------- 分类筛选与数量框 ---------- */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.chip {
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--muted);
+}
+.chip.on {
+  background: linear-gradient(135deg, #e8b93c, #c9a227);
+  color: #fff;
+  border-color: var(--gold-dark);
+  font-weight: 600;
+}
+input.qty {
+  width: 58px;
+  padding: 4px 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 13px;
+  text-align: center;
+  background: #fff;
+}
+select.shelfitem, select.shelfcat {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 4px 6px;
+  font-size: 13px;
+  max-width: 150px;
+  background: #fff;
+}
+.goods.shelfnew { flex-wrap: wrap; }
+
 .empty {
   text-align: center;
   color: var(--muted);

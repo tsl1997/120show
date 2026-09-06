@@ -13,7 +13,7 @@ const MAX_QUEUE = 3;
 /* ---------------- 存档与状态 ---------------- */
 
 /* 品阶 → 每重境界点（对应原作：九阳四重 ≈ 后天大圆满） */
-const GRADE_PTS = { 1: 0.5, 2: 1, 3: 1.5, 4: 2 };
+const GRADE_PTS = { 1: 0.5, 2: 1, 3: 1.5, 4: 2, 5: 3 };
 
 function freshState() {
   return {
@@ -31,7 +31,15 @@ function freshState() {
     firstTrades: {},
     buffs: {},
     storyDone: {},
-    stats: { trades: 0, servedGoku: 0, totalVp: 0, known: {}, worldTrips: { shaDiao: 0, xiaoao: 0, longzhu: 0, sanguo: 0, yitian: 0 } },
+    workers: {},
+    orders: [],
+    randomQueue: [],
+    shelf: [],
+    soldOnce: {},
+    choice5: false,
+    choiceOffered: false,
+    upgradeOffered: {},
+    stats: { trades: 0, servedGoku: 0, totalVp: 0, auctions: 0, known: {}, worldTrips: { shaDiao: 0, xiaoao: 0, longzhu: 0, sanguo: 0, yitian: 0 } },
     nextSpawnAt: Date.now() + 20000,
     greetCd: 0,
     log: [],
@@ -58,6 +66,10 @@ function load() {
       state.stats.known = s.state.stats.known || {};
       /* 迁移：库存中的商品必然上架过 */
       Object.keys(state.inv).forEach(id => { state.stats.known[id] = true; });
+      /* 防御：过滤坏数据 */
+      state.randomQueue = (state.randomQueue || []).filter(x => x && x.rid);
+      state.orders = (state.orders || []).filter(o => o && o.id);
+      state.shelf = (state.shelf || []).filter(l => l && l.id && ITEMS[l.id]);
       trip = s.trip || null;
     } else if (s && s.stats) {
       // 旧版存档兼容
@@ -87,12 +99,14 @@ function realmIndex() {
 function realmName() { return REALMS[realmIndex()].name; }
 
 function margin() {
-  let m = 1 + realmIndex() * 0.04;
-  if (state.shopLevel >= 2) m += 0.1;
-  return Math.min(m, 1.6);
+  let m = 1 + realmIndex() * 0.04 + (state.shopLevel - 1) * 0.1;
+  if (state.workers && state.workers.fanli) m += 0.08;
+  return Math.min(m, 2.2);
 }
 
 function countItem(id) { return state.inv[id] || 0; }
+function invCap() { return 200 + state.shopLevel * 100; }
+function invUsed() { return Object.values(state.inv).reduce((a, b) => a + b, 0); }
 function addItem(id, n) {
   if (!state.inv[id] && !state.stats.known[id]) {
     state.stats.known[id] = true;
@@ -105,8 +119,12 @@ function removeItem(id, n) {
 }
 function distinctItems() { return Object.keys(state.stats.known || {}).length; }
 
-function tokenCap() { return state.shopLevel >= 2 ? 5 : 3; }
-function spawnInterval() { return SPAWN_BASE_MS - (state.shopLevel >= 2 ? 20000 : 0) - Math.min(realmIndex() * 3000, 15000); }
+function tokenCap() { return 3 + (state.shopLevel - 1) * 2; }
+function spawnInterval() {
+  let ms = SPAWN_BASE_MS - state.shopLevel * 3000 - Math.min(realmIndex() * 2000, 15000);
+  if (state.workers && state.workers.shenwansan) ms *= 0.7;
+  return Math.max(ms, 15000);
+}
 
 function pushLog(text) {
   state.log.unshift({ t: Date.now(), text });
@@ -138,9 +156,20 @@ function questProgress(i) {
     case 6: return distinctItems() >= 12 && s.stats.trades >= 12;
     case 7: return !!s.storyDone["sanguo:siku"];
     case 8: return s.shopLevel >= 2;
+    case 9: return (s.stats.auctions || 0) >= 1;
+    case 10: return s.shopLevel >= 3;
+    case 11: return !!s.storyDone["zhushen:yujian"];
+    case 12: return WORKERS_EVER(s);
+    case 13: return s.shopLevel >= 4;
+    case 14: return ["mumu", "yanjiang", "shuangshuang", "xianxian"].some(id => s.stats.known[id]);
+    case 15: return s.shopLevel >= 5;
+    case 16: return !!s.storyDone["zhetian:jiulong"];
+    case 17: return s.shopLevel >= 6;
     default: return s.quests[i] && s.quests[i].done;
   }
 }
+
+function WORKERS_EVER(s) { return Object.keys(WORKERS).every(id => s.workers[id]); }
 
 function checkQuests() {
   state.quests.forEach((q, i) => {
@@ -163,10 +192,77 @@ function eligibleCustomers() {
   return Object.keys(CUSTOMERS).filter(id => CUSTOMERS[id].unlock(state));
 }
 
+/* ---------------- 随机NPC（世界偏好）---------------- */
+
+let randomSeq = 0;
+function makeRandomNPC() {
+  const groups = RANDOM_GROUPS.filter(g => g.unlock(state));
+  if (!groups.length) return null;
+  const g = pick(groups);
+  const budget = Math.round((g.budget[0] + Math.random() * (g.budget[1] - g.budget[0])) * (1 + realmIndex() * 0.04));
+  return {
+    rnd: true,
+    rid: "rnd_" + (++randomSeq) + "_" + Date.now(),
+    name: pick(RANDOM_SURNAMES) + pick(g.names),
+    world: g.name,
+    emoji: pick(g.emoji),
+    pref: g.pref.slice(),
+    budget: Math.max(10, budget),
+    main: false,
+    soldOnce: {},
+    intro: "听闻万界楼货通万界，特来进点货。",
+  };
+}
+
+function spawnRandomNPC() {
+  if (state.customers.length + (state.randomQueue || []).length >= MAX_QUEUE) return false;
+  const npc = makeRandomNPC();
+  if (!npc) return false;
+  state.randomQueue = state.randomQueue || [];
+  state.randomQueue.push(npc);
+  ding(npc.name + "（" + npc.world + "）走进了万界楼！");
+  pushLog("🚪 " + npc.name + "（" + npc.world + "）到访。");
+  return true;
+}
+
+/* 限购规则：功法/武器/奇物/现代物品 每位NPC限购1份 */
+function dealNpcKey() { return deal.rnd ? deal.rnd.rid : deal.cid; }
+function hasBoughtOnce(itemId) {
+  if (!ITEMS[itemId] || !ITEMS[itemId].once) return false;
+  if (deal.rnd) return !!deal.rnd.soldOnce[itemId];
+  const rec = state.soldOnce[dealNpcKey()];
+  return !!(rec && rec[itemId]);
+}
+function markBoughtOnce(itemId) {
+  if (!ITEMS[itemId] || !ITEMS[itemId].once) return;
+  if (deal.rnd) { deal.rnd.soldOnce[itemId] = true; return; }
+  const k = dealNpcKey();
+  if (!state.soldOnce[k]) state.soldOnce[k] = {};
+  state.soldOnce[k][itemId] = true;
+}
+/* 功法拥有一份即可无限售卖，售出不扣库存 */
+function consumeSold(id) {
+  if (ITEMS[id] && ITEMS[id].cat === "gongfa") return;
+  removeItem(id, 1);
+}
+/* 偏好定价：非偏好分类半价 */
+function prefMultOf(pref, itemId) {
+  return (pref || []).includes(ITEMS[itemId].cat) ? 1 : 0.5;
+}
+
 function spawnCustomer() {
-  if (state.customers.length >= MAX_QUEUE) return;
+  const total = state.customers.length + (state.randomQueue || []).length;
+  if (total >= MAX_QUEUE) return;
+  /* 二星起，四成概率来的是随机散客（遵循世界偏好与限购规则） */
+  if (state.shopLevel >= 2 && roll(0.4)) {
+    if (spawnRandomNPC()) renderLobby();
+    return;
+  }
   const pool = eligibleCustomers().filter(p => !state.customers.includes(p));
-  if (!pool.length) return;
+  if (!pool.length) {
+    if (spawnRandomNPC()) renderLobby();
+    return;
+  }
   const id = pick(pool);
   state.customers.push(id);
   ding(CUSTOMERS[id].name + " 破空而来，走进了万界楼！");
@@ -177,7 +273,7 @@ function spawnCustomer() {
 function greetBtn() {
   const now = Date.now();
   if (now < greetReadyAt) { toast("系统正在捕捉位面意念，请稍候…"); return; }
-  if (state.customers.length >= MAX_QUEUE) { toast("大堂已经客满啦！"); return; }
+  if (state.customers.length + (state.randomQueue || []).length >= MAX_QUEUE) { toast("大堂已经客满啦！"); return; }
   greetReadyAt = now + 20000;
   spawnCustomer();
   renderLobby();
@@ -189,21 +285,33 @@ function startDeal(cid) {
   $("#dealModal").classList.add("open");
 }
 
+function startDealRnd(rid) {
+  const npc = (state.randomQueue || []).find(x => x.rid === rid);
+  if (!npc) return;
+  deal = { rnd: npc, picked: [] };
+  renderDeal();
+  $("#dealModal").classList.add("open");
+}
+
 function dealData() {
+  if (deal.rnd) return { c: deal.rnd, isFirst: false };
   const c = CUSTOMERS[deal.cid];
   const isFirst = !!c.first && !state.firstTrades[deal.cid];
   return { c, isFirst };
 }
 
 function dealNeedTags() {
+  if (deal.order) return [deal.order.tag];
+  if (deal.rnd) return [];
   const { c } = dealData();
-  return c.need;
+  return c.need || [];
 }
 
 function togglePick(itemId) {
   const need = dealNeedTags();
   const it = ITEMS[itemId];
-  if (!it.tags.some(t => need.includes(t))) { toast("客户对这类商品没有意念需求。"); return; }
+  if (hasBoughtOnce(itemId)) { toast("这位客人已经买过「" + it.name + "」了，同款限购一份。"); return; }
+  if (!it.tags.some(t => need.includes(t)) && !deal.rnd) { toast("客户对这类商品没有意念需求。"); return; }
   const idx = deal.picked.indexOf(itemId);
   if (idx >= 0) deal.picked.splice(idx, 1);
   else {
@@ -214,6 +322,10 @@ function togglePick(itemId) {
 }
 
 function dealPrice() {
+  if (deal.order) {
+    const sum = deal.picked.reduce((a, id) => a + ITEMS[id].value, 0);
+    return { price: Math.round(sum * 2.2), note: "快递通道以物易物：报酬 = 商品价值 ×2.2" };
+  }
   const { c, isFirst } = dealData();
   if (isFirst) return { price: 0, note: "剧情首单：以物易物" };
   if (c.special === "goku") {
@@ -225,12 +337,18 @@ function dealPrice() {
   let loved = false;
   deal.picked.forEach(id => { if (c.loves && c.loves.includes(id)) loved = true; });
   if (loved) m += 0.5;
-  const sum = deal.picked.reduce((a, id) => a + ITEMS[id].value, 0);
+  const prefNote = [];
+  const sum = deal.picked.reduce((a, id) => {
+    const mult = prefMultOf(c.pref, id);
+    if (mult < 1) prefNote.push(ITEMS[id].name + "（非偏好半价）");
+    return a + ITEMS[id].value * mult;
+  }, 0);
   const price = Math.min(Math.round(sum * m), c.budget);
-  return { price, loved, note: loved ? "客户挚爱加价！" : "议价系数 ×" + m.toFixed(2) };
+  return { price, loved, note: (loved ? "客户挚爱加价！" : "议价系数 ×" + m.toFixed(2)) + (prefNote.length ? "　" + prefNote.join("、") : "") };
 }
 
 function confirmDeal() {
+  if (deal.order) { fulfillOrder(); return; }
   const { c, isFirst } = dealData();
   if (!deal.picked.length) { toast("至少要拿出一件商品。"); return; }
 
@@ -255,7 +373,7 @@ function confirmDeal() {
     toast("孙悟空：" + (blood > 0 ? "多谢店主，这个给你！" : "好吃！"), true);
   } else {
     const { price, loved } = dealPrice();
-    deal.picked.forEach(id => removeItem(id, 1));
+    deal.picked.forEach(id => { consumeSold(id); markBoughtOnce(id); });
     state.vp += price;
     state.stats.totalVp += price;
     state.stats.trades++;
@@ -269,7 +387,8 @@ function confirmDeal() {
     toast("成交！价值点 +" + fmt(price), true);
   }
 
-  state.customers = state.customers.filter(x => x !== deal.cid);
+  if (deal.rnd) state.randomQueue = (state.randomQueue || []).filter(x => x.rid !== deal.rnd.rid);
+  else state.customers = state.customers.filter(x => x !== deal.cid);
   checkQuests();
   closeModal("dealModal");
   deal = null;
@@ -279,12 +398,16 @@ function confirmDeal() {
 
 /* ---------------- 现代采购 / 拍卖 ---------------- */
 
-function buyModern(id) {
+function buyModern(id, qty) {
+  qty = Math.max(1, Math.min(999, Math.floor(qty || 1)));
   const it = ITEMS[id];
-  if (state.cny < it.cost) { toast("华夏币不足。"); return; }
-  state.cny -= it.cost;
-  addItem(id, 1);
-  pushLog("🛒 现代采购：" + it.name + " ×1（-" + fmt(it.cost) + " 华夏币）");
+  const unit = state.workers && state.workers.buma ? Math.ceil(it.cost / 2) : it.cost;
+  const cost = unit * qty;
+  if (state.cny < cost) { toast("华夏币不足（共需 " + fmt(cost) + "）。"); return; }
+  if (invUsed() + qty > invCap()) { toast("背包已满（容量 " + invCap() + "），先清点库存吧。"); return; }
+  state.cny -= cost;
+  addItem(id, qty);
+  pushLog("🛒 现代采购：" + it.name + " ×" + qty + "（-" + fmt(cost) + " 华夏币）");
   save(); renderAll();
 }
 
@@ -446,11 +569,22 @@ function buyVilla() {
 }
 
 function showEnding() {
-  $("#endTitle").textContent = "二星店主 · 试玩版完";
+  $("#endTitle").textContent = "二星店主 · 万界楼初具规模";
   $("#endText").innerHTML = "巍巍楼阁拔地而起，鎏金大字「万界楼」高悬正门。<br>" +
     "系统提示：「宿体晋升二星店主，解锁：顾客价值知情权、店主打折权、更快的客流量与更高采购权限。」<br><br>" +
-    "后续剧情预告：小型拍卖会引来一百多位皇帝（还有两个李世民）、发动海贼世界全员找恶魔果实、独孤求败的剑冢、哆啦A梦的次元口袋……<br>" +
-    "——商通万界，让所有人给我打工。<b>试玩版到此结束，你可以继续自由经营。</b>";
+    "——但这只是开始。虚空之中，一座万界商城正在凝聚；万界拍卖会的请帖即将发出……<br>" +
+    "<b>继续经营，直至六星，商通万界！</b>";
+  $("#endModal").classList.add("open");
+  save();
+}
+
+function showEndingSix() {
+  $("#endTitle").textContent = "六星店主 · 万道盟约";
+  $("#endText").innerHTML = "六层楼阁直入云霄，天晶悬于顶层，紫光流转。<br>" +
+    "系统提示：「六星店主权限已全部开启：回收六成、利润八分之一、万界连通诸天、时间加速。」<br><br>" +
+    "石昊在喝兽奶，叶凡签了投资人契约，菩提祖师的论道场场爆满；太古人族排队订购周天星斗大阵……<br>" +
+    "下一个台阶是<b>七星</b>：回收七成、按月利润结算、万界楼的真正权柄。<br>" +
+    "——商通万界，让所有人给我打工。<b>万界楼的传奇，未完待续。你可以继续自由经营。</b>";
   $("#endModal").classList.add("open");
   save();
 }
@@ -483,6 +617,359 @@ function nextIntro() {
 
 function closeModal(id) { $("#" + id).classList.remove("open"); }
 
+/* ---------------- 星级升级（三~六星）---------------- */
+
+function starMet(level) {
+  const c = STAR_CONDITIONS[level];
+  if (!c) return false;
+  if (distinctItems() < c.known || state.stats.trades < c.trades) return false;
+  if (c.story && !state.storyDone[c.story]) return false;
+  if (c.choice && !state.choice5) return false;
+  return true;
+}
+
+function starCondText(level) {
+  const c = STAR_CONDITIONS[level];
+  let t = "累计上架 " + c.known + " 种商品、完成 " + c.trades + " 笔交易";
+  if (c.story) t += "，并完成对应剧情";
+  if (c.choice) t += "，并与系统摊牌";
+  return t;
+}
+
+function maybeOfferUpgrade() {
+  const next = state.shopLevel + 1;
+  if (!STAR_CONDITIONS[next] || state.shopLevel >= 6) return;
+  if (next === 5 && !state.choice5) {
+    /* 五星：先触发系统摊牌 */
+    if (distinctItems() >= STAR_CONDITIONS[5].known && state.stats.trades >= STAR_CONDITIONS[5].trades && !state.choiceOffered) {
+      state.choiceOffered = true;
+      showChoice5();
+    }
+    return;
+  }
+  if (starMet(next) && !state.upgradeOffered[next]) {
+    state.upgradeOffered[next] = true;
+    $("#starTitle").textContent = "「叮咚！系统满足升级需求」";
+    $("#starText").innerHTML = "万界楼商品已经满足系统需求。<br><br>升级条件：" + starCondText(next) + " —— <b>已全部达成！</b><br>是否现在升级？";
+    $("#starYes").textContent = "立即升级（" + next + " 星）";
+    $("#starModal").classList.add("open");
+    save();
+  }
+}
+
+function applyStarUpgrade() {
+  const next = state.shopLevel + 1;
+  if (!STAR_CONDITIONS[next] || state.shopLevel >= 6) return;
+  if (!starMet(next)) { toast("升级条件尚未达成：" + starCondText(next)); return; }
+  state.shopLevel = next;
+  $("#starModal").classList.remove("open");
+  pushLog("🌟 万界楼升级！" + SHOP_LEVELS[next].name);
+  $("#starTitle").textContent = next + " 星店主 · " + SHOP_LEVELS[next].name;
+  $("#starText").innerHTML = STAR_PERKS[next] + "<br><br>" + SHOP_LEVELS[next].desc;
+  $("#starYes").textContent = "继续经营";
+  $("#starYes").onclick = () => { $("#starModal").classList.remove("open"); if (next === 6) showEndingSix(); };
+  $("#starModal").classList.add("open");
+  state.tokens = Math.min(state.tokens + 2, tokenCap() + 2);
+  checkQuests();
+  save();
+  renderAll();
+}
+
+function showChoice5() {
+  $("#choiceModal").classList.add("open");
+}
+function makeChoice5(keep) {
+  state.choice5 = true;
+  $("#choiceModal").classList.remove("open");
+  if (keep) {
+    pushLog("💜 你把手放上了紫色光团——「叮咚！升级成功！」本性未失，你就是万界商铺系统的宿主。");
+    ding("系统：「很好。万界商铺系统的宿主，必须是一个拥有喜怒哀乐的人。」");
+  } else {
+    pushLog("📜 你险些把系统移交给陈峰……最终系统判定：'装的也算！'——叮咚！升级成功。");
+    ding("系统：「选择的方式，会稍稍改变。」");
+  }
+  save();
+  maybeOfferUpgrade();
+  renderAll();
+}
+
+/* ---------------- 万界拍卖会（二星解锁）---------------- */
+
+let auctionSession = null;
+let auctionReadyAt = 0;
+
+function auctionPrice(id) {
+  const it = ITEMS[id];
+  const mult = 2.2 + Math.random() * 2.5 + state.shopLevel * 0.25 + (state.workers && state.workers.micu ? 0.15 : 0);
+  return Math.max(1, Math.round(it.value * mult));
+}
+
+function startAuction() {
+  const now = Date.now();
+  if (state.shopLevel < 2) { toast("二星店主后才能举办拍卖会。"); return; }
+  if (now < auctionReadyAt) { toast("拍卖场还在打扫，请稍候…"); return; }
+  const ids = Object.keys(state.inv).filter(id => state.inv[id] > 0);
+  if (!ids.length) { toast("仓库空空，无物可拍！"); return; }
+  auctionReadyAt = now + 300000;
+  const pool = ids.slice().sort(() => Math.random() - 0.5);
+  auctionSession = { lots: pool.slice(0, 4), idx: 0, gained: 0, log: [] };
+  $("#auctionModal").classList.add("open");
+  renderAuction();
+}
+
+function renderAuction() {
+  if (!auctionSession) return;
+  const box = $("#auctionBody");
+  if (auctionSession.idx >= auctionSession.lots.length) {
+    box.innerHTML = '<div class="trip-event"><p class="trip-text">本届拍卖会落幕！共入账 <b>' + fmt(auctionSession.gained) + ' 价值点</b>。台下观众的欢呼声经久不息。</p>' +
+      '<button id="auctionNext" class="btn primary">送客收摊</button></div>';
+    $("#auctionNext").onclick = () => { $("#auctionModal").classList.remove("open"); auctionSession = null; save(); renderAll(); };
+    return;
+  }
+  const id = auctionSession.lots[auctionSession.idx];
+  const it = ITEMS[id];
+  box.innerHTML = '<p class="muted">第 ' + (auctionSession.idx + 1) + " / " + auctionSession.lots.length + ' 件拍品 · 糜竺执锤，万界直播</p>' +
+    '<div class="trip-event"><h4>' + it.emoji + " " + it.name + '</h4><p class="trip-text">' + it.desc + '<br>系统底价：<b>' + fmt(it.value) + ' 价值点</b>（品相极佳，溢价空间巨大）</p>' +
+    '<div class="trip-opts"><button id="auctionHammer" class="btn primary">一锤定音！</button>' +
+    '<button id="auctionPass" class="btn ghost">流拍，下一件</button></div></div>' +
+    '<div class="logs">' + auctionSession.log.map(l => '<div class="logline">' + l + '</div>').join("") + '</div>';
+  $("#auctionHammer").onclick = auctionHammer;
+  $("#auctionPass").onclick = auctionPass;
+}
+
+function auctionHammer() {
+  if (!auctionSession) return;
+  const id = auctionSession.lots[auctionSession.idx];
+  if (countItem(id) < 1) { auctionSession.idx++; renderAuction(); return; }
+  const it = ITEMS[id];
+  const price = auctionPrice(id);
+  const buyer = pick(AUCTION_BUYERS[Math.min(6, Math.max(2, state.shopLevel))] || AUCTION_BUYERS[2]);
+  let line = "🔨 「" + it.name + "」由 <b>" + buyer + "</b> 以 " + fmt(price) + " 价值点拍得！";
+  if (roll(0.25)) line += " 场面：" + pick(AUCTION_EVENTS);
+  consumeSold(id);
+  state.vp += price;
+  state.stats.totalVp += price;
+  state.stats.auctions++;
+  auctionSession.gained += price;
+  auctionSession.log.unshift(line);
+  auctionSession.idx++;
+  checkQuests();
+  save();
+  renderAuction();
+}
+
+function auctionPass() {
+  if (!auctionSession) return;
+  auctionSession.log.unshift("⏭️ 第 " + (auctionSession.idx + 1) + " 件拍品流拍，台下嘘声一片。");
+  auctionSession.idx++;
+  renderAuction();
+}
+
+/* ---------------- 员工（位面代理人，三星解锁）---------------- */
+
+function hireWorker(id) {
+  const w = WORKERS[id];
+  if (state.workers[id]) return;
+  if (state.shopLevel < 3) { toast("三星店主后才能招募位面代理人。"); return; }
+  if (state.vp < w.cost) { toast("价值点不足（还差 " + fmt(w.cost - state.vp) + "）。"); return; }
+  state.vp -= w.cost;
+  state.workers[id] = true;
+  pushLog("🤝 位面代理人入职：" + w.name + "（-" + fmt(w.cost) + " 价值点）");
+  toast(w.name + " 入职万界楼！", true);
+  checkQuests();
+  save(); renderAll();
+}
+
+function renderStaff() {
+  const box = $("#staffList");
+  if (!box) return;
+  box.innerHTML = "";
+  Object.keys(WORKERS).forEach(id => {
+    const w = WORKERS[id];
+    const hired = !!state.workers[id];
+    const el = document.createElement("div");
+    el.className = "goods";
+    el.innerHTML = '<span class="g-emoji">' + w.emoji + '</span>' +
+      '<span class="g-name">' + w.name + ' <em class="studied">' + (hired ? "在职" : "待聘") + '</em></span>' +
+      '<span class="g-val">' + w.desc + '</span>' +
+      '<button class="btn small ' + (hired ? "ghost" : "primary") + '">' + (hired ? "已入职" : "招募 " + fmt(w.cost) + " 点") + '</button>';
+    el.querySelector("button").onclick = () => hireWorker(id);
+    box.appendChild(el);
+  });
+}
+
+/* ---------------- 快递通道（四星解锁）---------------- */
+
+const ORDER_FROMS = {
+  4: ["苍穹大世界 · 萧焱", "斗气大陆 · 匿名强者", "诛仙 · 鬼王宗", "风云 · 天下会"],
+  5: ["遮天 · 姜家", "武动乾坤 · 林动", "白蛇传 · 钱塘商会", "漫威 · 神盾局"],
+  6: ["完美世界 · 石村", "飞升之后 · 太古人族", "神墓 · 灭天联军", "西游 · 自由者联盟"],
+};
+
+function spawnOrder() {
+  if (state.shopLevel < 4) return;
+  if (state.orders.length >= 2) return;
+  const tags = ["丹药", "秘籍", "神兵", "奇物", "美酒", "食物", "珍宝"];
+  const froms = ORDER_FROMS[Math.min(6, state.shopLevel)] || ORDER_FROMS[4];
+  state.orders.push({
+    id: "ord_" + Date.now() + "_" + Math.floor(Math.random() * 999),
+    tag: pick(tags),
+    from: pick(froms),
+  });
+}
+
+function startDealOrder(oid) {
+  const order = state.orders.find(o => o.id === oid);
+  if (!order) return;
+  deal = { cid: null, order, picked: [] };
+  renderDeal();
+  $("#dealModal").classList.add("open");
+}
+
+function fulfillOrder() {
+  const order = deal.order;
+  if (!deal.picked.length) { toast("至少要附上一件商品。"); return; }
+  const sum = deal.picked.reduce((a, id) => a + ITEMS[id].value, 0);
+  const pay = Math.round(sum * 2.2);
+  deal.picked.forEach(id => consumeSold(id));
+  state.vp += pay;
+  state.stats.totalVp += pay;
+  state.stats.trades++;
+  state.orders = state.orders.filter(o => o.id !== order.id);
+  pushLog("📦 快递通道：来自 " + order.from + " 的订单成交（" + deal.picked.map(id => ITEMS[id].name).join("、") + "），+" + fmt(pay) + " 价值点。");
+  toast("订单送达！价值点 +" + fmt(pay), true);
+  state.customers = state.customers.filter(x => x !== deal.cid);
+  checkQuests();
+  closeModal("dealModal");
+  deal = null;
+  save();
+  renderAll();
+}
+
+function declineOrder(oid) {
+  state.orders = state.orders.filter(o => o.id !== oid);
+  pushLog("📦 拒收了一笔快递订单。");
+  save(); renderAll();
+}
+
+/* ---------------- 时间加速（六星权限）---------------- */
+
+let accelReadyAt = 0;
+
+function accelerate() {
+  if (state.shopLevel < 6) { toast("六星店主的权限。"); return; }
+  const now = Date.now();
+  if (now < accelReadyAt) { toast("系统正在恢复时间权限，请稍候…"); return; }
+  accelReadyAt = now + 300000;
+  state.tokens = tokenCap();
+  for (let i = 0; i < 3; i++) spawnCustomer();
+  pushLog("⏳ 时间加速发动：一年光阴转瞬即逝，采购令回满，客户盈门。");
+  toast("⏳ 时间加速：一年时光，弹指而过！", true);
+  save(); renderAll();
+}
+
+/* ---------------- 万界货架（三星解锁的自动交易）---------------- */
+
+let shelfNextAt = 0;
+
+function shelfUnlocked() { return state.shopLevel >= SHELF_CONFIG.unlockLevel; }
+
+function shelfChance(l) {
+  const it = ITEMS[l.id];
+  const ratio = l.price / Math.max(it.value, 1);
+  return Math.max(0.03, Math.min(0.9,
+    ratio <= 1 ? SHELF_CONFIG.baseChance - (1 - ratio) * 0.3 : SHELF_CONFIG.baseChance * Math.pow(ratio, -2)));
+}
+
+function shelfTick() {
+  if (!shelfUnlocked() || !state.shelf.length) return;
+  const now = Date.now();
+  if (!shelfNextAt) shelfNextAt = now + SHELF_CONFIG.tickMs;
+  if (now < shelfNextAt) return;
+  shelfNextAt = now + SHELF_CONFIG.tickMs;
+  let sold = 0;
+  state.shelf.forEach(l => {
+    if (ITEMS[l.id].cat !== "gongfa" && countItem(l.id) < 1) return;
+    const groups = RANDOM_GROUPS.filter(g => g.unlock(state) && g.pref.includes(l.cat));
+    if (!groups.length) return;
+    const g = pick(groups);
+    const buyerBudget = Math.round(g.budget[0] + Math.random() * (g.budget[1] - g.budget[0]));
+    if (l.price > buyerBudget * 1.2) return; /* 定价过高，客人看一眼就走 */
+    if (!roll(shelfChance(l))) return;
+    const buyer = pick(RANDOM_SURNAMES) + pick(g.names);
+    consumeSold(l.id);
+    state.vp += l.price;
+    state.stats.totalVp += l.price;
+    state.stats.trades++;
+    l.sold = (l.sold || 0) + 1;
+    sold++;
+    pushLog("🏷️ 货架：「" + ITEMS[l.id].name + "」被 " + buyer + "（" + g.name + "）以 " + fmt(l.price) + " 价值点买走。");
+  });
+  if (sold) {
+    toast("🏷️ 货架自动售出 " + sold + " 件商品！", true);
+    checkQuests();
+    save();
+    renderRes();
+    if (!document.activeElement || document.activeElement.tagName !== "INPUT") renderShelf();
+  }
+}
+
+function renderShelf() {
+  const box = $("#shelfList");
+  if (!box) return;
+  const lockEl = $("#shelfLock");
+  if (lockEl) lockEl.style.display = shelfUnlocked() ? "none" : "";
+  box.innerHTML = "";
+  if (!shelfUnlocked()) return;
+  state.shelf.forEach((l, i) => {
+    const it = ITEMS[l.id];
+    const el = document.createElement("div");
+    el.className = "goods";
+    el.innerHTML = '<span class="g-emoji">' + it.emoji + '</span>' +
+      '<span class="g-name">' + it.name + ' <span class="tagchip">' + (CATS[l.cat] ? CATS[l.cat].name : l.cat) + '</span> <em class="studied">已售 ' + (l.sold || 0) + (it.cat === "gongfa" ? "（无限售）" : "") + '</em></span>' +
+      '<span class="g-val">定价 <input class="qty shelfprice" type="number" min="1" value="' + l.price + '" /> 点（估价 ' + fmt(it.value) + '）</span>' +
+      '<button class="btn small ghost">下架</button>';
+    const priceInput = el.querySelector(".shelfprice");
+    priceInput.onchange = () => { l.price = Math.max(1, parseInt(priceInput.value, 10) || it.value); save(); };
+    el.querySelector("button").onclick = () => { state.shelf.splice(i, 1); save(); renderShelf(); };
+    box.appendChild(el);
+  });
+  if (state.shelf.length < SHELF_CONFIG.slots) {
+    const el = document.createElement("div");
+    el.className = "goods shelfnew";
+    const opts = Object.keys(state.inv).map(id =>
+      '<option value="' + id + '">' + ITEMS[id].emoji + " " + ITEMS[id].name + (ITEMS[id].cat === "gongfa" ? "（无限售）" : " ×" + state.inv[id]) + '</option>').join("");
+    const catOpts = Object.keys(CATS).map(k => '<option value="' + k + '">' + CATS[k].name + '</option>').join("");
+    el.innerHTML = '<span class="g-emoji">🏷️</span>' +
+      '<span class="g-name">空位 ' + (state.shelf.length + 1) + '/' + SHELF_CONFIG.slots + '</span>' +
+      '<select class="shelfitem">' + (opts || '<option value="">（仓库空空）</option>') + '</select>' +
+      '<select class="shelfcat">' + catOpts + '</select>' +
+      '<input class="qty shelfprice" type="number" min="1" placeholder="定价" />' +
+      '<button class="btn small primary">上架</button>';
+    const sel = el.querySelector(".shelfitem");
+    const catSel = el.querySelector(".shelfcat");
+    const priceInput = el.querySelector(".shelfprice");
+    const syncPrice = () => { if (sel.value && ITEMS[sel.value]) priceInput.value = ITEMS[sel.value].value; };
+    if (sel.value) syncPrice();
+    sel.onchange = () => { syncPrice(); if (ITEMS[sel.value]) catSel.value = ITEMS[sel.value].cat; };
+    el.querySelector("button").onclick = () => {
+      const id = sel.value;
+      if (!id || (!countItem(id) && ITEMS[id].cat !== "gongfa")) { toast("请选择库存中的商品。"); return; }
+      if (state.shelf.some(x => x.id === id)) { toast("该商品已上架。"); return; }
+      const price = Math.max(1, parseInt(priceInput.value, 10) || ITEMS[id].value);
+      state.shelf.push({ id, price, cat: catSel.value, sold: 0 });
+      pushLog("🏷️ 上架「" + ITEMS[id].name + "」，定价 " + fmt(price) + "，目标客群：" + (CATS[catSel.value] ? CATS[catSel.value].name : catSel.value) + "。");
+      save(); renderShelf();
+    };
+    box.appendChild(el);
+  } else {
+    const el = document.createElement("div");
+    el.className = "empty";
+    el.textContent = "货架已满（" + SHELF_CONFIG.slots + " 位），下架商品可腾出货位。";
+    box.appendChild(el);
+  }
+}
+
 /* ---------------- 渲染 ---------------- */
 
 function renderAll() {
@@ -492,21 +979,22 @@ function renderAll() {
   renderStudy();
   renderPlane();
   renderQuests();
+  renderStaff();
+  renderShelf();
 }
 
 function renderRes() {
   $("#rVp").textContent = fmt(state.vp);
   $("#rCny").textContent = fmt(state.cny);
   $("#rRealm").textContent = realmName();
-  $("#rShop").textContent = state.shopLevel >= 2 ? "二星店主" : "一星店主";
+  $("#rShop").textContent = state.shopLevel >= 2 ? state.shopLevel + " 星店主" : "一星店主";
   $("#rItems").textContent = distinctItems();
   $("#rTrades").textContent = state.stats.trades;
   $("#rTokens").textContent = state.tokens + " / " + tokenCap();
-  $("#shopName").textContent = state.shopLevel >= 2 ? "万界楼 · 明雅别墅" : "万界楼 · 出租房（20㎡）";
-  $("#shopDesc").textContent = state.shopLevel >= 2
-    ? "巍峨楼阁，八根雕龙玉柱，水晶柜台琳琅满目。"
-    : "不足二十平的出租房，泡面箱子还没搬走。";
-  $("#shopEmoji").textContent = state.shopLevel >= 2 ? "🏯" : "🏠";
+  const lv = SHOP_LEVELS[state.shopLevel] || SHOP_LEVELS[1];
+  $("#shopName").textContent = lv.name;
+  $("#shopDesc").textContent = lv.desc;
+  $("#shopEmoji").textContent = lv.emoji;
 }
 
 let lastQueueKey = null;
@@ -541,10 +1029,58 @@ function renderLobby() {
     card.querySelector("button").onclick = () => startDeal(cid);
     box.appendChild(card);
   });
+  /* 快递通道订单 */
+  state.orders.forEach(o => {
+    const card = document.createElement("div");
+    card.className = "customer order";
+    card.innerHTML =
+      '<div class="c-avatar">📦</div>' +
+      '<div class="c-info"><b>快递通道 · 订单</b><span class="c-world">' + o.from + '</span>' +
+      '<p class="c-quote">“万界信息平台下单：需要「' + o.tag + '」类商品，以物易物，报酬翻倍。”</p>' +
+      '<div class="c-need">订单需求：<span class="tagchip">' + o.tag + '</span></div></div>' +
+      '<button class="btn primary">接单</button>';
+    card.querySelector("button").onclick = () => startDealOrder(o.id);
+    box.appendChild(card);
+  });
+  /* 随机散客 */
+  (state.randomQueue || []).forEach(npc => {
+    const card = document.createElement("div");
+    card.className = "customer random";
+    card.innerHTML =
+      '<div class="c-avatar">' + npc.emoji + '</div>' +
+      '<div class="c-info"><b>' + npc.name + '</b><span class="c-world">' + npc.world + ' · 随机散客</span>' +
+      '<p class="c-quote">“' + npc.intro + '”</p>' +
+      '<div class="c-need">偏好：' + npc.pref.map(t => '<span class="tagchip">' + (CATS[t] ? CATS[t].name : t) + '</span>').join("") +
+      ' <span class="tagchip">预算 ' + fmt(npc.budget) + ' 点</span></div></div>' +
+      '<button class="btn primary">接待</button>';
+    card.querySelector("button").onclick = () => startDealRnd(npc.rid);
+    box.appendChild(card);
+  });
 }
 
+let uiCat = "all";
+
 function renderStore() {
-  /* 现代采购 */
+  /* 容量 */
+  const capEl = $("#invCap");
+  if (capEl) capEl.textContent = "背包 " + invUsed() + " / " + invCap() + "（随星级提升）";
+
+  /* 分类筛选 */
+  const chips = $("#catFilter");
+  if (chips) {
+    chips.innerHTML = "";
+    const mkChip = (key, label) => {
+      const b = document.createElement("button");
+      b.className = "chip" + (uiCat === key ? " on" : "");
+      b.textContent = label;
+      b.onclick = () => { uiCat = key; renderStore(); };
+      chips.appendChild(b);
+    };
+    mkChip("all", "全部");
+    Object.keys(CATS).forEach(k => mkChip(k, CATS[k].emoji + " " + CATS[k].name));
+  }
+
+  /* 现代采购（含数量框） */
   const buy = $("#buyList");
   buy.innerHTML = "";
   SHOP_GOODS.forEach(id => {
@@ -552,26 +1088,31 @@ function renderStore() {
     const el = document.createElement("div");
     el.className = "goods";
     el.innerHTML = '<span class="g-emoji">' + it.emoji + '</span>' +
-      '<span class="g-name">' + it.name + '</span>' +
+      '<span class="g-name">' + it.name + ' <span class="tagchip">' + (CATS[it.cat] ? CATS[it.cat].name : "") + '</span></span>' +
       '<span class="g-val">' + fmt(it.value) + ' 点</span>' +
-      '<button class="btn small">🧧 ' + fmt(it.cost) + '</button>';
-    el.querySelector("button").onclick = () => buyModern(id);
+      '<input class="qty" type="number" min="1" max="99" value="1" />' +
+      '<button class="btn small">🧧 ' + fmt(state.workers && state.workers.buma ? Math.ceil(it.cost / 2) : it.cost) + '</button>';
+    el.querySelector("button").onclick = () => {
+      const q = parseInt(el.querySelector(".qty").value, 10) || 1;
+      buyModern(id, q);
+    };
     buy.appendChild(el);
   });
 
-  /* 库存 */
+  /* 库存（分类筛选） */
   const inv = $("#invList");
   inv.innerHTML = "";
-  const ids = Object.keys(state.inv);
-  if (!ids.length) inv.innerHTML = '<div class="empty">仓库空空。去「现代采购」进货，或去「位面」淘宝！</div>';
+  const ids = Object.keys(state.inv).filter(id => uiCat === "all" || ITEMS[id].cat === uiCat);
+  if (!ids.length) inv.innerHTML = '<div class="empty">' + (Object.keys(state.inv).length ? "该分类下没有物品。" : "仓库空空。去「现代采购」进货，或去「位面」淘宝！") + '</div>';
   ids.forEach(id => {
     const it = ITEMS[id];
     const st = state.studied[id] || 0;
     const el = document.createElement("div");
     el.className = "goods";
+    const stockLabel = it.cat === "gongfa" ? "已收录（可无限售）" : "×" + state.inv[id];
     el.innerHTML = '<span class="g-emoji">' + it.emoji + '</span>' +
-      '<span class="g-name">' + it.name + (state.inv[id] > 1 ? ' ×' + state.inv[id] : '') +
-      (st ? ' <em class="studied">已修' + st + '/' + it.lvls + '重</em>' : '') + '</span>' +
+      '<span class="g-name">' + it.name + ' <span class="tagchip">' + (CATS[it.cat] ? CATS[it.cat].name : "") + '</span>' +
+      ' <em class="studied">' + stockLabel + (st ? ' · 已修' + st + '/' + it.lvls + '重' : '') + '</em></span>' +
       '<span class="g-val">' + fmt(it.value) + ' 点</span>' +
       '<span class="g-acts"></span>';
     const acts = el.querySelector(".g-acts");
@@ -616,6 +1157,21 @@ function renderStudy() {
 }
 
 function renderPlane() {
+  /* 时间加速（六星权限） */
+  const accel = $("#accelBox");
+  if (accel) {
+    if (state.shopLevel >= 6) {
+      const cd = Math.ceil((accelReadyAt - Date.now()) / 1000);
+      accel.style.display = "";
+      accel.innerHTML = '<h3>⏳ 时间加速（六星权限）</h3>' +
+        '<p class="muted">指定一个连通的世界加速时光——游戏内效果：采购令立即回满，三位客户立即登门。冷却 5 分钟。</p>' +
+        '<button id="accelBtn" class="btn primary">' + (cd > 0 ? "时间长河恢复中（" + cd + "s）" : "发动时间加速") + '</button>';
+      const b = $("#accelBtn");
+      if (b) { b.disabled = cd > 0; b.onclick = accelerate; }
+    } else {
+      accel.style.display = "none";
+    }
+  }
   const box = $("#worldList");
   box.innerHTML = "";
   Object.keys(WORLDS).forEach(wid => {
@@ -671,12 +1227,18 @@ function renderQuests() {
 
 function renderDeal() {
   if (!deal) return;
+  if (deal.order) { renderDealOrder(); return; }
   const { c, isFirst } = dealData();
   $("#dealTitle").textContent = "接待 · " + c.name;
+  const needList = c.need || [];
+  const prefHtml = c.need
+    ? c.need.map(t => '<span class="tagchip">' + t + '</span>').join("")
+    : (c.pref || []).map(t => '<span class="tagchip">' + (CATS[t] ? CATS[t].name : t) + '</span>').join("");
   $("#dealInfo").innerHTML = '<span class="c-world">' + c.world + '</span>' +
     '<p class="c-quote">“' + c.intro + '”</p>' +
-    '<div>意念需求：' + c.need.map(t => '<span class="tagchip">' + t + '</span>').join("") +
-    (isFirst ? ' <span class="tagchip story">剧情首单：以物易物</span>' : ' <span class="tagchip">预算 ' + fmt(c.budget) + ' 点</span>') + '</div>';
+    '<div>' + (c.need ? "意念需求：" : "偏好分类：") + prefHtml +
+    (isFirst ? ' <span class="tagchip story">剧情首单：以物易物</span>' : ' <span class="tagchip">预算 ' + fmt(c.budget) + ' 点</span>') +
+    (c.main ? '' : ' <span class="tagchip story">功法/武器/奇物限购1份</span>') + '</div>';
 
   const price = dealPrice();
   $("#dealPrice").innerHTML = '已选 ' + deal.picked.length + ' 件：' +
@@ -690,14 +1252,48 @@ function renderDeal() {
   if (!ids.length) list.innerHTML = '<div class="empty">仓库空空，快去进货！</div>';
   ids.forEach(id => {
     const it = ITEMS[id];
-    const match = it.tags.some(t => c.need.includes(t));
+    const match = deal.rnd ? c.pref.includes(it.cat) : needList.some(t => it.tags.includes(t));
+    const bought = hasBoughtOnce(id);
+    const mult = prefMultOf(c.pref, id);
+    const catName = CATS[it.cat] ? CATS[it.cat].name : it.cat;
+    const el = document.createElement("div");
+    el.className = "goods" + (match || deal.rnd ? "" : " dim");
+    el.innerHTML = '<span class="g-emoji">' + it.emoji + '</span>' +
+      '<span class="g-name">' + it.name + (state.inv[id] > 1 ? ' ×' + state.inv[id] : '') +
+      (it.cat === "gongfa" && state.inv[id] ? ' <em class="studied">∞</em>' : '') +
+      ' <span class="tagchip">' + catName + '</span>' + (mult < 1 ? ' <span class="tagchip story">非偏好半价</span>' : '') + '</span>' +
+      '<span class="g-val">' + fmt(Math.round(it.value * mult)) + ' 点</span>' +
+      '<button class="btn small ' + (deal.picked.includes(id) ? 'primary' : (match || deal.rnd ? '' : 'ghost')) + '" ' + (bought ? 'disabled' : '') + '>' +
+      (bought ? "已购过" : (deal.picked.includes(id) ? "✓ 已选" : (match || deal.rnd ? "展示" : "不合意念"))) + '</button>';
+    el.querySelector("button").onclick = () => togglePick(id);
+    list.appendChild(el);
+  });
+}
+
+function renderDealOrder() {
+  const price = dealPrice();
+  const list = $("#dealItems");
+  $("#dealTitle").textContent = "📦 快递通道 · 订单";
+  $("#dealInfo").innerHTML = '<span class="c-world">' + deal.order.from + '</span>' +
+    '<p class="c-quote">“万界信息平台下单，报酬丰厚，售后包邮。”</p>' +
+    '<div>订单需求：' + deal.order.tag.split("").map(t => '<span class="tagchip">' + t + '</span>').join("") + '</div>';
+  $("#dealPrice").innerHTML = '已选 ' + deal.picked.length + ' 件：' +
+    (deal.picked.map(id => ITEMS[id].name).join("、") || "——") +
+    '<br><b>预计报酬：' + fmt(price.price) + ' 价值点</b>' +
+    '<br><span class="muted">' + price.note + '</span>';
+  list.innerHTML = "";
+  const ids = Object.keys(state.inv);
+  if (!ids.length) list.innerHTML = '<div class="empty">仓库空空，无法接单。</div>';
+  ids.forEach(id => {
+    const it = ITEMS[id];
+    const match = it.tags.includes(deal.order.tag);
     const el = document.createElement("div");
     el.className = "goods" + (match ? "" : " dim");
     el.innerHTML = '<span class="g-emoji">' + it.emoji + '</span>' +
       '<span class="g-name">' + it.name + (state.inv[id] > 1 ? ' ×' + state.inv[id] : '') + '</span>' +
       '<span class="g-val">' + fmt(it.value) + ' 点</span>' +
       '<button class="btn small ' + (deal.picked.includes(id) ? 'primary' : (match ? '' : 'ghost')) + '">' +
-      (deal.picked.includes(id) ? "✓ 已选" : (match ? "展示" : "不合意念")) + '</button>';
+      (deal.picked.includes(id) ? "✓ 已选" : (match ? "附上" : "不合订单")) + '</button>';
     el.querySelector("button").onclick = () => togglePick(id);
     list.appendChild(el);
   });
@@ -776,6 +1372,15 @@ function tick() {
     spawnCustomer();
     state.nextSpawnAt = now + spawnInterval() * (0.7 + Math.random() * 0.6);
   }
+  /* 快递订单（四星+） */
+  if (state.intro && state.shopLevel >= 4 && roll(0.004 * (state.workers && state.workers.shenwansan ? 1.8 : 1))) {
+    spawnOrder();
+    renderLobby();
+    ding("📦 快递通道收到一笔新订单！");
+  }
+  /* 万界货架自动交易（三星+） */
+  shelfTick();
+  maybeOfferUpgrade();
   renderLobby();
   if (now % 10000 < 1100) { save(); renderRes(); }
 }
@@ -785,16 +1390,21 @@ function tick() {
 function init() {
   load();
   $("#greetBtn").onclick = greetBtn;
+  $("#auctionBtn").onclick = startAuction;
   document.querySelectorAll(".tab").forEach(t => t.onclick = () => switchTab(t.dataset.tab));
   $("#dealConfirm").onclick = confirmDeal;
   $("#dealCancel").onclick = () => { closeModal("dealModal"); deal = null; };
   $("#introBtn").onclick = nextIntro;
   $("#endClose").onclick = () => closeModal("endModal");
+  $("#starYes").onclick = applyStarUpgrade;
+  $("#starNo").onclick = () => { $("#starModal").classList.remove("open"); state.upgradeOffered[state.shopLevel + 1] = false; };
+  $("#choiceKeep").onclick = () => makeChoice5(true);
+  $("#choiceLeave").onclick = () => makeChoice5(false);
   $("#resetBtn").onclick = () => {
     if (confirm("确定要重新开店吗？当前存档将被删除。")) {
       localStorage.removeItem(SAVE_KEY);
       state = freshState();
-      trip = null; deal = null;
+      trip = null; deal = null; auctionSession = null;
       $("#endModal").classList.remove("open");
       renderAll();
       showIntro();
