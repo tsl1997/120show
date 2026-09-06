@@ -1,0 +1,50 @@
+/* ============ 湖北·荆州 ============ */
+(function () {
+  window.TRAVEL_CITIES = window.TRAVEL_CITIES || [];
+  window.TRAVEL_CITIES.push({
+    id: 'jingzhou',
+    name: '荆州',
+    country: '中国',
+    cc: 'CN',
+    province: '湖北',
+    flag: '🇨🇳',
+    region: '华中',
+    hero: '🏯',
+    desc: '"禹划九州，始有荆州"。三国故事最密集的古城，完好的城墙环着护城河，楚文化在这里埋着整座地下博物馆。',
+    travel: [{ name: '高铁', icon: '🚄', cost: 150 }, { name: '汽车', icon: '🚌', cost: 90 }],
+    visa: null,
+    spots: [
+      { id: 'jingzhou_chengqiang', name: '荆州古城墙', icon: '🧱', price: 27, desc: '中国保存最完好的古城垣之一，周长11公里。城门楼与瓮城完好，骑一辆自行车环城一圈，砖缝里全是三国故事。' },
+      { id: 'jingzhou_bowuguan', name: '荆州博物馆', icon: '🏺', price: 0, desc: '西汉男尸"遂先生"沉睡两千多年肌肤仍有弹性，战国丝绸薄如蝉翼。楚秦汉漆器荟萃，免费参观的宝藏馆。' },
+      { id: 'jingzhou_guanyu_miao', name: '关帝庙·关公义园', icon: '⛩️', price: 35, desc: '荆州是关公镇守十年的地方。巨型关公圣像曾是世界最大关公像，城内关帝庙香火数百年不断。' },
+      { id: 'jingzhou_zhangju', name: '张居正故居', icon: '🏛️', price: 20, desc: '明代改革家、"宰相之杰"张居正的故里宅院。园林清幽，一边逛一边读懂"一条鞭法"背后的万历朝风云。' },
+      { id: 'jingzhou_bingma_yong', name: '楚王车马阵', icon: '🐎', price: 60, desc: '"北有兵马俑，南有车马阵"。楚王陵陪葬车马坑规模惊人，四十乘战车列阵地下，气势直逼秦俑。' },
+      { id: 'jingzhou_honghu', name: '洪湖生态旅游区', icon: '🛶', price: 80, desc: '"洪湖水浪打浪"唱的地方。乘船穿行万亩荷塘，夏天采莲蓬、看渔撒网，水乡韵味十足。' },
+      { id: 'jingzhou_jiuli', name: '荆街夜市', icon: '🏮', price: 0, desc: '古城旁的夜市新地标，灯笼连成河。锅盔、烧烤、糖水铺子一路排开，本地人遛弯的深夜食堂。' },
+    ],
+    souvenirs: [
+      { id: 'jingzhou_guokui', name: '公安锅盔', icon: '🫓', tag: '食', type: '美食', price: 8, desc: '炉壁上烤得鼓起大泡的薄饼，梅干菜鲜肉馅咔嚓掉渣。荆州人从小吃到大，两块钱的祖传快乐。' },
+      { id: 'jingzhou_yu_gao', name: '荆州鱼糕', icon: '🐟', tag: '食', type: '美食', price: 35, desc: '"吃鱼不见鱼"的楚乡名菜，鱼肉打成茸蒸成糕。弹嫩鲜滑，是荆州年饭桌上不可动摇的头碗。' },
+      { id: 'jingzhou_zao_yang', name: '早堂面', icon: '🍜', tag: '食', type: '美食', price: 12, desc: '沙市人天不亮就吃的"过早之王"。碱水面配酥肥肉、大盘鳝鱼丝，汤头用整夜骨头熬出来。' },
+      { id: 'jingzhou_longfeng', name: '龙凤饼·八宝饭', icon: '🍚', tag: '食', type: '美食', price: 28, desc: '散饭豆皮八宝饭甜糯油润，龙凤喜饼皮酥馅香。老荆州婚宴上的"体面点心"，如今随时能吃到。' },
+      { id: 'jingzhou_pipa', name: '皮条鳝鱼', icon: '🐍', tag: '食', type: '美食', price: 68, desc: '荆州名菜"皮条鳝鱼"，鳝段炸得酥脆挂糖醋汁。造型像皮条得名，一口"咔嚓"停不下来。' },
+      { id: 'jingzhou_tangyuan', name: '米圆子', icon: '🍡', tag: '食', type: '美食', price: 8, desc: '米浆搓的小圆子配酒酿蛋花，甜酒香温润。荆州夜宵摊的"暖胃神器"，三块钱一碗。' },
+      { id: 'jingzhou_honghu_l莲', name: '洪湖莲蓬·莲子', icon: '🪷', tag: '食', type: '特产', price: 25, desc: '洪湖鲜莲蓬剥着吃清甜带脆，干莲子炖汤粉糯。一汪好水养出的"水中特产"。' },
+      { id: 'jingzhou_chu_xiu', name: '楚绣书签', icon: '🧵', tag: '衣', type: '文创', price: 45, desc: '楚文化凤鸟纹样绣上书签与团扇。荆州是楚绣重要传承地，一针一线绣出两千年前的浪漫。' },
+      { id: 'jingzhou_qi_wenxue', name: '漆器文创', icon: '🖌️', tag: '衣', type: '文创', price: 60, desc: '楚式漆器复刻的小茶盘、首饰盒，黑红金三色配凤纹。"地下文物看荆州"的颜值担当。' },
+      { id: 'jingzhou_sanyuan', name: '三国文创手办', icon: '🗿', tag: '衣', type: '文创', price: 35, desc: '刘备借荆州、关羽大意失荆州——Q版三国人物手办。古城里的"历史盲盒"，一抽一个名场面。' },
+      { id: 'jingzhou_hucheng_qixing', name: '古城墙骑行', icon: '🚲', tag: '玩', type: '体验', price: 20, desc: '护城河畔租辆单车，沿11公里城墙根慢骑。一边是历史砖墙、一边是市井烟火，一小时骑完千年。' },
+      { id: 'jingzhou_hanchuan', name: '护城河画舫夜游', icon: '⛴️', tag: '行', type: '体验', price: 60, desc: '夜幕下乘画舫绕护城河，城楼灯光倒映水中。听一段荆州花鼓戏，夜风都是古城的味道。' },
+      { id: 'jingzhou_huagu', name: '荆州花鼓戏', icon: '🎭', tag: '玩', type: '体验', price: 50, desc: '国家级非遗的地方戏，唱腔土到极致又动人。小剧场里听一折《站花墙》，方言台词笑点密集。' },
+      { id: 'jingzhou_minsu', name: '古城民宿一晚', icon: '🏨', tag: '住', type: '住宿', price: 200, desc: '古城墙根下的老宅民宿，推窗见城楼。夜里安静得能听到风穿过垛口，两百块睡进三国。' },
+    ],
+    stories: [
+      { id: 'jingzhou_story_sanguo', name: '刘备借荆州', icon: '📜', desc: '"刘备借荆州——有借无还"这句歇后语流传千年。荆州是三国争夺最激烈的城，十多个典故都在这里发生。' },
+      { id: 'jingzhou_story_dasui', name: '大意失荆州', icon: '⚔️', desc: '关羽北伐襄樊时后方被吕蒙偷袭，败走麦城。"大意失荆州"从此成为轻敌致败的代名词。' },
+      { id: 'jingzhou_story_nanshi', name: '西汉男尸两千年不腐', icon: '🧑‍🦳', desc: '凤凰山168号汉墓出土的男尸"遂先生"，距今两千多年皮肤仍有弹性。防腐技术之谜至今吸引研究者。' },
+      { id: 'jingzhou_story_yuemi', name: '越王勾践剑的"邻居"', icon: '🗡️', desc: '与越王勾践剑同出的还有吴王夫差矛——吴越争霸的冤家兵器在荆州楚墓"握手"。战国国际局势一目了然。' },
+      { id: 'jingzhou_story_honghu', name: '洪湖水浪打浪', icon: '🎵', desc: '经典民歌让洪湖名扬全国。夏天万亩荷塘碧叶接天，游客坐船深处才明白：歌里唱的全是真的。' },
+      { id: 'jingzhou_story_guokui', name: '锅盔的"公安"误会', icon: '🫓', desc: '公安锅盔的"公安"是湖北省公安县，不是警察。外地游客第一次听到"公安锅盔"都会愣三秒。' },
+    ],
+  });
+})();

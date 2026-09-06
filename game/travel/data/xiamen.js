@@ -1,0 +1,52 @@
+/* ============ 厦门 ============ */
+(function () {
+  window.TRAVEL_CITIES = window.TRAVEL_CITIES || [];
+  window.TRAVEL_CITIES.push({
+    id: 'xiamen',
+    name: '厦门',
+    country: '中国',
+    cc: 'CN',
+    province: '福建',
+    flag: '🇨🇳',
+    region: '东南',
+    hero: '🏝️',
+    desc: '海风把三角梅吹上骑楼老墙，鼓浪屿的琴声混着浪声，一座慢悠悠的"鹭岛"，连时间都愿意在这里排队。',
+    travel: [{ name: '高铁', icon: '🚄', cost: 580 }, { name: '飞机', icon: '✈️', cost: 820 }],
+    visa: null,
+    spots: [
+      { id: 'xiamen_gulangyu', name: '鼓浪屿', icon: '🎹', price: 90, desc: '世界文化遗产小岛，无车马喧嚣，只有琴声与涛声。日光岩俯瞰红瓦绿树，菽庄花园"藏海"设计妙不可言。' },
+      { id: 'xiamen_gulangyu_lundu', name: '鼓浪屿轮渡', icon: '⛴️', price: 35, desc: '从轮渡码头横渡鹭江，海风里远眺对岸小岛。来回35元的"海上公交"，是登上钢琴之岛的第一步。' },
+      { id: 'xiamen_xiada', name: '厦门大学', icon: '🎓', price: 0, desc: '依山傍海的"中国最美大学"之一，芙蓉隧道涂鸦、上弦场草坪。游客名额靠抢，进校园的仪式感拉满。' },
+      { id: 'xiamen_nanputuo', name: '南普陀寺', icon: '🛕', price: 0, desc: '五老峰下的千年古刹，香火与海风同飘。免费领一支香，素饼窗口常年排队，登顶还能俯瞰厦大全景。' },
+      { id: 'xiamen_huandaolu', name: '环岛路海岸线', icon: '🚴', price: 0, desc: '最美马拉松赛道，椰林、沙滩、木栈道一路铺展。租辆自行车吹着海风骑到曾厝垵，夕阳把海面染成金色。' },
+      { id: 'xiamen_hulishan', name: '胡里山炮台', icon: '💥', price: 23, desc: '克虏伯大炮曾镇守海疆，如今定时"开炮"表演。红夷火炮与蔚蓝大海同框，历史感扑面。' },
+      { id: 'xiamen_zhiwuyuan', name: '园林植物园', icon: '🌵', price: 30, desc: '万石植物园的沙生植物区成了出片圣地，巨型仙人掌配雾森系统，仙气缭绕。雨林区的"水汽森林"更绝。' },
+      { id: 'xiamen_shapowei', name: '沙坡尾避风坞', icon: '⚓', price: 0, desc: '老渔港变身文艺街区，旧渔船泊在彩色房子倒影里。海鲜大排档与独立书店比邻，港町气与新潮感一锅炖。' },
+    ],
+    souvenirs: [
+      { id: 'xiamen_shachamian', name: '沙茶面', icon: '🍜', tag: '食', type: '美食', price: 25, desc: '沙茶汤头浓香微辣，加猪肝、鸭腱、豆腐泡自由组合。汤一口就上头，是厦门人认的"灵魂早餐"。' },
+      { id: 'xiamen_haijian', name: '海蛎煎', icon: '🥚', tag: '食', type: '美食', price: 22, desc: '青蚵裹地瓜粉煎至边缘酥脆，浇蛋液锁鲜。蘸甜辣酱，海蛎肥嫩爆汁，闽南古早味的顶配。' },
+      { id: 'xiamen_tusundong', name: '土笋冻', icon: '🍮', tag: '食', type: '美食', price: 15, desc: '海边星虫熬出的胶质凝成水晶冻，蘸芥末酱油。知道原料前是勇敢者挑战，吃过才知道鲜掉眉毛。' },
+      { id: 'xiamen_jiangmuya', name: '姜母鸭', icon: '🦆', tag: '食', type: '美食', price: 68, desc: '老姜与鸭肉在砂锅里干焖收汁，麻油香飘半条街。姜香入肉、越焖越香，秋冬进补的头牌。' },
+      { id: 'xiamen_huashengtang', name: '花生汤', icon: '🥜', tag: '食', type: '美食', price: 8, desc: '花生炖到入口即化，汤色乳白甜润。卧一颗蛋花，配油条，黄则和的老味道百年不换。' },
+      { id: 'xiamen_mianxianhu', name: '面线糊', icon: '🍲', tag: '食', type: '美食', price: 12, desc: '细面线熬成糊，加大肠、醋肉、油条自由定制。清晨一碗热乎下肚，闽南人的胃就此开机。' },
+      { id: 'xiamen_shaozong', name: '烧肉粽', icon: '🍙', tag: '食', type: '美食', price: 10, desc: '糯米裹三层肉、香菇、虾米、卤蛋，淋花生酱和甜辣酱。一粽子三层快乐，"烧"字是灵魂，要趁热。' },
+      { id: 'xiamen_xianbing', name: '鼓浪屿馅饼', icon: '🥮', tag: '食', type: '特产', price: 25, desc: '绿豆馅酥皮饼百年老手艺，入口即化、甜而不腻。岛上伴手礼的天花板，一盒带回家全家分。' },
+      { id: 'xiamen_tieguanyin', name: '闽南铁观音茶包', icon: '🍵', tag: '食', type: '特产', price: 50, desc: '兰花香观音韵，七泡有余香。厦门人茶桌上的主角，带一包回家，客厅秒变功夫茶席。' },
+      { id: 'xiamen_zhuxiu', name: '厦门珠绣', icon: '🪡', tag: '衣', type: '文创', price: 80, desc: '玻璃珠绣出凤凰与牡丹，光下熠熠生辉。非遗手作小件，挂在包上摇一响，都是老厦门的手艺光阴。' },
+      { id: 'xiamen_bingxiangtie', name: '三角梅冰箱贴', icon: '🌸', tag: '衣', type: '文创', price: 25, desc: '市花三角梅爬满骑楼与日光岩，被做成滴胶冰箱贴。厦门的颜色，贴在冰箱上四季盛开。' },
+      { id: 'xiamen_ganhai', name: '赶海挖花蛤', icon: '🦐', tag: '玩', type: '体验', price: 80, desc: '退潮后跟着老渔民拎桶下滩涂，挖花蛤、抓小螃蟹、追弹涂鱼。泥泞一身但桶里有货，成就感爆棚。' },
+      { id: 'xiamen_fanchuan', name: '五缘湾帆船出海', icon: '⛵', tag: '玩', type: '体验', price: 100, desc: '帆船倾斜着切开碧海，浪花打上手背。运气好能遇白海豚跃出水面，"鹭岛"的海上视角就此解锁。' },
+      { id: 'xiamen_qixing', name: '环岛路骑行', icon: '🚲', tag: '玩', type: '体验', price: 20, desc: '双人自行车沿海岸线慢骑，一边椰林一边沙滩。海风咸咸、阳光碎在浪尖，骑行界的天花板路线。' },
+      { id: 'xiamen_minsu', name: '鼓浪屿海景民宿', icon: '🏨', tag: '住', type: '住宿', price: 350, desc: '百年老别墅改的民宿，庭院里三角梅开得泼辣。夜里枕着涛声入睡，清晨被琴声和鸟鸣叫醒。' },
+    ],
+    stories: [
+      { id: 'xiamen_story_gangqin', name: '钢琴之岛', icon: '🎹', desc: '鼓浪屿人均钢琴密度全国第一，走出无数音乐家。岛上还有中国唯一的钢琴博物馆，风琴钢琴馆里琴声不歇。' },
+      { id: 'xiamen_story_tusun', name: '土笋冻的"身世"', icon: '🪱', desc: '土笋冻原料是滩涂里的可口革囊星虫，熬煮出胶质冷凝成冻。相传郑成功驻军时发明，勇敢者的美味两百年。' },
+      { id: 'xiamen_story_xiada', name: '抢不到的厦大', icon: '🎓', desc: '厦门大学游客参观要实名预约，名额"秒空"程度堪比演唱会。网友调侃：中国最难进的大学，不是分数，是手速。' },
+      { id: 'xiamen_story_bailu', name: '鹭岛与白鹭', icon: '🕊️', desc: '厦门别称"鹭岛"，白鹭是市鸟。筼筜湖畔白鹭成群掠过水面，城市中心就能看鸟，生态名场面天天上演。' },
+      { id: 'xiamen_story_zengcuoan', name: '渔村的文艺转身', icon: '🎨', desc: '曾厝垵从默默渔村变成"中国最文艺渔村"，八百多家民宿小店挤在一平方公里的巷子里，连村口的猫都见过世面。' },
+      { id: 'xiamen_story_sanqimei', name: '爬满全城的三角梅', icon: '🌺', desc: '三角梅是厦门市花，立交桥、围墙上开成瀑布。游客问"这是假花吧"，本地人笑答：厦门的真花就这么努力。' },
+    ],
+  });
+})();

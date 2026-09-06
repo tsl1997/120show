@@ -1,0 +1,53 @@
+/* ============ xian ============ */
+(function () {
+window.TRAVEL_CITIES = window.TRAVEL_CITIES || [];
+  window.TRAVEL_CITIES.push({
+    id: 'xian',
+    name: '西安',
+    country: '中国',
+    cc: 'CN',
+    province: '陕西',
+    flag: '🇨🇳',
+    region: '西北',
+    hero: '🏮',
+    desc: '长安十二时辰永不散场：城墙根下听秦腔，大唐不夜城提灯夜游，一口肉夹馍咬下十三朝古都的碳水江湖。',
+    travel: [{ name: '高铁', icon: '🚄', cost: 460 }, { name: '飞机', icon: '✈️', cost: 700 }],
+    visa: null,
+    spots: [
+      { id: 'xian_bingmayong', name: '秦始皇兵马俑', icon: '🗿', price: 120, desc: '世界第八大奇迹。一号坑两千余陶俑列阵如初，千人千面无一重样，站在参观廊上仿佛听见两千年前的军鼓。' },
+      { id: 'xian_chengqiang', name: '西安城墙', icon: '🧱', price: 54, desc: '中国保存最完整的古代城垣，13.7公里一圈。在垛口租辆自行车环城骑行，一侧是青砖历史，一侧是烟火西安。' },
+      { id: 'xian_dayanta', name: '大雁塔·大唐不夜城', icon: '🏮', price: 0, desc: '玄奘译经的大雁塔下，北广场音乐喷泉亚洲最大。入夜不夜城灯火如昼，一步一景全是盛唐气象。' },
+      { id: 'xian_huiqinggong', name: '华清宫', icon: '♨️', price: 120, desc: '骊山脚下的唐代皇家温泉，杨贵妃"春寒赐浴华清池"的旧址。汤池遗址犹在，晚上还有实景演出《长恨歌》。' },
+      { id: 'xian_shanxibowu', name: '陕西历史博物馆', icon: '🏺', price: 0, desc: '"给我一天，还你万年"。兽首玛瑙杯、鎏金舞马衔杯壶，周秦汉唐的镇馆之宝挤满展柜，免费票要拼手速。' },
+      { id: 'xian_huiminjie', name: '回民街·洒金桥', icon: '🍢', price: 0, desc: '游客逛回民街，老饕钻洒金桥。烤肉摊烟熏火燎，甜食铺蜜枣甑糕冒热气，一条街的碳水和香料直击灵魂。' },
+      { id: 'xian_zhonggulou', name: '钟鼓楼', icon: '🔔', price: 50, desc: '晨钟暮鼓六百年，西安市中心的"城市原点"。夜色里金瓦重檐亮灯，鸽群绕楼，车流环岛而过像时间的年轮。' },
+    ],
+    souvenirs: [
+      { id: 'xian_roujiamo', name: '腊牛肉夹馍', icon: '🥙', tag: '食', type: '美食', price: 12, desc: '铁圈虎背菊花心的白吉馍，现剁腊牛肉塞到冒油。肉汁渗进馍芯，一口下去、两个下肚，"中式汉堡"的祖师爷。' },
+      { id: 'xian_liangpi', name: '凉皮', icon: '🍜', tag: '食', type: '美食', price: 9, desc: '筋道宽皮浇辣子油和醋汁，配面筋黄瓜丝。酸辣爽滑，配冰峰汽水与肉夹馍凑成"三秦套餐"。' },
+      { id: 'xian_paomo', name: '羊肉泡馍', icon: '🍲', tag: '食', type: '美食', price: 45, desc: '坨坨馍要自己掰成黄豆粒大小，滚汤一浇、糖蒜提味。掰馍半小时、吃面十分钟，西安人的耐心都在碗里。' },
+      { id: 'xian_biangbiang', name: 'biangbiang面', icon: '🍝', tag: '食', type: '美食', price: 22, desc: '裤带一样宽的手扯面，油泼辣子"刺啦"一声浇响。那个五十六画的biang字打不出来，但味道记得住。' },
+      { id: 'xian_zenggao', name: '甑糕', icon: '🍰', tag: '食', type: '美食', price: 8, desc: '红枣糯米在古陶甑里蒸得枣泥交融。一勺挖下去软糯黏甜，是回坊清晨最温暖的等待。' },
+      { id: 'xian_hulutou', name: '肉丸胡辣汤', icon: '🥣', tag: '食', type: '美食', price: 12, desc: '牛羊肉丸配土豆胡萝卜在浓汤里翻滚，浇一勺油泼辣子。清晨一碗下肚，浑身毛孔都醒了。' },
+      { id: 'xian_bingfeng', name: '冰峰汽水', icon: '🥤', tag: '食', type: '饮品', price: 2, desc: '"从小喝到大"的西安橙味汽水，玻璃瓶两块钱。凉皮肉夹馍的最佳第三者，本地人的液体乡愁。' },
+      { id: 'xian_shizibing', name: '火晶柿子饼', icon: '🥮', tag: '食', type: '美食', price: 6, desc: '临潼火晶柿子掺面炸制，外皮金黄酥脆内里流心。秋天回民街排队最长的摊位，就是它。' },
+      { id: 'xian_shiliuzhi', name: '临潼石榴汁', icon: '🧃', tag: '食', type: '饮品', price: 10, desc: '兵马俑旁的果园直榨，一颗颗手剥石榴压出宝石红。酸甜生津，喝完瓶子都想收藏。' },
+      { id: 'xian_bingmayong_wenxue', name: '兵马俑文创手办', icon: '🗿', tag: '衣', type: '文创', price: 29, desc: 'Q版跪射俑、健身俑、比心俑，两千年军团变身表情包。出土即顶流，放在工位上指挥千军万马。' },
+      { id: 'xian_piying', name: '华县皮影', icon: '🎭', tag: '衣', type: '文创', price: 80, desc: '牛皮刻镂、五彩上色的皮影人偶，灯影里能演一整出《三打白骨精》。非遗手作，挂在墙上就是一盏戏。' },
+      { id: 'xian_tangshinv', name: '唐仕女摆件', icon: '👩', tag: '衣', type: '文创', price: 60, desc: '丰腴圆润的唐风仕女俑，怀抱琵琶发髻高耸。博物馆同款文创，桌上摆一个，天天都过"长安三万里"。' },
+      { id: 'xian_chengqiang_qixing', name: '城墙骑行一圈', icon: '🚲', tag: '玩', type: '体验', price: 45, desc: '租辆自行车在13.7公里城墙上追风，青砖在轮下延伸。骑完浑身是汗，回头再看夕阳里的角楼，值了。' },
+      { id: 'xian_shuaiwanjiu', name: '永兴坊摔碗酒', icon: '🍶', tag: '玩', type: '体验', price: 15, desc: '五块钱米酒一饮而尽，碗往地上一摔："岁岁平安"！碎碗堆成小山，排队两小时就为这一声脆响。' },
+      { id: 'xian_laoqiang', name: '华阴老腔', icon: '🎤', tag: '玩', type: '体验', price: 150, desc: '"一声喊"吼出的黄土地摇滚，板凳木块齐上阵。观众被拉上台一起吼，比摇滚现场更生猛。' },
+      { id: 'xian_hanfu', name: '汉服妆造体验', icon: '👘', tag: '玩', type: '体验', price: 150, desc: '妆造师一支簪子挽起唐风发髻，齐胸襦裙一穿，走进大唐不夜城毫无违和感。满街"公主""贵妃"，比的是谁更有仪态。' },
+      { id: 'xian_tangfeng_minsu', name: '唐风民宿一晚', icon: '🏨', tag: '住', type: '住宿', price: 300, desc: '回民街旁的院落民宿，木格窗、土陶灯，床上铺着仿唐纹样床品。夜里推窗能望见鼓楼灯火。' },
+    ],
+    stories: [
+      { id: 'xian_story_caisé', name: '兵马俑本是彩色的', icon: '🎨', desc: '兵马俑出土时通身彩绘：朱红、粉绿、天蓝，几分钟内颜料卷曲脱落。如今科技在试图留住色彩，"中国紫"成了独门谜题。' },
+      { id: 'xian_story_ditie', name: '修地铁=考古现场', icon: '🚇', desc: '西安修地铁一条线挖出古墓几百座，地铁工地常变考古队工地。网友：别家修地铁挖管线，西安修地铁挖"朝代"。' },
+      { id: 'xian_story_mitanghe', name: '盛唐密盒抽答题', icon: '🎤', desc: '大唐不夜城"房玄龄""杜如晦"开盒互动，抽游客上台答题，金句频出全网出圈。游客为被"翻牌子"专程排队。' },
+      { id: 'xian_story_sajinqiao', name: '本地人的洒金桥', icon: '🗺️', desc: '回民街是给游客的，洒金桥才是西安人的胃。同样的腊牛肉，本地人愿为一口排到巷尾——美食江湖也有"里外之分"。' },
+      { id: 'xian_story_dishu', name: '城墙根的水写地书', icon: '🖋️', desc: '清晨环城公园里，大爷提海绵巨笔蘸清水在地面写行草，写完随水汽蒸发。一撇一捺都是几十年功力，免费街头书法展。' },
+      { id: 'xian_story_biang', name: '56画的biang字', icon: '✍️', desc: 'biangbiang面的"biang"字复杂到字典都不收，口诀倒背如流："一点飞上天，黄河两边弯……"写字如画符，陕西人的冷知识担当。' },
+    ],
+  });
+})();

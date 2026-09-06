@@ -1151,3 +1151,291 @@ const SHELF_CONFIG = {
   baseChance: 0.5,      // 定价=系统估价时的每跳成交率
   tickMs: 15000,        // 货架结算间隔
 };
+/* ============================================================
+ * 终局扩展：七星（1457章）→ 八星（1792章）→ 大结局（1812章）
+ * ============================================================ */
+
+/* ---------------- 七星商品（混沌级 / 十阶）---------------- */
+Object.assign(ITEMS, {
+  tiandaoB:  { name: "天道本源",     emoji: "🌌", value: 100000, tags: ["天材地宝", "奇物"], desc: "神墓大世界的天道自愿成为商品，服之增悟性，还能源涌不断。" },
+  yaohuangS: { name: "妖皇系统",     emoji: "🎛️", value: 150000, tags: ["奇物", "奇书"], desc: "系统重生流的产物，无视世界规则，瓶颈不存在的。东皇太一的心头好。" },
+  xingcb:    { name: "《星辰变》",   emoji: "📖", value: 500000, tags: ["秘籍"], grade: 5, lvls: 9, desc: "十阶功法，吞服星辰之力。" },
+  daoshu:    { name: "《道书》",     emoji: "📕", value: 800000, tags: ["秘籍"], grade: 5, lvls: 9, desc: "三千大道录音合一，时空穿梭自洪荒录得。" },
+  zlbuyao:   { name: "真龙不死药",   emoji: "🐉", value: 1000000, tags: ["天材地宝", "丹药"], desc: "遮天仙药，时空长河里先后被摘了八次（记忆已抹除）。" },
+  hundund:   { name: "混沌大道丹",   emoji: "🟣", value: 600000, tags: ["丹药"], desc: "以混沌魔神躯体炼制，服下有一刹那悟道之境。" },
+  xiaoyuzhou:{ name: "小型宇宙",     emoji: "🌐", value: 2000000, tags: ["奇物"], desc: "拍卖会开场热场神器，机械族父神倾族拍下。" },
+  hongmengT: { name: "《鸿蒙天道》", emoji: "📙", value: 900000, tags: ["秘籍"], grade: 5, lvls: 9, desc: "自永生大世界回收的无上神通。" },
+  kaitian:   { name: "《开天造化功》", emoji: "📗", value: 2000000, tags: ["秘籍"], grade: 5, lvls: 9, desc: "真一地球穿越者的十阶金手指——复制品，正主不能动。" },
+  hunyuanB:  { name: "《混元不灭经》", emoji: "王一", value: 1500000, tags: ["秘籍"], grade: 5, lvls: 9, desc: "融合诸般功法而成，第七重即七星之资。" },
+});
+ITEMS.hunyuanB.emoji = "📔";
+ITEM_CAT.tiandaoB = "tiancai"; ITEM_CAT.yaohuangS = "qiwu"; ITEM_CAT.xingcb = "gongfa";
+ITEM_CAT.daoshu = "gongfa"; ITEM_CAT.zlbuyao = "tiancai"; ITEM_CAT.hundund = "danyao";
+ITEM_CAT.xiaoyuzhou = "qiwu"; ITEM_CAT.hongmengT = "gongfa"; ITEM_CAT.kaitian = "gongfa";
+ITEM_CAT.hunyuanB = "gongfa";
+ITEMS.tiandaoB.cat = "tiancai"; ITEMS.yaohuangS.cat = "qiwu"; ITEMS.xingcb.cat = "gongfa";
+ITEMS.daoshu.cat = "gongfa"; ITEMS.zlbuyao.cat = "tiancai"; ITEMS.hundund.cat = "danyao";
+ITEMS.xiaoyuzhou.cat = "qiwu"; ITEMS.hongmengT.cat = "gongfa"; ITEMS.kaitian.cat = "gongfa";
+ITEMS.hunyuanB.cat = "gongfa";
+
+/* ---------------- 八星商品（真灵级 / 十一阶）---------------- */
+Object.assign(ITEMS, {
+  shuidi:    { name: "水滴",         emoji: "💧", value: 400000, tags: ["神兵", "奇物"], desc: "三体世界的末日武器，一件干掉一个舰队。" },
+  erxiangbo: { name: "二向箔",       emoji: "🃏", value: 800000, tags: ["奇物"], desc: "降维打击神器。使用前请阅读说明书，整个太阳系概不退换。" },
+  zhenling:  { name: "真灵本源",     emoji: "🔮", value: 2000000, tags: ["天材地宝"], desc: "太多元宇宙真灵生命体的本源，十一阶商品的原料。" },
+  chudao:    { name: "十二阶初始本源", emoji: "⚪", value: 5000000, tags: ["天材地宝"], desc: "初始生物的本源，无天囚笼最深处的秘密。七楼镇店之宝。" },
+  zijinlian: { name: "混沌紫金莲",   emoji: "🪷", value: 3000000, tags: ["奇物"], desc: "一百零八品，每颗莲子约一方世界大小。" },
+  daotianfu: { name: "盗天符",       emoji: "🪄", value: 800000, tags: ["奇物"], desc: "骗过天道强行合道，后土与周青联手镇天的底气。" },
+  dayujian:  { name: "大宇级战舰",   emoji: "🚀", value: 2500000, tags: ["神兵"], desc: "外观千丈，内部一方大宇宙，舰炮一击大千世界之力。" },
+});
+ITEM_CAT.shuidi = "wuqi"; ITEM_CAT.erxiangbo = "qiwu"; ITEM_CAT.zhenling = "tiancai";
+ITEM_CAT.chudao = "tiancai"; ITEM_CAT.zijinlian = "qiwu"; ITEM_CAT.daotianfu = "qiwu";
+ITEM_CAT.dayujian = "wuqi";
+ITEMS.shuidi.cat = "wuqi"; ITEMS.erxiangbo.cat = "qiwu"; ITEMS.zhenling.cat = "tiancai";
+ITEMS.chudao.cat = "tiancai"; ITEMS.zijinlian.cat = "qiwu"; ITEMS.daotianfu.cat = "qiwu";
+ITEMS.dayujian.cat = "wuqi";
+
+/* ---------------- 七星/八星客户 ---------------- */
+Object.assign(CUSTOMERS, {
+  chenzhan: {
+    name: "辰战", emoji: "⚔️", world: "神墓大世界 · 灭天主帅", budget: 500000,
+    need: ["天材地宝", "秘籍", "丹药"],
+    intro: "本座要灭杀天道，需要万界楼……呃，本座的天道怎么在你们货架上？",
+    loves: ["tiandaoB"],
+    pay: ["chudao"],
+    unlock: (s) => s.shopLevel >= 7,
+  },
+  donghuang: {
+    name: "东皇太一", emoji: "🌞", world: "洪荒 · 金乌", budget: 300000,
+    need: ["秘籍", "奇物", "丹药"],
+    intro: "本座乃洪荒金乌，听闻此楼有'系统'卖？先赊着，妖族复兴了还你。",
+    loves: ["yaohuangS"],
+    pay: ["hundund"],
+    unlock: (s) => s.shopLevel >= 7,
+  },
+  dipin: {
+    name: "帝辛", emoji: "🔥", world: "封神演义 · 人皇", budget: 2000000,
+    need: ["qiwu", "秘籍", "美酒"],
+    intro: "孤乃人皇帝辛！造纸印刷之术，孤出一百万价值点，谁敢与孤争？！",
+    loves: ["book", "phone"],
+    pay: ["zhubao", "zhubao"],
+    unlock: (s) => s.shopLevel >= 7,
+  },
+  jianglan: {
+    name: "姜澜", emoji: "⏳", world: "星辰变 · 神王", budget: 1000000,
+    need: ["天材地宝", "秘籍", "qiwu"],
+    intro: "姜澜界可加速千倍时光……听闻店主的'时间塔'比它还贵？学习一下。",
+    loves: ["daotianfu"],
+    pay: ["zijinlian"],
+    unlock: (s) => s.shopLevel >= 7,
+  },
+  leilong: {
+    name: "紫色雷龙", emoji: "⚡", world: "诸天万界 · 初始生物'雷'", budget: 5000000,
+    need: ["丹药", "天材地宝", "奇物"],
+    intro: "本座执掌诸天雷霆……那个，万界楼真的不关门了吧？本源赔罪，请收下。",
+    loves: ["chudao"],
+    pay: ["chudao", "zhenling"],
+    unlock: (s) => s.shopLevel >= 8,
+  },
+});
+CUSTOMERS.chenzhan.pref = ["tiancai", "gongfa", "danyao"];
+CUSTOMERS.donghuang.pref = ["gongfa", "qiwu", "danyao"];
+CUSTOMERS.dipin.pref = ["qiwu", "gongfa", "meijiu", "zhenbao"];
+CUSTOMERS.jianglan.pref = ["tiancai", "gongfa", "qiwu"];
+CUSTOMERS.leilong.pref = ["danyao", "tiancai", "qiwu"];
+
+/* ---------------- 七星世界 ---------------- */
+Object.assign(WORLDS, {
+  shenmu: {
+    name: "神墓大世界", emoji: "⚰️",
+    desc: "灭天之战的主场。天道在此被按在地上摩擦，最后自愿成了商品。",
+    unlock: (s) => s.shopLevel >= 6,
+    unlockText: "六星店主后开启时空定位",
+    events: [
+      {
+        id: "tiantian", title: "灭天之战 · 吃掉天道", story: true, quest: 19,
+        text: "通天教主的诛仙剑阵洞穿天道，邪神分身当众吞噬天道本体。石昊与全王在旁讨论：'天道好不好吃？能不能做火锅？'",
+        options: [
+          { label: "给天道加上'打不死'技能，开办围殴大会", risk: { power: 3, failText: "天道反咬一口，你被渡了三天天劫。", loseCny: 100000 }, result: { text: "天道被打得求饶，自愿成为万界楼商品——限时一小时一万灵点一份，销量火爆！", items: [["tiandaoB", 3]], vp: 100000, quest: 19 } },
+          { label: "只批发不围殴", result: { text: "你把天道按份打包，辰南、独孤败天、魔主入楼第一件事就是听见广播：'天道限时特惠'。", items: [["tiandaoB", 1]], vp: 50000 } },
+        ],
+      },
+      {
+        id: "shenmumu", title: "神墓 · 交易名额",
+        text: "辰战以一方世界、神魔图、拜将台为价，只求五个顾客名额——带辰南他们来万界楼开开眼。",
+        options: [
+          { label: "成交", result: { text: "辰南、独孤败天、魔主、人王、鬼主入楼。神墓世界的客户从此排队。", items: [["hundund", 1]], vp: 200000 } },
+          { label: "再谈谈价", result: { text: "辰战捏碎了拳头，你明智地恢复了原价。" } },
+        ],
+      },
+    ],
+  },
+  zhenyi: {
+    name: "真一地球", emoji: "🌍",
+    desc: "穿越者之乡。每天十几万人穿越失败，万界楼负责回收金手指（复刻版）。",
+    unlock: (s) => s.shopLevel >= 6,
+    unlockText: "六星店主后开启时空定位",
+    events: [
+      {
+        id: "chuanyuezhe", title: "穿越者集会 · 金手指回收", story: true, quest: 20,
+        text: "十万分之一穿越成功率的地球。八国联军筹办'全球古董品鉴公司'回收地球金手指，与万界楼五五分账。",
+        options: [
+          { label: "五五分账，全权回收", risk: { power: 2, failText: "某个带系统的穿越者反手把你当'夺金手指恶霸'给写了。", loseCny: 50000 }, result: { text: "《开天造化功》复刻版到手！正主的金手指不能动，'否则那些穿越者肯定扑街'。", items: [["kaitian", 1], ["yaohuangS", 1]], quest: 20 } },
+          { label: "只收复制品", vpCost: 100000, result: { text: "按规矩办事，货款两清。", items: [["kaitian", 1]] } },
+        ],
+      },
+    ],
+  },
+  xitong: {
+    name: "系统重生世界", emoji: "🎛️",
+    desc: "多宇宙多位面共存。周阳在这里学会了制造系统——然后把它摆上了货架。",
+    unlock: (s) => s.shopLevel >= 7,
+    unlockText: "七星店主后开启时空定位",
+    events: [
+      {
+        id: "zaoxitong", title: "系统工厂 · 妖皇系统", story: true,
+        text: "天地法则化作的'系统'在你掌心凝聚。东皇太一和金乌大帝正在柜台前争购妖皇系统。",
+        options: [
+          { label: "价高者得", result: { text: "东皇太一咬牙拍下：'妖族复兴，就在今日！'——'瓶颈？不存在的！'", items: [["yaohuangS", 1]], vp: 300000 } },
+          { label: "给许仙打103个系统实验", result: { text: "叮咚！叮咚！叮咚——许仙一脸懵逼地拥有了103个系统，你的实验数据完美。", items: [["yaohuangS", 2]], vp: 100000 } },
+        ],
+      },
+    ],
+  },
+  yongsheng: {
+    name: "永生大世界", emoji: "♾️",
+    desc: "方寒的故乡，仙王尽数被困永生之门。回收无上神通的好地方。",
+    unlock: (s) => s.shopLevel >= 7,
+    unlockText: "七星店主后开启时空定位",
+    events: [
+      {
+        id: "hongmeng", title: "永生之门 · 无上神通",
+        text: "《鸿蒙天道》《诸神创世》《三十三天造化神拳》——永生大世界的镇界神通被你成套回收。",
+        options: [
+          { label: "成套回收（-300000 价值点）", vpCost: 300000, result: { text: "三大无上神通入库，永生世界的仙王们隔着门骂街。", items: [["hongmengT", 1]] } },
+          { label: "只逛不买", result: { text: "方寒盯着永生之门，若有所思。" } },
+        ],
+      },
+    ],
+  },
+  youxi: {
+    name: "游戏世界", emoji: "🎮",
+    desc: "银色光球掌管的浩瀚世界。在万界楼面前，游戏世界只配当副本。",
+    unlock: (s) => s.shopLevel >= 7,
+    unlockText: "七星店主后开启时空定位",
+    events: [
+      {
+        id: "yinxing", title: "银色光球 · 权限玩家", story: true, quest: 22,
+        text: "银色光球在万界商城门口变出一个'周阳'NPC挑衅。你微微一笑，反手把游戏世界设成了顾客副本。",
+        options: [
+          { label: "让狠人大帝他们刷副本", risk: { power: 3, failText: "游戏世界临时加强了BOSS数值，第一波团灭。", loseCny: 200000 }, result: { text: "狠人大帝把遮天游戏世界三度炼成仙鼎，石昊通关全服。'实力玩家 VS 权限玩家'，完胜。", items: [["xiaoyuzhou", 1]], vp: 500000, quest: 22 } },
+          { label: "和解，做成联动", result: { text: "银色光球交出游戏多元宇宙的接入权，大家和气生财。", items: [["zhenling", 1]], vp: 200000 } },
+        ],
+      },
+    ],
+  },
+  heikeji: {
+    name: "黑科技世界", emoji: "🛰️",
+    desc: "一切黑科技的世界。三体世界已接入：水滴、二向箔、光粒，应有尽有。",
+    unlock: (s) => s.shopLevel >= 7,
+    unlockText: "七星店主后开启时空定位",
+    events: [
+      {
+        id: "santi", title: "三体 · 末日武器", story: true, quest: 23,
+        text: "执剑人罗辑面无表情地看着你：'要水滴，还是要二向箔？'",
+        options: [
+          { label: "全都要（-200000 价值点）", vpCost: 200000, result: { text: "水滴与二向箔入库。大蛇丸、格罗博士、拜月教主组成的科研天团当场蹦了起来。", items: [["shuidi", 1], ["erxiangbo", 1]], quest: 23 } },
+          { label: "只买水滴", vpCost: 100000, result: { text: "水滴到手，光滑得能照出你的灵魂。", items: [["shuidi", 1]] } },
+          { label: "太危险了", result: { text: "罗辑耸耸肩：' wise choice。'" } },
+        ],
+      },
+    ],
+  },
+  wutian: {
+    name: "无天囚笼", emoji: "🕳️",
+    desc: "关押初始生物的牢笼，'想象即存在'。深处有无智慧的'道'与初始级能量。",
+    unlock: (s) => s.shopLevel >= 8,
+    unlockText: "八星店主后单向连通",
+    events: [
+      {
+        id: "chudao", title: "囚笼深处 · 无智慧的道", story: true, quest: 24,
+        text: "囚笼核心，你见到了被抹去智慧的初始生物'道'。你疯狂吞吸其本源，惊动了无上天魔。",
+        options: [
+          { label: "吞吸本源（风险极大）", risk: { power: 5, failText: "无上天魔一巴掌拍来，你在囚笼里失联了一年多——万界楼都要关门大吉了！", loseCny: 1000000 }, result: { text: "十二阶初始本源到手！你闭关三年吞尽莽荒型初始生物，成为禁忌。", items: [["chudao", 1], ["zhenling", 3]], quest: 24 } },
+          { label: "先探探 作者地球", result: { text: "六十亿人写小说、小说成真的世界。你围观了一场'诸神之战'。", items: [["zhenling", 1]] } },
+        ],
+      },
+    ],
+  },
+  honghuang: {
+    name: "洪荒多元宇宙", emoji: "🐔",
+    desc: "以佛本是道为源世界，盘古、三千混沌魔神、一百零八品混沌紫金莲。",
+    unlock: (s) => s.shopLevel >= 7,
+    unlockText: "七星店主后开启时空定位",
+    events: [
+      {
+        id: "zhentian", title: "巫妖联手 · 镇压天道", story: true, quest: 21,
+        text: "后土与周青持盗天符强行合道，巫妖两族联手三方围攻天道，鸿钧奔逃——史诗级战役打响。",
+        options: [
+          { label: "支援巫妖两族", risk: { power: 4, failText: "天道的反击震得你元神震荡，退出了战场。", loseCny: 500000 }, result: { text: "天道被镇压！洪荒类多元宇宙筹建完成，万界楼的洪荒商品线打通了。", items: [["daotianfu", 1], ["zijinlian", 1]], quest: 21 } },
+          { label: "战后捡漏", result: { text: "你在战场边缘捡到了几枚混沌紫金莲的莲子。", items: [["zijinlian", 1]] } },
+        ],
+      },
+      {
+        id: "shichuan", title: "时空长河 · 薅羊毛", story: true,
+        text: "时空穿梭权限开启：回到真龙不死药无主的岁月，采光叶子、抽干神液、再用法阵治愈古龙抹除记忆——完美犯罪。",
+        options: [
+          { label: "薅！（连去八次）", result: { text: "真龙不死药、悟道古茶树六年份、三千大道录音……'不能玩了，等庆典再玩……咳咳，再工作！'", items: [["zlbuyao", 1], ["daoshu", 1]], vp: 300000 } },
+          { label: "敬畏历史", result: { text: "你在长河边坐了一会，什么也没拿。时间与空间默默记下了你的名字。" } },
+        ],
+      },
+    ],
+  },
+});
+
+/* ---------------- 七星/八星配置 ---------------- */
+REALMS.push(
+  { name: "混元无极", pts: 540 },
+  { name: "混元不灭", pts: 640 }
+);
+STAR_CONDITIONS[7] = { known: 80, trades: 220, story: "shenmu:tiantian", realm: 17 };
+STAR_CONDITIONS[8] = { known: 90, trades: 300, story: "honghuang:zhentian", realm: 18 };
+STAR_PERKS[7] = "七星店主权限：回收商品七成计入月利润，利润月增3%可无限兑换商品；万界楼升至七层，六楼开放；时间加速不再限次；可无限制招聘员工、无限制开分店；可收购特殊气运形成商品——以及，权限六：时空穿梭，凡连通世界皆可穿梭时间长河（不得改变历史巨变）。";
+STAR_PERKS[8] = "八星店主权限：年回收八成计入年利润，年增2%可自由支配商品；万界楼升至八层；权限九：废品回收站（仅限死物）；权限十二：等价转化——一件商品可转化为任意等价值商品；权限十五：单向连通无天囚笼。";
+SHOP_LEVELS[7] = { name: "万界楼 · 七层主殿", emoji: "🌠", desc: "七层楼阁耸入星海，时空长河在脚下流淌，六楼十阶商品开放参观。" };
+SHOP_LEVELS[8] = { name: "万界楼 · 八层终殿", emoji: "👁️", desc: "八层终殿，废品回收站洞天悬于左侧，十一阶商品琳琅满目。" };
+
+/* ---------------- 终局任务链（18~26）---------------- */
+QUESTS.push(
+  { id: 18, chapter: "第1457章", title: "七星店主·时空穿梭", desc: "宿主实力突破【混元无极】，累计上架80种商品、完成220笔交易，并见证吃掉天道。", reward: { tokens: 2 } },
+  { id: 19, chapter: "第980章",  title: "神墓·吃掉天道", desc: "前往神墓大世界，参加'打不死天道围殴大会'。", reward: { vp: 100000 } },
+  { id: 20, chapter: "第1456章", title: "真一地球·穿越者还乡", desc: "与八国联军的古董公司五五分账，回收穿越者金手指。", reward: { vp: 200000 } },
+  { id: 21, chapter: "第1750章", title: "洪荒·巫妖镇天", desc: "支援巫妖两族镇压天道，打通洪荒商品线。", reward: { tokens: 2 } },
+  { id: 22, chapter: "第1551章", title: "游戏世界·权限玩家", desc: "银色光球敢挑衅？让狠人大帝他们刷穿游戏世界。", reward: { vp: 500000 } },
+  { id: 23, chapter: "第1566章", title: "黑科技·水滴与二向箔", desc: "接入黑科技世界，从三体世界购入末日武器。", reward: { vp: 300000 } },
+  { id: 24, chapter: "第1797章", title: "无天囚笼·初始本源", desc: "晋升八星后深入无天囚笼，取得十二阶初始本源。", reward: { vp: 1000000 } },
+  { id: 25, chapter: "第1810章", title: "万道盟约", desc: "完成紫色雷龙献本源与百年庆典，见证时间与空间公布万道盟约。", reward: {} },
+  { id: 26, chapter: "第1812章", title: "周阳之境", desc: "踏入万界楼第九层，证得定义境——永远的万界楼。", reward: {} }
+);
+
+/* ---------------- 终局剧情：雷龙献本源 & 万道盟约公布 ---------------- */
+WORLDS.wutian.events.push(
+  {
+    id: "leilongxian", title: "万界楼 · 紫色雷龙献本源", story: true,
+    text: "你在囚笼失联一年多，紫色雷龙一句'不会触犯了万道盟约吧'引发全楼恐慌抢购。清算完造谣者后，雷龙颤巍巍把云朵般的紫色本源圆球放上柜台。",
+    options: [
+      { label: "收下赔罪本源", result: { text: "雷龙交出一瞬间面色苍白如纸。机械音宣告：'万界楼庆典活动正式开始！'——7.5折！", items: [["chudao", 1]], vp: 1000000 } },
+      { label: "大度原谅", result: { text: "'就差你一个了'——你大手一挥既往不咎，雷龙感动得雷霆乱冒。", vp: 500000 } },
+    ],
+  },
+  {
+    id: "gongbu", title: "百年庆典 · 万道盟约公布", story: true, quest: 25,
+    text: "百年庆典上，十二阶美食令诸初始生物又爱又惧。银色与白色长衫的两位初始生物并肩现身——'时间'与'空间'。一道遮天巨幕出现在万界楼上空，万道盟约逐条公布。",
+    options: [
+      {
+        label: "见证盟约全文",
+        result: { text: "盟约三：违背盟约者，承受所有初始生物全力一击……时间与空间揭示：万界楼，正是万道盟约的产物；而系统，就是万道盟约觉醒的生命形态。'这一顿免费吃，尽情地吃。'", vp: 2000000, quest: 25 },
+      },
+    ],
+  }
+);

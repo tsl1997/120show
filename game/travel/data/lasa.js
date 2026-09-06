@@ -1,0 +1,52 @@
+/* ============ 拉萨 ============ */
+(function () {
+  window.TRAVEL_CITIES = window.TRAVEL_CITIES || [];
+  window.TRAVEL_CITIES.push({
+    id: 'lasa',
+    name: '拉萨',
+    country: '中国',
+    cc: 'CN',
+    province: '西藏',
+    flag: '🇨🇳',
+    region: '青藏',
+    hero: '🏔️',
+    desc: '"日光城"海拔3650米：布达拉宫在玛布日山上守望三百年，八廓街转经的人流从不间断，甜茶馆里藏着拉萨所有的下午。',
+    travel: [{ name: '飞机', icon: '✈️', cost: 1500 }, { name: '火车', icon: '🚂', cost: 550 }],
+    visa: null,
+    spots: [
+      { id: 'lasa_budalagong', name: '布达拉宫', icon: '🏯', price: 200, desc: '世界海拔最高的宫殿，红白宫墙依山而建13层。金顶群在阳光下熠熠生辉，内部一千多间殿堂，一步一重天。' },
+      { id: 'lasa_dazhaosi', name: '大昭寺', icon: '🛕', price: 85, desc: '"先有大昭寺，后有拉萨城"。文成公主带来的释迦牟尼十二岁等身像前，酥油灯长明，磕长头的信徒五体投地。' },
+      { id: 'lasa_bakuoxi', name: '八廓街', icon: '☸️', price: 0, desc: '围绕大昭寺的千年转经道，也是拉萨最热闹的市集。手持转经筒的人流按顺时针缓缓流动，唐卡店甜茶馆鳞次栉比。' },
+      { id: 'lasa_bugong_guangchang', name: '布达拉宫广场', icon: '📸', price: 0, desc: '拍布达拉宫倒影的最佳机位，喷泉一开红山倒映水中。夜晚音乐喷泉亮起，宫墙灯光与星空同框。' },
+      { id: 'lasa_yaowangshan', name: '药王山观景台', icon: '📷', price: 0, desc: '五十元人民币背面的取景角度就在这里。举着纸币对准布宫拍一张"官方同款"，是所有游客的必修课。' },
+      { id: 'lasa_selasi', name: '色拉寺辩经', icon: '👏', price: 50, desc: '下午三点辩经园准时开演：僧人两两一组，击掌如雷、手势如剑。听不懂藏文没关系，气势与逻辑已经足够震撼。' },
+      { id: 'lasa_luobulinka', name: '罗布林卡', icon: '🌳', price: 60, desc: '历代达赖喇嘛的夏宫，"宝贝园林"。古树参天、格桑花铺地，夏天雪顿节时藏戏连唱一周。' },
+    ],
+    souvenirs: [
+      { id: 'lasa_suyoucha', name: '酥油茶', icon: '🍵', tag: '食', type: '饮品', price: 15, desc: '砖茶、酥油、盐打出来的"高原拿铁"，咸香浓郁。高反头晕时喝一碗，热量和安慰一起到位。' },
+      { id: 'lasa_tiancha', name: '拉萨甜茶', icon: '🥛', tag: '食', type: '饮品', price: 8, desc: '红茶加奶加糖，暖壶一壶八块钱。甜茶馆里自助续杯、按空杯数收钱，是拉萨人的社交货币。' },
+      { id: 'lasa_zangmian', name: '藏面', icon: '🍜', tag: '食', type: '美食', price: 10, desc: '牦牛肉汤底的碱水面，面少汤多。配一碟酸萝卜，甜茶馆早餐的黄金组合，六块钱吃到心满意足。' },
+      { id: 'lasa_paoniurou', name: '牦牛肉', icon: '🥩', tag: '食', type: '美食', price: 68, desc: '海拔四千米散养的牦牛肉质紧实，炖煮或烤串皆宜。营养满满的高原能量，是行走口粮的天花板。' },
+      { id: 'lasa_zanba', name: '糌粑', icon: '🥣', tag: '食', type: '美食', price: 12, desc: '青稞炒面拌酥油茶，用手捏成团吃。牧民的主粮口感独特，试一次就知道什么叫"高原碳水"。' },
+      { id: 'lasa_qingkejiu', name: '青稞酒', icon: '🍶', tag: '食', type: '饮品', price: 20, desc: '青稞酿的低度甜酒，"三口一杯"是藏家礼数。主人唱着敬酒歌，你不喝完歌就不停。' },
+      { id: 'lasa_paoniugan', name: '风干牦牛肉干', icon: '🥓', tag: '食', type: '特产', price: 80, desc: '高原冷风自然风干的牦牛肉条，越嚼越香。背包客的藏区必囤，一包能吃一路。' },
+      { id: 'lasa_tangka', name: '唐卡书签', icon: '🎨', tag: '衣', type: '文创', price: 50, desc: '矿物颜料绘制的迷你唐卡，笔笔都是虔诚。小件书签便于携带，大件唐卡一幅能画一年。' },
+      { id: 'lasa_zangxiang', name: '藏香', icon: '🕯️', tag: '衣', type: '特产', price: 35, desc: '柏木与三十余种藏药材手工搓制，烟缕笔直上扬。寺庙同款香气，点一支家里都是雪域味道。' },
+      { id: 'lasa_lvsongshi', name: '绿松石手串', icon: '🟢', tag: '衣', type: '文创', price: 120, desc: '藏族人挚爱的"天空之石"，蓝绿纹理独一无二。买一串文创款，转经筒旁盘出包浆。' },
+      { id: 'lasa_zangyin', name: '藏银手镯', icon: '💍', tag: '衣', type: '文创', price: 60, desc: '錾刻六字真言与吉祥八宝的老手艺，乌银质感古朴。八廓街小店里慢慢挑，每只都有手工痕迹。' },
+      { id: 'lasa_zangfu_xiezhen', name: '藏服写真', icon: '📸', tag: '玩', type: '体验', price: 300, desc: '穿上氆氇藏袍、编好彩色辫子，在八廓街白墙下拍写真。摄影师说：姿势不用教，人人都能拍出"卓玛"。' },
+      { id: 'lasa_tianchaguan', name: '甜茶馆坐一下午', icon: '🪑', tag: '玩', type: '体验', price: 15, desc: '光明港琼甜茶馆里，八块钱的暖壶配一碟藏面。和本地大爷拼桌，听不懂藏语也能跟着笑。' },
+      { id: 'lasa_majiami', name: '玛吉阿米餐吧', icon: '💌', tag: '玩', type: '体验', price: 80, desc: '八廓街那栋黄房子，传说中仓央嘉措与"未嫁娘"相遇的地方。点一份青稞饼，留言本上写三行情诗。' },
+      { id: 'lasa_namucuo', name: '纳木错一日游', icon: '🌊', tag: '玩', type: '体验', price: 280, desc: '翻过那根拉山口，圣湖蓝得像一块掉在地上的天空。湖边经幡猎猎，牦牛驮着游客慢慢走。' },
+      { id: 'lasa_zangshi_minsu', name: '藏式民宿一晚', icon: '🏨', tag: '住', type: '住宿', price: 250, desc: '藏式老院改的民宿，彩绘窗棂、唐卡挂墙。躺在藏床上数星星，海拔3650米的夜特别低。' },
+    ],
+    stories: [
+      { id: 'lasa_story_fenshua', name: '布达拉宫"粉刷节"', icon: '🖌️', desc: '每年秋末信众自发送来牛奶、蜂蜜、白灰，掺进涂料人工泼墙。布宫"喝"了几百年的奶，白墙香甜又防腐。' },
+      { id: 'lasa_story_gaofan', name: '来拉萨先躺一天', icon: '😴', desc: '高反面前人人平等，本地建议雷打不动：落地别洗澡、慢走多喝水。茶馆里常能看见抱着氧气瓶喝茶的"瘫友"。' },
+      { id: 'lasa_story_majiami', name: '玛吉阿米与情诗', icon: '💌', desc: '传说六世达赖仓央嘉措微服夜游，在八廓街黄房子里遇见心上人，写下"玛吉阿米"（未嫁娘）。如今黄房子成了全城最浪漫的餐馆。' },
+      { id: 'lasa_story_zhuanjing', name: '转经要顺时针', icon: '🔄', desc: '八廓街的人流永远顺时针流动，转经筒也要顺时针摇。逆行会收获全街注目礼——那是三个方向的善意提醒。' },
+      { id: 'lasa_story_riguang', name: '日光城的紫外线', icon: '☀️', desc: '拉萨年日照三千小时，紫外线强到"上午出门、下午换肤色"。游客的防晒霜在这都是消耗品，当地人是物理防晒十级学者。' },
+      { id: 'lasa_story_bianjing', name: '辩经的"啪"声', icon: '👏', desc: '色拉寺辩经的击掌响彻林间：提问者拍掌怒吼、答辩者从容应对。这场"佛学辩论赛"办了六百年，观众至今免费。' },
+    ],
+  });
+})();

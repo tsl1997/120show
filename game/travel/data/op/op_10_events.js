@@ -1,0 +1,25 @@
+/* 异世界·海贼王 分册24：大事件见闻 */
+window.OP_STORIES.push(
+  { id: 'opv_roger_exec', name: '罗杰处刑与大海贼时代', icon: '🏴‍☠️', desc: '"想要我的财宝吗？去找吧！我把世界上的一切都放在了那里。"罗格镇的一句遗言，全世界的海贼涌向大海。' },
+  { id: 'opv_godvalley_war', name: '神之谷事件', icon: '⚔️', desc: '38年前：洛克斯海贼团袭击天龙人的奴隶狩猎，罗杰与卡普联手击溃——最深的机密与"D"的宿命。' },
+  { id: 'opv_ohara_fire', name: '奥哈拉屠魔令', icon: '🔥', desc: '"研究历史的人必须死"——五老星的灭岛令。八岁罗宾在火海中逃出，"恶魔之子"的二十年逃亡。' },
+  { id: 'opv_shanks_arm', name: '香克斯的左臂与草帽之约', icon: '👒', desc: '"把它还给我，当你成为出色的海贼时。"一条手臂换一个海贼王——风车村的起点。' },
+  { id: 'opv_arlong_tears', name: '娜美的八年与一拳', icon: '🍊', desc: '"救救我！"——路飞把草帽扣在娜美头上："当然要救你！阿龙，我要把你打飞！"乡村的解放。' },
+  { id: 'opv_merry_funeral', name: '黄金梅利号的海上葬礼', icon: '🌅', desc: '"对不起，我只能带你们到水之七岛了。"船精灵的最后一程，全员在火中送别——"对不起，我们没能保护好你。"' },
+  { id: 'opv_enies_lobby_vow', name: '"我想活下去！"与烧旗宣战', icon: '🚩', desc: '索隆的"命令"与罗宾的眼泪。"把世界政府的旗子烧了吧！"——史上最狂的宣战书。' },
+  { id: 'opv_impel_breakout', name: '推进城大越狱', icon: '⛓️', desc: '路飞闯入LV5救人，毒毒与魔刀的走廊。LV6囚犯放出、冯克雷的开门——历史上最混乱的越狱。' },
+  { id: 'opv_marineford_war', name: '顶上战争', icon: '⚓', desc: '白胡子海贼团 vs 海军本部。"正义必胜? 当然——胜者才是正义！"白胡子战死、艾斯之死、黑胡子夺果——时代在此改写。' },
+  { id: 'opv_ace_death', name: '艾斯之死', icon: '🔥', desc: '替路飞挡下岩浆拳的哥哥。"谢谢你们爱我"——火拳的最后一笑，路飞的心碎与三个月的沉默。' },
+  { id: 'opv_whitebeard_last', name: '白胡子最后的咆哮', icon: '🔱', desc: '"ONE PIECE是真实存在的！"——站立的死者。白胡子的遗言再次点燃大海贼时代。' },
+  { id: 'opv_2years', name: '两年之约', icon: '⏰', desc: '香波地群岛的16点钟声。"3D2Y"——全员的两年修行与重聚。草帽团2.0的诞生。' },
+  { id: 'opv_fishman_island_pact', name: '鱼人岛的解放', icon: '🐠', desc: '霍迪的仇恨被击碎，白星与诺亚的约定。"我一定会回来带你去看真正的海"。' },
+  { id: 'opv_dressrosa_liberation', name: '德雷斯罗萨解放', icon: '🎪', desc: '鸟笼的四分钟、玩具的解咒、力库王复位——草帽大船团5600人的誓师大会。' },
+  { id: 'opv_wholecake_escape', name: '万国大逃亡', icon: '🍰', desc: 'BIG MOM的茶会崩坏与镜世界的逃杀。"婚礼? 我可没答应过！"山治的掌掴与真泪。' },
+  { id: 'opv_onigashima_final', name: '鬼岛决战', icon: '👹', desc: '三船长乱战四皇，"和之国是我要守护的地方"——凯多坠落，桃之助开国，"和之国将军光月桃之助"。' },
+  { id: 'opv_nika_awaken', name: '尼卡觉醒（五档）', icon: '☀️', desc: '解放之鼓响起——"太阳神尼卡"降临。心跳声与白发的笑声，橡胶的极限解放。' },
+  { id: 'opv_egghead_broadcast', name: '贝加庞克的世界广播', icon: '📡', desc: '"空白的一百年是真实的。世界将沉入大海。"——天才的遗言把真相播向全球。' },
+  { id: 'opv_shichibukai_abolish', name: '七武海制度废除', icon: '📜', desc: '世界会议的决议——"王下七武海"成为历史。鹰眼、女帝、巴基的各自去向与海军的追捕令。' },
+  { id: 'opv_world_summit', name: '世界会议', icon: '🏛️', desc: '五十年一度的王族大会。薇薇、白星、力库王齐聚玛丽乔亚——"D"的影子笼罩圣地。' },
+  { id: 'opv_bb_two_fruits', name: '黑胡子的双果实之谜', icon: '🕳️', desc: '暗暗+震震——"异常的身体构造"。蒂奇的秘密与LV6的野心——新时代的暴君。' },
+  { id: 'opv_future_saga', name: '最终章的预告', icon: '🏁', desc: '拉夫坦路的四块路标已集齐三块。草帽团与黑胡子、红发、世界政府的最终航海——传说的终幕在等待。' }
+);

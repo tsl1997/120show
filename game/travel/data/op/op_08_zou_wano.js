@@ -1,0 +1,30 @@
+/* 异世界·海贼王 分册20：佐乌毛皮族与和之国 */
+window.OP_STORIES = window.OP_STORIES || [];
+window.OP_STORIES.push(
+  { id: 'opz2_nekomamushi', name: '猫蝮蛇掌柜', icon: '🐈‍⬛', desc: '毛皮族夜之王。佐乌双王之一，杰克拷问下断臂不吐密，和之国的夜战大将。' },
+  { id: 'opz2_inuarashi', name: '犬岚公爵', icon: '🐕', desc: '毛皮族昼之王，"白昼之王"。剑术与礼仪的骑士，光月家旧臣，与猫蝮蛇的恩怨和解。' },
+  { id: 'opz2_wanda', name: '旺达', icon: '🐆', desc: '毛皮族女战士，火枪手队长。救起草帽团的高邻。' },
+  { id: 'opz2_pedro_past', name: '佩德罗的过去', icon: '📜', desc: '与罗杰海贼团的相遇，"新世代会来的"——香克斯? 是罗杰船上的预言。' },
+  { id: 'opw_oden', name: '光月御田', icon: '🍖', desc: '和之国九里大名，泡温泉的"傻瓜殿下"。随白胡子出海、登上罗杰的船抵达拉夫坦路的男人，"我要知道这个国家的过去"——被釜烹刑的悲壮大名。' },
+  { id: 'opw_toki', name: '光月时', icon: '⏳', desc: '御田之妻，时空果实能力者。来自八百年前的女人，"我们来自过去"的穿越者。' },
+  { id: 'opw_momonosuke', name: '光月桃之助', icon: '🍡', desc: '御田之子，和之国正统继承人。被时送到二十年后的少年，未来将军。' },
+  { id: 'opw_hiyori', name: '光月日和', icon: '🌸', desc: '御田之女，花魁"小紫"。隐姓埋名二十年的复仇之花，与索隆的秋水之缘。' },
+  { id: 'opw_kinemon', name: '锦卫门', icon: '🔺', desc: '赤鞘九侠之首，狐火锦卫门。斩裂火焰的剑士，桃之助的忠臣，"武士之国的心脏"。' },
+  { id: 'opw_denjiro', name: '传次郎（狂死郎）', icon: '🎭', desc: '赤鞘九侠，潜伏大蛇身边二十年的"狂死郎"。"武士的复仇是一场长戏"——花魁小紫事件的导演。' },
+  { id: 'opw_kikunojo', name: '菊之丞（小菊）', icon: '⚔️', desc: '赤鞘九侠，女装的男武士，以藏之弟。斩断凯多鳞片的铃后武士。' },
+  { id: 'opw_kawamatsu', name: '河松', icon: '🐟', desc: '赤鞘九侠，河童出身的鱼人武士。养育日和二十年的奶爸武士。' },
+  { id: 'opw_raizo', name: '雷藏', icon: '📜', desc: '赤鞘九侠，卷卷果实能力者。忍者里的"卷轴大师"，佐乌的守护人。' },
+  { id: 'opw_ashura', name: '阿修罗童子（酒天丸）', icon: '🍶', desc: '赤鞘九侠，九里的头目。"酒天丸"的孤高盗贼，鬼岛爆炸的决死特攻。' },
+  { id: 'opw_orochi', name: '黑炭大蛇', icon: '🐍', desc: '八岐大蛇果实能力者，篡位的和之国将军。八头八尾的执念与恐惧，"和之国是老人的国家"。' },
+  { id: 'opw_higurashi', name: '黑炭暮蝉', icon: '🕷️', desc: '大蛇的军师奶奶，模仿果实能力者——模仿御田之脸的骗局制造者。' },
+  { id: 'opw_hyogoro', name: '花之豹五郎', icon: '🎴', desc: '和之国黑道总长，"花之豹五郎"。兔碗采石场的老人，流樱霸气的宗师。' },
+  { id: 'opw_toko', name: '小南子', icon: '🎵', desc: '康家的女儿，"SMILE失败品"只会笑的女孩。最令人心碎的笑声。' },
+  { id: 'opw_yasuie', name: '霜月康家（丑三小子）', icon: '🏮', desc: '白舞大名，"丑三小子"义贼。替赤鞘吸引火刑的笑之大名。' },
+  { id: 'opw_otama', name: '小玉', icon: '🍡', desc: '丸子果实的少女，驯服百兽团的"丸子忍者"。和之国的希望之光。' },
+  { id: 'opw_fukurokuju', name: '福禄寿', icon: '🥷', desc: '御庭番众首领，大蛇的忍者头目。雷藏的宿敌，忍者之战的老将。' },
+  { id: 'opw_hanzo', name: '半藏', icon: '☠️', desc: '御庭番众的用毒忍者，"毒之手半藏"。小菊的对手。' },
+  { id: 'opw_gyukimaru', name: '牛鬼丸', icon: '🐂', desc: '铃后的守墓武士，收集名刀归还亡者。索隆秋水之战的对手。' },
+  { id: 'opw_kaido_oden', name: '御田的釜刑与"一口鱼糕"', icon: '🔥', desc: '油锅起舞一小时的御田，"我比你们多活了几十年"。为九侠挡下沸油的最强大名。' },
+  { id: 'opw_reliquary', name: '御田日记与二十年之约', icon: '⏰', desc: '"二十年后，打开国门之战"。赤鞘九侠穿越时间的宿命集结。' },
+  { id: 'opw_smile_tragedy', name: 'SMILE果实的悲剧', icon: '💀', desc: '和之国"只会笑的村庄"——失败的SMILE夺走愤怒与悲伤。工厂之村的黑历史。' }
+);

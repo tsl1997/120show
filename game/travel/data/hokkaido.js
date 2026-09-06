@@ -1,0 +1,50 @@
+/* ============ 日本·北海道 ============ */
+(function () {
+  window.TRAVEL_CITIES = window.TRAVEL_CITIES || [];
+  window.TRAVEL_CITIES.push({
+    id: 'hokkaido',
+    name: '北海道',
+    country: '日本',
+    cc: 'JP',
+    flag: '🇯🇵',
+    region: '日本·北海道',
+    hero: '❄️',
+    desc: '雪国腹地·北国风情：小樽的运河灯笼、札幌的雪祭、富良野的紫色花田，连奶酪和哈密瓜都自带奶油滤镜。',
+    travel: [{ name: '飞机', icon: '✈️', cost: 2600 }, { name: '高铁·新干线', icon: '🚄', cost: 2400 }],
+    visa: { cost: 300, note: '日本单次旅游签证（旅行社代办）' },
+    spots: [
+      { id: 'hokkaido_otingai', name: '小樽运河', icon: '🏮', price: 0, desc: '煤气灯与红砖仓库倒映在运河里，冬夜雪灯点亮时像一封信。音乐盒堂的八音盒声，是这座"浪漫仓库城"的BGM。' },
+      { id: 'hokkaido_sapporo_yukimatsuri', name: '札幌雪祭', icon: '⛄', price: 0, desc: '每年二月，大通公园立起十几米高的冰雪雕塑。夜晚灯光打亮冰塔，零下十度挤满十万人，冬天就该这么热闹。' },
+      { id: 'hokkaido_furano', name: '富良野花田', icon: '💜', price: 30, desc: '七月薰衣草开成紫色波浪，彩色花带像打翻的调色盘。租辆单车在田埂间骑行，风里全是香气。' },
+      { id: 'hokkaido_atoro', name: '阿寒湖·摩周湖', icon: '🌊', price: 40, desc: '火山湖群像宝石散落：摩周湖常年雾锁"神秘之湖"，阿寒湖上有绿球藻。冬天湖面结冰还能玩冰钓和摩托雪橇。' },
+      { id: 'hokkaido_niseko', name: '二世谷滑雪场', icon: '🎿', price: 320, desc: '"雪质世界第一"的粉雪天堂，外国滑雪客的朝圣地。摔进半米深的粉雪里不疼，站起来满身雪雾。' },
+      { id: 'hokkaido_asahiyama', name: '旭山动物园', icon: '🐧', price: 45, desc: '日本人气第一动物园，企鹅雪地巡游是招牌节目。它们摇摇摆摆列队走过雪原，队伍后面总有想抱走它们的游客。' },
+      { id: 'hokkaido_hakodate', name: '函馆山夜景', icon: '🌃', price: 15, desc: '"世界三大夜景"之一，函馆湾像一把发光的折扇。缆车十分钟登顶，风很大、灯很暖、人很满足。' },
+    ],
+    souvenirs: [
+      { id: 'hokkaido_soup_curry', name: '汤咖喱', icon: '🍛', tag: '食', type: '美食', price: 55, desc: '清爽药膳汤底泡着巨块蔬菜和鸡腿，辣度分十几级。北海道人的冬日充电站，汤都能喝光。' },
+      { id: 'hokkaido_ramens', name: '札幌味噌拉面', icon: '🍜', tag: '食', type: '美食', price: 50, desc: '味噌汤底浓到挂勺，炒豆芽和黄油玉米是灵魂。元祖一条街"拉面共和国"里，每家店都是百年配方。' },
+      { id: 'hokkaido_kaisendon', name: '海鲜丼', icon: '🍥', tag: '食', type: '美食', price: 130, desc: '朝市现开的海胆、三文鱼籽、甜虾铺满一碗。北海道的海鲜甜度离谱，配一小瓶酱油就足够。' },
+      { id: 'hokkaido_jingisukan', name: '成吉思汗烤羊肉', icon: '🐑', tag: '食', type: '美食', price: 80, desc: '帽状铁锅烤羊肉，先铺蔬菜再码肉。名字源自蒙古烤羊，北海道人硬是把羊吃成了本地名片。' },
+      { id: 'hokkaido_melon', name: '夕张哈密瓜', icon: '🍈', tag: '食', type: '美食', price: 60, desc: '切开就爆汁的"瓜中爱马仕"，甜到不需要形容词。农场直卖一个几百日元起，果肉橙色像落日。' },
+      { id: 'hokkaido_milk', name: '北海道牛乳·冰淇淋', icon: '🥛', tag: '食', type: '饮品', price: 20, desc: '道产牛奶浓得挂杯，双球冰淇淋奶盖厚到糊嘴。牧场边现挤现喝，草原味道直接封神。' },
+      { id: 'hokkaido_shiroi_koibito', name: '白色恋人', icon: '🍪', tag: '食', type: '特产', price: 70, desc: '两片薄脆夹白巧克力，札幌手信的天花板。工厂还能参观制作流程，铁盒设计十年未变。' },
+      { id: 'hokkaido_potato', name: '薯条三兄弟·六花亭', icon: '🍟', tag: '食', type: '特产', price: 55, desc: '黄油夹心葡萄饼干与北海道土豆脆条。机场免税区一提一提往篮里扔的"伴手礼战神"。' },
+      { id: 'hokkaido_ohtaru_le', name: '小樽音乐盒', icon: '🎵', tag: '衣', type: '文创', price: 120, desc: '运河边的音乐盒堂有几千只八音盒，玻璃、木质、蒸汽式任选。拧紧发条，把北海道的冬天带回家。' },
+      { id: 'hokkaido_glass', name: '北一硝子玻璃器', icon: '🫙', tag: '衣', type: '文创', price: 90, desc: '小樽玻璃工坊的星砂杯、油灯吊饰。烛光下折射出暖光，是"北国限定"的温柔。' },
+      { id: 'hokkaido_lavender', name: '薰衣草周边', icon: '🌿', tag: '衣', type: '文创', price: 40, desc: '富良野薰衣草做成香包、精油与香皂。放进衣柜，夏天的紫色花田会一直跟着你。' },
+      { id: 'hokkaido_ski_board', name: '滑雪板租赁·教学', icon: '🏂', tag: '玩', type: '体验', price: 200, desc: '教练带着在粉雪坡上练犁式刹车，摔进雪里像摔进棉花。一天学不会没关系，拍照已经值回票价。' },
+      { id: 'hokkaido_onsen', name: '登别温泉·露天风吕', icon: '♨️', tag: '玩', type: '体验', price: 150, desc: '"北海道第一汤"的硫磺泉，雪夜里露天泡汤看落雪。头上的雪、肩上的热气，人间值得具象化。' },
+      { id: 'hokkaido_ice_ride', name: '破冰船·流冰漫步', icon: '🚢', tag: '玩', type: '体验', price: 220, desc: '网走海域乘破冰船碾过鄂霍次克海流冰，碎裂声震撼。还能穿干式防寒服下海"漂"在冰块之间。' },
+      { id: 'hokkaido_ryokan', name: '温泉旅馆一晚', icon: '🏨', tag: '住', type: '住宿', price: 550, desc: '榻榻米房间配怀石晚餐，浴衣一穿就下温泉。北海道的夜晚，从一池热汤和一碗热酒开始。' },
+    ],
+    stories: [
+      { id: 'hokkaido_story_liubing', name: '流冰会"唱歌"', icon: '❄️', desc: '鄂霍次克海流冰挤压碰撞时会发出玻璃般的脆响，当地人叫"冰的歌"。这是北纬四十四度的冬季限定音效。' },
+      { id: 'hokkaido_story_oyaji', name: '企鹅散步的由来', icon: '🐧', desc: '旭山动物园当年濒临倒闭，靠"行为展示"创意翻盘：让企鹅自己散步给游客看。如今冬天排队两小时看它摇摇摆摆。' },
+      { id: 'hokkaido_story_niu', name: '北海道的"牧歌经济"', icon: '🐄', desc: '日本一半以上的牛奶产自北海道，奶牛数量比城市人口还悠闲。牧场墙上写着：牛开心，牛奶才好喝。' },
+      { id: 'hokkaido_story_xueji', name: '雪祭原来是"自娱自乐"', icon: '⛄', desc: '札幌雪祭始于1950年，最初只是中学生堆几座雪塔的自娱自乐。如今已是百万游客的冰雪盛宴，还配国际雪雕比赛。' },
+      { id: 'hokkaido_story_yuuxiang', name: '薰衣草的"紫色经济"', icon: '💜', desc: '富良野曾因"富田农场"培育耐寒薰衣草走红。七月花田开镰时，整片山谷的香气能飘出几公里。' },
+      { id: 'hokkaido_story_hanfan', name: '一碗拉面的"三大流派"', icon: '🍜', desc: '北海道人把拉面喝出了地域：札幌味噌、函馆盐味、旭川酱油。当地人说：这不是拉面，是地图。' },
+    ],
+  });
+})();

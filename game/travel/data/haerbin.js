@@ -1,0 +1,51 @@
+/* ============ haerbin ============ */
+(function () {
+window.TRAVEL_CITIES = window.TRAVEL_CITIES || [];
+  window.TRAVEL_CITIES.push({
+    id: 'haerbin',
+    name: '哈尔滨',
+    country: '中国',
+    cc: 'CN',
+    province: '黑龙江',
+    flag: '🇨🇳',
+    region: '东北',
+    hero: '❄️',
+    desc: '"尔滨"的雪是会宠人的：冰雪大世界的冰砖垒成宫殿，中央大街的面包石踏过百年，零下二十度也要举着一根马迭尔冰棍。',
+    travel: [{ name: '高铁', icon: '🚄', cost: 760 }, { name: '飞机', icon: '✈️', cost: 950 }],
+    visa: null,
+    spots: [
+      { id: 'haerbin_bingxue', name: '哈尔滨冰雪大世界', icon: '🏰', price: 328, desc: '全球最大冰雪主题乐园，松花江上的冰砖一年垒起一座城。夜晚灯光一开，冰塔冰堡流光溢彩，零下二十度冻成烟花也值。' },
+      { id: 'haerbin_sofeiya', name: '圣索菲亚教堂', icon: '⛪', price: 0, desc: '拜占庭风格的墨绿洋葱顶，红砖墙上落满白鸽。俄式风情的地标，广场上喂鸽子拍大片，一秒穿越到莫斯科郊外。' },
+      { id: 'haerbin_zhongyangdajie', name: '中央大街', icon: '🏙️', price: 0, desc: '百年步行街，脚下是价值连城的面包石，两侧巴洛克老楼林立。冬天雪一落，欧式路灯配冰雕，美得不像话。' },
+      { id: 'haerbin_fanghongta', name: '防洪纪念塔', icon: '🗼', price: 0, desc: '松花江畔的1957年抗洪丰碑。塔下喷泉、江上冰封，滑冰的、冬泳的、拉爬犁的，东北冬天的生活图鉴全在这。' },
+      { id: 'haerbin_taiyangdao', name: '太阳岛雪博会', icon: '⛄', price: 240, desc: '雪雕艺术的殿堂，几十米高的雪雕在阳光下泛着蓝光。雪原、木栈道、松林雾凇，北国风光的经典大片。' },
+      { id: 'haerbin_dongbeihu', name: '东北虎林园', icon: '🐅', price: 120, desc: '乘铁笼车深入虎群领地，数百只东北虎在雪地里踱步打盹。看"大猫"们圆滚滚的样子，你会怀疑它们的食谱。' },
+      { id: 'haerbin_songhuajiang', name: '松花江冰雪嘉年华', icon: '🛷', price: 0, desc: '江面冻成天然游乐场：冰滑梯、雪圈漂移、狗拉爬犁。本地小孩放学就来撒野，游客一上冰就秒回童年。' },
+    ],
+    souvenirs: [
+      { id: 'haerbin_guobaorou', name: '锅包肉', icon: '🍖', tag: '食', type: '美食', price: 42, desc: '里脊挂土豆淀粉炸至金黄，糖醋汁"哗"地浇响。外酥里嫩、酸甜扑鼻，东北菜扛把子，上桌三分钟见底。' },
+      { id: 'haerbin_hongchang', name: '哈尔滨红肠', icon: '🌭', tag: '食', type: '美食', price: 30, desc: '百年俄式工艺，果木熏出深红外衣。切片即食、蒜香浓郁，配大列巴就是一顿正宗"哈啤"前的硬菜。' },
+      { id: 'haerbin_dalieba', name: '秋林大列巴', icon: '🍞', tag: '食', type: '美食', price: 25, desc: '三斤重的大圆面包，外壳硬得能敲桌子。果木烤出微酸麦香，切片蒸软或蘸炼乳，俄式乡愁都在里面。' },
+      { id: 'haerbin_madier', name: '马迭尔冰棍', icon: '🍦', tag: '食', type: '美食', price: 5, desc: '零下二十度的中央大街，人人举着奶白色的冰棍。甜而不腻、冰得扎实，"冬天吃冰棍"是哈尔滨人的骄傲传统。' },
+      { id: 'haerbin_tieguodun', name: '铁锅炖', icon: '🍲', tag: '食', type: '美食', price: 70, desc: '大铁锅炖大鹅配土豆玉米，锅边贴一圈玉米饼子。柴火咕嘟一小时，掀盖那阵白汽，就是东北冬天的暖。' },
+      { id: 'haerbin_shazhucai', name: '杀猪菜', icon: '🥘', tag: '食', type: '美食', price: 50, desc: '酸菜白肉血肠一锅出，蘸蒜泥酱油。东北年味的灵魂，酸香解腻，吃到最后再灌一碗热汤，通体舒泰。' },
+      { id: 'haerbin_gewasi', name: '秋林格瓦斯', icon: '🥤', tag: '食', type: '饮品', price: 8, desc: '面包发酵的俄式饮料，麦香里带一丝微醺。冰镇后"呲"地开瓶，是红肠列巴的天命CP。' },
+      { id: 'haerbin_dongli', name: '冻梨冻柿子', icon: '🍐', tag: '食', type: '美食', price: 10, desc: '黑铁蛋似的冻梨要用凉水"拔"出冰壳，咬开爆出蜜汁。窗台上冻一排，是东北阳台的天然冰箱。' },
+      { id: 'haerbin_hongchang_lipin', name: '红肠礼盒', icon: '🎁', tag: '食', type: '特产', price: 88, desc: '秋林里道斯、哈肉联装盒带走，真空锁住烟熏香。亲戚朋友人手一根，"尔滨"的年味用红肠快递。' },
+      { id: 'haerbin_bingxue_wenxue', name: '冰雪文创·冰雕小夜灯', icon: '🕯️', tag: '衣', type: '文创', price: 45, desc: '把冰雪大世界的城堡揣回家。亚克力冰砖造型小夜灯，一按开关，松花江的冬夜就亮在床头。' },
+      { id: 'haerbin_binghua', name: '冰晶雪花挂件', icon: '❄️', tag: '衣', type: '文创', price: 30, desc: '树脂封存真实冰纹的雪花挂坠，每一枚纹路不同。哈尔滨限定的"冬天纪念币"。' },
+      { id: 'haerbin_caochang', name: '东北澡堂搓澡', icon: '🧖', tag: '玩', type: '体验', price: 80, desc: '进门先泡一小时，搓澡师傅几下搓出一身"泥卷"，再冲奶浴盐浴。搓完像脱了一层皮轻二两，南方人从此念念不忘。' },
+      { id: 'haerbin_binghua_yuan', name: '伏尔加庄园一日', icon: '🕌', tag: '玩', type: '体验', price: 150, desc: '阿什河畔的俄式庄园，复刻圣尼古拉教堂金顶倒映雪原。坐雪橇、看白桦、喝红菜汤，不出国门的"俄罗斯之旅"。' },
+      { id: 'haerbin_huaxue', name: '亚布力滑雪体验', icon: '🎿', tag: '玩', type: '体验', price: 260, desc: '中国滑雪产业发源地，初级道牵手中级道。摔三跤学会犁式刹车，山顶热奶茶一喝，冰雪运动真香。' },
+      { id: 'haerbin_eminmin', name: '俄式民宿一晚', icon: '🏨', tag: '住', type: '住宿', price: 300, desc: '中央大街旁的百年欧式老公寓，木地板咯吱作响。窗外飘雪，屋里壁炉热牛奶，一秒住进俄式小说。' },
+    ],
+    stories: [
+      { id: 'haerbin_story_erbin', name: '"尔滨"讨好型市格', icon: '🥰', desc: '2024年冬天全网喊它"尔滨"：冻梨切片摆盘、索菲亚挂人造月亮、鄂伦春族上街巡游。市民自发免费接送游客，宠客宠成顶流。' },
+      { id: 'haerbin_story_poshui', name: '泼水成冰', icon: '💧', desc: '零下三十度把热水泼向空中，水雾瞬间凝成弧形冰花。"泼水成冰"的正确姿势要用热水，温差越大雾越美，是东北限定魔法。' },
+      { id: 'haerbin_story_mianbaoshi', name: '面包石铺成的百年街', icon: '🪨', desc: '中央大街的面包石一块价值一块银元，当年"一块石头一块大洋"。百年过去车马碾过，石头光滑如镜，仍是全街最贵地段。' },
+      { id: 'haerbin_story_sufeiya', name: '教堂变身记', icon: '⛪', desc: '圣索菲亚教堂曾当过百货仓库，墙皮斑驳险些拆掉。1997年修复后惊艳世人，如今成了哈尔滨最上镜的城市名片。' },
+      { id: 'haerbin_story_laohu', name: '老虎胖成了"大猫"', icon: '🐯', desc: '东北虎林园的虎因伙食太好屡上热搜，雪地里滚成圆球。园方回应"冬膘正常"，网友：原来威严和可爱可以并存。' },
+      { id: 'haerbin_story_dongli_ba', name: '冻梨要凉水拔', icon: '🍐', desc: '冻梨不能热水泡，要扔进凉水盆"拔"，水面结出冰壳、梨内软化，敲开冰壳咬一口冰甜爆汁，东北人的物理智慧。' },
+    ],
+  });
+})();

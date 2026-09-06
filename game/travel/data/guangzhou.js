@@ -1,0 +1,52 @@
+/* ============ 广州 ============ */
+(function () {
+  window.TRAVEL_CITIES = window.TRAVEL_CITIES || [];
+  window.TRAVEL_CITIES.push({
+    id: 'guangzhou',
+    name: '广州',
+    country: '中国',
+    cc: 'CN',
+    province: '广东',
+    flag: '🇨🇳',
+    region: '华南',
+    hero: '🗼',
+    desc: '两千年的商都，骑楼下飘着肠粉和靓汤香。"小蛮腰"亮灯时珠江生辉，早茶桌上的虾饺永远是第一主角。',
+    travel: [{ name: '高铁', icon: '🚄', cost: 460 }, { name: '飞机', icon: '✈️', cost: 780 }],
+    visa: null,
+    spots: [
+      { id: 'guangzhou_xiaomanyao', name: '广州塔"小蛮腰"', icon: '🗼', price: 150, desc: '600米的纤细腰身是珠江新城最亮的名片。登塔观景或塔顶摩天轮，夜色里整条珠江都在为你打光。' },
+      { id: 'guangzhou_chenjiaci', name: '陈家祠', icon: '🏯', price: 10, desc: '岭南建筑艺术巅峰，砖雕、木雕、灰塑挤满屋脊。每块砖都像一出戏，"百鸟朝凤"图能看上半天。' },
+      { id: 'guangzhou_shamian', name: '沙面岛', icon: '🏛️', price: 0, desc: '珠江白鹅潭畔的欧式建筑群，领事馆旧址林立。梧桐绿荫下婚纱摄影队一字排开，复古城堡感拉满。' },
+      { id: 'guangzhou_yongqingfang', name: '永庆坊·粤剧博物馆', icon: '🎭', price: 0, desc: '西关骑楼老街改造的文创街区，李小龙祖居就在巷里。粤剧艺术博物馆水榭戏台，金丝戏服亮瞎眼。' },
+      { id: 'guangzhou_baiyunshan', name: '白云山', icon: '⛰️', price: 5, desc: '"羊城第一秀"，五元门票的天然氧吧。凌晨就有阿伯打着手电登顶看日出，摩星岭上全城尽收眼底。' },
+      { id: 'guangzhou_yuexiu', name: '越秀公园·五羊雕像', icon: '🐏', price: 0, desc: '五羊石像述着"五羊衔谷"的建城传说，"羊城"得名于此。明代古城墙盘在山间，木棉花开时红遍全山。' },
+      { id: 'guangzhou_shengbo', name: '广东省博物馆', icon: '🦕', price: 0, desc: '"月光宝盒"造型建筑里藏着千年海贸史。广彩瓷、沉船出水文物，海上丝绸之路的实证都在这。' },
+    ],
+    souvenirs: [
+      { id: 'guangzhou_zaocha', name: '早茶一盅两件', icon: '🥟', tag: '食', type: '美食', price: 60, desc: '虾饺、凤爪、叉烧包推车流转，一壶普洱坐半天。"叹早茶"叹的是从容，广州人的人情往来都在茶桌上。' },
+      { id: 'guangzhou_changfen', name: '布拉肠粉', icon: '🌯', tag: '食', type: '美食', price: 10, desc: '米浆现拉现蒸，布一样滑嫩。浇豉油、撒芝麻，牛肉蛋馅随心搭，五块钱解锁广州人的清晨。' },
+      { id: 'guangzhou_yuntunmian', name: '云吞面', icon: '🍜', tag: '食', type: '美食', price: 15, desc: '竹升压出的银丝面脆弹，云吞藏在碗底。大地鱼汤底鲜到掉眉，先汤后面再云吞，顺序都不能乱。' },
+      { id: 'guangzhou_baiqieji', name: '白切鸡', icon: '🍗', tag: '食', type: '美食', price: 48, desc: '清远走地鸡"三提三浸"，皮爽肉滑骨髓带红。蘸姜葱蓉，广州人检验一只鸡的最高标准。' },
+      { id: 'guangzhou_shaoe', name: '深井烧鹅', icon: '🦢', tag: '食', type: '美食', price: 58, desc: '荔枝木明炉烧制，皮脆如玻璃、油香四溢。斩件上桌配酸梅酱，一口下去，粤语十级也说不出话。' },
+      { id: 'guangzhou_shuangpinai', name: '双皮奶', icon: '🍮', tag: '食', type: '美食', price: 12, desc: '水牛奶两次结皮，奶皮厚得能托起汤匙。加红豆莲子双拼，甜品店的镇店之宝。' },
+      { id: 'guangzhou_liangcha', name: '廿四味凉茶', icon: '🍵', tag: '食', type: '饮品', price: 5, desc: '苦到怀疑人生的中药茶饮，广州人却当"续命水"。喉咙一痛就来一杯，喝完老板递一颗话梅救场。' },
+      { id: 'guangzhou_liaotang', name: '老火靓汤', icon: '🍲', tag: '食', type: '美食', price: 25, desc: '三煲四炖足足六小时，木棉花煲鲫鱼、五指毛桃炖鸡。广州妈妈的执念：宁可食无菜，不可饭无汤。' },
+      { id: 'guangzhou_jizibing', name: '鸡仔饼', icon: '🍪', tag: '食', type: '特产', price: 18, desc: '冰肉、蒜蓉、南乳入饼，咸甜交错带椒盐香。成珠楼百年配方，长得像小鸡而得名的老广味道。' },
+      { id: 'guangzhou_laopobing', name: '广式老婆饼', icon: '🥮', tag: '食', type: '特产', price: 15, desc: '冬瓜蓉馅酥皮饼，软糯清甜。传说因阿哥卖饼赎妻得名，广州人把它做成了百年手信。' },
+      { id: 'guangzhou_chenpi', name: '新会陈皮', icon: '🍊', tag: '食', type: '特产', price: 88, desc: '"一两陈皮一两金"，越陈越香越值钱。煲汤炖肉放一片，广东人对时间的投资从陈皮开始。' },
+      { id: 'guangzhou_guangxiu', name: '广绣书签', icon: '🧵', tag: '衣', type: '文创', price: 45, desc: '四大名绣之一，一根丝线劈成几十股绣出荔枝红。书签小件，针脚里全是岭南的富丽与耐心。' },
+      { id: 'guangzhou_zhujiang', name: '珠江夜游', icon: '🚢', tag: '行', type: '体验', price: 78, desc: '游船从天字码头出发，两岸霓虹倒进江里。经过小蛮腰时全船惊呼，珠江的夜比白天艳十倍。' },
+      { id: 'guangzhou_yueju', name: '粤剧变装拍照', icon: '🎭', tag: '玩', type: '体验', price: 88, desc: '穿戴凤冠霞帔、勾面谱拍一组粤剧写真。水袖一甩、眼波一转，西关小姐的韵味上身。' },
+      { id: 'guangzhou_baiyun_huadao', name: '白云山滑道', icon: '🛷', tag: '玩', type: '体验', price: 30, desc: '从山顶坐着滑车一路冲下林荫弯道，风声呼呼。上山五块钱，下山三十块尖叫，值。' },
+      { id: 'guangzhou_jiudian', name: '珠江新城景观房', icon: '🏨', tag: '住', type: '住宿', price: 500, desc: '高层落地窗正对小蛮腰，夜里躺在床上看塔身变色。楼下就是花城广场，广州的繁华一眼收进。' },
+    ],
+    stories: [
+      { id: 'guangzhou_story_shichi', name: '"什么都敢吃"的误会', icon: '🍽️', desc: '"食在广州"被传成广州人什么都敢吃，其实粤菜最讲鲜与本味。真正的底气是：一只鸡都有几十种做法。' },
+      { id: 'guangzhou_story_tan', name: '"叹"早茶哲学', icon: '☕', desc: '广州人说"叹早茶"，"叹"就是享受。一盅两件坐一上午，报纸看完再走——慢慢来，是这座城市最奢侈的日常。' },
+      { id: 'guangzhou_story_liangcha', name: '凉茶铺的救场话梅', icon: '😖', desc: '第一次喝廿四味的游客表情管理全线崩溃，老板娘见怪不怪递上一颗话梅。这颗话梅被称为"广州最温柔的售后服务"。' },
+      { id: 'guangzhou_story_tajian', name: '小蛮腰的百变灯光', icon: '🌈', desc: '广州塔每晚换装：过年红、清明白、节庆金……网友练就"看塔辨节日"的本领，它成了全城最大电子日历。' },
+      { id: 'guangzhou_story_zhuandiao', name: '陈家祠的"砖雕大戏"', icon: '🎬', desc: '陈家祠墙上一块砖雕能雕七层楼阁、上百人物。当年工匠按戏出雕刻，游客笑称"清末的连续剧，一集都没烂尾"。' },
+      { id: 'guangzhou_story_richu', name: '凌晨白云山等日出', icon: '🌄', desc: '看日出不一定要去海边，广州仔凌晨四点爬白云山，摩星岭上一人一壶茶等天亮。下山还能饮个早茶，完美闭环。' },
+    ],
+  });
+})();

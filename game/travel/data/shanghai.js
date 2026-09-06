@@ -1,0 +1,53 @@
+/* ============ 上海 ============ */
+(function () {
+  window.TRAVEL_CITIES = window.TRAVEL_CITIES || [];
+  window.TRAVEL_CITIES.push({
+    id: 'shanghai',
+    name: '上海',
+    country: '中国',
+    cc: 'CN',
+    province: '上海',
+    flag: '🇨🇳',
+    region: '华东',
+    hero: '🌃',
+    desc: '外滩的百年万国建筑对望陆家嘴的摩天森林，梧桐区的午后藏着咖啡香，一座把精致与市井拧在一起的魔都。',
+    travel: [{ name: '高铁', icon: '🚄', cost: 460 }, { name: '飞机', icon: '✈️', cost: 750 }],
+    visa: null,
+    spots: [
+      { id: 'shanghai_waitan', name: '外滩', icon: '🌉', price: 0, desc: '万国建筑博览群一字排开，对岸陆家嘴灯火如昼。晚上七点灯亮那一刻，江风、钟声与天际线一起向你扑来。' },
+      { id: 'shanghai_mingzhu', name: '东方明珠', icon: '🗼', price: 199, desc: '浦东的球串地标，乘电梯直上259米悬空观光廊。脚下是透明玻璃和黄浦江车流，腿软但照片值回票价。' },
+      { id: 'shanghai_yuyuan', name: '豫园·城隍庙', icon: '🏮', price: 40, desc: '四百年江南园林，九曲桥回廊鱼池，一步一景。元宵灯会时花灯满园，九曲桥上人潮和灯影一起流。' },
+      { id: 'shanghai_disney', name: '上海迪士尼乐园', icon: '🎡', price: 475, desc: '内地首座迪士尼，全球最大的城堡在这里。从早八冲到烟花秀，疯狂动物城园区加勒比海盗，一天跑断腿也笑到脸酸。' },
+      { id: 'shanghai_nanjinglu', name: '南京路步行街', icon: '🛍️', price: 0, desc: '"中华商业第一街"，霓虹招牌从百年前亮到现在。铛铛车叮叮当当驶过，逛到尽头就是外滩。' },
+      { id: 'shanghai_tianzifang', name: '田子坊', icon: '🎨', price: 0, desc: '石库门弄堂改造的文创街区，窄巷里挤满手作店、画廊和茶馆。抬头是晾衣杆，低头是咖啡香，魔都的魔性之一。' },
+      { id: 'shanghai_bowuguan', name: '上海博物馆', icon: '🏺', price: 0, desc: '青铜馆的大克鼎坐镇，书画陶瓷件件重器。"鼎盛千秋"的展厅里，与三千年前的礼器对视片刻。' },
+      { id: 'shanghai_wukanglu', name: '武康路·梧桐区', icon: '🍃', price: 0, desc: '武康大楼像一艘巨轮泊在六岔路口。梧桐树影里全是老洋房与咖啡馆，漫步圣地，随手一拍都是电影感。' },
+    ],
+    souvenirs: [
+      { id: 'shanghai_xiaolongbao', name: '南翔小笼包', icon: '🥟', tag: '食', type: '美食', price: 35, desc: '十四个褶的功夫都包在薄皮里，汤汁烫嘴。先开窗、后喝汤，蘸姜丝香醋，豫园门口排队一小时也认了。' },
+      { id: 'shanghai_shengjian', name: '生煎馒头', icon: '🍳', tag: '食', type: '美食', price: 12, desc: '底板煎得金黄焦脆，一咬汤汁四溅。撒芝麻葱花，配咖喱牛肉汤，上海早餐的"顶流双子"。' },
+      { id: 'shanghai_xianjiang', name: '咸豆浆', icon: '🥣', tag: '食', type: '饮品', price: 6, desc: '豆浆里加虾皮榨菜油条碎，咸鲜凝结成絮。外地人第一次喝直呼"黑暗料理"，老上海却认这一口是童年。' },
+      { id: 'shanghai_cifantuan', name: '粢饭团', icon: '🍙', tag: '食', type: '美食', price: 10, desc: '糯米裹油条榨菜肉松，双手一捏紧实成团。四大金刚之一，赶地铁的上海人边走边啃。' },
+      { id: 'shanghai_hongshaorou', name: '本帮红烧肉', icon: '🍖', tag: '食', type: '美食', price: 88, desc: '浓油赤酱的代表，冰糖收汁红亮如琥珀。入口肥而不腻、甜得温柔，配一碗白饭就是本帮菜的告白。' },
+      { id: 'shanghai_dazhaxie', name: '大闸蟹', icon: '🦀', tag: '食', type: '美食', price: 128, desc: '秋风起蟹脚痒，大闸蟹青背白肚。拆蟹吃黄蘸姜醋，配一壶黄酒，是上海人仪式感爆棚的秋天。' },
+      { id: 'shanghai_xiekehuan', name: '蟹壳黄', icon: '🥮', tag: '食', type: '美食', price: 6, desc: '烤得层层起酥的小烧饼，芝麻面金黄似蟹壳。咸的葱油、甜的白糖，一口一个停不下来。' },
+      { id: 'shanghai_bingtuan', name: '光明冰砖', icon: '🍦', tag: '食', type: '美食', price: 5, desc: '蓝白纸盒装着奶香雪糕砖，从1970年代甜到现在。半个上海人的童年第一口冷饮，如今是复古甜品顶流。' },
+      { id: 'shanghai_dabaitu', name: '大白兔奶糖', icon: '🍬', tag: '食', type: '特产', price: 15, desc: '"七粒大白兔等于一杯牛奶"的国民奶糖，米纸都能吃。铁罐礼盒拿去送人，是全球华人的共同童年。' },
+      { id: 'shanghai_wuxiangdou', name: '城隍庙五香豆', icon: '🫘', tag: '食', type: '特产', price: 20, desc: '奶油五香蚕豆，皮薄肉酥，嚼到最后满口回甘。"未进城隍庙，先吃五香豆"，上海老牌手信。' },
+      { id: 'shanghai_bingxiangtie', name: '外滩建筑冰箱贴', icon: '🧲', tag: '衣', type: '文创', price: 35, desc: '海关大楼、和平饭店微缩成金属冰箱贴。贴在自家冰箱上，江风汽笛声仿佛隔空传来。' },
+      { id: 'shanghai_xuehuagao', name: '上海女人雪花膏', icon: '🧴', tag: '衣', type: '文创', price: 25, desc: '民国风铁盒雪花膏，玉兰花香。复古包装配上"摩登"字样，阿婆梳妆台上的老古董成了文创爆款。' },
+      { id: 'shanghai_you', name: '黄浦江游轮', icon: '🚢', tag: '行', type: '体验', price: 120, desc: '夜航黄浦江，一侧是万国灯光、一侧是摩天森林。船头江风扑面，汽笛一响，才懂什么叫"魔都夜景封神"。' },
+      { id: 'shanghai_shanghaizhongxin', name: '上海中心118层观光', icon: '🏙️', tag: '玩', type: '体验', price: 180, desc: '乘世界最快电梯55秒冲上632米之巅，云雾就在窗外飘。俯瞰螺旋楼身下的城市网格，连长江入海口都隐约可见。' },
+      { id: 'shanghai_guangguang', name: '外滩观光隧道', icon: '🚇', tag: '行', type: '体验', price: 50, desc: '穿越江底的"科幻胶囊"小列车，五彩灯光不断变幻。土味十足又莫名快乐，五分钟横渡黄浦江。' },
+      { id: 'shanghai_haitanfang', name: '外滩江景房', icon: '🏨', tag: '住', type: '住宿', price: 600, desc: '落地窗外就是外滩天际线与江面灯火。夜里靠在窗边听海关钟声，早晨被阳光里的海关大楼叫醒。' },
+    ],
+    stories: [
+      { id: 'shanghai_story_wukang', name: '武康大楼的护栏', icon: '📸', desc: '这艘"巨轮"成了顶流机位后，马路对面的拍照人群差点站到机动车道上，街道只好装上护栏与斑马线。网红楼的安全带。' },
+      { id: 'shanghai_story_linalu', name: '玲娜贝儿排队战', icon: '🦊', desc: '迪士尼新顶流"川沙妲己"玲娜贝儿见面会，凌晨排队三小时起步，代购价一度翻十倍。一只狐狸的娱乐圈。' },
+      { id: 'shanghai_story_sanjiantao', name: '陆家嘴"厨房三件套"', icon: '🏙️', desc: '开瓶器（环球金融中心）、注射器（金茂大厦）、打蛋器（上海中心）——三座摩天楼被市民调侃成厨房套装，官方都默认了。' },
+      { id: 'shanghai_story_1933', name: '宰牲场变创意园', icon: '🏢', desc: '1933老场坊曾是远东最大宰牲场，廊桥交错的混凝土迷宫如今成了秀场与咖啡空间。回环迷路才对味。' },
+      { id: 'shanghai_story_dabaitu', name: '大白兔的"跨界"宇宙', icon: '🐰', desc: '奶糖味润唇膏、香水、沐浴乳……大白兔联名出一款火一款。网友：涂上就是行走的"七粒等于一杯牛奶"。' },
+      { id: 'shanghai_story_haiguan', name: '海关大楼的钟声', icon: '🕰️', desc: '外滩海关大钟是亚洲第一大钟，报时曲换过《威斯敏斯特》《东方红》。整点钟声一响，全上海都校表。' },
+    ],
+  });
+})();

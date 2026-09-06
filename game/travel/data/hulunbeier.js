@@ -1,0 +1,52 @@
+/* ============ hulunbeier ============ */
+(function () {
+window.TRAVEL_CITIES = window.TRAVEL_CITIES || [];
+  window.TRAVEL_CITIES.push({
+    id: 'hulunbeier',
+    name: '呼伦贝尔',
+    country: '中国',
+    cc: 'CN',
+    province: '内蒙古',
+    flag: '🇨🇳',
+    region: '塞北',
+    hero: '🐎',
+    desc: '中国最美草原，天下第一曲水蜿蜒其间。牛羊像散落的珍珠，马蹄踏碎晨雾，蒙古包的炊烟是草原唯一的路标。',
+    travel: [{ name: '飞机', icon: '✈️', cost: 1200 }, { name: '火车', icon: '🚂', cost: 700 }],
+    visa: null,
+    spots: [
+      { id: 'hulunbeier_caoyuan', name: '呼伦贝尔大草原', icon: '🌾', price: 30, desc: '世界四大草原之一，六月绿到天边。金帐汗部落门前，勒勒车与敖包静立，风吹草低见牛羊不是诗句是实景。' },
+      { id: 'hulunbeier_morigele', name: '莫日格勒河', icon: '🌊', price: 0, desc: '"天下第一曲水"，一条河在草原上拧出上百道弯。制高点俯瞰，河道如银色绸带，夕阳下泛着碎金。' },
+      { id: 'hulunbeier_shidi', name: '额尔古纳湿地', icon: '🦅', price: 65, desc: '亚洲第一湿地，根河在绿洲间画出马蹄岛。栈道尽头俯瞰，白桦林、灌木丛与河湾拼成北疆的调色盘。' },
+      { id: 'hulunbeier_guomen', name: '满洲里国门', icon: '🚂', price: 70, desc: '中俄国境线上的巍峨国门，41号界碑旁仰望。绿皮火车轰隆穿过，国旗下合影的人排成长队。' },
+      { id: 'hulunbeier_taowa', name: '套娃广场', icon: '🎎', price: 100, desc: '全球最大套娃建筑群，三十米高的彩绘套娃楼。中俄蒙三色风情在夜晚亮灯后梦幻值拉满，像个巨大糖果盒。' },
+      { id: 'hulunbeier_baihualin', name: '白桦林景区', icon: '🌲', price: 60, desc: '成片白桦笔直如剑，树皮斑白如雪。林间栈道散步，阳光从叶隙筛下光斑，是森林系写真的天然影棚。' },
+      { id: 'hulunbeier_shiwei', name: '室韦·恩和乡村', icon: '🏡', price: 0, desc: '中俄边境的木刻楞村庄，蓝眼睛黄头发的俄罗斯族大叔用东北话跟你唠嗑。列巴房飘香，向日葵开满木篱笆。' },
+    ],
+    souvenirs: [
+      { id: 'hulunbeier_kaoyang', name: '烤全羊', icon: '🐑', tag: '食', type: '美食', price: 888, desc: '整羊上架果木慢烤两小时，皮脆肉嫩冒油花。开羊仪式割"头刀肉"敬贵客，围坐分食是草原待客的最高礼节。' },
+      { id: 'hulunbeier_shoubarou', name: '手把肉', icon: '🍖', tag: '食', type: '美食', price: 88, desc: '清水炖羊肉，只用盐提鲜，用手把着吃。羊肉嫩得没有膻味，蘸韭菜花酱，是草原对味蕾的降维打击。' },
+      { id: 'hulunbeier_guocha', name: '咸奶茶·锅茶', icon: '🥛', tag: '食', type: '饮品', price: 30, desc: '砖茶熬奶加盐，锅里滚着奶皮、炒米、牛肉干。一碗下肚咸香暖胃，牧民一天的力气都从这锅茶来。' },
+      { id: 'hulunbeier_naidoufu', name: '奶豆腐·奶皮子', icon: '🧀', tag: '食', type: '美食', price: 20, desc: '鲜奶发酵压制的奶豆腐，酸奶上凝的奶皮子。嚼着微酸奶香浓，蘸白糖是牧区孩子的甜品。' },
+      { id: 'hulunbeier_mayinaijiu', name: '马奶酒', icon: '🍾', tag: '食', type: '饮品', price: 25, desc: '马奶发酵酿成的低度奶酒，乳白微酸带劲。下马酒迎客礼：银碗一端，歌不停、酒不断，不喝完下不了马。' },
+      { id: 'hulunbeier_lieba', name: '俄式列巴', icon: '🍞', tag: '食', type: '美食', price: 15, desc: '恩和乡列巴房柴火烤制，外壳焦脆内心绵软。配蓝莓酱一口咬下，边境小村的俄罗斯味道。' },
+      { id: 'hulunbeier_lanmeijiang', name: '野生蓝莓酱', icon: '🫐', tag: '食', type: '特产', price: 30, desc: '大兴安岭野生蓝莓小颗浓缩，酸甜到皱眉再回甘。抹列巴、拌奶豆腐，草原森林双拼风味。' },
+      { id: 'hulunbeier_niurougan', name: '风干牛肉干', icon: '🥩', tag: '食', type: '特产', price: 70, desc: '牛后腿肉切条自然风干，嚼劲十足越嚼越香。成吉思汗的"军粮"，如今是自驾草原的后备箱必囤。' },
+      { id: 'hulunbeier_huashupi', name: '桦树皮工艺品', icon: '🧺', tag: '衣', type: '文创', price: 60, desc: '鄂伦春族桦皮技艺，树皮压出驯鹿与山纹。轻巧防潮，是森林民族传了千年的"塑料替代品"。' },
+      { id: 'hulunbeier_qima', name: '草原骑马穿越', icon: '🐎', tag: '玩', type: '体验', price: 150, desc: '马倌带路策马入草原深处，一小时从生疏到人马合一。风从耳边过，草浪往身后退，这才是草原的正确打开方式。' },
+      { id: 'hulunbeier_naadam', name: '那达慕·赛马摔跤', icon: '🏇', tag: '玩', type: '体验', price: 80, desc: '"男儿三艺"同场开赛：少年骑手伏在马背上飞驰，搏克手跳着鹰步入场。锣鼓声里草原的热血全部上线。' },
+      { id: 'hulunbeier_menggubao', name: '蒙古包住宿一晚', icon: '⛺', tag: '住', type: '住宿', price: 280, desc: '住在草原腹地的毡房里，夜里掀帘就是满天银河。清晨被鸟鸣和牛铃叫醒，掀开门帘太阳正从草海升起。' },
+      { id: 'hulunbeier_gouhuo', name: '篝火晚会', icon: '🔥', tag: '玩', type: '体验', price: 50, desc: '夜幕降临草原营地火堆升腾，马头琴响起，游客牧民手拉手跳安代舞。火星飞向夜空，歌声追着风跑。' },
+      { id: 'hulunbeier_jiniunai', name: '挤牛奶·喂羊羔', icon: '🐄', tag: '玩', type: '体验', price: 30, desc: '跟着牧民大姐学挤奶，手法不对牛尾巴先给你一巴掌。奶瓶一递，羊羔们顶撞着来抢，萌到犯规。' },
+      { id: 'hulunbeier_huacao', name: '滑草', icon: '🛹', tag: '玩', type: '体验', price: 50, desc: '坐滑草车从草坡俯冲而下，风声呼啸绿浪翻滚。夏天限定的"雪道"，小孩玩了赖着不走。' },
+      { id: 'hulunbeier_efang', name: '访俄户做列巴', icon: '🏡', tag: '玩', type: '体验', price: 60, desc: '走进恩和俄罗斯族大妈家的木刻楞，揉面、烤列巴、蘸盐吃蜂蜜。临走再跳一曲喀秋莎，舞步不标准没关系。' },
+    ],
+    stories: [
+      { id: 'hulunbeier_story_naadam', name: '那达慕男儿三艺', icon: '🏅', desc: '摔跤、赛马、射箭并称"男儿三艺"，是草原男人的成人礼。搏克手入场跳鹰步、唱赞歌，输赢之外先比气势。' },
+      { id: 'hulunbeier_story_yang', name: '听着音乐长大的羊', icon: '🎵', desc: '"呼伦贝尔的羊听着音乐长大"——文旅局亲自玩梗。草原无污染、牧草带药香，羊肉不膻成了官方认证的骄傲。' },
+      { id: 'hulunbeier_story_quhui', name: '九曲十八弯', icon: '🌀', desc: '莫日格勒河在平坦草原上绕出上百个弯，走了一小时还在原地附近。牧民笑称：这条河散步比马跑得慢。' },
+      { id: 'hulunbeier_story_taowa', name: '满洲里套娃酒店', icon: '🎎', desc: '整栋楼就是一只巨型套娃，房间从里到外都是套娃元素。住进去像被俄罗斯童话吞下，出片率百分百。' },
+      { id: 'hulunbeier_story_lenji', name: '中国冷极在根河', icon: '🥶', desc: '根河测出过零下58度的极寒，却有一条"不冻河"寒冬不结冰。水汽凝成雾凇挂满河岸，冷极反而最出片。' },
+      { id: 'hulunbeier_story_baihua', name: '白桦树皮不能刻', icon: '🚫', desc: '白桦树皮被刻字后难愈合并招虫害，景区刻一字罚款起步。想留念？用桦树皮做的明信片写心愿，环保又浪漫。' },
+    ],
+  });
+})();

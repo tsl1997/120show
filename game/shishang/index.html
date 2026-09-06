@@ -11,7 +11,7 @@
     <header class="topbar">
       <div>
         <h1 id="gameTitle">万界楼 · 史上最强店主</h1>
-        <p class="eyebrow">商通万界，让所有人给我打工 · 从一星到六星店主</p>
+        <p class="eyebrow">商通万界，让所有人给我打工 · 全本：一星到八星，直至周阳之境</p>
       </div>
       <div class="actions">
         <button id="resetBtn" class="btn ghost" type="button">重开一局</button>
@@ -76,6 +76,8 @@
 
     <!-- 位面 -->
     <section class="panel" data-panel="plane">
+      <div id="shuttleBox" class="realm-box" style="display:none;"></div>
+      <div id="convertBox" class="realm-box" style="display:none;"></div>
       <div id="accelBox" class="realm-box" style="display:none;"></div>
       <div class="realm-box">
         <h3>🌍 位面采购</h3>
@@ -103,12 +105,13 @@
     <section class="panel" data-panel="quest">
       <h3 class="sec-title">📜 主线任务（对应原作前期剧情）</h3>
       <div id="questList" class="quests"></div>
+      <div id="finaleBox" class="realm-box villa" style="display:none;"></div>
       <div id="villaBox" class="realm-box villa"></div>
       <h3 class="sec-title">🗒️ 大事记</h3>
       <div id="logList" class="logs"></div>
     </section>
 
-    <footer class="footer">改编自南极烈日《史上最强店主》（一星至六星）· 仅供试玩 · XS 魔法实验室</footer>
+    <footer class="footer">改编自南极烈日《史上最强店主》全本（一星至八星 · 周阳之境）· 仅供试玩 · XS 魔法实验室</footer>
   </main>
 
   <!-- 交易弹窗 -->

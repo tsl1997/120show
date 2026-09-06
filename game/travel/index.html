@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>旅行图鉴之路 | 旅行收集游戏</title>
+<meta name="description" content="出生武汉的旅行收集游戏：景点打卡、特色周边、奇闻趣事，走遍中国，环游世界！">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧳</text></svg>">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <div class="top-title">🧳 旅行图鉴之路</div>
+    <div class="top-stats">
+      <span class="stat money" title="旅行基金">💰 <b id="hud-money">0</b></span>
+      <span class="stat" title="所在城市">📍 <b id="hud-city">武汉</b></span>
+      <span class="stat" title="图鉴收集进度">📖 <b id="hud-progress">0/0</b></span>
+      <button id="btn-reset" title="重新开始">🔄</button>
+    </div>
+  </header>
+
+  <nav id="tabs">
+    <button class="tab active" data-tab="city">🏙 本城</button>
+    <button class="tab" data-tab="map">🗺 世界地图</button>
+    <button class="tab" data-tab="book">📖 图鉴</button>
+    <button class="tab" data-tab="bag">🎒 背包</button>
+    <button class="tab" data-tab="office">🛂 事务所</button>
+  </nav>
+
+  <main id="view"></main>
+
+  <footer id="footbar">本游戏价格参考现实物价 · 收益仅为游戏数值 · 图鉴点亮即获旅行基金</footer>
+</div>
+
+<div id="toast-wrap"></div>
+<div id="modal-wrap" class="hidden"></div>
+
+<!-- 数据文件：新增城市数据后在此追加一行 -->
+
+<script src="data/amsterdam.js"></script>
+<script src="data/athens.js"></script>
+<script src="data/atlanta.js"></script>
+<script src="data/auckland.js"></script>
+<script src="data/austin.js"></script>
+<script src="data/bali.js"></script>
+<script src="data/bangkok.js"></script>
+<script src="data/barcelona.js"></script>
+<script src="data/beijing.js"></script>
+<script src="data/berlin.js"></script>
+<script src="data/boston.js"></script>
+<script src="data/cairo.js"></script>
+<script src="data/capetown.js"></script>
+<script src="data/changchun.js"></script>
+<script src="data/changsha.js"></script>
+<script src="data/chengde.js"></script>
+<script src="data/chengdu.js"></script>
+<script src="data/chicago.js"></script>
+<script src="data/chongqing.js"></script>
+<script src="data/dalian.js"></script>
+<script src="data/dallas.js"></script>
+<script src="data/datong.js"></script>
+<script src="data/detroit.js"></script>
+<script src="data/dubai.js"></script>
+<script src="data/dunhuang.js"></script>
+<script src="data/fukuoka.js"></script>
+<script src="data/guangzhou.js"></script>
+<script src="data/guilin.js"></script>
+<script src="data/guiyang.js"></script>
+<script src="data/haerbin.js"></script>
+<script src="data/hakone.js"></script>
+<script src="data/hangzhou.js"></script>
+<script src="data/hanoi.js"></script>
+<script src="data/hita.js"></script>
+<script src="data/hokkaido.js"></script>
+<script src="data/hongkong.js"></script>
+<script src="data/honolulu.js"></script>
+<script src="data/houston.js"></script>
+<script src="data/huangshan.js"></script>
+<script src="data/huhehaote.js"></script>
+<script src="data/hulunbeier.js"></script>
+<script src="data/isekai_baima.js"></script>
+<script src="data/isekai_bixue.js"></script>
+<script src="data/isekai_conan.js"></script>
+<script src="data/isekai_dazhuzai.js"></script>
+<script src="data/isekai_db.js"></script>
+<script src="data/isekai_douluo.js"></script>
+<script src="data/isekai_doupo.js"></script>
+<script src="data/isekai_feihu.js"></script>
+<script src="data/isekai_fo.js"></script>
+<script src="data/isekai_liancheng.js"></script>
+<script src="data/isekai_longshe.js"></script>
+<script src="data/isekai_luding.js"></script>
+<script src="data/isekai_manghuang.js"></script>
+<script src="data/isekai_naruto.js"></script>
+<script src="data/op/op_01_world_spots.js"></script>
+<script src="data/op/op_02_crew.js"></script>
+<script src="data/op/op_03_yonko_a.js"></script>
+<script src="data/op/op_03_yonko_b.js"></script>
+<script src="data/op/op_03_yonko_c.js"></script>
+<script src="data/op/op_04_marine.js"></script>
+<script src="data/op/op_05_gov.js"></script>
+<script src="data/op/op_05_rev.js"></script>
+<script src="data/op/op_06_shichibukai.js"></script>
+<script src="data/op/op_06_supernova.js"></script>
+<script src="data/op/op_07_dark.js"></script>
+<script src="data/op/op_07_impel.js"></script>
+<script src="data/op/op_08_east_blue.js"></script>
+<script src="data/op/op_08_alabasta.js"></script>
+<script src="data/op/op_08_skypiea.js"></script>
+<script src="data/op/op_08_water7.js"></script>
+<script src="data/op/op_08_thriller.js"></script>
+<script src="data/op/op_08_fishman.js"></script>
+<script src="data/op/op_08_dressrosa.js"></script>
+<script src="data/op/op_08_zou_wano.js"></script>
+<script src="data/op/op_08_egghead.js"></script>
+<script src="data/op/op_09_treasure_a.js"></script>
+<script src="data/op/op_09_treasure_b.js"></script>
+<script src="data/op/op_10_events.js"></script>
+<script src="data/isekai_onepiece.js"></script>
+<script src="data/isekai_panlong.js"></script>
+<script src="data/isekai_sailormoon.js"></script>
+<script src="data/isekai_sheDiao.js"></script>
+<script src="data/isekai_shendiao.js"></script>
+<script src="data/isekai_shenmu.js"></script>
+<script src="data/isekai_shujian.js"></script>
+<script src="data/isekai_slamdunk.js"></script>
+<script src="data/isekai_tianlong.js"></script>
+<script src="data/isekai_tunshi.js"></script>
+<script src="data/isekai_wanmei_shengxu.js"></script>
+<script src="data/isekai_wudong.js"></script>
+<script src="data/isekai_xiake.js"></script>
+<script src="data/isekai_xiaoao.js"></script>
+<script src="data/isekai_xingchen.js"></script>
+<script src="data/isekai_xueshan.js"></script>
+<script src="data/isekai_xueying.js"></script>
+<script src="data/isekai_yangshen.js"></script>
+<script src="data/isekai_yitian.js"></script>
+<script src="data/isekai_yuanyang.js"></script>
+<script src="data/isekai_yuenv.js"></script>
+<script src="data/isekai_zhetian.js"></script>
+<script src="data/jingdezhen.js"></script>
+<script src="data/jingzhou.js"></script>
+<script src="data/kaifeng.js"></script>
+<script src="data/kamakura.js"></script>
+<script src="data/kashi.js"></script>
+<script src="data/kualalumpur.js"></script>
+<script src="data/kumamoto.js"></script>
+<script src="data/kyoto.js"></script>
+<script src="data/lanzhou.js"></script>
+<script src="data/lasa.js"></script>
+<script src="data/lasvegas.js"></script>
+<script src="data/leshan.js"></script>
+<script src="data/lijiang.js"></script>
+<script src="data/lisbon.js"></script>
+<script src="data/london.js"></script>
+<script src="data/losangeles.js"></script>
+<script src="data/luoyang.js"></script>
+<script src="data/macau.js"></script>
+<script src="data/matsuyama.js"></script>
+<script src="data/miami.js"></script>
+<script src="data/minneapolis.js"></script>
+<script src="data/mohe.js"></script>
+<script src="data/moscow.js"></script>
+<script src="data/nagoya.js"></script>
+<script src="data/nairobi.js"></script>
+<script src="data/nanjing.js"></script>
+<script src="data/nara.js"></script>
+<script src="data/newdelhi.js"></script>
+<script src="data/neworleans.js"></script>
+<script src="data/newyork.js"></script>
+<script src="data/okinawa.js"></script>
+<script src="data/orlando.js"></script>
+<script src="data/osaka.js"></script>
+<script src="data/paris.js"></script>
+<script src="data/philadelphia.js"></script>
+<script src="data/pingyao.js"></script>
+<script src="data/prague.js"></script>
+<script src="data/qingdao.js"></script>
+<script src="data/quanzhou.js"></script>
+<script src="data/rio.js"></script>
+<script src="data/rome.js"></script>
+<script src="data/saitama.js"></script>
+<script src="data/sandiego.js"></script>
+<script src="data/sanfrancisco.js"></script>
+<script src="data/sanya.js"></script>
+<script src="data/seattle.js"></script>
+<script src="data/sendai.js"></script>
+<script src="data/seoul.js"></script>
+<script src="data/series_anime_a.js"></script>
+<script src="data/series_anime_b.js"></script>
+<script src="data/series_devilfruit.js"></script>
+<script src="data/series_tokusatsu.js"></script>
+<script src="data/series_world.js"></script>
+<script src="data/shanghai.js"></script>
+<script src="data/shaoxing.js"></script>
+<script src="data/shenyang.js"></script>
+<script src="data/shenzhen.js"></script>
+<script src="data/shizuoka.js"></script>
+<script src="data/singapore.js"></script>
+<script src="data/suzhou.js"></script>
+<script src="data/sydney.js"></script>
+<script src="data/taian.js"></script>
+<script src="data/taibei.js"></script>
+<script src="data/takaoka.js"></script>
+<script src="data/tianjin.js"></script>
+<script src="data/tokyo.js"></script>
+<script src="data/toronto.js"></script>
+<script src="data/tottori.js"></script>
+<script src="data/vancouver.js"></script>
+<script src="data/vienna.js"></script>
+<script src="data/washington.js"></script>
+<script src="data/wuhan.js"></script>
+<script src="data/wulumuqi.js"></script>
+<script src="data/xiamen.js"></script>
+<script src="data/xian.js"></script>
+<script src="data/xiangyang.js"></script>
+<script src="data/xining.js"></script>
+<script src="data/xishuangbanna.js"></script>
+<script src="data/yangzhou.js"></script>
+<script src="data/yinchuan.js"></script>
+<script src="data/yokohama.js"></script>
+<script src="data/zhangjiajie.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

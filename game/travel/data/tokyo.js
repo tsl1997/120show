@@ -1,0 +1,51 @@
+/* ============ 日本·东京都 ============ */
+(function () {
+  window.TRAVEL_CITIES = window.TRAVEL_CITIES || [];
+  window.TRAVEL_CITIES.push({
+    id: 'tokyo',
+    name: '东京都',
+    country: '日本',
+    cc: 'JP',
+    flag: '🇯🇵',
+    region: '日本·关东',
+    hero: '🗼',
+    desc: '首善之都·都道府县之首：涩谷的人潮、浅草的雷门、晴空塔下的天空树与烟火气，一座把未来与江户叠在一起的城市。',
+    travel: [{ name: '飞机', icon: '✈️', cost: 2200 }, { name: '邮轮', icon: '🛳️', cost: 3800 }],
+    visa: { cost: 300, note: '日本单次旅游签证（旅行社代办）' },
+    spots: [
+      { id: 'tokyo_sensoji', name: '浅草寺·雷门', icon: '🏮', price: 0, desc: '东京最古老的寺庙，巨大红灯笼是"江户风格"的门面。仲见世商店街一路小吃到本堂，抽一签、求一符才算来过。' },
+      { id: 'tokyo_skytree', name: '东京晴空塔', icon: '🗼', price: 120, desc: '634米的世界第一高塔，350米展望台俯瞰关东平原。晴天能望到富士山，天望甲板的玻璃地板让人腿软。' },
+      { id: 'tokyo_meiji', name: '明治神宫', icon: '⛩️', price: 0, desc: '市中心的一片百年森林，鸟居与碎石参道自带结界感。写一块绘马、看一场传统婚礼，转身就是原宿街头。' },
+      { id: 'tokyo_shibuya', name: '涩谷十字路口', icon: '🚦', price: 0, desc: '全球最忙的十字路口，绿灯一亮三千人同时对角线过街。忠犬八公铜像前等人，看一次"人浪"就上头。' },
+      { id: 'tokyo_disney', name: '东京迪士尼度假区', icon: '🏰', price: 480, desc: '迪士尼乐园与全球唯一的迪士尼海洋双园。盐味爆米花、美女与野兽城堡、梦幻电动花车，一天根本不够。' },
+      { id: 'tokyo_ueno', name: '上野公园·博物馆群', icon: '🌸', price: 0, desc: '樱花季的东京第一赏花地，公园里挤着国立博物馆与美术馆。西乡隆盛铜像下的野餐垫，是日本春日的经典构图。' },
+      { id: 'tokyo_koukyo', name: '皇居外苑·二重桥', icon: '🏯', price: 0, desc: '日本天皇居所外围的护城河与石垣，二重桥倒影是明信片封面。慢跑的东京人在环绕皇居的跑道上刷圈。' },
+      { id: 'tokyo_ginza', name: '银座', icon: '🛍️', price: 0, desc: '全球最贵的商业街之一，周末变步行街。百年和果子铺与奢侈品旗舰店同排而立，橱窗就是艺术展。' },
+    ],
+    souvenirs: [
+      { id: 'tokyo_ichiran', name: '一兰拉面', icon: '🍜', tag: '食', type: '美食', price: 60, desc: '24小时营业的豚骨拉面，隔间点单、汤汁一滴不剩的"完食"文化。辣度软硬自选，深夜的治愈天花板。' },
+      { id: 'tokyo_sushi', name: '回转寿司', icon: '🍣', tag: '食', type: '美食', price: 100, desc: '两盘一千日元的平价寿司，金枪鱼中腹入口即化。触屏点单、新干线小车送餐，吃的是新鲜加科技感。' },
+      { id: 'tokyo_wagyu', name: '和牛烧肉', icon: '🥩', tag: '食', type: '美食', price: 300, desc: 'A5和牛的雪花纹理在炭火上滋滋作响，一片融化在舌尖。配一碗米饭就是"人生豪华时刻"。' },
+      { id: 'tokyo_tenpura', name: '天妇罗套餐', icon: '🍤', tag: '食', type: '美食', price: 120, desc: '大虾、星鳗、时蔬裹薄浆现炸，蘸天露或盐。酥脆不油腻，老师傅的油温就是职人功夫。' },
+      { id: 'tokyo_matcha', name: '抹茶冰淇淋·和果子', icon: '🍦', tag: '食', type: '美食', price: 25, desc: '宇治抹茶苦香回甘，铜锣烧、大福排成一排。浅草街头的"抹茶阶梯"，颜色越深越贵。' },
+      { id: 'tokyo_osake', name: '日本清酒', icon: '🍶', tag: '食', type: '饮品', price: 60, desc: '獭祭、久保田冰镇微甘。居酒屋来一合，配毛豆烤串，就是日剧里的下班瞬间。' },
+      { id: 'tokyo_banana', name: '东京香蕉·白色恋人', icon: '🍌', tag: '食', type: '特产', price: 40, desc: '香蕉造型海绵蛋糕夹香蕉奶油，机场手信区永远的C位。伴手礼文化讲究到包装都舍不得扔。' },
+      { id: 'tokyo_manhua', name: '动漫手办·周边', icon: '🤖', tag: '衣', type: '文创', price: 150, desc: '秋叶原的手办塔、扭蛋墙、抓娃娃机宇宙。二次元圣地里，钱包需要有人看管。' },
+      { id: 'tokyo_ukiyoe', name: '浮世绘文创', icon: '🖼️', tag: '衣', type: '文创', price: 80, desc: '神奈川冲浪里印上手巾、明信片与扇子。江户美学一百年前就征服了世界，现在征服你的行李箱。' },
+      { id: 'tokyo_yamanote', name: 'JR山手线环线', icon: '🚃', tag: '行', type: '体验', price: 15, desc: '花十几块钱坐一圈山手线，东京的心脏在窗外流转。一小时内路过涩谷、新宿、秋叶原，性价比之王。' },
+      { id: 'tokyo_metro_pass', name: '东京地铁一日券', icon: '🚇', tag: '行', type: '体验', price: 40, desc: '一日券在手，13条线随便换乘。东京地铁图初看像拉面，坐两天就是自家小区。' },
+      { id: 'tokyo_maid', name: '秋叶原女仆咖啡厅', icon: '☕', tag: '玩', type: '体验', price: 80, desc: '被称"主人"、画小猫蛋包饭、和女仆合唱主题歌。社死指数五颗星，快乐指数同样五颗星。' },
+      { id: 'tokyo_sento', name: '钱汤·温泉体验', icon: '♨️', tag: '玩', type: '体验', price: 25, desc: '市民澡堂泡个澡，富士山壁画下泡出江户心情。先洗净再入池，是日本温泉的铁规矩。' },
+      { id: 'tokyo_kimono', name: '和服浴衣体验', icon: '👘', tag: '玩', type: '体验', price: 300, desc: '浅草街上租一套浴衣配木屐，漫步雷门下。系带师傅三两下勒出腰身，走路都自动放慢。' },
+      { id: 'tokyo_capusule', name: '新宿胶囊旅馆', icon: '🏨', tag: '住', type: '住宿', price: 250, desc: '两平米的太空舱里睡一晚，公共浴池和漫画房是彩蛋。东京住宿的"赛博体验"，安静得出奇。' },
+    ],
+    stories: [
+      { id: 'tokyo_story_shibuya', name: '十字路口的人浪', icon: '🌊', desc: '涩谷路口单次绿灯过街可达三千人，却几乎不碰撞。摄影师蹲点拍"人浪"，东京人则淡定到不看红绿灯数。' },
+      { id: 'tokyo_story_bianlibu', name: '便利店是深夜食堂', icon: '🏪', desc: '24小时便利店解决东京人一天三餐：关东煮、饭团、炸鸡配啤酒。店员一句"加热吗"是最温柔的都市问候。' },
+      { id: 'tokyo_story_sakura', name: '樱花前线', icon: '🌸', desc: '每年三月日本气象厅发布"樱花前线"，全民追着花期从南到北看花。樱花只开一周，"物哀"美学全在这一周里。' },
+      { id: 'tokyo_story_tate', name: '东京塔与晴空塔', icon: '🗼', desc: '333米的东京塔守了半个世纪，直到634米晴空塔接班。两塔对望像一场接力，老塔如今以橙色灯光继续营业。' },
+      { id: 'tokyo_story_dianche', name: '山手线的"遗忘"传说', icon: '🚃', desc: '山手线是闭环，坐错方向最多绕一圈就回来。传言"在山手线睡过站会环城旅行一整夜"，其实末班车后它真的会休息。' },
+      { id: 'tokyo_story_kaiji', name: '梅雨与夏日祭', icon: '🎆', desc: '六月梅雨连绵，七月花火大会准时开炸。浴衣、团扇、苹果糖，日本夏天的仪式感从气象开始、从祭典高潮。' },
+    ],
+  });
+})();

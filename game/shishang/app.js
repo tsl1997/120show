@@ -37,6 +37,7 @@ function freshState() {
     shelf: [],
     soldOnce: {},
     choice5: false,
+    finale: false,
     choiceOffered: false,
     upgradeOffered: {},
     stats: { trades: 0, servedGoku: 0, totalVp: 0, auctions: 0, known: {}, worldTrips: { shaDiao: 0, xiaoao: 0, longzhu: 0, sanguo: 0, yitian: 0 } },
@@ -165,6 +166,15 @@ function questProgress(i) {
     case 15: return s.shopLevel >= 5;
     case 16: return !!s.storyDone["zhetian:jiulong"];
     case 17: return s.shopLevel >= 6;
+    case 18: return s.shopLevel >= 7;
+    case 19: return !!s.storyDone["shenmu:tiantian"];
+    case 20: return !!s.storyDone["zhenyi:chuanyuezhe"];
+    case 21: return !!s.storyDone["honghuang:zhentian"];
+    case 22: return !!s.storyDone["youxi:yinxing"];
+    case 23: return !!s.storyDone["heikeji:santi"];
+    case 24: return !!s.storyDone["wutian:chudao"];
+    case 25: return !!s.storyDone["wutian:gongbu"];
+    case 26: return !!s.finale;
     default: return s.quests[i] && s.quests[i].done;
   }
 }
@@ -625,12 +635,14 @@ function starMet(level) {
   if (distinctItems() < c.known || state.stats.trades < c.trades) return false;
   if (c.story && !state.storyDone[c.story]) return false;
   if (c.choice && !state.choice5) return false;
+  if (c.realm && realmIndex() < c.realm) return false;
   return true;
 }
 
 function starCondText(level) {
   const c = STAR_CONDITIONS[level];
   let t = "累计上架 " + c.known + " 种商品、完成 " + c.trades + " 笔交易";
+  if (c.realm) t += "，宿主实力达到【" + (REALMS[c.realm] ? REALMS[c.realm].name : "???") + "】";
   if (c.story) t += "，并完成对应剧情";
   if (c.choice) t += "，并与系统摊牌";
   return t;
@@ -638,7 +650,7 @@ function starCondText(level) {
 
 function maybeOfferUpgrade() {
   const next = state.shopLevel + 1;
-  if (!STAR_CONDITIONS[next] || state.shopLevel >= 6) return;
+  if (!STAR_CONDITIONS[next] || state.shopLevel >= 8) return;
   if (next === 5 && !state.choice5) {
     /* 五星：先触发系统摊牌 */
     if (distinctItems() >= STAR_CONDITIONS[5].known && state.stats.trades >= STAR_CONDITIONS[5].trades && !state.choiceOffered) {
@@ -659,7 +671,7 @@ function maybeOfferUpgrade() {
 
 function applyStarUpgrade() {
   const next = state.shopLevel + 1;
-  if (!STAR_CONDITIONS[next] || state.shopLevel >= 6) return;
+  if (!STAR_CONDITIONS[next] || state.shopLevel >= 8) return;
   if (!starMet(next)) { toast("升级条件尚未达成：" + starCondText(next)); return; }
   state.shopLevel = next;
   $("#starModal").classList.remove("open");
@@ -970,6 +982,131 @@ function renderShelf() {
   }
 }
 
+/* ---------------- 时空穿梭（七星权限）---------------- */
+
+let shuttleReadyAt = 0;
+const SHUTTLE_POOL = ["zlbuyao", "daoshu", "hundund", "hongmengT", "xingcb", "tiandaoB"];
+const SHUTTLE_FLAVOR = {
+  zlbuyao: "你回到真龙不死药无主的岁月，采光叶子、抽干神液，再用法阵治愈古龙、抹除记忆——完美犯罪。",
+  daoshu: "你在洪荒录下三千大道的碰撞之声，合成一部《道书》。",
+  hundund: "你跟着盘古捡了一枚混沌魔神的残躯——没让盘古发现，放心。",
+  hongmengT: "永生大世界的远古岁月里，《鸿蒙天道》尚无主人。",
+  xingcb: "吞吸星辰之力的传承，在时空长河的上游静静躺着。",
+  tiandaoB: "你救了幼年狠人大帝的兄长，复刻了昆仑山的血迹，瞒过了所有人。",
+};
+
+function shuttle() {
+  if (state.shopLevel < 7) { toast("七星权限：时空穿梭。"); return; }
+  const now = Date.now();
+  if (now < shuttleReadyAt) { toast("时空长河需要恢复平静（" + Math.ceil((shuttleReadyAt - now) / 1000) + "s）。"); return; }
+  shuttleReadyAt = now + 120000;
+  const id = pick(SHUTTLE_POOL);
+  addItem(id, 1);
+  pushLog("⏳ 时空穿梭：" + SHUTTLE_FLAVOR[id] + "（获得「" + ITEMS[id].name + "」）");
+  toast("⏳ 穿梭归来：「" + ITEMS[id].name + "」+1", true);
+  checkQuests();
+  save(); renderAll();
+}
+
+/* ---------------- 等价转换（八星权限）---------------- */
+
+function convertItem(srcId, dstId) {
+  if (state.shopLevel < 8) { toast("八星权限：等价转化。"); return; }
+  if (!srcId || !dstId || srcId === dstId) { toast("请选择两件不同商品。"); return; }
+  if (!countItem(srcId)) { toast("没有可转化的「" + ITEMS[srcId].name + "」。"); return; }
+  if (ITEMS[srcId].value !== ITEMS[dstId].value) { toast("只能转化为等价值的商品（" + fmt(ITEMS[srcId].value) + " 点）。"); return; }
+  removeItem(srcId, 1);
+  addItem(dstId, 1);
+  pushLog("⚖️ 等价转化：「" + ITEMS[srcId].name + "」→「" + ITEMS[dstId].name + "」（" + fmt(ITEMS[srcId].value) + " 点）。");
+  toast("⚖️ 等价转化成功！", true);
+  save(); renderAll();
+}
+
+function renderConvert() {
+  const box = $("#convertBox");
+  if (!box) return;
+  if (state.shopLevel < 8) { box.style.display = "none"; return; }
+  box.style.display = "";
+  const ids = Object.keys(state.inv);
+  const opts = ids.map(id => '<option value="' + id + '">' + ITEMS[id].name + "（" + fmt(ITEMS[id].value) + " 点）</option>").join("");
+  box.innerHTML = '<h3>⚖️ 等价转化（八星权限）</h3>' +
+    '<p class="muted">一件商品可转化为任意一种等价值的商品——十一阶商品的终极答案。</p>' +
+    '<select id="convSrc">' + (opts || '<option value="">（仓库空空）</option>') + '</select>' +
+    ' → <select id="convDst"></select>' +
+    ' <button id="convBtn" class="btn small primary">转化</button>';
+  const src = box.querySelector("#convSrc");
+  const dst = box.querySelector("#convDst");
+  const fillDst = () => {
+    const v = src.value ? ITEMS[src.value].value : -1;
+    dst.innerHTML = Object.keys(ITEMS).filter(id => ITEMS[id].value === v && id !== src.value)
+      .map(id => '<option value="' + id + '">' + ITEMS[id].name + '</option>').join("") || '<option value="">（无等值商品）</option>';
+  };
+  fillDst();
+  src.onchange = fillDst;
+  box.querySelector("#convBtn").onclick = () => convertItem(src.value, dst.value);
+}
+
+/* ---------------- 废品回收站（八星权限）---------------- */
+
+const JUNK_POOL = [
+  { id: "sangshi", flavor: "一具丧尸残躯被天地排斥到了回收站。" },
+  { id: "xuantie", flavor: "半块废弃的玄铁矿石滚了进来。" },
+  { id: "yaocai", flavor: "一株枯萎的灵芝，居然还剩半分药性。" },
+  { id: "gold_ingot", flavor: "某位皇帝私库漏出来的一枚金锭。" },
+  { id: "fulu", flavor: "一张泡过水的朱砂符箓，晾干还能用。" },
+  { id: "hulu", flavor: "一根断掉的葫芦藤，上面结了个小葫芦。" },
+];
+
+function junkTick() {
+  if (state.shopLevel < 8 || !state.intro) return;
+  if (!roll(0.006)) return;
+  const j = pick(JUNK_POOL);
+  addItem(j.id, 1);
+  pushLog("🗑️ 废品回收站：" + j.flavor + "（获得「" + ITEMS[j.id].name + "」）");
+  toast("🗑️ 废品回收站送来了「" + ITEMS[j.id].name + "」", true);
+  save(); renderRes();
+}
+
+/* ---------------- 大结局：周阳之境 ---------------- */
+
+function renderFinale() {
+  const box = $("#finaleBox");
+  if (!box) return;
+  if (state.quests[25] && state.quests[25].done && !state.finale) {
+    box.style.display = "";
+    box.innerHTML = '<h3>👁️ 万界楼 · 第九层</h3>' +
+      '<p class="muted">诸天万界诞生前的玄妙状态在你面前展开：莫可名状，不可言明，有无非无。</p>' +
+      '<button id="finaleBtn" class="btn primary">踏入第九层，证道定义境</button>';
+    const b = $("#finaleBtn");
+    if (b) b.onclick = showFinalEnding;
+  } else if (state.finale) {
+    box.style.display = "";
+    box.innerHTML = '<h3>👁️ 周阳之境</h3><p class="muted">诸天万界以你的存在而存在。你已经把"定义"二字，写进了万物之内。</p>';
+  } else {
+    box.style.display = "none";
+  }
+}
+
+function showFinalEnding() {
+  state.finale = true;
+  checkQuests();
+  $("#endTitle").textContent = "周阳之境 · 永远的万界楼（大结局）";
+  $("#endText").innerHTML =
+    "你踏入万界楼第九层。那里是诸天万界诞生前的玄妙状态——有无非无，既不是存在，也不是非存在。<br><br>" +
+    "你踏出一步，玄妙状态被打破，衍化出最高等级的粒子状态能量，又被你的功法反复吞噬。无数个循环之后，一个前所未有的境界诞生了——<br>" +
+    "<b>定义境，周阳之境。</b><br>" +
+    "「诸天万界以他的存在而存在的境界。只有他认同的一切，才能存在；他没有认同的一切，一瞬间就会湮灭。」<br><br>" +
+    "时间与空间——最初诞生的'变'与'存在'——在你面前微微颔首。你没有沉迷至高，也没有离开万界楼：宣布九层庆典、给新来的楚风塞了张金卡、看小南极写下《史上最强店主》……<br><br>" +
+    "无数年后，又一个走投无路的年轻人听到那个熟悉的声音：<br>" +
+    "<b>「是否愿意进入万界楼，这里可以满足你的一切需求？」<br>「愿意！」</b><br><br>" +
+    "—— 商通万界，让所有人给我打工。全书完，感谢游玩。" +
+    '<br><span class="muted">（你可以继续自由经营，或点击「重开一局」再入轮回。）</span>';
+  $("#endModal").classList.add("open");
+  pushLog("👁️ 你踏入第九层，证得定义境——周阳之境。永远的万界楼，开张了。");
+  save();
+  renderAll();
+}
+
 /* ---------------- 渲染 ---------------- */
 
 function renderAll() {
@@ -981,6 +1118,7 @@ function renderAll() {
   renderQuests();
   renderStaff();
   renderShelf();
+  renderFinale();
 }
 
 function renderRes() {
@@ -1157,6 +1295,22 @@ function renderStudy() {
 }
 
 function renderPlane() {
+  /* 时空穿梭（七星权限） */
+  const shuttle = $("#shuttleBox");
+  if (shuttle) {
+    if (state.shopLevel >= 7) {
+      const cd = Math.ceil((shuttleReadyAt - Date.now()) / 1000);
+      shuttle.style.display = "";
+      shuttle.innerHTML = '<h3>⏳ 时空穿梭（七星权限）</h3>' +
+        '<p class="muted">凡连通的世界，皆可穿梭时间长河——不得改变历史巨变，否则拿走的一切化为虚无。冷却 2 分钟。</p>' +
+        '<button id="shuttleBtn" class="btn primary">' + (cd > 0 ? "时间长河恢复中（" + cd + "s）" : "穿梭时空，薅一波羊毛") + '</button>';
+      const b = shuttle.querySelector("#shuttleBtn");
+      if (b) { b.disabled = cd > 0; b.onclick = shuttle; }
+    } else {
+      shuttle.style.display = "none";
+    }
+  }
+  renderConvert();
   /* 时间加速（六星权限） */
   const accel = $("#accelBox");
   if (accel) {
@@ -1380,6 +1534,8 @@ function tick() {
   }
   /* 万界货架自动交易（三星+） */
   shelfTick();
+  /* 废品回收站（八星权限） */
+  junkTick();
   maybeOfferUpgrade();
   renderLobby();
   if (now % 10000 < 1100) { save(); renderRes(); }
