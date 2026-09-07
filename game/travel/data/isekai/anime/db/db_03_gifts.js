@@ -1,0 +1,31 @@
+/* 异世界·龙珠 分册03：特色宝物 */
+window.DB_GIFTS = window.DB_GIFTS || [];
+window.DB_GIFTS.push(
+  { id: 'dbg_ball4', name: '四星球', icon: '🟠', tag: '玩', type: '宝物', price: 180, desc: '爷爷孙悟饭的遗物，悟空的命根子——七颗龙珠之一。' },
+  { id: 'dbg_balls7', name: '七龙珠集齐套装', icon: '🐉', tag: '玩', type: '宝物', price: 300, desc: '集齐七颗召唤神龙——"说出你的愿望吧！"（一年内只能一次）' },
+  { id: 'dbg_nyoi', name: '如意棒', icon: '🥢', tag: '玩', type: '宝物', price: 120, desc: '能伸能缩的金箍棒——小悟空的坐骑与武器。' },
+  { id: 'dbg_kinto', name: '筋斗云', icon: '☁️', tag: '行', type: '宝物', price: 140, desc: '心不纯的人坐不上去——悟空的专属飞行云。' },
+  { id: 'dbg_kameha', name: '龟派气功修行手册', icon: '🌊', tag: '玩', type: '秘籍', price: 180, desc: '"卡——美——哈——美——哈！"龟仙人的绝学传承。' },
+  { id: 'dbg_kaio_ken', name: '界王拳', icon: '🔴', tag: '玩', type: '秘籍', price: 220, desc: '北界王的极限倍增术——"两倍界王拳！二十倍界王拳！"' },
+  { id: 'dbg_genkidama', name: '元气弹', icon: '🌀', tag: '玩', type: '秘籍', price: 240, desc: '向万物的元气借力——"把手举起来！把元气借给我！"' },
+  { id: 'dbg_senzu', name: '仙豆', icon: '🫘', tag: '食', type: '美食', price: 200, desc: '吃一颗十日不饿、伤全愈的神奇豆子——加林仙人的战略物资。' },
+  { id: 'dbg_scout', name: '战斗力测试仪（斯考特）', icon: '📟', tag: '玩', type: '宝物', price: 150, desc: '"战五渣"的出处——贝吉塔时代的战斗力测量器。' },
+  { id: 'dbg_radar', name: '龙珠雷达', icon: '📡', tag: '玩', type: '宝物', price: 170, desc: '布尔玛的发明，龙珠追踪神器——冒险的起点。' },
+  { id: 'dbg_capsule', name: '万能胶囊（Hoi-Poi）', icon: '💊', tag: '玩', type: '宝物', price: 120, desc: '房子汽车装进口袋——胶囊公司的黑科技。' },
+  { id: 'dbg_saiyan_armor', name: '赛亚人战斗服', icon: '🛡️', tag: '衣', type: '服饰', price: 160, desc: '白色护甲+蓝色紧身衣——弗利萨军团的标配战衣。' },
+  { id: 'dbg_scythe_sword', name: '特兰克斯的剑', icon: '🗡️', tag: '玩', type: '宝物', price: 160, desc: '一刀两断弗利萨的传家宝剑——未来战士的证明。' },
+  { id: 'dbg_goku_gi', name: '悟空的蓝色道服', icon: '🥋', tag: '衣', type: '服饰', price: 150, desc: '龟仙流的橙色道服与"龟"字——悟空的标志战衣。' },
+  { id: 'dbg_piccolo_cape', name: '比克的白色披风', icon: '💚', tag: '衣', type: '服饰', price: 140, desc: '那美克战士的白色披风与紫色道服——沉默的守护者。' },
+  { id: 'dbg_weights', name: '龟仙人的负重护具', icon: '🏋️', tag: '玩', type: '宝物', price: 130, desc: '乌龟壳负重训练——"脱下它你就变强了"。' },
+  { id: 'dbg_potara', name: '坡塔拉耳环', icon: '💎', tag: '玩', type: '宝物', price: 240, desc: '界王神的合体神器——"贝吉特"诞生的秘密。' },
+  { id: 'dbg_mafuba', name: '魔封波', icon: '🍶', tag: '玩', type: '秘籍', price: 220, desc: '武泰斗的封印绝技——"进电饭锅里去吧！"的元祖招式。' },
+  { id: 'dbg_spirit_sword', name: '元气剑', icon: '⚡', tag: '玩', type: '秘籍', price: 200, desc: '悟饭的手刀化剑——"爸爸，看我的元气剑！"' },
+  { id: 'dbg_saiyan_pod', name: '赛亚人太空舱', icon: '🛸', tag: '行', type: '宝物', price: 170, desc: '摇篮与逃生舱——卡卡罗特来到地球的摇篮。' },
+  { id: 'dbg_namek_ship', name: '那美克星飞船', icon: '🚀', tag: '行', type: '宝物', price: 150, desc: '布尔玛改装的宇宙飞船——通往那美克星的一百天旅程。' },
+  { id: 'dbg_final_flash', name: '贝吉塔的终极闪光', icon: '💥', tag: '玩', type: '秘籍', price: 210, desc: '"Final Flash！"——王子拼上性命的大招。' },
+  { id: 'dbg_destructo', name: '气圆斩（气元斩）', icon: '🌀', tag: '玩', type: '秘籍', price: 170, desc: '克林的圆盘气功——切山切海切尾巴的得意技。' },
+  { id: 'dbg_saiyan_tail', name: '赛亚人的尾巴', icon: '🐒', tag: '玩', type: '宝物', price: 150, desc: '满月变身大猿的秘密——被剪掉又长出来的烦恼。' },
+  { id: 'dbg_zeno_button', name: '全王的按钮', icon: '🌈', tag: '玩', type: '宝物', price: 280, desc: '一键召见全王——"毁灭宇宙"级别的玩具。' },
+  { id: 'dbg_mrmouth', name: '武道会冠军腰带', icon: '🏅', tag: '衣', type: '宝物', price: 140, desc: '撒旦先生的天下第一证明——搞笑又悲壮的荣耀。' },
+  { id: 'dbg_ubi_book', name: '悟饭的学者论文', icon: '📚', tag: '玩', type: '文创', price: 90, desc: '"我不想打架，我想当学者"——赛亚人学霸的终点。' }
+);

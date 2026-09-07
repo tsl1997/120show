@@ -1,0 +1,30 @@
+/* 异世界·灌篮高手 分册03：特色宝物 */
+window.SL_GIFTS = window.SL_GIFTS || [];
+window.SL_GIFTS.push(
+  { id: 'slg_jersey10', name: '湘北10号球衣', icon: '🎽', tag: '衣', type: '服饰', price: 140, desc: '樱木花道同款红白球衣，背后印"花道"——天才的号码。' },
+  { id: 'slg_jersey11', name: '湘北11号球衣', icon: '🎽', tag: '衣', type: '服饰', price: 150, desc: '流川枫的王牌号码，"全日本第一的高中生"目标款。' },
+  { id: 'slg_jersey4', name: '湘北4号队长球衣', icon: '🎖️', tag: '衣', type: '服饰', price: 130, desc: '赤木刚宪的队长号码，全国制霸梦想的重量。' },
+  { id: 'slg_jersey14', name: '湘北14号球衣', icon: '🎯', tag: '衣', type: '服饰', price: 130, desc: '三井寿的三分射手号码——浪子回头的证明。' },
+  { id: 'slg_jersey7', name: '湘北7号球衣', icon: '⚡', tag: '衣', type: '服饰', price: 120, desc: '宫城良田的闪电号码，"神奈川第一速度"。' },
+  { id: 'slg_ball', name: '灌篮高手比赛用球', icon: '🏀', tag: '玩', type: '宝物', price: 100, desc: '联名比赛用球，"天才"签名款——晴子问出的那颗篮球。' },
+  { id: 'slg_choco', name: '安西教练的零食', icon: '🍫', tag: '食', type: '美食', price: 40, desc: '"你现在放弃的话，比赛就结束了"——白发的佛的茶点。' },
+  { id: 'slg_rukawa_pad', name: '流川枫护腕', icon: '🦊', tag: '衣', type: '服饰', price: 70, desc: '"大笨蛋"流川枫同款护腕，冷脸小狐狸的装备。' },
+  { id: 'slg_flag', name: '湘北队旗', icon: '🚩', tag: '衣', type: '宝物', price: 90, desc: '全国大赛湘北队旗，"湘北王牌"的荣耀之旗。' },
+  { id: 'slg_illust', name: '井上雄彦画集', icon: '📚', tag: '玩', type: '文创', price: 130, desc: '《PLUS/SLAM DUNK ILLUSTRATIONS》画集复刻，青春圣经的手稿。' },
+  { id: 'slg_mitsui_badge', name: '"我想打篮球"徽章', icon: '🎖️', tag: '玩', type: '徽章', price: 50, desc: '浪子回头名场面徽章——"安西教练，我想打篮球"。' },
+  { id: 'slg_genius_sign', name: '"我是天才"手幅', icon: '✍️', tag: '玩', type: '文创', price: 60, desc: '樱木花道语录手幅——天才的自信口号。' },
+  { id: 'slg_hair_dye', name: '樱木的染发膏', icon: '🎨', tag: '玩', type: '文创', price: 40, desc: '一头红发的来历——不良少年的自我标识。' },
+  { id: 'slg_rukawa_bike', name: '流川枫的自行车', icon: '🚲', tag: '行', type: '宝物', price: 90, desc: '单手骑行睡着也能骑的车——上课睡觉的提前彩排。' },
+  { id: 'slg_sendoh_rod', name: '仙道的钓鱼竿', icon: '🎣', tag: '玩', type: '宝物', price: 90, desc: '"钓鱼的时候什么都想不通"——天才的禅意装备。' },
+  { id: 'slg_uozumi_knife', name: '鱼住的厨师刀', icon: '🔪', tag: '玩', type: '宝物', price: 90, desc: '"第二个梦想也是梦想"——中锋放弃篮球的选择。' },
+  { id: 'slg_maki_mvp', name: '牧绅一的MVP奖杯', icon: '👑', tag: '玩', type: '宝物', price: 140, desc: '神奈川帝王的荣耀，十六年王者的象征。' },
+  { id: 'slg_fujima_whistle', name: '藤真的哨子', icon: '🕊️', tag: '玩', type: '宝物', price: 110, desc: '球员兼教练的信物——紫白军团的优雅指挥。' },
+  { id: 'slg_hikoichi_note', name: '彦一的笔记本', icon: '📓', tag: '玩', type: '文创', price: 60, desc: '"记录所有比赛"——未来教练的第一步。' },
+  { id: 'slg_sannoh_pennant', name: '山王三连霸锦旗', icon: '👑', tag: '衣', type: '宝物', price: 160, desc: '全国三连霸的最强证明——被湘北终结的传说。' },
+  { id: 'slg_sakuragi_knee', name: '樱木的护膝', icon: '🩹', tag: '衣', type: '宝物', price: 80, desc: '两万球特训与背伤的见证——"我最喜欢现在的时刻"。' },
+  { id: 'slg_ayako_fan', name: '彩子的战术扇', icon: '📣', tag: '玩', type: '宝物', price: 70, desc: '啪的一声敲醒球员——湘北女军师的指挥棒。' },
+  { id: 'slg_haruko_ribbon', name: '晴子的应援彩带', icon: '🎀', tag: '衣', type: '宝物', price: 60, desc: '"花道君加油！"篮球部应援的粉色元气。' },
+  { id: 'slg_morishige_record', name: '森重宽的成绩单', icon: '🌪️', tag: '玩', type: '文创', price: 80, desc: '一年级50分20篮板——新时代怪物的数据。' },
+  { id: 'slg_nationals_ticket', name: '全国大会门票', icon: '🎟️', tag: '玩', type: '宝物', price: 100, desc: '神奈川代表队的入场券——湘北三年的梦想。' },
+  { id: 'slg_videotape', name: '山王战录像带', icon: '📼', tag: '玩', type: '宝物', price: 110, desc: '研究最强对手的作战资料——湘北的复仇剧本。' }
+);

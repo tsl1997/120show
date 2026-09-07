@@ -1,0 +1,31 @@
+/* 异世界·火影忍者 分册06：一族·尾兽·通灵兽 */
+window.NA_STORIES = window.NA_STORIES || [];
+window.NA_STORIES.push(
+  { id: 'naz_hyuga', name: '日向一族（宗家与分家）', icon: '👁️', desc: '白眼的瞳术家族。宗家与分家的咒印之别——"笼中鸟"的命运，宁次挣脱的枷锁。' },
+  { id: 'naz_hiashi', name: '日向日足', icon: '🥷', desc: '雏田与花火之父，日向宗家当主。弟弟日差的死与宁次的心结——"对不起，让我代替你活下去"。' },
+  { id: 'naz_hanabi', name: '日向花火', icon: '🎆', desc: '雏田的妹妹，白眼的天才——博人传的种子调查团成员。' },
+  { id: 'naz_hizashi', name: '日向日差', icon: '🕯️', desc: '宁次的父亲，为哥哥赴死的分家。"我不是为了宗家，我是自己选择了死亡"。' },
+  { id: 'naz_ink_butterfly', name: '猪鹿蝶', icon: '🦋', desc: '山中（猪）·秋道（鹿）·奈良（蝶）三族的组合秘术。鹿丸井野丁次——"猪鹿蝶"之名传承三代。' },
+  { id: 'naz_shikaku', name: '父辈的猪鹿蝶', icon: '♟️', desc: '鹿久、丁座、亥一——第四次大战联合军的头脑"鹿久"最后一声"拜托了"。' },
+  { id: 'naz_shukaku', name: '一尾·守鹤', icon: '🦝', desc: '砂隐的尾兽，风遁与封印术的狸猫。"被当作工具的孤独"——与鸣人成为朋友的第一只尾兽。' },
+  { id: 'naz_matatabi', name: '二尾·又旅', icon: '🐱', desc: '云隐的猫又尾兽，二位柚木门的人柱力。' },
+  { id: 'naz_isobu', name: '三尾·矶抚', icon: '🐢', desc: '雾隐的龟尾兽，照美冥时代曾被迪达拉捕获。' },
+  { id: 'naz_son_goku', name: '四尾·孙悟空', icon: '🐒', desc: '岩隐的猿王尾兽，"老孙"的自称——熔遁的猿王。' },
+  { id: 'naz_kokuo', name: '五尾·穆王', icon: '🐴', desc: '岩隐的骏马尾兽，汉的人柱力——沸遁的蒸汽战马。' },
+  { id: 'naz_saiken', name: '六尾·犀犬', icon: '🐌', desc: '雾隐的蛞蝓尾兽，泡沫忍者羽辉的人柱力。' },
+  { id: 'naz_chomei', name: '七尾·重明', icon: '🦋', desc: '泷隐的独角仙尾兽，芙的人柱力——七只翅膀的鳞粉飞行。' },
+  { id: 'naz_gyuki', name: '八尾·牛鬼', icon: '🐙', desc: '云隐的章鱼牛尾兽，奇拉比的"说唱搭档"。"因为我们相信彼此"——人柱力的模范。' },
+  { id: 'naz_kurama', name: '九尾·九喇嘛', icon: '🦊', desc: '九尾狐，最强的尾兽。"名字是九喇嘛"——从憎恨到羁绊，鸣人最深的伙伴。' },
+  { id: 'naz_shinobi_alliance', name: '忍者联合军', icon: '🤝', desc: '五大国+铁之国的八万人联合，"这一拳，是历代忍者的意志"——鸣人与佐助? 是全员的心之旗。' },
+  { id: 'naz_iron_country', name: '铁之国', icon: '⚙️', desc: '不设忍者的武士之国，三船大将的中立立场，五影会谈的会场。' },
+  { id: 'naz_gamabunta', name: '蛤蟆文太', icon: '🐸', desc: '妙木山的大蛤蟆，自来也与鸣人的通灵。"这就叫通灵之术！"烟斗与太刀的老大。' },
+  { id: 'naz_gamatatsu', name: '蛤蟆吉&蛤蟆龙', icon: '🐸', desc: '文太的儿子们，鸣人的后辈通灵——"吉"与吃货"龙"。' },
+  { id: 'naz_manda', name: '万蛇&青蛇', icon: '🐍', desc: '龙地洞的大蛇之王与佐助的新通灵青蛇。' },
+  { id: 'naz_katsuyu', name: '蛞蝓·片栗', icon: '🐌', desc: '纲手的通灵，医疗蛞蝓的分身大军。"纲手大人在战斗"。' },
+  { id: 'naz_pakkun', name: '忍犬帕克', icon: '🐶', desc: '卡卡西的八忍犬之首，"鼻子可不是摆设"。追踪与吐槽担当。' },
+  { id: 'naz_ink_beasts', name: '佐井的超兽伪画', icon: '🐉', desc: '墨画成真的忍术——"超兽伪画·龙"与"虎"。根培养的画师。' },
+  { id: 'naz_sannin_team', name: '传说三忍', icon: '🃏', desc: '自来也、大蛇丸、纲手——"三忍"之名由雨隐半神半藏授予。' },
+  { id: 'naz_hanzo', name: '山椒鱼半藏', icon: '🐸', desc: '雨隐村的"半神"，授予三忍之名的男人。被佩恩终结的时代。' },
+  { id: 'naz_dan', name: '加藤断', icon: '💚', desc: '纲手的恋人，灵化术的忍者。死于战争——"我要改变这个忍界"的遗愿。' },
+  { id: 'naz_nawaki', name: '绳树', icon: '🌱', desc: '纲手的弟弟，初代的孙子。十二岁战死——"项链"的诅咒与嘱托。' }
+);

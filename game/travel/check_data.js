@@ -16,7 +16,11 @@ const collectJs = dir => {
   }
 };
 collectJs(dataDir);
-jsFiles.sort((a, b) => (a.endsWith('isekai_onepiece.js') ? 1 : b.endsWith('isekai_onepiece.js') ? -1 : a.localeCompare(b)));
+jsFiles.sort((a, b) => {
+  const aw = /^isekai_/.test(path.basename(a)) ? 1 : 0, bw = /^isekai_/.test(path.basename(b)) ? 1 : 0;
+  if (aw !== bw) return aw - bw;
+  return a.localeCompare(b);
+});
 jsFiles.forEach(p => { try { require(p); } catch (e) { console.error(`❌ ${path.relative(__dirname, p)} 加载失败: ${e.message}`); process.exitCode = 1; } });
 
 const CITIES = global.window.TRAVEL_CITIES || [];

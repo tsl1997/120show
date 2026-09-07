@@ -1,0 +1,58 @@
+/* 异世界·射雕英雄传 分册02：高手相遇与大事件 */
+window.SD_STORIES = window.SD_STORIES || [];
+window.SD_STORIES.push(
+  /* ---- 主角与至亲 ---- */
+  { id: 'sdc_guojing', name: '郭靖', icon: '🛡️', desc: '天资鲁钝却大巧若拙——"侠之大者，为国为民"的北侠原型，降龙十八掌的传承者。' },
+  { id: 'sdc_huangrong', name: '黄蓉', icon: '🌸', desc: '桃花岛主的聪慧女儿，"叫花鸡"钓来洪七公——射雕第一机变女诸葛。' },
+  { id: 'sdc_yangkang', name: '杨康', icon: '🎭', desc: '认贼作父的小王爷——贪恋富贵的悲剧，铁枪庙的终结。' },
+  { id: 'sdc_munianci', name: '穆念慈', icon: '🥀', desc: '比武招亲动了心的苦命女子，"念慈"之名一生错付。' },
+  { id: 'sdc_fathers', name: '郭啸天与杨铁心', icon: '🗡️', desc: '牛家村结义的两位忠良之后——风雪夜的灭门之祸。' },
+  { id: 'sdc_baosiruo', name: '包惜弱', icon: '🐇', desc: '杨康之母，救了完颜洪烈的善良女子——十八年王妃的牢笼。' },
+  { id: 'sdc_liping', name: '李萍', icon: '🏔️', desc: '郭靖之母，大漠生子的刚毅母亲——以死明志教子忠义。' },
+  /* ---- 五绝 ---- */
+  { id: 'sdc_hongqigong', name: '洪七公（北丐）', icon: '🍗', desc: '天下五绝之北丐，降龙十八掌与打狗棒法——"老叫花一生杀过231人，皆是恶徒"。' },
+  { id: 'sdc_huangyaoshi', name: '黄药师（东邪）', icon: '🌸', desc: '桃花岛主，武功通神却离经叛道——"我黄老邪行事，何须向人解释"。' },
+  { id: 'sdc_ouyangfeng', name: '欧阳锋（西毒）', icon: '🐍', desc: '白驼山庄主，蛤蟆功与毒蛇杖——逆练九阴疯癫的"天下第一"。' },
+  { id: 'sdc_yideng', name: '一灯大师（南帝）', icon: '🛕', desc: '大理段皇爷出家——一阳指与救人的舍身禅。' },
+  { id: 'sdc_wangchongyang', name: '王重阳（中神通）', icon: '⛩️', desc: '全真创教祖师，第一次华山论剑的天下第一——先天功冠绝群雄。' },
+  { id: 'sdc_zhoubotong', name: '周伯通（老顽童）', icon: '🧒', desc: '全真教老顽童，双手互搏与空明拳——"打架是天下第一好玩的事"。' },
+  /* ---- 师门与恩人 ---- */
+  { id: 'sdc_qiu_chuji', name: '丘处机', icon: '⚔️', desc: '全真七子中最烈的长春子——牛家村雪夜的杀倭义士。' },
+  { id: 'sdc_mayu', name: '马钰', icon: '☯️', desc: '全真掌教，暗中教郭靖内功两年——蒙古崖顶的月下传功。' },
+  { id: 'sdc_jiangnan7', name: '江南七怪', icon: '🍺', desc: '柯镇恶、朱聪、韩宝驹、南希仁、张阿生、全金发、韩小莹——十八年之约的七位授业恩师。' },
+  { id: 'sdc_kezhen_e', name: '柯镇恶（飞天蝙蝠）', icon: '🕶️', desc: '江南七怪之首，盲眼侠客——"我柯镇恶一生正直，从不怕人"。' },
+  { id: 'sdc_jiebie', name: '哲别', icon: '🏹', desc: '蒙古神射手，郭靖的射箭师父——"哲别"就是神箭之意。' },
+  { id: 'sdc_tiemuzhen', name: '铁木真', icon: '🐎', desc: '成吉思汗——"英雄"之问与郭靖的决裂。' },
+  { id: 'sdc_huazheng', name: '华筝', icon: '🎀', desc: '蒙古公主，郭靖的青梅竹马——金刀驸马的婚约与放手。' },
+  { id: 'sdc_tuolei', name: '托雷', icon: '🤝', desc: '郭靖的安答（结义兄弟），蒙古四王子。' },
+  /* ---- 敌人 ---- */
+  { id: 'sdc_wanyanhonglie', name: '完颜洪烈', icon: '👑', desc: '金国王爷，牛家村之祸的元凶——十八年偷来的"家"。' },
+  { id: 'sdc_ouyangke', name: '欧阳克', icon: '🐍', desc: '西毒之侄（实为私子），白驼山少主——蛇奴与风流债。' },
+  { id: 'sdc_meichaofeng', name: '梅超风（黑风双煞）', icon: '🌑', desc: '桃花岛叛徒，九阴白骨爪的疯魔——"师父，弟子知错了"。' },
+  { id: 'sdc_chenxuanfeng', name: '陈玄风', icon: '💀', desc: '黑风双煞之男，"铜尸"——死于少年郭靖的匕首。' },
+  { id: 'sdc_qiuqianren', name: '裘千仞（铁掌水上飘）', icon: '⛰️', desc: '铁掌帮主，"准五绝"级别的枭雄——后来皈依一灯门下。' },
+  { id: 'sdc_qiuqianzhang', name: '裘千丈', icon: '🎭', desc: '裘千仞的双胞胎兄长，装神弄鬼的江湖骗子。' },
+  { id: 'sdc_pengshahu', name: '彭连虎、沙通天、灵智上人、侯通海', icon: '⚔️', desc: '金国王府座上客的四大江湖败类——"黄河四鬼"的靠山。' },
+  { id: 'sdc_lingzhi', name: '灵智上人', icon: '🧘', desc: '密宗大手印高手，被黄药师戏弄的番僧。' },
+  { id: 'sdc_yinggu', name: '瑛姑（神算子）', icon: '🧮', desc: '一灯的爱妃，周伯通的旧爱——为救子算尽天机。' },
+  { id: 'sdc_yuzhi', name: '渔樵耕读', icon: '🎣', desc: '一灯座下四大弟子：点苍渔隐、樵子、武三通、朱子柳。' },
+  { id: 'sdc_quan7', name: '全真七子', icon: '☯️', desc: '马钰、丘处机、谭处端、刘处玄、王处一、郝大通、孙不二——天罡北斗阵。' },
+  { id: 'sdc_luguan', name: '陆冠英', icon: '⛵', desc: '太湖群豪之主，桃花岛记名弟子。' },
+  { id: 'sdc_shangu', name: '傻姑', icon: '🌱', desc: '曲灵风之女，桃花岛的痴傻见证人——铁枪庙真相的关键。' },
+  { id: 'sdc_qu_linfeng', name: '曲灵风', icon: '🖼️', desc: '黄药师的大弟子，腿废后盗画抚养傻姑。' },
+  /* ---- 大事件 ---- */
+  { id: 'sdv_niujiacun_tragedy', name: '牛家村之变', icon: '🌨️', desc: '一场风雪，丘处机杀追兵，段天德灭两家——全书的命运齿轮。' },
+  { id: 'sdv_18year_pact', name: '十八年之约', icon: '⚔️', desc: '丘处机与江南七怪赌赛育儿——醉仙楼之约定下郭靖一生。' },
+  { id: 'sdv_shediao', name: '弯弓射大雕', icon: '🏹', desc: '郭靖一箭双雕震草原——"金刀驸马"的成名时刻。' },
+  { id: 'sdv_meet_huangrong', name: '张家口初遇黄蓉', icon: '🍜', desc: '请小叫花吃一顿豪宴——"我请你吃饭"成就一生姻缘。' },
+  { id: 'sdv_bidao_zhaoqin', name: '比武招亲', icon: '🥊', desc: '穆易父女与杨康的擂台——"不肯认亲"的寒心开局。' },
+  { id: 'sdv_taohua_qiupin', name: '桃花岛求亲', icon: '🌸', desc: '郭靖欧阳克比试求婚——背九阴真经的"笨功夫"胜出。' },
+  { id: 'sdv_heifeng_battle', name: '荒山战黑风双煞', icon: '💀', desc: '七怪血战九阴白骨爪——张阿生之死与柯镇恶失明之源。' },
+  { id: 'sdv_hongqigong_teach', name: '洪七公授掌', icon: '🍗', desc: '一顿叫花鸡换三十招——"降龙十八掌"的美食学。' },
+  { id: 'sdv_hubo_zhiyin', name: '双手互搏与空明拳', icon: '🧒', desc: '老顽童与郭靖结拜——一人两用的奇功相授。' },
+  { id: 'sdv_yideng_heal', name: '一灯疗伤', icon: '🛕', desc: '消耗五年功力救黄蓉——大理段氏的舍身禅。' },
+  { id: 'sdv_tieqiangmiao_truth', name: '铁枪庙真相大白', icon: '🛕', desc: '黄蓉巧计揭穿一切——欧阳锋杀欧阳克、杨康刺中毒剑而亡。' },
+  { id: 'sdv_huashan_erjian', name: '第二次华山论剑', icon: '⛰️', desc: '疯癫欧阳锋逆练九阴夺魁——"天下第一"的荒诞与苍凉。' },
+  { id: 'sdv_xizheng', name: '西征与劝谏', icon: '🐎', desc: '郭靖随蒙古西征立功，又冒死劝屠城——"英雄"之问的答案。' },
+  { id: 'sdv_wumu_yishu', name: '武穆遗书', icon: '📜', desc: '岳飞的兵书——铁掌峰争夺与守城之道的传承。' }
+);

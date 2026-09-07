@@ -1,0 +1,31 @@
+/* 异世界·天龙八部 分册03：武功秘籍与神兵 */
+window.TL_GIFTS = window.TL_GIFTS || [];
+window.TL_GIFTS.push(
+  { id: 'tlg_liumai', name: '六脉神剑谱', icon: '☝️', tag: '玩', type: '秘籍', price: 320, desc: '大理段氏最高武学，六指剑气无形无质——"一阳指为基，六剑为峰"。' },
+  { id: 'tlg_yiyangzhi', name: '一阳指', icon: '👆', tag: '玩', type: '秘籍', price: 220, desc: '段氏家传指法，隔空点穴与凌空点穴——天龙寺五本论剑的功夫。' },
+  { id: 'tlg_beiming', name: '北冥神功卷轴', icon: '🌀', tag: '玩', type: '秘籍', price: 300, desc: '逍遥派绝学，吸人内力为己用——段誉的"北冥真气"。' },
+  { id: 'tlg_lingbo', name: '凌波微步图', icon: '👣', tag: '玩', type: '秘术', price: 280, desc: '取自洛神赋的步法，六十四卦踏步避尽天下攻击。' },
+  { id: 'tlg_xianglong', name: '降龙十八掌（乔峰版）', icon: '🐉', tag: '玩', type: '秘籍', price: 300, desc: '丐帮镇帮绝学，"亢龙有悔"——刚猛天下第一的掌法。' },
+  { id: 'tlg_dagou', name: '打狗棒与打狗棒法', icon: '🎋', tag: '玩', type: '宝物', price: 260, desc: '丐帮帮主信物碧玉杖——"天下无狗"三十六路棒法。' },
+  { id: 'tlg_yijin', name: '易筋经', icon: '📖', tag: '玩', type: '秘籍', price: 320, desc: '少林至高内功，游坦之无意练成的神功，化腐朽为神奇。' },
+  { id: 'tlg_qiankun', name: '小无相功', icon: '☯️', tag: '玩', type: '秘籍', price: 280, desc: '逍遥派内功心法——鸠摩智以之催动七十二绝技。' },
+  { id: 'tlg_baxiang', name: '八荒六合唯我独尊功', icon: '🧊', tag: '玩', type: '秘籍', price: 280, desc: '天山童姥的返老还童神功——每三十年重修一次。' },
+  { id: 'tlg_tianshan_zhemei', name: '天山折梅手', icon: '🌸', tag: '玩', type: '秘籍', price: 260, desc: '灵鹫宫绝学，三路掌法三路擒拿，融天下武学于一炉。' },
+  { id: 'tlg_tianshan_liuyang', name: '天山六阳掌', icon: '☀️', tag: '玩', type: '秘籍', price: 260, desc: '阳刚掌法变仙无穷——生成"生死符"的根基。' },
+  { id: 'tlg_shengsifu', name: '生死符', icon: '❄️', tag: '玩', type: '秘术', price: 260, desc: '薄冰入体痒痛难当——三十六洞七十二岛的梦魇。' },
+  { id: 'tlg_douzhuan', name: '斗转星移', icon: '🔄', tag: '玩', type: '秘籍', price: 280, desc: '慕容家传，"以彼之道还施彼身"——借力打力的最高境界。' },
+  { id: 'tlg_huoyandao', name: '火焰刀', icon: '🔥', tag: '玩', type: '秘籍', price: 260, desc: '鸠摩智的掌缘内劲，无形刀罡削金断玉。' },
+  { id: 'tlg_huagong', name: '化功大法', icon: '☠️', tag: '玩', type: '秘籍', price: 240, desc: '丁春秋的毒功，化去敌手内力——星宿派的镇派邪功。' },
+  { id: 'tlg_bingscan', name: '冰蚕毒掌', icon: '🕷️', tag: '玩', type: '秘籍', price: 220, desc: '游坦之的阴寒掌力——冰蚕之毒练出的邪门功夫。' },
+  { id: 'tlg_beisu', name: '悲酥清风', icon: '🌫️', tag: '玩', type: '秘术', price: 180, desc: '西夏奇毒，闻之筋酥骨软——解药为一颗解药丸。' },
+  { id: 'tlg_qibugong', name: '少林七十二绝技（抄本）', icon: '🛕', tag: '玩', type: '秘籍', price: 300, desc: '拈花指、多罗叶指、无相劫指……藏经阁的至高收藏。' },
+  { id: 'tlg_shenxian_statue', name: '神仙姊姊玉像', icon: '🪷', tag: '玩', type: '宝物', price: 240, desc: '无量山洞底的绝世玉像——王语嫣神似的前世佳人。' },
+  { id: 'tlg_langhuan_books', name: '琅嬛玉洞书谱', icon: '📜', tag: '玩', type: '秘籍', price: 280, desc: '天下武学尽收其中——逍遥派收藏的武学总纲。' },
+  { id: 'tlg_haanshi_garden', name: '还施水阁藏书', icon: '🏛️', tag: '玩', type: '秘籍', price: 240, desc: '燕子坞的武学宝库，"以彼之道"的情报库。' },
+  { id: 'tlg_qianlong_xinfa', name: '修罗刀', icon: '🗡️', tag: '玩', type: '宝物', price: 180, desc: '秦红棉的修罗刀——母女双刀的凶器。' },
+  { id: 'tlg_dianying_diao', name: '闪电貂', icon: '🐿️', tag: '玩', type: '神兽', price: 160, desc: '钟灵的灵兽，快如闪电的毒貂。' },
+  { id: 'tlg_iron_mask', name: '游坦之的铁面', icon: '⛓️', tag: '衣', type: '宝物', price: 140, desc: '烙在脸上的铁面——阿紫给"庄聚贤"的残酷礼物。' },
+  { id: 'tlg_liaowang_knife', name: '萧峰的断箭', icon: '🏹', tag: '玩', type: '宝物', price: 240, desc: '雁门关外的折箭——"教单于折箭，六军辟易"的英雄信物。' },
+  { id: 'tlg_luxiang_jade', name: '八部天龙护身符', icon: '🕊️', tag: '玩', type: '宝物', price: 160, desc: '"天龙八部"皆是人间的悲欢众生——金庸的佛喻之作。' },
+  { id: 'tlg_xiaoyao_fan', name: '逍遥折扇', icon: '🪭', tag: '玩', type: '宝物', price: 120, desc: '逍遥派弟子的风流信物——琴棋书画皆藏杀机。' }
+);

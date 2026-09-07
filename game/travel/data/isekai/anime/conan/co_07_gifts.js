@@ -1,0 +1,32 @@
+/* 异世界·名侦探柯南 分册07：特色宝物（阿笠发明/组织之物/基德道具） */
+window.CO_GIFTS = window.CO_GIFTS || [];
+window.CO_GIFTS.push(
+  { id: 'cog_bowtie', name: '蝴蝶结变声器', icon: '🎀', tag: '衣', type: '宝物', price: 140, desc: '阿笠博士发明01号：旋钮调音，模仿任何人的声音——让小五郎变成名侦探的神器。' },
+  { id: 'cog_watch', name: '手表型麻醉枪', icon: '⌚', tag: '玩', type: '宝物', price: 150, desc: '瞄准镜+麻醉针，"射程内百发百中"。让毛利小五郎"沉睡"的经典道具。' },
+  { id: 'cog_shoes', name: '力量增强鞋', icon: '👟', tag: '衣', type: '宝物', price: 130, desc: '电力刺激足部肌肉，一记足球"打飞铁门"。柯南的武力担当。' },
+  { id: 'cog_skate', name: '超高速太阳能滑板', icon: '🛹', tag: '行', type: '宝物', price: 160, desc: '太阳能驱动追得上汽车，柯南上学放学的代步神器。' },
+  { id: 'cog_badge', name: '侦探徽章', icon: '📡', tag: '衣', type: '宝物', price: 70, desc: '内置通讯器与发信器——元太光彦步美随时在线的集合神器。' },
+  { id: 'cog_glasses', name: '侦探眼镜', icon: '👓', tag: '衣', type: '宝物', price: 100, desc: '望远、夜视、追踪发信器——"真相就在镜片之后"。' },
+  { id: 'cog_tie', name: '领结型录音机', icon: '🎙️', tag: '衣', type: '宝物', price: 80, desc: '钮扣即录音键，与蝴蝶结变声器组成"侦探套装"。' },
+  { id: 'cog_aptx', name: 'APTX4869', icon: '💊', tag: '玩', type: '宝物', price: 220, desc: '"不留尸体的神秘毒药"——吃下前请三思：你的名字会消失。' },
+  { id: 'cog_antidote', name: '白乾（临时解药）', icon: '🧪', tag: '食', type: '宝物', price: 260, desc: '灰原试作型解药，"变回新一只有24小时"——大冒险的开始。' },
+  { id: 'cog_ai_notes', name: '宫野家的研究档案', icon: '📔', tag: '玩', type: '宝物', price: 200, desc: '父母与志保的A药研究手稿——"4869"这个数字的秘密。' },
+  { id: 'cog_kid_card2', name: '怪盗基德预告函', icon: '🃏', tag: '玩', type: '宝物', price: 90, desc: '"今夜，明月将窃走这颗宝石"——魔术师牌预告函。' },
+  { id: 'cog_kid_gun', name: '扑克牌麻醉枪', icon: '🂡', tag: '玩', type: '宝物', price: 150, desc: '基德的卡片武器，"魔术不是欺骗，是表演"。' },
+  { id: 'cog_kid_monocle', name: '单片眼镜&白色斗篷', icon: '🎩', tag: '衣', type: '宝物', price: 140, desc: '月光魔术师的标配——"Ladies and gentlemen，晚上好！"' },
+  { id: 'cog_kid_glider2', name: '滑翔翼', icon: '🪂', tag: '玩', type: '宝物', price: 160, desc: '白翼滑翔逃离现场——中森警部的永远噩梦。' },
+  { id: 'cog_sportscar', name: '黑色保时捷356A', icon: '🏎️', tag: '行', type: '宝物', price: 220, desc: '琴酒的座驾，"看到那辆车就快跑"——组织的死亡符号。' },
+  { id: 'cog_beetle', name: '阿笠博士的甲壳虫车', icon: '🚗', tag: '行', type: '宝物', price: 120, desc: '大众甲壳虫——柯南与灰原的移动堡垒，少年侦探团的出游专车。' },
+  { id: 'cog_megure_hat', name: '目暮警部的大衣与帽', icon: '🧥', tag: '衣', type: '宝物', price: 90, desc: '帽檐下藏着为妻子挡伤的疤——警视厅正义的象征。' },
+  { id: 'cog_ran_belt', name: '小兰的空手道腰带', icon: '🥋', tag: '衣', type: '宝物', price: 100, desc: '主将级实力——"我可是会空手道的！"一拳碎柱。' },
+  { id: 'cog_heiji_bike', name: '服部平次的摩托车', icon: '🏍️', tag: '行', type: '宝物', price: 140, desc: '大阪街头穿梭的坐骑——"工藤！前面交给你了！"' },
+  { id: 'cog_kazuha_amulet', name: '和叶的护身符', icon: '🏮', tag: '玩', type: '宝物', price: 90, desc: '合气道少女的平安符——"平次那个笨蛋要平平安安"。' },
+  { id: 'cog_sniper', name: '赤井的狙击枪', icon: '🎯', tag: '玩', type: '宝物', price: 240, desc: '800米外的一击必中——"银色子弹"的凶器与荣耀。' },
+  { id: 'cog_amuro_knife', name: '波洛围裙与公安手环', icon: '🔒', tag: '衣', type: '宝物', price: 130, desc: '"我的恋人是这个国家"——三重身份的男人随身之物。' },
+  { id: 'cog_sera_cap', name: '世良的棒球帽', icon: '🧢', tag: '衣', type: '宝物', price: 100, desc: '遮住短发的运动帽，"高中生侦探世良真纯登场！"' },
+  { id: 'cog_marie_koala', name: '领域外的妹妹的考拉玩偶', icon: '🐨', tag: '玩', type: '宝物', price: 110, desc: '变小的赤井玛丽藏在手机里的化身——"哥、哥哥……"的电子音。' },
+  { id: 'cog_cruise_ticket', name: '二十年前的事故剪报', icon: '📰', tag: '玩', type: '文创', price: 90, desc: '羽田浩司案与组织初露的线索——"ASACA? RUM？"的谜面。' },
+  { id: 'cog_puzzle_case', name: '名侦探的放大镜', icon: '🔎', tag: '玩', type: '宝物', price: 80, desc: '"排除一切不可能，剩下的再不可能也是真相。"——推理的仪式感。' },
+  { id: 'cog_bomb_wire', name: '红线与绿线', icon: '🧵', tag: '玩', type: '宝物', price: 120, desc: '《引爆摩天楼》的生死抉择——"剪红线还是绿线"。' },
+  { id: 'cog_cocoon', name: '茧（游戏舱）', icon: '🎮', tag: '玩', type: '宝物', price: 180, desc: '《贝克街的亡灵》的虚拟现实舱——弘树留给世界的最后游戏。' }
+);

@@ -1,0 +1,62 @@
+/* 异世界·天龙八部 分册02：高手相遇与大事件 */
+window.TL_STORIES = window.TL_STORIES || [];
+window.TL_STORIES.push(
+  /* ---- 三兄弟 ---- */
+  { id: 'tlc_qiaofeng', name: '乔峰（萧峰）', icon: '🍶', desc: '丐帮帮主，契丹血统汉人养育。"虽万千人吾往矣"——聚贤庄一人战群雄的悲剧英雄。' },
+  { id: 'tlc_duanyu', name: '段誉', icon: '🪷', desc: '大理世子，不爱武功爱美人。凌波微步+北冥神功+六脉神剑——痴恋"神仙姐姐"的呆子。' },
+  { id: 'tlc_xuzhu', name: '虚竹', icon: '🧘', desc: '少林小和尚，珍珑棋局"自填一子"得无崖子百年功力——命运的弃子变宠儿。' },
+  { id: 'tlc_oath', name: '结义三兄弟', icon: '🤝', desc: '乔峰、段誉、虚竹少林寺前结义——"不求同年同月同日生"。' },
+  /* ---- 红颜 ---- */
+  { id: 'tlc_wangyuyan', name: '王语嫣', icon: '🌺', desc: '"神仙姐姐"般的绝色，天下武学活百科——却看不穿表哥的野心。' },
+  { id: 'tlc_azhu', name: '阿朱', icon: '🌺', desc: '"塞上牛羊空许约"——易容替父受掌，死在萧峰掌下的至爱。' },
+  { id: 'tlc_azi', name: '阿紫', icon: '🐍', desc: '阿朱之妹，星宿派的毒辣少女——"姐夫"萧峰的最后牵挂。' },
+  { id: 'tlc_abi', name: '阿碧', icon: '🚣', desc: '燕子坞的采莲少女，吴侬软语摇橹人，慕容复最后的陪伴。' },
+  { id: 'tlc_zhongling', name: '钟灵', icon: '🐿️', desc: '万劫谷的闪电貂少女，段誉的第一个"小妹妹"。' },
+  { id: 'tlc_muwanqing', name: '木婉清', icon: '🖤', desc: '黑纱蒙面的"黑玫瑰"，段誉的未婚妻——黑玫瑰的刀。' },
+  /* ---- 大理段氏 ---- */
+  { id: 'tlc_duanzhengchun', name: '段正淳', icon: '💘', desc: '"镇南王"的风流债：刀白凤、秦红棉、甘宝宝、阮星竹、康敏——处处留情的王爷。' },
+  { id: 'tlc_daobaifeng', name: '刀白凤', icon: '🕊️', desc: '段誉之母，摆夷族王妃，"天龙寺外菩提树下"的秘密。' },
+  { id: 'tlc_duanyanqing', name: '恶贯满盈·段延庆', icon: '🐸', desc: '四大恶人之首，被废的前太子——段誉的生父之谜。' },
+  { id: 'tlc_yeerniang', name: '无恶不作·叶二娘', icon: '😭', desc: '抢夺婴儿的恶妇——玄慈与她的孽缘真相。' },
+  { id: 'tlc_yuelaosan', name: '凶神恶煞·岳老三', icon: '🐊', desc: '南海鳄神，"我是老三！"执念辈分排序的老顽童恶人。' },
+  { id: 'tlc_yunzhonghe', name: '穷凶极恶·云中鹤', icon: '🦅', desc: '轻功绝顶的采花淫贼，四大恶人的末席。' },
+  { id: 'tlc_duanzhengming', name: '段正明', icon: '👑', desc: '大理皇帝，段誉的伯父，六脉神剑的练成者。' },
+  /* ---- 逍遥派 ---- */
+  { id: 'tlc_tonglao', name: '天山童姥', icon: '🧊', desc: '八荒六合唯我独尊功，返老还童的缥缈峰主人——李秋水的一生之敌。' },
+  { id: 'tlc_liqiushui', name: '李秋水', icon: '💃', desc: '西夏太妃，逍遥派三老之一——"小无相功"的传人。' },
+  { id: 'tlc_wuyazi', name: '无崖子', icon: '☯️', desc: '逍遥派掌门，珍珑棋局设局者——七十年功力尽数传虚竹。' },
+  { id: 'tlc_suxinghe', name: '苏星河', icon: '🎹', desc: '聋哑老人，"函谷八友"之师，无崖子的大弟子。' },
+  { id: 'tlc_dingchunqiu', name: '丁春秋', icon: '☠️', desc: '星宿老怪，化功大法与毒功——"星宿老仙，法力无边"。' },
+  { id: 'tlc_xiaoyao3', name: '逍遥派三老', icon: '☯️', desc: '无崖子、天山童姥、李秋水——一段三角孽缘与逍遥派的兴衰。' },
+  /* ---- 丐帮与中原 ---- */
+  { id: 'tlc_quanqing', name: '全冠清', icon: '🐍', desc: '丐帮的阴谋家，杏子林政变的幕后推手。' },
+  { id: 'tlc_kangmin', name: '马夫人康敏', icon: '🕷️', desc: '"我要让你身败名裂"——白世镜与全冠清的毒妇棋手。' },
+  { id: 'tlc_baishijing', name: '白世镜', icon: '🪞', desc: '丐帮执法长老，被康敏拿捏的伪君子。' },
+  { id: 'tlc_xiaoyuanshan', name: '萧远山', icon: '🐺', desc: '萧峰之父，雁门关外一怒杀四师的辽人武士——藏身少林三十年。' },
+  { id: 'tlc_murongbo', name: '慕容博', icon: '🎭', desc: '"已死"的慕容老爷，雁门关阴谋的始作俑者——假传音讯的祸首。' },
+  { id: 'tlc_saodi_seng', name: '扫地僧', icon: '🧹', desc: '藏经阁的无名老僧——一掌"点化"萧远山慕容博的天花板存在。' },
+  { id: 'tlc_xuanci', name: '玄慈方丈', icon: '🛕', desc: '少林方丈，"带头大哥"——雁门关伏击的统帅与叶二娘的情孽。' },
+  { id: 'tlc_jiumozhi', name: '鸠摩智', icon: '🔥', desc: '吐蕃国师，火焰刀天下无双——强练七十二绝技走火入魔，终成一代高僧。' },
+  { id: 'tlc_murongfu', name: '慕容复', icon: '🎭', desc: '"以彼之道还施彼身"，姑苏慕容复国大梦——疯癫于土坟前的西夏皇帝梦。' },
+  { id: 'tlc_murong4', name: '慕容家四大家臣', icon: '🛡️', desc: '邓百川、公冶乾、包不同、风波恶——"非也非也"的忠义组合。' },
+  { id: 'tlc_youtanzhi', name: '游坦之（庄聚贤）', icon: '⛓️', desc: '聚贤庄遗孤，爱上阿紫的铁面人——冰蚕毒掌与易筋经的可怜人。' },
+  { id: 'tlc_yelvhongji', name: '耶律洪基', icon: '🐎', desc: '辽国皇帝，萧峰的结拜大哥——"南朝不可侵"的野心与背叛。' },
+  { id: 'tlc_wanyan', name: '完颜阿骨打', icon: '🏹', desc: '女真首领，萧峰的生死之交——草原上的豪气汉子。' },
+  { id: 'tlc_xue_medicine', name: '薛神医', icon: '🌿', desc: '聚贤庄群雄之一，"杀人名医"薛慕华。' },
+  { id: 'tlc_zhaoqiansun', name: '赵钱孙', icon: '🎭', desc: '雁门关旧人，忘却姓名的疯癫高手。' },
+  { id: 'tlc_tangong', name: '谭公谭婆', icon: '🍶', desc: '聚贤庄旧友，"打是亲骂是爱"的欢喜冤家。' },
+  /* ---- 大事件 ---- */
+  { id: 'tlv_yanmen_ambush', name: '雁门关伏击战', icon: '🏯', desc: '三十年前的错误伏击——慕容博假讯害得萧远山家破人亡，一切悲剧的原点。' },
+  { id: 'tlv_wuliang_valley', name: '无量山奇遇', icon: '🌊', desc: '段誉坠入剑湖底，遇神仙姊姊玉像——得北冥神功与凌波微步。' },
+  { id: 'tlv_xingzilin_coup', name: '杏子林之变', icon: '🌳', desc: '丐帮政变公开乔峰身世——"契丹人萧峰"从此再无归处。' },
+  { id: 'tlv_juxian_battle', name: '聚贤庄血战', icon: '🍶', desc: '"乔峰乃契丹人，今日与诸位恩断义绝"——一人独战三百豪杰。' },
+  { id: 'tlv_xiaojinghu_tragedy', name: '小镜湖的误会', icon: '🌾', desc: '阿朱易容替父受掌——"塞上牛羊空许约"全书最痛一掌。' },
+  { id: 'tlv_zhenlong_solved', name: '虚竹破珍珑', icon: '⚫', desc: '闭眼乱堵一子反解天下残局——虚竹得无崖子百年内力。' },
+  { id: 'tlv_ice_cellar', name: '冰窖姻缘', icon: '🧊', desc: '西夏公主梦中的"梦郎"——虚竹的缘分从黑暗中的相拥开始。' },
+  { id: 'tlv_shaoshi_battle', name: '少室山大战', icon: '🛕', desc: '三兄弟联手对丁春秋、慕容复、游坦之——扫地僧出，天下皆惊。' },
+  { id: 'tlv_sweeping_monk', name: '扫地僧点化二老', icon: '🧹', desc: '一掌"杀死"再救活——萧远山慕容博四十年恩怨一笔勾销。' },
+  { id: 'tlv_yanmen_end', name: '雁门关外萧峰之死', icon: '🗡️', desc: '"教单于折箭，六军辟易"——以死止战的英雄终章。' },
+  { id: 'tlv_murong_madness', name: '慕容复的疯魔', icon: '🎭', desc: '土坟称帝的西夏梦——复国执念的最终归宿，唯阿碧相守。' },
+  { id: 'tlv_liumai_master', name: '六脉神剑大成', icon: '☝️', desc: '段誉吸尽鸠摩智功力——六脉神剑随心而发。' },
+  { id: 'tlv_xuzhou_reign', name: '灵鹫宫新主人', icon: '🏔️', desc: '虚竹继任尊主，解三十六洞七十二岛生死符之厄。' }
+);

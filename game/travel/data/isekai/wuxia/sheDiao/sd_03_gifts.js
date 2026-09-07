@@ -1,0 +1,32 @@
+/* 异世界·射雕英雄传 分册03：武功秘籍与神兵 */
+window.SD_GIFTS = window.SD_GIFTS || [];
+window.SD_GIFTS.push(
+  { id: 'sdg_jiuyin', name: '九阴真经（全卷）', icon: '📖', tag: '玩', type: '秘籍', price: 320, desc: '黄裳所著天下武学总纲——两次华山论剑的争夺焦点。' },
+  { id: 'sdg_jiuyin_claw', name: '九阴白骨爪', icon: '💀', tag: '玩', type: '秘籍', price: 220, desc: '梅超风错练的邪功版——五指插骨的阴毒爪法。' },
+  { id: 'sdg_xianglong2', name: '降龙十八掌', icon: '🐉', tag: '玩', type: '秘籍', price: 300, desc: '洪七公传授郭靖——"亢龙有悔，盈不可久"。' },
+  { id: 'sdg_dagou2', name: '打狗棒法', icon: '🎋', tag: '玩', type: '秘籍', price: 240, desc: '丐帮帮主不传之秘，三十六路"天下无狗"。' },
+  { id: 'sdg_tanzhi', name: '弹指神通', icon: '🫰', tag: '玩', type: '秘籍', price: 260, desc: '黄药师的指力绝技——弹石如箭，百步穿杨。' },
+  { id: 'sdg_luoying', name: '落英神剑掌', icon: '🌸', tag: '玩', type: '秘籍', price: 250, desc: '桃花岛掌法，落英缤纷的虚招与真杀。' },
+  { id: 'sdg_yuxiao', name: '玉箫剑法', icon: '🎶', tag: '玩', type: '秘籍', price: 240, desc: '以箫作剑，"碧海潮生曲"的雅杀。' },
+  { id: 'sdg_bihai', name: '碧海潮生曲', icon: '🌊', tag: '玩', type: '秘籍', price: 260, desc: '黄药师的音律内功——箫声中内力失控的杀阵。' },
+  { id: 'sdg_lanhua', name: '兰花拂穴手', icon: '🌺', tag: '玩', type: '秘籍', price: 230, desc: '桃花岛点穴轻功——兰指拂过，穴道尽封。' },
+  { id: 'sdg_hama', name: '蛤蟆功', icon: '🐸', tag: '玩', type: '秘籍', price: 280, desc: '欧阳锋的成名绝技——蓄力一击山崩地裂。' },
+  { id: 'sdg_yiyang2', name: '一阳指', icon: '👆', tag: '玩', type: '秘籍', price: 260, desc: '南帝段氏指法——克制蛤蟆功的天敌。' },
+  { id: 'sdg_xiantian', name: '先天功', icon: '☯️', tag: '玩', type: '秘籍', price: 280, desc: '王重阳的镇教内功——先天真气天下无双。' },
+  { id: 'sdg_shuangshou', name: '双手互搏之术', icon: '🧒', tag: '玩', type: '秘籍', price: 260, desc: '老顽童独创——一心二用，一人打两人。' },
+  { id: 'sdg_kongming', name: '空明拳', icon: '💨', tag: '玩', type: '秘籍', price: 240, desc: '天下至柔的拳法——"空谷幽兰，绵绵不绝"。' },
+  { id: 'sdg_tiezhang', name: '铁掌功', icon: '⛰️', tag: '玩', type: '秘籍', price: 240, desc: '裘千仞的刚猛掌法——"铁掌水上飘"的看家本领。' },
+  { id: 'sdg_tiangang', name: '天罡北斗阵', icon: '⭐', tag: '玩', type: '秘籍', price: 250, desc: '全真七子的合击大阵——一人化一星，七星镇北斗。' },
+  { id: 'sdg_ruanwei', name: '软猬甲', icon: '🦔', tag: '衣', type: '宝物', price: 220, desc: '黄蓉的贴身护甲——刀枪不入，刺尖带毒。' },
+  { id: 'sdg_snake_staff', name: '欧阳锋的蛇杖', icon: '🐍', tag: '玩', type: '宝物', price: 180, desc: '杖头双蛇吐信——白驼山的毒物权杖。' },
+  { id: 'sdg_jiuhua', name: '九花玉露丸', icon: '💊', tag: '食', type: '神药', price: 180, desc: '桃花岛圣药，内伤立愈——黄药师的看门丹药。' },
+  { id: 'sdg_baoxue', name: '雪参玉蟾丸', icon: '🍡', tag: '食', type: '神药', price: 160, desc: '补气养血的疗伤圣品。' },
+  { id: 'sdg_xiaohongma', name: '汗血宝马小红马', icon: '🐎', tag: '行', type: '神兽', price: 180, desc: '日行千里的神驹——郭靖黄蓉的双骑。' },
+  { id: 'sdg_doubles', name: '双白雕', icon: '🕊️', tag: '玩', type: '神兽', price: 150, desc: '大漠空中的信使——郭靖驯养的双雕。' },
+  { id: 'sdg_bow', name: '射雕长弓', icon: '🏹', tag: '玩', type: '宝物', price: 140, desc: '弯弓射大雕的神臂弓——哲别亲传的箭术证明。' },
+  { id: 'sdg_wumu', name: '武穆遗书', icon: '📜', tag: '玩', type: '经文', price: 280, desc: '岳飞留下的兵法秘册——"运用之妙，存乎一心"。' },
+  { id: 'sdg_dogstick', name: '碧玉打狗棒', icon: '🟩', tag: '玩', type: '宝物', price: 220, desc: '丐帮帮主代代相传的信物——绿玉杖头刻"丐"。' },
+  { id: 'sdg_lingshe', name: '灵蛇拳', icon: '🐍', tag: '玩', type: '秘籍', price: 200, desc: '欧阳克的蛇形拳法——柔曲诡变如灵蛇盘旋。' },
+  { id: 'sdg_cuixin', name: '摧心掌', icon: '🖤', tag: '玩', type: '秘籍', price: 180, desc: '九阴经中的阴损掌法——震碎心脉于无形。' },
+  { id: 'sdg_hulu', name: '洪七公的酒葫芦', icon: '🍶', tag: '玩', type: '宝物', price: 100, desc: '北丐的随身酒器——"叫花鸡配好酒"。' }
+);
