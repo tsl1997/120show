@@ -71,4 +71,18 @@
     { id: 'lux_chanel', name: '香奈儿 N°5', type: '奢侈品', city: 'paris', price: 1500, desc: '1921年"女人要闻起来像女人"的传奇香水。' },
     { id: 'lux_dior', name: '迪奥 Ladurée 马卡龙联名礼盒', type: '奢侈品', city: 'paris', price: 800, desc: '迪奥咖啡+马卡龙下午茶套餐，"粉色 elegant"。' },
     { id: 'lux_cartier', name: '卡地亚 Love 手镯（入门款）', type: '奢侈品', city: 'paris', price: 8000, desc: '螺丝手镯需要"专用螺丝刀"才能戴上，"爱情锁"。' }] });
+  /* 欧盟成员国御守 */
+  S({ id: 'eu_charm', cat: 'world', name: '欧盟成员国御守', years: '1957-至今', author: '欧洲煤钢共同体→欧盟', theme: '政治·申根', background: '1957年法德意荷比卢六国签《罗马条约》开启欧洲一体化。如今欧盟27国，申根签证让一国签证通行26国。', story: '在巴黎的卢森堡广场，在罗马的祖国祭坛，在雅典的宪法广场——欧洲人用不同的方式纪念"我们在一起"。', protagonist: '欧盟六创始国', slogan: 'In Varietate Concordia（多元一体）！', cities: ['paris', 'rome', 'berlin', 'amsterdam', 'vienna', 'athens'], items: [
+    { id: 'eu_paris', name: '巴黎·法兰西鸢尾御守', type: '御守', city: 'paris', price: 120, desc: '法国国花鸢尾的珐琅徽章，蓝色百合纹。象征法兰西王室的优雅与传承。' },
+    { id: 'eu_rome', name: '罗马·雄鹰御守', type: '御守', city: 'rome', price: 120, desc: '古罗马军团雄鹰徽记，黄铜珐琅。SPQR 是 Senatus Populusque Romanus 的缩写。' },
+    { id: 'eu_berlin', name: '柏林·勃兰登门御守', type: '御守', city: 'berlin', price: 120, desc: '勃兰登堡门的迷你铜雕，十二柱与胜利女神。柏林墙倒塌后成了"统一欧洲"象征。' },
+    { id: 'eu_amsterdam', name: '阿姆斯特丹·郁金香木鞋御守', type: '御守', city: 'amsterdam', price: 120, desc: '荷兰木鞋里嵌一朵陶瓷郁金香。风车、运河、郁金香是荷兰三宝。' },
+    { id: 'eu_vienna', name: '维也纳·莫扎特音符御守', type: '御守', city: 'vienna', price: 120, desc: '金色音符与维也纳金色大厅剪影。奥地利用音乐在欧盟里找到位置。' },
+    { id: 'eu_athens', name: '雅典·橄榄枝雅典娜御守', type: '御守', city: 'athens', price: 120, desc: '橄榄枝缠绕的猫头鹰徽，希腊的智慧象征。神话时代欧洲文明的源头。' }] });
+  /* 联合国五常徽章（不含美） */
+  S({ id: 'un_p5', cat: 'world', name: '联合国安理会常任理事国', years: '1945-至今', author: '联合国宪章', theme: '政治·联合国', background: '1945年中、法、苏、英、美五国成为安理会常任理事国，拥有否决权。联合国总部在纽约，教科文在巴黎，IMO 在伦敦。', story: '一票否决，让"二战战胜国"继续坐在世界权力的圆桌上。从雅尔塔到纽约，半个多世纪的国际秩序。', protagonist: '五常代表', slogan: '维护世界和平与安全！', cities: ['paris', 'london', 'moscow', 'beijing'], items: [
+    { id: 'un_paris', name: '巴黎·联合国教科文徽章', type: '徽章谷子', city: 'paris', price: 80, desc: 'UNESCO 总部在巴黎第七区的"方舟"楼，希腊神殿与现代主义混合建筑。' },
+    { id: 'un_london', name: '伦敦·国际海事组织徽章', type: '徽章谷子', city: 'london', price: 80, desc: 'IMO 总部在泰晤士河边，主管全球海运安全规则。锚与地球的徽记。' },
+    { id: 'un_moscow', name: '莫斯科·联合国欧洲总部纪念', type: '徽章谷子', city: 'moscow', price: 80, desc: '联合国欧洲总部在莫斯科国民经济成就展览馆区。"和平"与"劳动"两尊雕像立在大门。' },
+    { id: 'un_beijing', name: '北京·联合国驻华代表处徽章', type: '徽章谷子', city: 'beijing', price: 80, desc: '联合国开发计划署、儿基会等多家机构驻北京。朝阳门外的"联合国蓝"。' }] });
 })();

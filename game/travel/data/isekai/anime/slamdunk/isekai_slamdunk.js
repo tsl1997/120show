@@ -8,7 +8,7 @@
   window.TRAVEL_CITIES.push({
     id: 'isekai_slamdunk', name: '灌篮高手·湘北高中', country: '异世界', cc: 'CN', flag: '🏀', region: 'isekai_anime', world: 'isekai', hero: '🏀',
     desc: '井上雄彦的青春圣经：问题儿童樱木花道加入湘北篮球部，"教练，我想打篮球"——向全国大赛，冲刺！神奈川四大强队与山王的世纪之战等你见证。',
-    labels: { spotL: '景点圣地', souvenirL: '特色宝物', storyL: '人物相遇', spotB: '前往', souvenirB: '获取', storyB: '相遇' },
+    labels: { spotL: '景点圣地', souvenirL: '特色宝物', storyL: '剧情名场面', spotB: '前往', souvenirB: '获取', storyB: '见证' },
     travel: [{ name: '穿越之门', icon: '🌌', cost: 520 }], visa: null,
     spots: window.SL_SPOTS || [],
     souvenirs: window.SL_GIFTS || [],

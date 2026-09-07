@@ -2,7 +2,7 @@
 (function () {
   window.TRAVEL_SERIES = window.TRAVEL_SERIES || [];
   window.TRAVEL_SERIES.push({
-    id: 'sr_yihuo', cat: 'china', name: '异火榜系列（斗破苍穹）', years: '2009-2011', author: '天蚕土豆', theme: '异火榜名火收藏',
+    id: 'sr_yihuo', cat: 'isekai', name: '异火榜系列（斗破苍穹）', years: '2009-2011', author: '天蚕土豆', theme: '异火榜名火收藏',
     background: '斗气大陆异火榜二十三种异火，焚决吞火进化——萧炎从青莲地心火起步，最终吞噬净莲妖火成就炎帝。',
     story: '"三十年河东，三十年河西，莫欺少年穷！"',
     protagonist: '萧炎与诸火', slogan: '炎帝临世，万火朝拜。',
@@ -18,7 +18,7 @@
     ]
   });
   window.TRAVEL_SERIES.push({
-    id: 'sr_fenghao', cat: 'china', name: '封号斗罗系列（斗罗大陆）', years: '2008-2009', author: '唐家三少', theme: '封号斗罗强者收藏',
+    id: 'sr_fenghao', cat: 'isekai', name: '封号斗罗系列（斗罗大陆）', years: '2008-2009', author: '唐家三少', theme: '封号斗罗强者收藏',
     background: '斗罗大陆的至高称号——九环封号斗罗，一人可敌一国。昊天锤、天使、菊斗罗……强者的名号就是传说。',
     story: '唐门外门唐三，踏上斗罗大陆的成神之路。',
     protagonist: '唐三与历代封号斗罗', slogan: '双神同辉，海神修罗。',
@@ -34,7 +34,7 @@
     ]
   });
   window.TRAVEL_SERIES.push({
-    id: 'sr_zhetian_di', cat: 'china', name: '天帝人皇系列（遮天完美）', years: '2010-2013', author: '辰东', theme: '大帝天帝收藏',
+    id: 'sr_zhetian_di', cat: 'isekai', name: '天帝人皇系列（遮天完美）', years: '2010-2013', author: '辰东', theme: '大帝天帝收藏',
     background: '九龙拉棺拉出万古大戏：无始大帝、狠人大帝、荒天帝……万古至强者的传说与成仙路的悲愿。',
     story: '"吾为天帝，当镇世间一切敌！"',
     protagonist: '叶凡、石昊与诸帝', slogan: '独断万古。',

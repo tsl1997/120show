@@ -17,7 +17,7 @@
     world: 'isekai',
     hero: '🍥',
     desc: '"我可是要成为火影的男人！"木叶村的火影岩下，吊车尾鸣人喊出梦想。忍者五大国的羁绊与宿命，从第七班开始——"这就是我的忍道！"',
-    labels: { spotL: '景点圣地', souvenirL: '特色宝物', storyL: '人物相遇', spotB: '前往', souvenirB: '获取', storyB: '相遇' },
+    labels: { spotL: '景点圣地', souvenirL: '特色宝物', storyL: '剧情名场面', spotB: '前往', souvenirB: '获取', storyB: '见证' },
     travel: [{ name: '穿越之门', icon: '🌌', cost: 520 }],
     visa: null,
     spots: window.NA_SPOTS || [],

@@ -8,7 +8,7 @@
   window.TRAVEL_CITIES.push({
     id: 'isekai_db', name: '龙珠·七龙珠世界', country: '异世界', cc: 'CN', flag: '🐉', region: 'isekai_anime', world: 'isekai', hero: '🐉',
     desc: '"卡——美——哈——美——哈！"野孩子悟空与布玛寻找七龙珠的冒险，最终成长为守护宇宙的超级赛亚人——战斗力只有五的渣滓？来试试就知道。',
-    labels: { spotL: '景点圣地', souvenirL: '特色宝物', storyL: '人物相遇', spotB: '前往', souvenirB: '获取', storyB: '相遇' },
+    labels: { spotL: '景点圣地', souvenirL: '特色宝物', storyL: '剧情名场面', spotB: '前往', souvenirB: '获取', storyB: '见证' },
     travel: [{ name: '穿越之门', icon: '🌌', cost: 520 }], visa: null,
     spots: window.DB_SPOTS || [],
     souvenirs: window.DB_GIFTS || [],

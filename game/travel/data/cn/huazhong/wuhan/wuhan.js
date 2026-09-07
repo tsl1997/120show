@@ -17,8 +17,8 @@
     labels: { spotL: '景点打卡', souvenirL: '特色周边', storyL: '城市故事', spotB: '打卡', souvenirB: '买下', storyB: '听闻' },
     travel: [{ name: '在家门口', icon: '🏠', cost: 0 }],
     visa: null,
-    spots: window.WH_SPOTS || [],
-    souvenirs: window.WH_GIFTS || [],
-    stories: window.WH_STORIES || []
+    spots: (window.WH_SPOTS = window.WH_SPOTS || []),
+    souvenirs: (window.WH_GIFTS = window.WH_GIFTS || []),
+    stories: (window.WH_STORIES = window.WH_STORIES || []),
   });
 })();

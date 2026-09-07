@@ -14,8 +14,19 @@ CITIES.forEach(c => { CITY_BY_ID[c.id] = c; });
 const SERIES = (window.TRAVEL_SERIES || []).slice();
 const SERIES_BY_ID = {};
 const CITY_SERIES = {};
-const SERIES_TYPE_ICON = { '手办模型': '🧸', '徽章谷子': '🎖️', '服饰包箱': '🎒', '毛绒公仔': '🧸', '生活数码联名': '📱', '球星卡': '🃏', '诗句卡': '📜', '城印章': '🖌️', '美妆': '💄', '奢侈品': '👑' };
-const SERIES_CAT_ICON = { anime: '📺', tokusatsu: '🦸', usa: '🗽', china: '📜', beauty: '💄', luxury: '👑' };
+const SERIES_TYPE_ICON = { '手办模型': '🧸', '徽章谷子': '🎖️', '服饰包箱': '🎒', '毛绒公仔': '🧸', '生活数码联名': '📱', '球星卡': '🃏', '诗句卡': '📜', '城印章': '🖌️', '美妆': '💄', '奢侈品': '👑', '国宝卡': '🏺', '美食卡': '🍜', '古都信物': '🏯', '水乡信物': '🛶', '风情卡': '🎉', '山岳卡': '⛰️', '名茶卡': '🍵', '名湖信物': '🌊', '学府卡': '🎓', '非遗卡': '🧵', '戏曲卡': '🎭', '红色纪念': '🚩', '歌谣唱片': '💿', '泡沫年代': '📼', '扭蛋': '🔮', '车站印章': '🖌️', '御守': '🎐' };
+const SERIES_CATS = [
+  ['anime', '📺 日本动漫'],
+  ['isekai', '🌌 异世界收藏'],
+  ['tokusatsu', '🦸 日本特摄剧'],
+  ['japan', '🗾 日本风物'],
+  ['usa', '🗽 美国流行'],
+  ['china', '📜 中国文脉'],
+  ['beauty', '💄 日韩美妆'],
+  ['luxury', '👑 法国奢侈品'],
+  ['world', '🌍 国际与地标'],
+];
+const SERIES_CAT_ICON = { anime: '📺', isekai: '🌌', tokusatsu: '🦸', japan: '🗾', usa: '🗽', china: '📜', beauty: '💄', luxury: '👑', world: '🌍' };
 SERIES.forEach(sr => {
   SERIES_BY_ID[sr.id] = sr;
   (sr.items || []).forEach(it => {
@@ -57,6 +68,8 @@ function defaultState() {
     mapCountry: null,
     bookTab: 'spot',
     bookOpen: {},         // 图鉴手风琴展开状态
+    seriesCat: null,      // 系列收藏·层级1：类别
+    seriesSel: null,      // 系列收藏·层级3：选中系列
   };
 }
 let S = load();
@@ -78,6 +91,23 @@ const fmtMoney = n => {
   return '¥' + (Number.isInteger(v) ? v : v.toFixed(1));
 };
 function isForeign(city) { return city.cc !== 'CN'; }
+
+/* ---------- 系列配色（同一副本内多系列用不同底色区分，主角金/其余自动分配） ---------- */
+const SERIES_PALETTE = ['#d4a017', '#c0392b', '#2e86c1', '#16a085', '#8e44ad', '#d35400', '#e84393', '#27ae60', '#34495e', '#c0392b', '#f39c12', '#2980b9', '#7f8c8d', '#6c3483', '#1abc9c', '#e74c3c', '#5d6d7e', '#af7ac5', '#d68910', '#5499c7'];
+function seriesColor(sr) {
+  if (sr && sr.color) return sr.color;
+  const id = sr && sr.id ? sr.id : '';
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return SERIES_PALETTE[h % SERIES_PALETTE.length];
+}
+function rgbaOf(hex, a) {
+  const m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(hex).trim());
+  if (!m) return 'rgba(140,125,105,' + a + ')';
+  let c = m[1]; if (c.length === 3) c = c.split('').map(x => x + x).join('');
+  const n = parseInt(c, 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
 function cityItems(city, kind) { if (kind === 'series') return seriesItemsOf(city); return (city[kind === 'story' ? 'stories' : kind + 's'] || []); }
 function itemKindId(kind, itemId) { return itemId; }
 
@@ -166,23 +196,23 @@ function renderCity() {
       const g = list.filter(i => S.collected[i.id]).length;
       return `<button class="sub-tab ${S.subTab === k ? 'active' : ''}" data-subtab="${k}">${KIND_META[k].icon} ${LBof(k + 'L', KIND_META[k].label)}<span class="cnt">${g}/${list.length} 已点亮</span></button>`;
     }).join('')}
-  </div>
-  <div class="item-list">`;
+  </div>`;
   const kind = S.subTab;
-  cityItems(c, kind).forEach(it => {
+  const buildCard = it => {
     const got = !!S.collected[it.id];
     const rw = rewardOf(c, kind, it);
     const price = +it.price || 0;
     const sr = kind === 'series' ? SERIES_BY_ID[it.seriesId] : null;
+    const col = kind === 'series' ? seriesColor(sr) : null;
     const tag = kind === 'spot' ? '游' : kind === 'story' ? '闻' : kind === 'series' ? '藏' : it.tag;
     const type = kind === 'spot' ? '景点' : kind === 'story' ? '趣闻' : kind === 'series' ? (it.type || '收藏') : (it.type || '周边');
-    html += `
-    <div class="item-card ${got ? '' : 'locked'}">
+    return `
+    <div class="item-card ${got ? '' : 'locked'}${sr ? ' has-sr' : ''}" ${col ? 'style="--sr:' + col + '"' : ''}>
       ${got ? '<span class="collected-mark">✨</span>' : ''}
       <div class="item-head">
         <div class="item-icon">${it.icon}</div>
         <div style="flex:1">
-          <div class="item-name">${esc(it.name)}${sr ? `<span style="font-size:10px;color:var(--gold)">　${esc(sr.name)}</span>` : ""}</div>
+          <div class="item-name">${esc(it.name)}</div>
           <div class="item-tags"><span class="tagchip t-${tag}">${tag}</span><span class="tagchip">${esc(type)}</span></div>
         </div>
         <div class="item-price ${price ? '' : 'free'}">${price ? fmtMoney(price) : '免费'}</div>
@@ -195,8 +225,32 @@ function renderCity() {
              <span class="reward-hint">${rw}</span>`}
       </div>
     </div>`;
-  });
-  html += '</div>';
+  };
+  const list = cityItems(c, kind);
+  let inner = '';
+  if (kind === 'series') {
+    const bySr = {};
+    list.forEach(it => (bySr[it.seriesId] = bySr[it.seriesId] || []).push(it));
+    inner += '<div class="sr-city">';
+    Object.keys(bySr).forEach(srId => {
+      const sr = SERIES_BY_ID[srId] || {};
+      const col = seriesColor(sr);
+      const items = bySr[srId];
+      const got = items.filter(i => S.collected[i.id]).length;
+      inner += `<div class="sr-block" style="background:${rgbaOf(col, .07)}">
+        <div class="sr-block-head" style="border-left-color:${col}">
+          <span class="sr-dot" style="background:${col}"></span>
+          <span class="sr-block-name">${esc(sr.name || srId)}</span>
+          <span class="sr-block-cnt">${got}/${items.length}</span>
+        </div>
+        <div class="item-list">${items.map(buildCard).join('')}</div>
+      </div>`;
+    });
+    inner += '</div>';
+  } else {
+    inner = `<div class="item-list">${list.map(buildCard).join('')}</div>`;
+  }
+  html += inner;
   $('#view').innerHTML = html;
 }
 
@@ -369,39 +423,82 @@ function handleMapAct(t) {
   else if (act === 'country') { S.mapCountry = val || null; }
   save(); renderMap();
 }
-/* ---- 系列收藏图鉴 ---- */
+/* ---- 系列收藏图鉴（分层浏览：类别 → 系列列表(按IP宇宙分组) → 系列详情） ---- */
+function serCounts(list) {
+  let got = 0, total = 0;
+  list.forEach(sr => sr.items.forEach(i => { total++; if (S.collected[i.id]) got++; }));
+  return { got, total };
+}
+function seriesGroupOf(sr) {
+  // 组名：优先取名称末尾“（XXX）”的 XXX；无括号则用系列名；少数基底 IP 特判
+  const override = { 'anime_onepiece': '航海王' };
+  if (override[sr.id]) return override[sr.id];
+  const m = /（([^）]+)）\s*$/.exec(sr.name);
+  return (m && m[1]) || sr.name;
+}
+function seriesCrumb(html) { return '<button class="travel-chip" data-act="seriesBack">← 返回</button> ' + html; }
 function renderSeriesBook() {
-  let html = '<div class="office-note">🌟 主题系列收藏：动漫、特摄、球星卡、古诗词、美妆与奢侈品。每个系列收集全部物品可点亮 🏆。</div>';
-  const cats = [['anime', '📺 日本动漫'], ['tokusatsu', '🦸 日本特摄剧'], ['usa', '🗽 美国流行'], ['china', '📜 中国文脉'], ['beauty', '💄 日韩美妆'], ['luxury', '👑 法国奢侈品']];
-  cats.forEach(([cat, label]) => {
-    const list = SERIES.filter(x => x.cat === cat);
-    if (!list.length) return;
-    html += `<div class="map-group-title">${label}（${list.length} 个系列）</div>`;
-    list.forEach(sr => {
-      const got = sr.items.filter(i => S.collected[i.id]).length;
-      const open = !!S.bookOpen[sr.id];
-      html += `
-      <div class="book-city ${open ? 'open' : ''}">
-        <div class="book-city-head" data-act="toggleBook" data-city="${sr.id}" data-kind="series">
-          <span>${SERIES_CAT_ICON[sr.cat] || '⭐'}</span><h4>${esc(sr.name)}</h4>
-          <span class="bprog">${got}/${sr.items.length}${got === sr.items.length ? ' 🏆' : ''}</span>
-          <span class="arrow">▶</span>
-        </div>
-        <div class="book-city-body">
-          <div style="font-size:12px;color:var(--ink2);line-height:1.7;padding:8px 4px">
-            <b>${esc(sr.years)} · ${esc(sr.author)}</b>　主题：${esc(sr.theme)}<br>
-            主角：${esc(sr.protagonist)}　<sapn style="color:var(--gold)">「${esc(sr.slogan)}」</sapn><br>
-            ${esc(sr.background)}<br>${esc(sr.story)}
-          </div>
-          <div class="bk-grid">`;
-      sr.items.forEach(it => {
-        const got2 = !!S.collected[it.id];
-        html += '<div class="bk-cell ' + (got2 ? 'got' : '') + '"><span class="bk-ico">' + (got2 ? it.icon : '❓') + '</span><span class="bk-name">' + (got2 ? esc(it.name) : '<span class="bk-unknown">？？？？</span>') + '</span><span class="bk-sub">' + (got2 ? esc((CITY_BY_ID[it.city] || {}).name || '') + ' · ' + esc(it.type) : '尚未收集') + '</span></div>';
-      });
-      html += '</div></div></div>';
+  const existCats = SERIES_CATS.filter(([k]) => SERIES.some(s => s.cat === k));
+  let h = '';
+  /* 层级1：类别卡片 */
+  if (!S.seriesCat) {
+    h += '<div class="office-note">🗂 图鉴按主题分层摆放：先选类别，再进到「IP宇宙/系列」，最后展开条目收藏——就像翻一张世界地图。</div><div class="map-grid">';
+    existCats.forEach(([k, label]) => {
+      const list = SERIES.filter(s => s.cat === k);
+      const { got, total } = serCounts(list);
+      h += `<div class="city-card" data-act="seriesCat" data-sval="${k}" style="cursor:pointer">
+        <div class="cc-head"><span class="cc-flag">${SERIES_CAT_ICON[k]}</span><div>
+        <div class="cc-name">${label}</div><div class="cc-region">${list.length} 个系列</div></div>
+        <span class="cc-progress" style="margin-left:auto">${got}/${total}</span></div>
+        <div class="cc-desc">${list[0] ? esc(list[0].background) : ''}</div></div>`;
     });
+    return h + '</div>';
+  }
+  const catMeta = SERIES_CATS.find(c => c[0] === S.seriesCat) || ['', ''];
+  /* 层级2：系列列表（按 IP 宇宙分组） */
+  if (!S.seriesSel) {
+    const list = SERIES.filter(s => s.cat === S.seriesCat);
+    const { got, total } = serCounts(list);
+    h += '<div class="map-group-title">' + seriesCrumb(SERIES_CAT_ICON[S.seriesCat] + ' ' + catMeta[1]) + `（${list.length} 个系列 · ${got}/${total}）</div>`;
+    const seen = [];
+    list.forEach(sr => { const g = seriesGroupOf(sr); if (!seen.includes(g)) seen.push(g); });
+    seen.forEach(g => {
+      h += `<div class="map-group-title">📦 ${esc(g)}</div>`;
+      list.filter(sr => seriesGroupOf(sr) === g).forEach(sr => {
+        const { got: g2, total: t2 } = serCounts([sr]);
+        const col = seriesColor(sr);
+        h += `<div class="book-city-head" data-act="seriesSel" data-sval="${sr.id}" style="cursor:pointer;--sr:${col}">
+          <span class="sr-dot" style="background:${col}"></span>
+          <span>${SERIES_CAT_ICON[sr.cat] || '⭐'}</span><h4>${esc(sr.name)}</h4>
+          <span class="bprog">${g2}/${t2}${g2 === t2 && t2 ? ' 🏆' : ''}</span><span class="arrow">▶</span></div>`;
+      });
+    });
+    return h;
+  }
+  /* 层级3：系列详情 */
+  const sr = SERIES_BY_ID[S.seriesSel];
+  if (!sr) { S.seriesSel = null; return renderSeriesBook(); }
+  const col = seriesColor(sr);
+  h += '<div class="map-group-title">' + seriesCrumb(SERIES_CAT_ICON[S.seriesCat] + ' ' + catMeta[1] + ' › ' + esc(seriesGroupOf(sr))) + '</div>';
+  h += `<div class="book-city open sr-tint" style="--sr:${col}">
+    <div class="book-city-head">
+      <span>${SERIES_CAT_ICON[sr.cat] || '⭐'}</span><h4>${esc(sr.name)}</h4>
+      <span class="bprog">${esc(sr.years)}</span></div>
+    <div class="book-city-body">
+      <div style="font-size:12px;color:var(--ink2);line-height:1.7;padding:8px 4px">
+        <b>${esc(sr.years)} · ${esc(sr.author)}</b>　主题：${esc(sr.theme)}<br>
+        主角：${esc(sr.protagonist)}　<sapn style="color:var(--gold)">「${esc(sr.slogan)}」</sapn><br>
+        ${esc(sr.background)}<br>${esc(sr.story)}
+      </div>
+      <div class="bk-grid">`;
+  sr.items.forEach(it => {
+    const got = !!S.collected[it.id];
+    const st = got ? 'background:' + rgbaOf(col, .1) + ';' : '';
+    h += `<div class="bk-cell ${got ? 'got' : ''}" style="border-color:${rgbaOf(col, .4)};${st}"><span class="bk-ico">${got ? it.icon : '❓'}</span>
+      <span class="bk-name">${got ? esc(it.name) : '<span class="bk-unknown">？？？？</span>'}</span>
+      <span class="bk-sub">${got ? esc((CITY_BY_ID[it.city] || {}).name || '') + ' · ' + esc(it.type) : '尚未收集'}</span></div>`;
   });
-  return html;
+  return h + '</div></div></div>';
 }
 
 /* ================= 视图：图鉴 ================= */
@@ -610,6 +707,9 @@ document.addEventListener('click', e => {
   if (t.dataset.subtab) { S.subTab = t.dataset.subtab; save(); renderCity(); return; }
   if (t.dataset.booktab) { S.bookTab = t.dataset.booktab; save(); renderBook(); return; }
   const act = t.dataset.act;
+  if (act === 'seriesCat') { S.seriesCat = t.dataset.sval || null; S.seriesSel = null; save(); renderBook(); return; }
+  if (act === 'seriesSel') { S.seriesSel = t.dataset.sval || null; save(); renderBook(); return; }
+  if (act === 'seriesBack') { if (S.seriesSel) S.seriesSel = null; else S.seriesCat = null; save(); renderBook(); return; }
   if (act === 'collect') collect(t.dataset.kind, t.dataset.item);
   else if (act === 'go') goCity(t.dataset.city, +t.dataset.t);
   else if (act === 'passport') buyPassport();

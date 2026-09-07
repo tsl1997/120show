@@ -1,0 +1,32 @@
+/* 张家界 分册02：特色周边（土家风味·山货手信·民俗体验） */
+window.ZJJ_GIFTS = window.ZJJ_GIFTS || [];
+window.ZJJ_GIFTS.push(
+  { id: 'zhangjiajie_yanrou', name: '土家腊肉·三下锅', icon: '🍖', tag: '食', type: '美食', price: 60, desc: '柴火熏的土家腊肉黑亮咸香，三下锅是"湘西火锅"。腊肉炒蕨菜，下饭三碗。' },
+  { id: 'zhangjiajie_mijiu', name: '米酒·岩耳炖土鸡', icon: '🍶', tag: '食', type: '美食', price: 50, desc: '土家米酒甜后劲大，"摔碗酒"喝的就是豪气。岩耳长在崖壁上，炖鸡是"悬崖的味道"。' },
+  { id: 'zhangjiajie_juecai', name: '蕨菜·葛根粉', icon: '🌱', tag: '食', type: '特产', price: 35, desc: '湘西野蕨菜炒腊肉香到跺脚。葛根粉冲调成羹，"山里的凉粉"。' },
+  { id: 'zhangjiajie_maojian', name: '莓茶（藤茶）', icon: '🍵', tag: '食', type: '特产', price: 60, desc: '张家界莓茶"黄酮之王"，回甘明显。土家人喝了几百年，"长寿茶"。' },
+  { id: 'zhangjiajie_yinshi', name: '苗银·土家织锦', icon: '💍', tag: '衣', type: '服饰', price: 130, desc: '苗银项圈与手镯叮当作响，西兰卡普土家织锦。手工挑织的"无字史书"。' },
+  { id: 'zhangjiajie_ahava', name: '阿凡达文创', icon: '🛸', tag: '衣', type: '文创', price: 45, desc: '哈利路亚悬浮山模型、蓝色夜空明信片。电影取景地的"官方联动"，科幻与山水混搭。' },
+  { id: 'zhangjiajie_niuer', name: '牛角梳·崖柏手串', icon: '🪮', tag: '衣', type: '文创', price: 70, desc: '湘西水牛角梳不伤发，崖柏香气安神。"山货三宝"之二。' },
+  { id: 'zhangjiajie_suodao', name: '天子山索道·杨家界索道', icon: '🚡', tag: '行', type: '体验', price: 72, desc: '索道穿行峰林之间，"在悬浮山上方飞行"。脚下是刀削斧劈的砂岩柱。' },
+  { id: 'zhangjiajie_bengji', name: '蹦极·飞索挑战', icon: '🪂', tag: '玩', type: '体验', price: 500, desc: '大峡谷蹦极260米高，"世界最高商业蹦极"之一。纵身一跃，"人生高光时刻"。' },
+  { id: 'zhangjiajie_yan', name: '《魅力湘西》演出', icon: '🎭', tag: '玩', type: '体验', price: 228, desc: '土家哭嫁、上刀山下火海现场版。湘西神秘文化大秀，"边城故事"催泪。' },
+  { id: 'zhangjiajie_miao', name: '苗寨家访', icon: '🏮', tag: '玩', type: '体验', price: 120, desc: '进苗寨喝拦门酒，长桌宴摆起。银饰满头的苗阿妹教唱山歌，"对上歌才能走"。' },
+  { id: 'zhangjiajie_minsu', name: '武陵源民宿', icon: '🏨', tag: '住', type: '住宿', price: 300, desc: '景区门口的吊脚楼民宿，露台正对峰林。清晨云雾在窗外流动，"住在画里醒来"。' },
+  { id: 'zjjg_husanxiaguo', name: '胡师傅三下锅', icon: '🍲', tag: '食', type: '美食', price: 88, desc: '腊肉、肥肠、肚片一锅同炖，花椒辣子把锅底烧得滚烫。配两碗米饭加一把青菜，湖南人的夜宵就齐活了。' },
+  { id: 'zjjg_gaoshan_larou', name: '高山土猪腊肉', icon: '🥓', tag: '食', type: '特产', price: 68, desc: '高山土猪肋条抹盐上炕，松柏枝熏出金黄油亮。切薄片配蒜苗大火一炒，隔着包装袋都闻得到柴火香。' },
+  { id: 'zjjg_xuedoufu', name: '土家血豆腐', icon: '🍢', tag: '食', type: '美食', price: 28, desc: '猪血拌豆腐灌进肠衣，挂上火塘熏成深褐色的硬块。切片爆炒或下进火锅，咬开是粗粝又紧实的家常味。' },
+  { id: 'zjjg_midoufu', name: '米豆腐', icon: '🥣', tag: '食', type: '美食', price: 12, desc: '大米磨浆蒸成嫩黄的方块，浇上红油酸辣汁撒葱花。慈利人的夏天，一半胃口都是这碗凉粉给的。' },
+  { id: 'zjjg_haozibaba', name: '蒿子粑粑', icon: '🫓', tag: '食', type: '美食', price: 15, desc: '清明前后的野蒿切碎，揉进糯米粉煎得两面焦黄。咬一口满是青草香气，土家人说这是春天的味道。' },
+  { id: 'zjjg_duzhongcha', name: '杜仲雄花茶', icon: '🍵', tag: '食', type: '饮品', price: 75, desc: '杜仲树的雄花晒干泡水，茶汤金黄，带一丝清苦后回甘。山里人管它叫筋骨茶，是张家界的硬核山货。' },
+  { id: 'zjjg_gegenfen', name: '野生葛根粉', icon: '🍮', tag: '食', type: '特产', price: 45, desc: '深山挖的野葛根磨成粉，开水一冲就凝成半透明胶冻。撒上红糖和桂花，清凉下火，是土家人的天然甜品。' },
+  { id: 'zjjg_mihoutao', name: '张家界猕猴桃', icon: '🥝', tag: '食', type: '特产', price: 55, desc: '高山猕猴桃个头不大却甜得发齁，红心黄心绿心全都有。回程捎上两箱，放软了撕开皮直接吸着吃。' },
+  { id: 'zjjg_yaner', name: '崖壁岩耳干', icon: '🍄', tag: '食', type: '特产', price: 98, desc: '岩耳只长在千米绝壁的阴面，采耳人要系着绳索悬空去抠。泡发后和土鸡一起炖，汤头鲜得眉毛都要掉。' },
+  { id: 'zjjg_tianmenhuxian', name: '《天门狐仙》实景演出', icon: '🎭', tag: '玩', type: '体验', price: 238, desc: '以天门山为幕布的山谷实景剧，狐仙与书生的故事在真山真水里上演。灯光亮起那一刻，整面悬崖都在发光。' },
+  { id: 'zjjg_daciba', name: '土家打糍粑体验', icon: '🍡', tag: '游', type: '体验', price: 60, desc: '两个木槌你来我往，把热腾腾的糯米饭捶打成软糯的团。趁热揪一块蘸上黄豆粉，自己动手的那口格外香。' },
+  { id: 'zjjg_baishouwu_gouhuo', name: '摆手舞篝火晚会', icon: '🔥', tag: '玩', type: '体验', price: 120, desc: '夜里围着火塘跳摆手舞，阿妹在前头带，游客在后头学。鼓点越敲越急，手都甩酸了还舍不得停下来。' },
+  { id: 'zjjg_nuoxi_mianju', name: '土家傩戏面具', icon: '👺', tag: '玩', type: '文创', price: 80, desc: '傩戏面具涂着浓烈的颜色，凶神恶煞里却带着善意。带一个回家挂上墙，据说是湘西最神秘的一抹符号。' },
+  { id: 'zjjg_zharan_fangjin', name: '土家蜡染方巾', icon: '🧣', tag: '衣', type: '服饰', price: 65, desc: '溪布街的蜡染坊里，蓝底白花一块块晾在竹竿上。方巾是手艺人一针一蜡点出来的，每一块花色都不重样。' },
+  { id: 'zjjg_guiwenshi', name: '龟纹石笔筒', icon: '🪨', tag: '玩', type: '文创', price: 55, desc: '龟纹石取自本地山体，风化出纵横的裂纹像龟壳。打磨成笔筒摆在书桌上，天生的山水纹理自带几分古意。' },
+  { id: 'zjjg_xibujie_kezhan', name: '溪布街吊脚楼客栈', icon: '🏨', tag: '住', type: '住宿', price: 268, desc: '溪布街边的吊脚楼客栈，窗外就是河水和酒吧的灯影。夜里枕着水声入眠，早上一推窗便是峰林剪影。' }
+);

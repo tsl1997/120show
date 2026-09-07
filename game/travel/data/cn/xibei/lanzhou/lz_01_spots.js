@@ -1,0 +1,32 @@
+/* 兰州 分册01：景点圣地（黄河穿城/城市人文/远郊山水） */
+window.LZ_SPOTS = window.LZ_SPOTS || [];
+window.LZ_SPOTS.push(
+  { id: 'lanzhou_zhongshan', name: '中山桥（黄河铁桥）', icon: '🌉', price: 0, desc: '1909年建成的"天下黄河第一桥"，德国钢材百年不锈。夜色亮灯最迷人，桥上看黄河滚滚东去。' },
+  { id: 'lanzhou_baita', name: '白塔山', icon: '⛰️', price: 0, desc: '山巅白塔与中山桥隔河相望。爬半小时俯瞰黄河穿城，"俯瞰金城"的经典机位。' },
+  { id: 'lanzhou_shuiche', name: '黄河母亲雕塑·水车园', icon: '🌀', price: 0, desc: '"黄河母亲"雕像是兰州的城市名片。水车园里巨型木水车吱呀转动，重现古代灌溉智慧。' },
+  { id: 'lanzhou_wuquanshan', name: '五泉山公园', icon: '⛲', price: 0, desc: '霍去病西征"鞭插五泉"传说之地。古建层叠、泉水叮咚，本地人的晨练后花园。' },
+  { id: 'lanzhou_gansu_bo', name: '甘肃省博物馆', icon: '🏺', price: 0, desc: '铜奔马"马踏飞燕"真品所在地，中国旅游标志的故乡。丝绸之路文物精华，免费预约必看。' },
+  { id: 'lanzhou_zhengning', name: '正宁路夜市', icon: '🏮', price: 0, desc: '"牛奶鸡蛋醪糟"大爷的网红摊位，香飘整条街。烤串、甜胚子、灰豆子，兰州夜宵江湖。' },
+  { id: 'lanzhou_xinglongshan', name: '兴隆山', icon: '🍂', price: 40, desc: '陇右名山，成吉思汗曾在山中歇驾。秋天彩林满山，冬天雾凇挂枝，兰州人的周末后花园。' },
+  { id: 'lzp_shuicheyuan', name: '兰州水车博览园', icon: '⚙️', price: 0, desc: '黄河边立着十几轮巨木水车，轮子翻水哗哗作响。登观景台数车、下河边踩水，还能钻进民俗馆看皮影与剪纸。' },
+  { id: 'lzp_huanghefengqing', name: '黄河风情线', icon: '🌊', price: 0, desc: '四十里滨河大道串起雕塑园、水车园与中山桥，绿柳拂岸。傍晚散步最舒服，晚霞把河面染成金红色。' },
+  { id: 'lzp_huanghelou', name: '黄河楼', icon: '🏯', price: 0, desc: '七里河畔的新地标，登楼可看黄河在这里拐出漂亮河湾。楼里是甘肃历史展，傍晚亮灯如通体红玉。' },
+  { id: 'lzp_beilin', name: '兰州碑林', icon: '📜', price: 0, desc: '白塔山西侧的书法宝库，碑刻收录历代名家临摹的《淳化阁帖》。绿荫庭院里碑石林立，人少清幽。' },
+  { id: 'lzp_dazhongxiang', name: '大众巷', icon: '🥟', price: 0, desc: '老兰州的美食小巷，马子禄牛肉面门口永远排队。清晨一碗面配小菜，再捎上杜记甜醅子当下午茶。' },
+  { id: 'lzp_dunhuangyishu', name: '敦煌艺术馆', icon: '🎨', price: 0, desc: '黄河边藏着一座莫高窟复制展厅，按原尺寸临摹的壁画洞窟。不看飞天雕塑、只来静静看画，人少体验好。' },
+  { id: 'lzp_qingcheng_guzhen', name: '青城古镇', icon: '🏘️', price: 0, desc: '黄河岸边四百年古镇，青砖古院与高家祠堂诉说水烟旧事。镇里石板巷子悠长，老戏台还唱着秦腔。' },
+  { id: 'lzp_santaige', name: '皋兰山·三台阁', icon: '🏔️', price: 0, desc: '城南最高点，索道上山再爬一段即到三台阁。入夜俯瞰兰州夜景，万家灯火沿着黄河铺成一条银河。' },
+  { id: 'lzp_jinguancheng', name: '金城关文化风情园', icon: '🏮', price: 0, desc: '白塔山下的仿古建筑群，面片馆与葫芦店一字排开。夜里灯笼高挂，剪纸皮影和太平鼓表演轮番上场。' },
+  { id: 'lzp_shichuan', name: '什川古梨园', icon: '🍐', price: 0, desc: '黄河谷地藏着一万株百年古梨树，树龄最老的四百多岁。四月梨花如雪、深秋金梨坠枝，老树仍年年结果。' },
+  { id: 'lzp_renshoushan', name: '仁寿山桃园', icon: '🌸', price: 0, desc: '安宁区的桃乡山野，四月桃花开满坡。桃子熟时满街桃香，山下的农家乐里端出白凤桃最甜的一盘。' },
+  { id: 'lzp_tulugou', name: '吐鲁沟', icon: '🌲', price: 40, desc: '兰州人的避暑后花园，峡谷溪水清冽、杉林蔽日。徒步栈道听鸟鸣，秋天满沟红叶比城市凉快十度。' },
+  { id: 'lzp_shifogou', name: '石佛沟', icon: '🏕️', price: 25, desc: '市区不远的山林秘境，得名于崖壁上的石佛像。泉水沿沟淌下，沟里寺庙钟声悠悠，适合半日清肺。' },
+  { id: 'lzp_shibowuyuan', name: '兰州市博物馆', icon: '🏛️', price: 0, desc: '明代白衣寺塔立在闹市院中，砖雕塔檐秀气。馆藏马家窑彩陶与汉晋文物，半小时就能逛完金城旧事。' },
+  { id: 'lzp_laojie', name: '兰州老街', icon: '🎪', price: 0, desc: '七里河的仿古商业街，戏楼前常有秦腔快闪。夜里亮灯后适合溜达吃小吃，仿敦煌藻井的屋顶最上镜。' },
+  { id: 'lzp_chuangyi', name: '兰州创意文化产业园', icon: '🖼️', price: 0, desc: '旧厂房改造的艺术园区，涂鸦墙上画着黄河与骆驼。美术馆和小剧场藏身其中，周末市集里挤满拍文艺照片的年轻人。' },
+  { id: 'lzp_baiyunguan', name: '白云观', icon: '☯️', price: 0, desc: '黄河南岸的道观，白马浪传说的发生地。观门正对黄河奔流，香火在垂柳间袅袅，本地人初一十五来拜。' },
+  { id: 'lzp_xiguan_qingzhen', name: '西关清真大寺', icon: '🕌', price: 0, desc: '闹市中心的阿拉伯风格清真寺，圆顶新月直插蓝天。礼拜声悠扬，寺前集市卖着盖碗茶与油香。' },
+  { id: 'lzp_huanghe_yeyou', name: '夜游黄河', icon: '🚢', price: 90, desc: '乘游船从中山桥下穿过，两岸灯光倒进河里碎成金鳞。船身调个头，白塔山和黄河楼便先后入画来。' },
+  { id: 'lzp_zhangyelv', name: '张掖路步行街', icon: '🛍️', price: 0, desc: '兰州最热闹的市中心大街，老字号与商场肩并肩。晚上霓虹一路亮到中山桥头，逛街的人潮到深夜不散。' },
+  { id: 'lzp_balujun', name: '八路军兰州办事处纪念馆', icon: '🚩', price: 0, desc: '抗战时期接送苏联援华物资的红色驿站原址。小院里复原着电台与办公室，墙上黑白照片讲着“西北小延安”。' }
+);

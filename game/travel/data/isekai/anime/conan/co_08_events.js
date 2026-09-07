@@ -1,4 +1,5 @@
-/* 异世界·名侦探柯南 分册08：大事件见闻 */
+/* 异世界·名侦探柯南 分册08：剧情名场面 */
+window.CO_STORIES = window.CO_STORIES || [];
 window.CO_STORIES.push(
   { id: 'cov_roller_coaster', name: '云霄飞车杀人事件', icon: '🎢', desc: '一切的开端：新一目击组织交易被灌下APTX4869——"身体缩小了！"' },
   { id: 'cov_moonlight', name: '月光奏鸣曲杀人事件', icon: '🎹', desc: '月影岛的火与钢琴——"我最恨的案子"，柯南对犯人的恨与怜悯。' },

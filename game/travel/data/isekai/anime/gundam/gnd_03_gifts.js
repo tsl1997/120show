@@ -1,0 +1,32 @@
+/* 异世界·机动战士高达（宇宙世纪） 分册03：特色宝物 */
+window.GND_GIFTS = window.GND_GIFTS || [];
+window.GND_GIFTS.push(
+  { id: 'gndg_rx78', name: '高达 RX-78-2', icon: '🤖', tag: '玩', type: '手办', price: 220, desc: '被称作白色恶魔的一年战争传奇机体，也是无数孩子拼装梦开始的地方。' },
+  { id: 'gndg_beam_rifle', name: '光束步枪', icon: '🔫', tag: '玩', type: '宝物', price: 170, desc: '一扣扳机便能贯穿装甲的高达招牌火器，把实弹时代的浪漫打散在光束里。' },
+  { id: 'gndg_beam_saber', name: '光束军刀', icon: '⚔️', tag: '玩', type: '宝物', price: 140, desc: '粉红光束凝聚成的近战刀刃，一刀挥下足以切开厚重装甲的白色凶器。' },
+  { id: 'gndg_shield', name: '高达专用盾牌', icon: '🛡️', tag: '玩', type: '宝物', price: 80, desc: '印着联邦星徽的白色护盾，无数次呼啸的弹雨都靠它在身后硬扛下来。' },
+  { id: 'gndg_hyper_bazooka', name: '扎古火箭筒', icon: '🚀', tag: '玩', type: '宝物', price: 100, desc: '吉翁军标准的重型肩扛火器，一发炮弹便能让联邦舰桥心惊胆战。' },
+  { id: 'gndg_guncannon', name: '钢加农', icon: '💣', tag: '玩', type: '手办', price: 140, desc: '背挂双联加农炮的联邦中距离支援机，白色基地炮火掩护的坚实壁垒。' },
+  { id: 'gndg_guntank', name: '钢坦克', icon: '🚜', tag: '玩', type: '手办', price: 120, desc: '履带加炮塔的联邦战车型机体，远距离压制火力里最可靠的老将。' },
+  { id: 'gndg_gm', name: '吉姆', icon: '🪖', tag: '玩', type: '手办', price: 100, desc: '高达的量产简化兄弟，无数联邦驾驶员的生命堆出了这场战争的胜利。' },
+  { id: 'gndg_zaku', name: '扎古Ⅱ', icon: '⚙️', tag: '玩', type: '手办', price: 120, desc: '一年战争中最经典的量产机，独眼转动的每一圈都藏着王牌的故事。' },
+  { id: 'gndg_charzaku', name: '夏亚专用扎古（红有三）', icon: '🔴', tag: '玩', type: '手办', price: 180, desc: '肩甲钉着三根红漆的赤色机体，三倍速的传说就是从这里一路蔓延开的。' },
+  { id: 'gndg_corefighter', name: '核心战机', icon: '✈️', tag: '玩', type: '手办', price: 150, desc: '能脱离机体独自作战的高达核心单元，既是逃生舱也是战术上的奇兵。' },
+  { id: 'gndg_bigzam', name: '大扎姆', icon: '💿', tag: '玩', type: '手办', price: 210, desc: '体型压倒群机的吉翁巨型装甲，曾让一整支联邦舰队在炮口下胆寒。' },
+  { id: 'gndg_model_kit', name: '高达拼装模型', icon: '🧩', tag: '玩', type: '手办', price: 130, desc: '把白色恶魔从板件上一块块剪下拼起，是每个少年进入宇宙世纪的入门仪式。' },
+  { id: 'gndg_fed_badge', name: '联邦军徽', icon: '⭐', tag: '玩', type: '徽章', price: 90, desc: '联邦军将士胸前的星光徽记，别上它等于向吉翁宣告自己所属的阵营。' },
+  { id: 'gndg_zeon_badge', name: '吉翁军徽', icon: '👁️', tag: '玩', type: '徽章', price: 90, desc: '独眼机体的吉翁标志，像一只凝视战场的机械单眼，见证理想与野心。' },
+  { id: 'gndg_minovsky', name: '米诺夫斯基物理学入门', icon: '📚', tag: '闻', type: '秘籍', price: 130, desc: '解读米诺夫斯基粒子与光束武器的军内教材，读完就能给整备班打下手。' },
+  { id: 'gndg_ration', name: '联邦军用口粮', icon: '🥫', tag: '食', type: '美食', price: 40, desc: '压缩成方块的全营养军粮，据说连吃三罐就能尝出自由的阵营味。' },
+  { id: 'gndg_zeon_ration', name: '吉翁野战军粮', icon: '🍖', tag: '食', type: '美食', price: 45, desc: '装在罐头里的宇宙炖肉，是前线士兵寒夜里唯一一点带温度的热气。' },
+  { id: 'gndg_energy', name: '三倍速能量饮料', icon: '🥤', tag: '食', type: '饮品', price: 30, desc: '口味奇特的殖民卫星汽水，喝一口就仿佛听见红色彗星呼啸的引擎声。' },
+  { id: 'gndg_pilot_suit', name: '联邦驾驶员服', icon: '🦺', tag: '衣', type: '服饰', price: 170, desc: '红白相间的标准驾驶服，拉上拉链的一瞬间连呼吸都变得像要出击。' },
+  { id: 'gndg_char_suit', name: '夏亚的红色驾驶服', icon: '🧑‍🚀', tag: '衣', type: '服饰', price: 190, desc: '赤红与洁白相间的彗星装束，传说穿上它连走路都会自带三倍速。' },
+  { id: 'gndg_cap', name: '白色基地纪念帽', icon: '🧢', tag: '衣', type: '服饰', price: 60, desc: '印着舷号与联邦星徽的乘员便帽，舰桥组成员几乎人手一顶的出勤装备。' },
+  { id: 'gndg_bag', name: '白色基地帆布包', icon: '🎒', tag: '衣', type: '文创', price: 80, desc: '印着白色基地舷号的纪念周边，背着它出门就像随时待命出击的木马乘员。' },
+  { id: 'gndg_cardpack', name: '一年战争收藏卡包', icon: '🎴', tag: '玩', type: '收藏卡', price: 90, desc: '随机开出驾驶员与机体的集换卡牌，集满一整套就等于收藏了一整场战争。' },
+  { id: 'gndg_hotel', name: 'Side6观景旅馆', icon: '🛏️', tag: '住', type: '住宿', price: 200, desc: '中立殖民卫星的环形舷窗客房，躺在床边看星河流转，战火难得如此遥远。' },
+  { id: 'gndg_cockpit', name: 'MS驾驶舱模拟体验', icon: '🕹️', tag: '玩', type: '体验', price: 190, desc: '坐进一比一复原的驾驶舱握住操纵杆，仪表点亮的一瞬你就是新人机师。' },
+  { id: 'gndg_glass', name: '格拉纳达月尘玻璃杯', icon: '🏺', tag: '住', type: '特产', price: 80, desc: '掺入月面尘埃烧制的星色玻璃器，是月球都市才有的独特旅行手信。' },
+  { id: 'gndg_ticket', name: '月神二号穿梭机纪念票', icon: '🎫', tag: '行', type: '文创', price: 50, desc: '往返月神二号的登机纪念券，票根背面印着联邦宇宙港的整条航路图。' }
+);

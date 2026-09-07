@@ -3,10 +3,10 @@
   window.TRAVEL_SERIES = window.TRAVEL_SERIES || [];
   const T = s => window.TRAVEL_SERIES.push(s);
   /* 类别一：圆谷·奥特曼系列 */
-  T({ id: 'toku_ultra', cat: 'tokusatsu', name: '奥特曼系列（圆谷）', years: '1966-至今', author: '円谷英二·圆谷制作', theme: '巨大英雄·光之巨人', background: '1966年初代奥特曼开创"巨大变身英雄"特摄类型，圆谷株式会社出品。M78星云光之国的设定影响亚洲数代人，迪迦奥特曼是中国90后的集体记忆。', story: '来自M78星云的宇宙警备队队员与地球人合体，变身成40米巨人与怪兽战斗。奥特曼计时器闪烁的三分钟，是人类与光签订的契约。', protagonist: '初代奥特曼/早田进', slogan: '变身！（シュワッチ！）', cities: ['tokyo', 'hiroshima'], items: [
+  T({ id: 'toku_ultra', cat: 'tokusatsu', name: '奥特曼系列（圆谷）', years: '1966-至今', author: '円谷英二·圆谷制作', theme: '巨大英雄·光之巨人', background: '1966年初代奥特曼开创"巨大变身英雄"特摄类型，圆谷株式会社出品。M78星云光之国的设定影响亚洲数代人，迪迦奥特曼是中国90后的集体记忆。', story: '来自M78星云的宇宙警备队队员与地球人合体，变身成40米巨人与怪兽战斗。奥特曼计时器闪烁的三分钟，是人类与光签订的契约。', protagonist: '初代奥特曼/早田进', slogan: '变身！（シュワッチ！）', cities: ['tokyo'], items: [
     { id: 'ultra_soft', name: '初代奥特曼软胶（Sofubi）', type: '手办模型', city: 'tokyo', price: 130, desc: 'B-Club 复刻银红软胶，"三分钟 Timer"胸口。' },
     { id: 'ultra_badge', name: '奥特兄弟徽章盒', type: '徽章谷子', city: 'tokyo', price: 55, desc: '初代/赛文/泰罗/迪迦/泽塔吧唧五枚。' },
-    { id: 'ultra_tshirt', name: 'M78星云宇宙警备队T恤', type: '服饰包箱', city: 'hiroshima', price: 100, desc: '宇宙警备队徽章满印，"光之国制式"。' },
+    { id: 'ultra_tshirt', name: 'M78星云宇宙警备队T恤', type: '服饰包箱', city: 'tokyo', price: 100, desc: '宇宙警备队徽章满印，"光之国制式"。' },
     { id: 'ultra_plush', name: '奥特曼计时器抱枕', type: '毛绒公仔', city: 'tokyo', price: 80, desc: '蓝红计时器抱枕，会"噔噔噔"想象。' },
     { id: 'ultra_berry', name: '奥特曼变身器玩具', type: '生活数码联名', city: 'tokyo', price: 160, desc: '迪迦神光棒/泽塔光弩发声玩具，"变身音效"。' }] });
   /* 类别二：东映·假面骑士系列 */

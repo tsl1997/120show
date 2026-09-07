@@ -1,0 +1,32 @@
+/* 泰安 分册01：景点圣地（登山朝圣线+岱庙古建+山脚胜迹） */
+window.TA_SPOTS = window.TA_SPOTS || [];
+window.TA_SPOTS.push(
+  { id: 'taian_taishan', name: '泰山', icon: '⛰️', price: 115, desc: '五岳之首，"会当凌绝顶，一览众山小"。6660级台阶从红门到玉皇顶，夜爬看日出是经典玩法。' },
+  { id: 'taian_daimiao', name: '岱庙', icon: '🛕', price: 30, desc: '历代帝王封禅泰山前祭拜的行宫，与故宫齐名的三大宫殿式建筑群。汉柏唐槐千年犹在。' },
+  { id: 'taian_riguang', name: '玉皇顶日出', icon: '🌄', price: 0, desc: '凌晨四点山顶挤满军大衣，云海之上金光乍现。"泰山日出"是中国人的一生心愿清单。' },
+  { id: 'taian_shibapan', name: '十八盘·南天门', icon: '🧱', price: 0, desc: '最陡处坡度70度的"天梯"，1600级石阶直上南天门。爬完腿抖三天，"过了十八盘，天上一重天"。' },
+  { id: 'taian_houshiwu', name: '后石坞·桃花峪', icon: '🌲', price: 0, desc: '泰山"幽区"，古松林立人少景美。天烛峰路线是户外党最爱，"泰山的前世"。' },
+  { id: 'taian_wenquan', name: '泰山温泉城', icon: '♨️', price: 128, desc: '下山后的犒劳，硫磺泉泡到通体舒泰。"爬山泡汤"是泰安周末的标准流程。' },
+  { id: 'taian_fangte', name: '泰安方特欢乐世界', icon: '🎢', price: 280, desc: '泰山脚下的主题乐园，"飞跃极限"球幕飞车。带孩子家庭的缓冲站，刺激项目不少。' },
+  { id: 'tap_hongmen', name: '红门宫', icon: '🏮', price: 0, desc: '红门晓日是泰山古八景之一，登山者大多从这道山门起步。检票而入即是天路，古柏夹道石坊相迎。' },
+  { id: 'tap_kongzidenglin', name: '孔子登临处', icon: '⛩️', price: 0, desc: '石坊题着“登泰山而小天下”，源自孔子登临之叹。儒家圣人走过的山路成了文脉，天下第一山由此得名。' },
+  { id: 'tap_doumugong', name: '斗母宫', icon: '🛕', price: 0, desc: '登泰山中路的小巧古刹，三重院落沿坡升起，供奉斗姆元君。檐角风铃清响，过客歇脚讨一碗热茶。' },
+  { id: 'tap_jingshiyu', name: '经石峪', icon: '🪨', price: 0, desc: '山谷石坪刻着半部《金刚经》，字大如斗铺了整整一坡，号称大字鼻祖。夏日溪水漫过经文的画面最出片。' },
+  { id: 'tap_zhongtianmen', name: '中天门', icon: '🚠', price: 0, desc: '泰山之半名中天，索道与进山巴士在此换乘。抬头南天门藏在云里，身后是层层远山与来时的路。' },
+  { id: 'tap_yunbuqiao', name: '云步桥·五大夫松', icon: '🌉', price: 0, desc: '飞瀑溅雪的断崖横着一座小桥，桥北古松下立着“五大夫”石碑。秦始皇避雨封松的典故，就藏在这虬枝里。' },
+  { id: 'tap_tianjie', name: '天街', icon: '🛍️', price: 0, desc: '南天门上依崖而生的青石板街，海拔一千四百米。店铺卖军大衣姜汤和煎饼，云雾时常漫过屋檐。' },
+  { id: 'tap_bixiaci', name: '碧霞祠', icon: '🏯', price: 0, desc: '供奉泰山奶奶碧霞元君的金顶古观，明代大殿铜瓦鎏金。登山香客进香叩首，山顶最热闹处就在此处。' },
+  { id: 'tap_riguanfeng', name: '日观峰·拱北石', icon: '🌅', price: 0, desc: '泰山观日出最正统的位置，拱北石探向云海。凌晨四点人已站满岩台，红日从云隙之间轰然跃出。' },
+  { id: 'tap_wuzibei', name: '无字碑', icon: '🪦', price: 0, desc: '玉皇顶旁的汉代石表，通体无字任人猜想。有人说是汉武帝立石告天，碑上的沉默比铭文更有重量。' },
+  { id: 'tap_wuyueduzun', name: '五岳独尊石刻', icon: '🗿', price: 0, desc: '光绪年间镌就的四个大字，是泰山最硬的签名。无数人排着长队与它合影，把“独尊”二字收进行囊。' },
+  { id: 'tap_jiqitaiming', name: '大观峰·纪泰山铭', icon: '📜', price: 0, desc: '唐玄宗封禅后亲书《纪泰山铭》，刻满千丈崖壁，字字描金。远望如一卷圣旨摊开在青岩之上。' },
+  { id: 'tap_tianzhufeng', name: '天烛峰', icon: '🎇', price: 0, desc: '泰山东麓群峰如烛，直插青天，是看日落与星空的秘境。山崖下就是封禅大典的露天实景剧场。' },
+  { id: 'tap_dongyudao', name: '东御道', icon: '🥾', price: 0, desc: '汉武帝东封泰山走过的古御道，沿溪谷曲折上山。石板被岁月磨得发亮，路旁还躺着宋代的石桥残基。' },
+  { id: 'tap_heilongtan', name: '黑龙潭', icon: '🌊', price: 0, desc: '泰山西溪百丈崖下的一汪碧潭，瀑布三叠垂落。传说潭中栖龙，水色墨绿深不见底，掬一捧沁凉入骨。' },
+  { id: 'tap_daizongfang', name: '岱宗坊', icon: '⛩️', price: 0, desc: '登泰古道的起点石坊，是山与城的界碑。旧时官民祭山先过此坊，如今抬脚过坊，便算入了泰山。' },
+  { id: 'tap_tianwai', name: '天外村广场', icon: '🏙️', price: 0, desc: '山脚“天圆地方”广场，进山巴士与索道的枢纽。十二根盘龙石柱环列，抬头整座泰山迎面压来。' },
+  { id: 'tap_puzhaosi', name: '普照寺', icon: '🙏', price: 0, desc: '泰山南麓的幽静古寺，筛月亭下六朝松筛一地碎光。冯玉祥曾隐居读书，山门钟声不疾不徐。' },
+  { id: 'tap_wangmuch', name: '王母池', icon: '⛲', price: 0, desc: '泰山脚下千年道观池苑，传为王母梳妆之处。泉水自岩隙涌出，古树虬蟠，暑天入园暑气顿消。' },
+  { id: 'tap_tiankuangdian', name: '岱庙·天贶殿', icon: '🏛️', price: 0, desc: '岱庙主殿与故宫太和殿齐名，北宋大木作气度雄浑。殿内《启跸回銮图》画尽宋真宗封禅仪仗。' },
+  { id: 'tap_hanbaiyuan', name: '汉柏院', icon: '🌳', price: 0, desc: '汉武帝登封泰山时手植的柏树，两千多岁仍在抽青。枯枝横空如龙爪，“汉柏凌寒”位列岱庙古树之首。' }
+);

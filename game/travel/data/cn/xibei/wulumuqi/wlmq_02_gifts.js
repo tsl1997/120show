@@ -1,0 +1,31 @@
+/* 新疆·乌鲁木齐 分册02：特色周边（西域美食/多民族手信/天山体验） */
+window.WLMQ_GIFTS = window.WLMQ_GIFTS || [];
+window.WLMQ_GIFTS.push(
+  { id: 'wulumuqi_dapanji', name: '大盘鸡', icon: '🍗', tag: '食', type: '美食', price: 88, desc: '鸡块土豆辣皮子炖到酥烂，皮带面拌进汤汁。"新疆名菜之王"，两人一盘中盘都嫌大。' },
+  { id: 'wulumuqi_shaobaozi', name: '烤包子·馕坑肉', icon: '🥟', tag: '食', type: '美食', price: 10, desc: '馕坑贴烤的包子咔嚓爆汁，馕坑肉串比手臂粗。配一瓣生洋葱，维族吃法的豪迈。' },
+  { id: 'wulumuqi_shouzhuafan', name: '手抓饭', icon: '🍚', tag: '食', type: '美食', price: 30, desc: '黄萝卜、羊腿肉与大米焖出的金黄抓饭。葡萄干点缀，油润喷香，"新疆的国民饭"。' },
+  { id: 'wulumuqi_nang', name: '馕', icon: '🫓', tag: '食', type: '特产', price: 8, desc: '馕坑烤出的"新疆面包"，芝麻洋葱香。馕坑肉、辣皮子馕、玫瑰花酱馕几十种。' },
+  { id: 'wulumuqi_kawa', name: '卡瓦斯·酸奶刨冰', icon: '🥤', tag: '食', type: '饮品', price: 10, desc: '蜂蜜发酵的"新疆啤儿"微甜气泡。酸奶刨冰堆成小山，巴扎解暑神器。' },
+  { id: 'wulumuqi_guogan', name: '吐鲁番葡萄干·和田大枣', icon: '🍇', tag: '食', type: '特产', price: 50, desc: '绿香妃王葡萄干无核大粒，和田骏枣肉厚甜糯。巴扎干果区砍价乐趣无穷。' },
+  { id: 'wulumuqi_baba', name: '切糕（玛仁糖）', icon: '🍬', tag: '食', type: '特产', price: 40, desc: '核桃、葡萄干、玉米饴压制的能量块。按两称重，"实诚又顶饿"的丝路干粮。' },
+  { id: 'wulumuqi_aiDeLeiSi', name: '艾德莱斯绸', icon: '🌈', tag: '衣', type: '服饰', price: 120, desc: '扎经染色的"彩虹丝绸"，维族姑娘的裙装面料。围巾与裙子色彩灵动，"丝绸之路上的活化石"。' },
+  { id: 'wulumuqi_yingji', name: '英吉沙小刀·铜器', icon: '🗡️', tag: '衣', type: '文创', price: 130, desc: '四百年历史的英吉沙弯刀（工艺摆件）与手工铜壶。巴扎匠人现场錾花，"手艺在刀刃上"。' },
+  { id: 'wulumuqi_dongbula', name: '都塔尔·手鼓', icon: '🪕', tag: '衣', type: '文创', price: 150, desc: '维族乐器都塔尔与达甫（手鼓）小件。巴扎琴行里师傅即兴弹一段，音乐就融进血液。' },
+  { id: 'wulumuqi_tianshan_hike', name: '天池环湖徒步', icon: '🥾', tag: '玩', type: '体验', price: 100, desc: '天池环湖栈道徒步两小时，云杉倒影随光变化。马队可选上山，"西王母的瑶池"步行巡礼。' },
+  { id: 'wulumuqi_nanshan_ride', name: '南山骑马', icon: '🐎', tag: '玩', type: '体验', price: 120, desc: '哈萨克族牧民带骑走菊花台草原。毡房里喝一碗马奶酒，"做半天哈萨克客人"。' },
+  { id: 'wulumuji_hotel', name: '大巴扎旁民宿', icon: '🏨', tag: '住', type: '住宿', price: 300, desc: '巴扎步行圈内的民族风情民宿。夜里听着都塔尔琴声入睡，清晨被馕香唤醒。' },
+  { id: 'wlmqg_banmian', name: '过油肉拌面', icon: '🍜', tag: '食', type: '美食', price: 30, desc: '拉条子筋道，过油肉嫩滑，配蒜苗皮牙子辣皮子一拌，油亮汤汁裹满每根面。乌鲁木齐人的午餐标配，一盘下肚顶到天黑。' },
+  { id: 'wlmqg_yangrouchuan', name: '烤羊肉串', icon: '🍢', tag: '食', type: '美食', price: 20, desc: '大块羊肉穿在铁签上烤得滋滋冒油，撒把孜然和辣面子。肥瘦相间咬下去汁水迸出，就着热馕吃，是最地道的新疆下午。' },
+  { id: 'wlmqg_naicha', name: '新疆奶茶', icon: '☕', tag: '食', type: '饮品', price: 12, desc: '砖茶兑鲜奶加一把盐，煮出的奶茶咸香醇厚。掰块馕泡进去，热乎乎喝一碗，胃里暖烘烘，是牧区传下来的待客茶。' },
+  { id: 'wlmqg_mifen', name: '新疆炒米粉', icon: '🍝', tag: '食', type: '美食', price: 28, desc: '粗米粉裹满浓稠辣酱，鸡肉芹菜酸菜拌成一大碗。辣得吸溜嘴也舍不得放筷子，是乌鲁木齐年轻人的深夜食堂顶流。' },
+  { id: 'wlmqg_jiaomaji', name: '椒麻鸡', icon: '🐔', tag: '食', type: '美食', price: 68, desc: '煮熟的土鸡撕成细条，浇上花椒麻油和皮牙子拌匀。麻香冲鼻辣得清爽，乌鲁木齐人夏天的开胃神器，配个馕饼更是一绝。' },
+  { id: 'wlmqg_hetao', name: '薄皮核桃·巴旦木', icon: '🥜', tag: '食', type: '特产', price: 45, desc: '纸皮核桃手一捏就开，巴旦木满口脆香回甘。干果摊上堆成小山，老板随手递来让你先尝，尝着尝着袋子就装满了。' },
+  { id: 'wlmqg_ditan', name: '手工打结羊毛地毯', icon: '🧶', tag: '衣', type: '文创', price: 260, desc: '和田匠人手工打结的羊毛地毯，石榴与巴旦木纹样鲜艳繁复。一个老师傅要打上几个月，铺开便是一幅踩在脚下的西域画。' },
+  { id: 'wlmqg_duopa', name: '维吾尔花帽·朵帕', icon: '🧢', tag: '衣', type: '服饰', price: 35, desc: '四片绣花拼成的小帽叫朵帕，金线银线绣着巴旦木纹。维吾尔大叔帽不离头，游客也买一顶戴上，笑意从帽檐底下漾开来。' },
+  { id: 'wlmqg_muqamu', name: '十二木卡姆精选集', icon: '🎼', tag: '玩', type: '文创', price: 60, desc: '维吾尔族的音乐史诗十二木卡姆，早已入选人类非物质文化遗产。带一套精选辑回家，都塔尔与手鼓一响，仿佛又回到大巴扎黄昏。' },
+  { id: 'wlmqg_danang', name: '打馕体验课', icon: '🫓', tag: '玩', type: '体验', price: 60, desc: '跟着师傅学打馕，面团拍圆印上花纹，弯腰贴进滚烫的馕坑。等它鼓着焦黄出炉，自己亲手烤的那一张，趁热掰开最香。' },
+  { id: 'wlmqg_huaxue', name: '丝绸之路滑雪一日体验', icon: '🎿', tag: '玩', type: '体验', price: 260, desc: '冬天买张雪票，从高山雪道一路滑下，云杉林在脚边退成风景。租板请教练都方便，摔进松软的粉雪里，笑声响彻山谷。' },
+  { id: 'wlmqg_zhanfang', name: '南山毡房民宿', icon: '🏕️', tag: '住', type: '住宿', price: 220, desc: '住进哈萨克牧民的毡房，花毡铺地，炉上的奶茶咕嘟冒泡。夜里看星星听风声，清晨掀开毡帘，雪山正好立在门口。' },
+  { id: 'wlmqg_baoche', name: '天池南山一日包车', icon: '🚙', tag: '行', type: '体验', price: 260, desc: '包一辆车把天山天池与南山串成一日，司机兼向导最懂哪里好看。沿途雪山戈壁轮番登场，比赶公交省心不止一百倍。' },
+  { id: 'wlmqg_maixilaifu', name: '麦西来甫歌舞宴', icon: '🎶', tag: '玩', type: '体验', price: 180, desc: '入夜钻进大巴扎的歌舞宴会厅，抓饭烤肉刚上桌，木卡姆乐手就奏响琴鼓。食客被邀进舞池转圈起舞，一顿饭吃成一场婚礼。' }
+);

@@ -1,4 +1,5 @@
-/* 异世界·火影忍者 分册09：大事件见闻 */
+/* 异世界·火影忍者 分册09：剧情名场面 */
+window.NA_STORIES = window.NA_STORIES || [];
 window.NA_STORIES.push(
   { id: 'nazv_kyubi_attack', name: '九尾之乱', icon: '🦊', desc: '鸣人出生当夜，带土放出九尾袭击木叶。四代目夫妇以生命封印——"鸣人，父母的爱与你同在"。' },
   { id: 'nazv_uchiha_massacre', name: '宇智波灭族之夜', icon: '🖤', desc: '鼬在村子与一族之间选择了村子。八岁的佐助失去了全部——"愚蠢的欧豆豆"。' },

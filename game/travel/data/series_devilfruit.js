@@ -2,7 +2,7 @@
 (function () {
   window.TRAVEL_SERIES = window.TRAVEL_SERIES || [];
   window.TRAVEL_SERIES.push({
-    id: 'df_chart', cat: 'anime', name: '恶魔果实图鉴（航海王）', years: '1999-至今', author: '尾田荣一郎', theme: '恶魔果实能力收藏',
+    id: 'df_chart', cat: 'isekai', name: '恶魔果实图鉴（航海王）', years: '1999-至今', author: '尾田荣一郎', theme: '恶魔果实能力收藏',
     background: '恶魔果实分为超人系、动物系（含古代种与幻兽种）、自然系三大类。能力者被大海厌恶（不会游泳），海楼石是唯一克星。果实图鉴记录已知全部果实——每颗都是独一无二的存在。',
     story: '从东海飘来的怪果子改变少年的一生。自然系无视攻击、超人系千奇百怪、幻兽种改写传说——这就是伟大航路的"最强排行榜"。',
     protagonist: '全部能力者', slogan: '吃了它，就再也回不去大海了。',

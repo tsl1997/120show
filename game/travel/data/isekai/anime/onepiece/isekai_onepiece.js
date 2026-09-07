@@ -18,7 +18,7 @@
     world: 'isekai',
     hero: '🏴‍☠️',
     desc: '"财富、名声、权力，曾拥有一切的海贼王哥尔·D·罗杰，临刑前的一句话让人们涌向大海——『我的财宝吗？想要的话就给你好了。去找吧！我把世界上的一切都放在了那里。』"伟大航路，启航！',
-    labels: { spotL: '景点圣地', souvenirL: '特色宝物', storyL: '人物相遇', spotB: '前往', souvenirB: '获取', storyB: '相遇' },
+    labels: { spotL: '景点圣地', souvenirL: '特色宝物', storyL: '剧情名场面', spotB: '前往', souvenirB: '获取', storyB: '见证' },
     travel: [{ name: '穿越之门', icon: '🌌', cost: 520 }],
     visa: null,
     spots: window.OP_SPOTS || [],

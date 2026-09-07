@@ -1,0 +1,33 @@
+/* 西双版纳 分册02：特色周边（傣味美食/热带风物/非遗手作/雨林体验） */
+window.XSBN_GIFTS = window.XSBN_GIFTS || [];
+window.XSBN_GIFTS.push(
+  { id: 'banna_kao yu', name: '香茅草烤鱼·烤鸡', icon: '🐟', tag: '食', type: '美食', price: 45, desc: '香茅草捆鱼炭烤，柠檬香渗进肉里。配菠萝饭与喃咪蘸水，"傣味三宝"。' },
+  { id: 'banna_bofan', name: '菠萝饭·菠萝蜜', icon: '🍍', tag: '食', type: '美食', price: 25, desc: '紫糯米塞进菠萝蒸，果香四溢。菠萝蜜大如西瓜，果肉金黄甜到粘手。' },
+  { id: 'banna_nuomi', name: '手抓饭·竹筒饭', icon: '🍚', tag: '食', type: '美食', price: 45, desc: '芭蕉叶铺满手抓饭，五彩糯米饭好看又好吃。竹筒饭带竹膜清香，"雨林的礼物"。' },
+  { id: 'banna_kaichuan', name: '椰子·百香果饮', icon: '🥥', tag: '食', type: '饮品', price: 15, desc: '现开椰子配百香果汁，热带双拼。"36度的高温，15度的快乐"。' },
+  { id: 'banna_pucha', name: '普洱茶', icon: '🍵', tag: '食', type: '特产', price: 120, desc: '普洱茶六大茶山就在版纳，老班章"茶王"。茶饼越陈越香，"可以喝的古董"。' },
+  { id: 'banna_xianglian', name: '热带水果干·小玉米', icon: '🌽', tag: '食', type: '特产', price: 30, desc: '菠萝蜜干、芒果干甜到心坎。小花糯玉米糯到弹牙，"夜市必囤"。' },
+  { id: 'banna_daiqun', name: '傣装写真·筒裙', icon: '👗', tag: '衣', type: '服饰', price: 150, desc: '傣族筒裙修身显瘦，水灯与孔雀元素。星光夜市傣装拍照，"人均傣族公主"。' },
+  { id: 'banna_xiangbao', name: '香包·手工纸', icon: '🌸', tag: '衣', type: '文创', price: 35, desc: '傣族香包装着香草，睡得安稳。构树手工纸花纹独特，"雨林手作"。' },
+  { id: 'banna_foshi', name: '傣陶·银饰', icon: '🏺', tag: '衣', type: '文创', price: 90, desc: '傣族慢轮制陶非遗，陶罐古朴。傣银孔雀坠子，"水一样的民族手艺"。' },
+  { id: 'banna_poshui', name: '泼水节体验', icon: '💦', tag: '玩', type: '体验', price: 60, desc: '傣族园天天过泼水节，水枪水盆齐上阵。"被泼得越湿，祝福越多"。' },
+  { id: 'banna_yuxiang2', name: '雨林徒步·夜游植物园', icon: '🔦', tag: '玩', type: '体验', price: 100, desc: '向导带路认绞杀榕与见血封喉。夜游找竹节虫、萤火虫，"雨林夜话"。' },
+  { id: 'banna_daba', name: '澜沧江篝火晚会', icon: '🔥', tag: '玩', type: '体验', price: 180, desc: '放水灯、跳团结舞、看六国歌舞。澜沧江边的狂欢，"湄公河之夜"。' },
+  { id: 'banna_minsu', name: '傣式泳池民宿', icon: '🏨', tag: '住', type: '住宿', price: 350, desc: '告庄的傣式民宿带泳池，木梯上楼。夜里星光夜市步行可达，"热带度假模式"。' },
+  { id: 'xsbng_suansun', name: '罐装傣家酸笋', icon: '🥬', tag: '食', type: '特产', price: 35, desc: '鲜笋入坛发酵半个月，闻着冲、煮开是真香。酸笋煮鸡、酸笋炒牛肉都靠它提味，真空罐装方便带回家开火就做。' },
+  { id: 'xsbng_shaokao', name: '傣味烧烤拼盘', icon: '🍢', tag: '食', type: '美食', price: 60, desc: '香茅草捆的烤鱼、蘸大芫荽小米辣的烤肉串，炭火一燎滋滋冒油。配上一杯冰咖啡，从告庄夜市一路吃到尽兴。' },
+  { id: 'xsbng_laokafei', name: '老挝冰咖啡', icon: '🧋', tag: '食', type: '饮品', price: 18, desc: '滤壶滴出的浓咖啡兑上炼乳，倒进装满碎冰的塑料袋，扎紧吸管边走边喝。苦甜冰爽，是告庄夜市人手一袋的续命水。' },
+  { id: 'xsbng_paoluda', name: '泡鲁达', icon: '🥤', tag: '食', type: '饮品', price: 18, desc: '缅甸传来的南洋甜品：椰奶打底，泡进干面包与紫米，再撒一把椰丝。吸一口冰凉甜糯，烈日下的快乐就这么简单。' },
+  { id: 'xsbng_chongjijiao', name: '舂鸡脚', icon: '🍗', tag: '食', type: '美食', price: 30, desc: '青柠、小米辣与豇豆在石臼里把鸡脚舂到入味，酸辣冲鼻。夜市摊前人人边吃边吸溜，是打开傣味世界的敲门砖。' },
+  { id: 'xsbng_kongqueyan', name: '孔雀宴', icon: '🦚', tag: '食', type: '美食', price: 150, desc: '芭蕉叶上摆开孔雀开屏的手抓饭阵，烤鱼烤肉与蔬果围成翎羽。一桌人围着“孔雀”开吃，傣家待客的排面直接拉满。' },
+  { id: 'xsbng_liulian', name: '榴莲山竹果篮', icon: '🍈', tag: '食', type: '特产', price: 60, desc: '熟透的榴莲金黄绵密，山竹一掰露出白嫩果肉。水果市场现剥现称，吃到手指黏黏的，摊主还会教你挑一颗报恩榴莲。' },
+  { id: 'xsbng_fengmi', name: '热带雨林蜂蜜', icon: '🍯', tag: '食', type: '特产', price: 55, desc: '山里的蜂农直接摇桶取蜜，百花蜜浓到挂勺。带着淡淡的柚子花香，冲水润嗓，是雨林最甜的一口伴手礼。' },
+  { id: 'xsbng_xiangfenzhi', name: '象粪纸记事本', icon: '🐘', tag: '玩', type: '文创', price: 45, desc: '野象谷把大象粪便回收洗净，高温消毒打成纸浆。纸里还留着草茎纤维，印上象脚印，是自带故事的环保手信。' },
+  { id: 'xsbng_daijin', name: '傣锦围巾', icon: '🧣', tag: '衣', type: '服饰', price: 120, desc: '木织机上一梭一梭织出的傣锦，孔雀纹与佛塔纹爬满布面。当围巾或披肩都好看，把雨林的花色披在肩上。' },
+  { id: 'xsbng_beiyeyou', name: '贝叶经书签', icon: '🍃', tag: '玩', type: '文创', price: 40, desc: '刻经人用铁笔在贝叶上留下经文，如今做成黄铜书签。打开是句祝福，合上是千年的佛前时光，还附赠一小片菩提叶。' },
+  { id: 'xsbng_xiangjiaogu', name: '象脚鼓体验', icon: '🥁', tag: '玩', type: '体验', price: 90, desc: '细腰长鼓挎上肩，跟着傣家乐师学几段鼓点。鼓声一响，腿脚不自觉想跳舞，泼水节的快乐提前抵达。' },
+  { id: 'xsbng_kongquewu', name: '孔雀舞演出票', icon: '💃', tag: '游', type: '体验', price: 160, desc: '舞台灯光下看一场孔雀舞，指尖捏成雀首，裙摆开成雀屏。从村寨篝火到专业剧场，傣家姑娘把美跳进了骨子里。' },
+  { id: 'xsbng_daiyao', name: '傣药香薰SPA', icon: '💆', tag: '游', type: '体验', price: 200, desc: '香茅、姜与艾草熬成热汤，药草蒸汽混着精油抚平一身疲惫。泡完敷上青草膏，把雨林给的松弛带进梦乡。' },
+  { id: 'xsbng_laopi', name: '老挝黄啤酒', icon: '🍺', tag: '食', type: '饮品', price: 15, desc: '湄公河岸冰镇到起雾的东南亚啤酒，入口清爽带麦香。星光夜市撸串配它，一口下去就有了异国傍晚的松弛感。' },
+  { id: 'xsbng_tengbianbao', name: '藤编手工包', icon: '🧺', tag: '衣', type: '服饰', price: 80, desc: '篾匠把藤条劈得又薄又韧，编出圆鼓鼓的菜篮子包。拎去赶摆装水果，或是当拍照道具，草编纹理里都是阳光的味道。' }
+);

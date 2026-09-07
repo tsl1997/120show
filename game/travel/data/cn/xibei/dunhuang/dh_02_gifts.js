@@ -1,0 +1,31 @@
+/* 敦煌 分册02：特色周边（丝路味道/莫高文创/大漠体验） */
+window.DH_GIFTS = window.DH_GIFTS || [];
+window.DH_GIFTS.push(
+  { id: 'dunhuang_xingpi', name: '杏皮水', icon: '🥤', tag: '食', type: '饮品', price: 8, desc: '李广杏皮熬的酸甜饮料，敦煌"国民快乐水"。大漠骄阳下冰镇一杯，从喉咙凉到心里。' },
+  { id: 'dunhuang_liguang', name: '驴肉黄面', icon: '🍜', tag: '食', type: '美食', price: 30, desc: '"天上龙肉，地上驴肉"，黄面拉得细如龙须。配香菇肉末浇头，顺顺顺驴肉黄面是招牌。' },
+  { id: 'dunhuang_hu', name: '胡羊焖饼', icon: '🥘', tag: '食', type: '美食', price: 60, desc: '羊肉焖到酥烂，薄饼吸饱汤汁。"敦煌人的大盘鸡"，两人一锅管饱。' },
+  { id: 'dunhuang_liguangxing', name: '李广杏', icon: '🍑', tag: '食', type: '特产', price: 50, desc: '飞将军李广得名，敦煌独有的甜杏。鲜杏娇贵，杏干杏脯四季可吃。' },
+  { id: 'dunhuang_yeguangbei', name: '夜光杯', icon: '🍷', tag: '衣', type: '文创', price: 120, desc: '"葡萄美酒夜光杯"的祁连玉杯，薄如蛋壳。月光下杯壁透绿，"酒泉"故事随身带。' },
+  { id: 'dunhuang_feitian', name: '飞天文创', icon: '🧚', tag: '衣', type: '文创', price: 55, desc: '反弹琵琶飞天做成丝巾、书签、胶带。莫高窟官方文创，壁画美学穿在身上。' },
+  { id: 'dunhuang_sha', name: '沙画瓶·骆驼玩偶', icon: '🐪', tag: '衣', type: '文创', price: 40, desc: '鸣沙山的沙装进彩沙瓶，五色流沙如大漠日落。骆驼毛绒玩具驼铃叮当，丝路记忆可携带。' },
+  { id: 'dunhuang_luotuo', name: '骆驼骑行', icon: '🐫', tag: '玩', type: '体验', price: 100, desc: '鸣沙山骑驼队走丝路古线，驼铃叮当。五峰驼队绵延成"沙漠长龙"，日落下剪影绝美。' },
+  { id: 'dunhuang_huasha', name: '滑沙·沙漠越野', icon: '🏂', tag: '玩', type: '体验', price: 120, desc: '从沙山之巅坐滑板俯冲，沙鸣如雷。沙漠摩托冲沙丘更刺激，"大漠过山车"。' },
+  { id: 'dunhuang_xingkong', name: '沙漠星空露营', icon: '⛺', tag: '住', type: '住宿', price: 220, desc: '鸣沙山后山的露营基地，帐篷、篝火、银河。沙漠的夜空亮到"银河伸手可摘"。' },
+  { id: 'dunhuang_bihua_ke', name: '壁画临摹体验课', icon: '🎨', tag: '玩', type: '体验', price: 150, desc: '用矿物颜料临摹一幅飞天，老师讲解壁画千年不褪色之谜。画完带走"自己的莫高窟"。' },
+  { id: 'dunhuang_che', name: '西线一日包车', icon: '🚙', tag: '行', type: '体验', price: 200, desc: '包车走西线：阳关-玉门关-雅丹。戈壁公路自驾感拉满，司机是"丝路活地图"。' },
+  { id: 'dhg_zaojing_si', name: '藻井飞天丝巾', icon: '🧣', tag: '衣', type: '服饰', price: 168, desc: '把隋唐窟顶的藻井图案织进真丝方巾，莲花与飞天的配色取自壁画原色。披在肩上，等于把一片千年穹顶带出门。' },
+  { id: 'dhg_jiuluse', name: '九色鹿毛绒玩偶', icon: '🦌', tag: '玩', type: '文创', price: 88, desc: '取材257窟《鹿王本生》的九色神鹿，通体软绒，安静地蹲坐着。它是敦煌壁画里最温柔的一课，教人莫负善心。' },
+  { id: 'dhg_bihua_ban', name: '壁画复刻装饰板', icon: '🖼️', tag: '玩', type: '文创', price: 120, desc: '用矿物颜料手工复刻的飞天壁板，边缘做了斑驳做旧。挂上墙就像从窟里揭下了一平方米，家里也有莫高窟。' },
+  { id: 'dhg_rili', name: '敦煌日历', icon: '📅', tag: '玩', type: '文创', price: 68, desc: '三百六十五天，每天一页敦煌壁画，节气对应飞天与供养人。摆上书桌翻过一页，像拆开一个千年的盲盒。' },
+  { id: 'dhg_shamo_xuegao', name: '月牙泉文创雪糕', icon: '🍦', tag: '食', type: '美食', price: 20, desc: '月牙泉与九层楼造型的冰淇淋，牛奶和巧克力两种口味。举着它在实景前合影，是新一代“到此一游”的仪式。' },
+  { id: 'dhg_dazao', name: '鸣山大枣', icon: '🍒', tag: '食', type: '特产', price: 40, desc: '敦煌绿洲晒足日头的大枣，肉厚核小，甜到能起糖砂。抓一把当零嘴，戈壁滩上最朴实的甜都在这。' },
+  { id: 'dhg_heizhi', name: '羊肉合汁', icon: '🍲', tag: '食', type: '美食', price: 28, desc: '敦煌人叫它“合汁”，羊肉清汤打底，配丸子、夹沙和粉条。清晨一碗下肚，从胃暖到脚，比咖啡更提神。' },
+  { id: 'dhg_paor_yougao', name: '泡儿油糕', icon: '🍡', tag: '食', type: '美食', price: 15, desc: '敦煌宴席的甜点收尾，糯米皮包进糖馅，下锅炸到表面鼓起细泡。咬开是滚烫的糖心，烫嘴也要趁热吃。' },
+  { id: 'dhg_shasha', name: '流沙艺术摆件', icon: '⏳', tag: '玩', type: '文创', price: 55, desc: '鸣沙山的彩沙在玻璃夹层里堆出月牙泉与驼队，翻转时流沙重新作画。敦煌的沙被封进相框，从此“留得住”了。' },
+  { id: 'dhg_feitian_hanfu', name: '飞天写真体验', icon: '📸', tag: '游', type: '体验', price: 399, desc: '换上复原壁画妆容的服饰，在鸣沙山前拍一组“飞天”。灯光亮起的瞬间，你仿佛刚从112窟壁画里走出来。' },
+  { id: 'dhg_luobuma', name: '罗布麻茶', icon: '🍵', tag: '食', type: '特产', price: 45, desc: '荒漠植物罗布麻制成的养生茶，敦煌老人当口粮茶泡。初喝微苦，回甘绵长，戈壁的坚韧都熬进了汤色里。' },
+  { id: 'dhg_xingkong_minxiu', name: '星空民宿一夜', icon: '🏡', tag: '住', type: '住宿', price: 380, desc: '鸣沙山脚的民宿，入夜关灯躺下，天窗正对整条银河。老板备着西瓜与沙葱饼，运气好还能等来一场流星雨。' },
+  { id: 'dhg_damo_wanyan', name: '大漠晚宴', icon: '🥂', tag: '食', type: '体验', price: 280, desc: '日落前在雅丹戈壁支起长桌，烤羊排配冰镇杏皮水。举杯对着金红的晚霞碰一下，这顿饭值得专门飞一趟。' },
+  { id: 'dhg_feitian_fengling', name: '飞天风铃', icon: '🎐', tag: '玩', type: '文创', price: 45, desc: '铜制小飞天托着莲花，系成风铃挂在窗前。微风一过叮当作响，仿佛有条飘带真的从莫高窟飞到了家里。' },
+  { id: 'dhg_zaojing_bookmark', name: '藻井纹书签', icon: '🔖', tag: '玩', type: '文创', price: 30, desc: '把窟顶莲花藻井拓成黄铜书签，纹样精细到能看清每一瓣花瓣。夹进书里，翻页时一朵千年莲花随之绽放。' }
+);

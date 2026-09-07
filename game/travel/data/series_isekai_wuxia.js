@@ -2,7 +2,7 @@
 (function () {
   window.TRAVEL_SERIES = window.TRAVEL_SERIES || [];
   window.TRAVEL_SERIES.push({
-    id: 'sr_wulin_secret', cat: 'china', name: '武林绝学系列（金庸武学）', years: '1955-1972', author: '金庸', theme: '绝世武功秘籍收藏',
+    id: 'sr_wulin_secret', cat: 'isekai', name: '武林绝学系列（金庸武学）', years: '1955-1972', author: '金庸', theme: '绝世武功秘籍收藏',
     background: '飞雪连天射白鹿，笑书神侠倚碧鸳。金庸十四部书中的至高武学：从降龙十八掌到独孤九剑，从九阴九阳到葵花宝典——每一部秘籍都是一段江湖血雨。',
     story: '"武功练到极处，讲究的是境界而非招式。"',
     protagonist: '历代金庸主角', slogan: '无招胜有招。',
@@ -21,7 +21,7 @@
     ]
   });
   window.TRAVEL_SERIES.push({
-    id: 'sr_jinyong_beauty', cat: 'china', name: '金庸美人系列（绝代佳人）', years: '1955-1972', author: '金庸', theme: '绝代佳人头牌收藏',
+    id: 'sr_jinyong_beauty', cat: 'isekai', name: '金庸美人系列（绝代佳人）', years: '1955-1972', author: '金庸', theme: '绝代佳人头牌收藏',
     background: '飞雪连天射白鹿，笑书神侠倚碧鸳——金庸笔下的绝代佳人，或聪慧、或仙气、或刁蛮、或温柔，共同织就江湖儿女的缱绻底色。',
     story: '"问世间情为何物，直教生死相许。"',
     protagonist: '黄蓉、小龙女、王语嫣、赵敏……', slogan: '一见杨过误终身。',
@@ -40,7 +40,7 @@
     ]
   });
   window.TRAVEL_SERIES.push({
-    id: 'sr_shenbing', cat: 'china', name: '神兵利器系列（江湖名器）', years: '1955-1972', author: '金庸', theme: '神兵宝刀收藏',
+    id: 'sr_shenbing', cat: 'isekai', name: '神兵利器系列（江湖名器）', years: '1955-1972', author: '金庸', theme: '神兵宝刀收藏',
     background: '武林至尊，宝刀屠龙；倚天不出，谁与争锋——江湖名器见证了多少恩怨情仇。',
     story: '兵者是凶器，圣人不得已而用之。',
     protagonist: '历代持剑人', slogan: '重剑无锋，大巧不工。',

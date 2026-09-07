@@ -1,0 +1,32 @@
+/* 黄山 分册02：特色周边（徽菜/名茶/墨砚/徽州文创/住宿体验），旧souvenirs原样保留在前 */
+window.HS_GIFTS = window.HS_GIFTS || [];
+window.HS_GIFTS.push(
+  { id: 'huangshan_chouguiyu', name: '臭鳜鱼', icon: '🐟', tag: '食', type: '美食', price: 88, desc: '闻着臭吃着鲜，"徽菜之首"。腌制发酵的鳜鱼蒜瓣肉，红烧浇汁下饭三碗。' },
+  { id: 'huangshan_maodoufu', name: '毛豆腐', icon: '🧈', tag: '食', type: '美食', price: 25, desc: '长着白绒毛的豆腐煎到两面黄，蘸辣酱吃。"发酵的魔法"，外地人的勇者挑战。' },
+  { id: 'huangshan_she', name: '黄山烧饼', icon: '🫓', tag: '食', type: '特产', price: 20, desc: '梅干菜猪肉馅炉烤酥饼，"蟹壳黄"。刚出炉咔嚓掉渣，一袋接一袋停不下来。' },
+  { id: 'huangshan_heimu', name: '徽墨·歙砚', icon: '🖤', tag: '衣', type: '文创', price: 180, desc: '"天下墨业在绩溪"，徽墨描金描彩；歙砚四大名砚之一。文房收藏级，"落纸如漆"。' },
+  { id: 'huangshan_chemu', name: '太平猴魁·祁门红茶', icon: '🍵', tag: '食', type: '特产', price: 130, desc: '猴魁两叶抱一芽"猴韵"十足，祁红是"世界三大高香茶"。安徽茶的双子星。' },
+  { id: 'huangshan_weicai', name: '徽州贡菊', icon: '🌼', tag: '食', type: '特产', price: 45, desc: '黄山贡菊泡水清肝明目，"四大名菊"之首。一撮菊花一杯水，"徽州的白月光"。' },
+  { id: 'huangshan_tiehua', name: '徽州竹雕·砖雕文创', icon: '🧱', tag: '衣', type: '文创', price: 90, desc: '徽州三雕小件：竹雕笔筒、砖雕镇纸。把徽派建筑的精美"搬"上桌面。' },
+  { id: 'huangshan_sheying', name: '黄山日出云海观测', icon: '🌄', tag: '玩', type: '体验', price: 0, desc: '光明顶或清凉台蹲日出，云海翻涌如潮。"不到光明顶，不见黄山景"，冻着也值。' },
+  { id: 'huangshan_hongcun_xiezhen', name: '宏村写生·汉服旅拍', icon: '🎨', tag: '玩', type: '体验', price: 120, desc: '月沼边写生的学生成风景，你也可以画一幅。汉服旅拍在白墙黛瓦间，"画里乡村"成片。' },
+  { id: 'huangshan_wenquan', name: '黄山温泉', icon: '♨️', tag: '玩', type: '体验', price: 198, desc: '黄山四绝之一的飘雪温泉，李白曾来泡。爬山后泡汤，"四绝打卡完成"。' },
+  { id: 'huangshan_susong', name: '山上住宿看日出', icon: '🏨', tag: '住', type: '住宿', price: 600, desc: '山上酒店虽贵但能看日出云海。凌晨五点裹军大衣出门，"人生高光时刻"。' },
+  { id: 'hsg_yipinguo', name: '徽州一品锅', icon: '🍲', tag: '食', type: '美食', price: 128, desc: '胡适最爱的一品锅，锅里层层码着蛋饺、肉圆、笋干和萝卜，炭火慢慢炖。客人围炉而坐一层层往下吃，越到底层越鲜。' },
+  { id: 'hsg_yanxian_lihe', name: '腌鲜鳜鱼礼盒', icon: '🐟', tag: '食', type: '特产', price: 118, desc: '把闻着臭吃着鲜的臭鳜鱼装进真空袋，连酱料包一起给你配好。带回家按说明红烧，蒜瓣肉依然弹嫩，解一口徽州乡愁。' },
+  { id: 'hsg_taguo', name: '徽州挞粿', icon: '🫓', tag: '食', type: '美食', price: 15, desc: '一张薄饼夹满梅干菜、豆角或是香椿馅，在铁板上烙到两面焦黄。趁热咬下去油香四溢，是徽州人走哪都惦记的主食。' },
+  { id: 'hsg_wucheng_chagan', name: '五城茶干', icon: '🍘', tag: '食', type: '特产', price: 28, desc: '休宁五城的老手艺，豆腐干配秘制酱汁反复卤晒，越嚼越香。纹路泛着茶色，切薄片配茶下酒，是旧时茶客的常备零嘴。' },
+  { id: 'hsg_shuangshi', name: '黄山双石', icon: '🍄', tag: '食', type: '美食', price: 98, desc: '石鸡与石耳一荤一素同锅炖，山珍的鲜全钻进汤里。石鸡是山涧里的蛙，石耳长在绝壁上，两样都得靠山民一根绳去采。' },
+  { id: 'hsg_daobanxiang', name: '刀板香腊肉', icon: '🥓', tag: '食', type: '特产', price: 88, desc: '咸肉蒸透后铺在香樟木板上趁热切，肉香混着木香往上窜。刀板留香四个字，说的就是徽州腊味的招牌吃法，配饭一流。' },
+  { id: 'hsg_shanhetao', name: '皖南山核桃', icon: '🥜', tag: '食', type: '特产', price: 65, desc: '壳薄仁满的手剥山核桃，椒盐炒得满屋飘香。皖南人家的秋日零嘴，抓一把慢慢磕，看戏聊天一晚上就过去了。' },
+  { id: 'hsg_huangshan_maofeng', name: '黄山毛峰明前茶', icon: '🍵', tag: '食', type: '特产', price: 160, desc: '清明前一芽一叶，白毫披身像雀舌。山泉水一冲，清香冷冽回甘悠长，喝下去是云雾高山的清气，也是徽州人的待客礼。' },
+  { id: 'hsg_hongcun_minsu', name: '宏村民宿一晚', icon: '🏡', tag: '住', type: '住宿', price: 428, desc: '老宅改成的民宿，天井洒下细雨声，木窗正好框住半池月沼。夜里枕着百年马头墙入睡，清晨被鸟鸣和写生学生的笑闹唤醒。' },
+  { id: 'hsg_yudeng', name: '汪满田鱼灯', icon: '🏮', tag: '玩', type: '文创', price: 58, desc: '歙县汪满田元宵鱼灯的缩小版，竹骨纸糊，彩绘的鳞片栩栩如生。点亮提在手里慢慢走，年年有余的好彩头就跟着你了。' },
+  { id: 'hsg_wanan_luopan', name: '万安罗盘', icon: '🧭', tag: '玩', type: '文创', price: 120, desc: '休宁万安镇传了四百年的老手艺，盘面密密麻麻标着天干地支、二十四山。曾替徽商行船定方向，如今是精致神秘的风水摆件。' },
+  { id: 'hsg_huizhou_qixi', name: '徽州漆器', icon: '🏺', tag: '玩', type: '文创', price: 140, desc: '生漆一层一层髹涂打磨，再嵌螺钿、描金彩绘。漆面温润如玉，越用越见光泽，徽州漆器这门手艺，藏着慢工出细活的耐心。' },
+  { id: 'hsg_huishang_suanpan', name: '徽商算盘摆件', icon: '🧮', tag: '玩', type: '文创', price: 68, desc: '徽商出门总揣一把算盘，吃苦耐劳被人称作徽骆驼。小巧的紫檀算盘摆在案头，闲时拨两下，仿佛听到当年商帮的算珠响。' },
+  { id: 'hsg_huipai_moxing', name: '徽派民居模型', icon: '🏘️', tag: '玩', type: '文创', price: 99, desc: '白墙黛瓦马头墙的微型拼装件，天井、木窗、门罩比例都讲究。自己动手搭一座小徽宅，把画里的乡村一点点搬上桌面。' },
+  { id: 'hsg_matouqiang_sijin', name: '马头墙真丝丝巾', icon: '🧣', tag: '衣', type: '服饰', price: 168, desc: '把徽州的马头墙、远山与云雾画上真丝丝巾，手感垂顺柔滑。往颈间一系就是一幅移动的水墨徽州，素雅又耐看。' },
+  { id: 'hsg_huiju_zheshan', name: '徽剧脸谱折扇', icon: '🪭', tag: '玩', type: '文创', price: 78, desc: '扇面上手绘着浓墨重彩的徽剧脸谱，眉眼传神、色彩浓烈。收拢是戏箱里的行头，展开便是一折梨园旧梦，风里都带戏腔。' },
+  { id: 'hsg_heimoshiyan', name: '徽墨描金体验', icon: '🖌️', tag: '游', type: '体验', price: 98, desc: '在老师傅手边给墨锭描金，一笔一笔描出山水与云龙纹。亲手做的墨带回家研墨写字，能闻到松烟香，也闻到一颗匠心。' }
+);

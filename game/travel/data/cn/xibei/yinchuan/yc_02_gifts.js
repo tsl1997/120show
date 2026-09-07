@@ -1,0 +1,32 @@
+/* 银川 分册02：特色周边（塞上风味/西夏文创/回乡风情） */
+window.YC_GIFTS = window.YC_GIFTS || [];
+window.YC_GIFTS.push(
+  { id: 'yinchuan_shouzhua', name: '滩羊手抓', icon: '🍖', tag: '食', type: '美食', price: 90, desc: '盐池滩羊"吃着中草药喝着矿泉水"，无膻味天花板。清水煮蘸盐，鲜到词穷。' },
+  { id: 'yinchuan_lahuhu', name: '辣糊糊', icon: '🍲', tag: '食', type: '美食', price: 30, desc: '银川人的"麻辣烫plus"，浓稠辣糊裹满串串。夜市人手一碗，越糊越香。' },
+  { id: 'yinchuan_gouqi', name: '中宁枸杞', icon: '🔴', tag: '食', type: '特产', price: 60, desc: '"中国枸杞之乡"，粒大色红泡水上浮。干嚼一把回甘，原浆与枸杞糕是新潮吃法。' },
+  { id: 'yinchuan_hongjiu', name: '贺兰红葡萄酒', icon: '🍷', tag: '食', type: '特产', price: 150, desc: '贺兰山东麓斩获国际大奖无数。酒庄直购一瓶一百多，"中国的波尔多"。' },
+  { id: 'yinchuan_bagua', name: '羊肉老夹馍·羊杂碎', icon: '🍲', tag: '食', type: '美食', price: 20, desc: '银川羊杂碎配茴香饼，辣油红汤奶白汤。清晨一碗，"塞上人的元气"。' },
+  { id: 'yinchuan_mianpian', name: '烩羊杂·手撕土鸡', icon: '🍗', tag: '食', type: '美食', price: 60, desc: '黄渠桥羊羔肉爆炒辣香，手撕鸡配油饼。宁夏菜"重油重辣"的实在劲儿。' },
+  { id: 'yinchuan_xixia_wenxue', name: '西夏文创', icon: '📜', tag: '衣', type: '文创', price: 45, desc: '西夏文字翻成的"你的名字"书签，神秘方块字。党项文明文创，冷知识拉满。' },
+  { id: 'yinchuan_yanhua', name: '贺兰石砚', icon: '🪨', tag: '衣', type: '文创', price: 180, desc: '贺兰石"紫底绿彩"雕成砚台，中国名砚之一。文房收藏级手信，"塞上瑰宝"。' },
+  { id: 'yinchuan_shaomo', name: '沙画与枸杞文创', icon: '🎨', tag: '衣', type: '文创', price: 35, desc: '沙湖细沙做成沙画瓶，枸杞红了做香囊。宁夏的颜色：红黄蓝三原色。' },
+  { id: 'yinchuan_huaxue', name: '沙湖滑沙·骆驼', icon: '🐪', tag: '玩', type: '体验', price: 80, desc: '沙丘滑沙俯冲入芦苇荡，骑驼穿沙丘。一半水一半沙的"魔幻切换"。' },
+  { id: 'yinchuan_jiucai', name: '酒庄品酒之旅', icon: '🍷', tag: '玩', type: '体验', price: 150, desc: '地下酒窖品三款干红，讲解员讲风土。亲手灌一瓶签名的酒带走，"贺兰山东麓的仪式感"。' },
+  { id: 'yinchuan_dianying', name: '影城换装体验', icon: '🎞️', tag: '玩', type: '体验', price: 100, desc: '在镇北堡穿《大话西游》戏服拍照，紫霞仙子同款。"分分钟拍出电影海报"。' },
+  { id: 'yinchuan_minsu', name: '酒庄民宿', icon: '🏨', tag: '住', type: '住宿', price: 350, desc: '贺兰山下的酒庄民宿，阳台看日出照在山脊。夜里开一瓶本庄红酒，"紫色之夜"。' },
+  { id: 'ycg_yanggaorou', name: '黄渠桥爆炒羊羔肉', icon: '🥩', tag: '食', type: '美食', price: 80, desc: '不足两月的小羊羔切块旺火爆炒，辣椒葱段激出焦香。肉嫩到脱骨带汁，配一碗热米饭，是宁夏人待客的硬菜。' },
+  { id: 'ycg_babao_gaiwan', name: '八宝盖碗茶', icon: '🍵', tag: '食', type: '饮品', price: 30, desc: '盖碗里红枣枸杞桂圆葡萄干堆成小山，沸水冲下香气漫开。盖住闷一会儿再掀盖轻呷，甜润回甘是回乡待客之道。' },
+  { id: 'ycg_gouqi_yuanjiang', name: '枸杞原浆', icon: '🧃', tag: '食', type: '饮品', price: 68, desc: '头茬鲜枸杞低温榨浆，不兑水不加糖，酸甜浓稠挂杯。撕开即饮补元气，把宁夏的红宝石随身带上路。' },
+  { id: 'ycg_xixia_pijiu', name: '西夏啤酒', icon: '🍺', tag: '食', type: '饮品', price: 15, desc: '银川人撸串桌上的老伙计，麦香清爽气泡足。怀远夜市配辣糊糊灌一大口，冰镇下肚是西北夏夜的痛快。' },
+  { id: 'ycg_huaiyuan_bing', name: '怀远宫廷酥牛肉饼', icon: '🥙', tag: '食', type: '美食', price: 12, desc: '怀远夜市排长队的招牌，酥皮层层分明一碰掉渣。牛肉大葱馅烤得滋滋冒油，趁热咬下满口都是香。' },
+  { id: 'ycg_saozimian', name: '羊肉臊子面', icon: '🍜', tag: '食', type: '美食', price: 25, desc: '手工面筋道爽滑，羊肉臊子炒得油亮，浇上酸香汤头。呼噜噜连汤带面一碗下肚，银川人中午的踏实味道。' },
+  { id: 'ycg_lahuhu_diliao', name: '辣糊糊蘸料包', icon: '🌶️', tag: '食', type: '特产', price: 28, desc: '把银川夜市灵魂打包回家，辣椒香料炒香磨成糊。涮菜蘸串瞬间还原街边味，越煮越糊越上头，一包解乡愁。' },
+  { id: 'ycg_helan_yinzhang', name: '贺兰石印章', icon: '🔖', tag: '玩', type: '文创', price: 120, desc: '紫底绿彩贺兰石雕成闲章，天然纹理独一无二。可刻姓名亦可刻西夏文，案头一方，塞上风骨与文气并存。' },
+  { id: 'ycg_xixia_shufa', name: '西夏文书法卷轴', icon: '🖌️', tag: '玩', type: '文创', price: 180, desc: '书家以狼毫写西夏文，笔画繁密方正如画。裱成卷轴悬于书房，把沉睡近千年的神秘文字在宣纸上重新唤醒。' },
+  { id: 'ycg_huixiang_cixiu', name: '回乡刺绣丝巾', icon: '🧣', tag: '衣', type: '服饰', price: 130, desc: '回族绣娘飞针走线，牡丹与汤瓶图案跃上软糯真丝。系在颈间是手艺的温度，也是回乡最温柔的一份伴手礼。' },
+  { id: 'ycg_ermaopi_kanjian', name: '滩羊二毛皮坎肩', icon: '🧥', tag: '衣', type: '服饰', price: 320, desc: '出生月余的滩羊羔皮卷花如波，轻暖不显臃肿。老银川御寒的宝贝，如今成了时髦的“塞北皮草”，风雪天也体面。' },
+  { id: 'ycg_huangheshi', name: '黄河石手绘摆件', icon: '🪨', tag: '玩', type: '文创', price: 50, desc: '黄河边拾来的卵石，画上岩画太阳神或西夏纹样。每一块纹理都不重复，是母亲河冲刷千年的独家纪念品。' },
+  { id: 'ycg_xixia_bag', name: '西夏文帆布包', icon: '🎒', tag: '玩', type: '文创', price: 65, desc: '帆布包印西夏文吉祥语，神秘方块字自带高级感。背上它逛夜市回头率高，总有人凑过来问这是什么文字。' },
+  { id: 'ycg_huar_yanyan', name: '回乡花儿演出票', icon: '🎤', tag: '游', type: '体验', price: 90, desc: '在回乡文化园听一场花儿演唱会，高亢唱腔穿云裂石。歌者即兴编词逗得满场笑，一曲唱罢掌声叫好声掀翻屋顶。' },
+  { id: 'ycg_yuehai_minsu', name: '阅海湖畔民宿', icon: '🏨', tag: '住', type: '住宿', price: 360, desc: '推窗即是湖景的小院民宿，清晨被水鸟叫醒。阳台泡壶八宝茶看贺兰山日出，银川的慢日子都浓缩在这一晚。' }
+);
