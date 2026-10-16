@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>网页上链发布台 · Sepolia</title>
+<title>网页上链发布台 · 多链</title>
+<script src="networks.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.17.0/dist/ethers.umd.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -99,6 +100,13 @@
   }
   .pk-panel input:focus { border-color: #38bdf8; }
   .pk-panel .warn-note { font-size: 12px; color: #fbbf24; margin-top: 10px; }
+  /* 通用文本输入（接收地址 / 私钥网络选择） */
+  .text-input {
+    flex: 1; min-width: 240px; background: #060a0f; border: 1px solid #17202c; color: #a7f3d0;
+    padding: 9px 12px; font: inherit; font-size: 12.5px; outline: none;
+  }
+  .text-input:focus { border-color: #38bdf8; }
+  select.text-input { min-width: 170px; flex: none; color: #a7f3d0; }
   .hidden { display: none !important; }
   @media (max-width: 860px) {
     .lhead { display: none; }
@@ -114,6 +122,7 @@
       <div class="hacts">
         <button id="mm-btn" class="btn">连接 MetaMask</button>
         <button id="pk-btn" class="btn">私钥连接</button>
+        <button id="switch-sep" class="btn ghost hidden">↻ 切到 Sepolia</button>
         <a class="btn ghost" id="browser-link" href="chain-browser.html" target="_blank" rel="noopener">链上浏览器 ↗</a>
       </div>
     </div>
@@ -125,6 +134,7 @@
     <div class="pk-hint">没有 MetaMask？也可以直接用私钥发布 —— 无需扩展，适用于内置预览面板、file:// 本地打开等无法注入 MetaMask 的场景。交易由本页用私钥本地签名后经 PublicNode RPC 广播，私钥不会离开你的浏览器。</div>
     <div class="pkrow">
       <input id="pk" type="password" spellcheck="false" autocomplete="off" placeholder="粘贴 0x 开头的 64 位私钥（仅建议测试网）">
+      <select id="pk-chain" class="text-input" title="选择签名广播所用的网络"></select>
       <button id="pk-go" class="btn">连接</button>
       <button id="pk-cancel" class="btn ghost">收起</button>
     </div>
@@ -142,11 +152,16 @@
       <textarea id="src" spellcheck="false" placeholder="在此粘贴完整网页源码，例如：&#10;&lt;!DOCTYPE html&gt;&#10;&lt;html lang=&quot;zh-CN&quot;&gt;&#10;...&#10;&lt;/html&gt;"></textarea>
       <div class="srcbar">
         <span class="info" id="srcinfo">0 字符 · 0 字节 · 预计 gas ≈ 21,000</span>
-        <span class="hint">源码将以十六进制写入交易的 data 字段，永久保存在链上</span>
+        <span class="hint">源码将以十六进制写入交易的 data 字段，永久保存在链上 · MetaMask 模式可发往任意已配置网络（非默认链会提示）· 私钥模式经所选网络 RPC 广播</span>
       </div>
       <div class="srcbar">
-        <button id="publish" class="btn primary" disabled>② 发布到链上（自发自收交易）</button>
-        <span class="hint">交易为「发送方 = 接收方 = 你的钱包」的自传，仅附加 data，确认后在 MetaMask 中签名</span>
+        <span class="hint" style="flex:none">接收地址</span>
+        <input id="to-addr" class="text-input" spellcheck="false" autocomplete="off"
+          placeholder="留空 = 默认 0x…6666666666（发布广场地址，大家都能在链上浏览器检索到）">
+      </div>
+      <div class="srcbar">
+        <button id="publish" class="btn primary" disabled>② 发布到链上</button>
+        <span class="hint">交易发往你指定的接收地址（留空为默认地址），仅附加 data · MetaMask 模式确认后签名 · 私钥模式本地签名后广播</span>
       </div>
     </div>
   </section>
@@ -191,6 +206,12 @@
   var MAX_BYTES = 100 * 1024;
   var PAGE_SIZE = 20;
   var LOCAL_PK_KEY = 'deploy_pk';
+  var LOCAL_PK_CHAIN_KEY = 'deploy_pk_chain';
+  // 默认接收地址（尾号 9 个 6）：用户不指定接收地址时发往这里。
+  // MetaMask 禁止向「用户自己钱包内的账户」发送带 data 的交易（反钓鱼策略，协议层其实允许），
+  // 故 MetaMask 模式的默认目标是这个固定 EOA（无合约代码，扩展放行）。
+  // 附带效果：所有用户的发布都汇聚到这个地址，链上浏览器查它就是一个「发布广场」。
+  var TARGET_ADDR = '0x0000000000000000000000000000000666666666';
 
   var state = { account: null, chainId: null, mode: null, wallet: null, publishing: false, mpLoading: false, items: [], cursor: null, counters: null };
 
@@ -229,7 +250,17 @@
   function hideErr() { $('err').style.display = 'none'; }
   function hasMM() { return typeof window.ethereum !== 'undefined' && !!window.ethereum; }
   function hasEthers() { return typeof window.ethers !== 'undefined' && !!window.ethers; }
-  function isSepolia() { return state.chainId === SEPOLIA_CHAIN_ID; }
+  // 网络配置来自 networks.js（与链上浏览器同源）；加载失败时退化为仅显示 chainId
+  function chainMeta(cid) { return (window.NETWORKS && window.NETWORKS[String(cid || '').toLowerCase()]) || null; }
+  function chainName(cid) {
+    var n = chainMeta(cid);
+    return n ? n.name : ('chainId ' + (cid ? parseInt(cid, 16) : '?'));
+  }
+  function chainRpc(cid) {
+    var n = chainMeta(cid);
+    return (n && n.rpc) || RPC_URL; // 兜底 Sepolia RPC
+  }
+  function isDefault() { return state.chainId === SEPOLIA_CHAIN_ID; }
   function showPkPanel() { $('pk-panel').classList.remove('hidden'); }
   function hidePkPanel() { $('pk-panel').classList.add('hidden'); }
 
@@ -301,18 +332,23 @@
       // 已连接（MetaMask 或私钥模式）：按钮变为「断开」
       btn.textContent = '断开 ' + short(state.account);
       if (state.mode === 'pk') {
-        nl.appendChild(el('span', 'ok', '● 私钥模式 · ' + short(state.account) + ' · Sepolia (chainId 11155111) · 交易经 PublicNode 广播'));
-      } else if (isSepolia()) {
+        nl.appendChild(el('span', 'ok', '● 私钥模式 · ' + short(state.account) + ' · ' + chainName(state.chainId)
+          + ' (chainId ' + (state.chainId ? parseInt(state.chainId, 16) : '?') + ') · 交易经该链公共 RPC 广播'));
+      } else if (isDefault()) {
         nl.appendChild(el('span', 'ok', '● 已连接 ' + short(state.account) + ' · Sepolia (chainId 11155111)'));
       } else {
-        var cid = state.chainId ? parseInt(state.chainId, 16) : '?';
-        nl.appendChild(el('span', 'warn', '● 已连接 ' + short(state.account) + ' · 当前网络 chainId ' + cid + ' —— 发布需要 Sepolia'));
+        // 非默认网络：提示用户，但不禁用发布（用户想用哪个链发布都允许）
+        nl.appendChild(el('span', 'warn', '● 已连接 ' + short(state.account) + ' · ' + chainName(state.chainId)
+          + ' (chainId ' + (state.chainId ? parseInt(state.chainId, 16) : '?') + ') —— ⚠ 非默认网络，发布将在该链进行'));
       }
-      setPublishEnabled(isSepolia() && !state.publishing);
+      // 非默认链（且是 MetaMask 模式）时显示「切到 Sepolia」快捷按钮
+      $('switch-sep').classList.toggle('hidden', isDefault() || state.mode === 'pk');
+      setPublishEnabled(!state.publishing);
       return;
     }
     // 未连接
     btn.textContent = '连接 MetaMask';
+    $('switch-sep').classList.add('hidden');
     if (!hasMM()) {
       nl.appendChild(el('span', 'bad', '● 未检测到 MetaMask（内置预览 / file:// 环境无法注入扩展）—— 可用「私钥连接」，或在真实浏览器中打开'));
     } else {
@@ -323,25 +359,34 @@
 
   function setPublishEnabled(on) { $('publish').disabled = !on; }
 
-  /* ---------- MetaMask 连接 + 强制 Sepolia ---------- */
+  /* ---------- MetaMask 连接（不强制网络：任何已配置网络都可发布，非默认链仅提示） ---------- */
   function ethReq(method, params) {
     return window.ethereum.request({ method: method, params: params || [] });
   }
 
-  function ensureSepolia() {
-    return ethReq('eth_chainId').then(function (chainId) {
-      state.chainId = chainId;
-      if (chainId === SEPOLIA_CHAIN_ID) return;
-      return ethReq('wallet_switchEthereumChain', [{ chainId: SEPOLIA_CHAIN_ID }]).catch(function (e) {
-        // 链未添加 → 引导用户添加 Sepolia
-        if (e && (e.code === 4902 || /unrecognized|not added|missing chain/i.test((e && e.message) || ''))) {
-          return ethReq('wallet_addEthereumChain', SEPOLIA_PARAMS);
-        }
-        throw e;
-      }).then(function () {
-        // 切换/添加后复核链 ID
-        return ethReq('eth_chainId');
-      }).then(function (cid) { state.chainId = cid; });
+  // 读取当前网络链 ID（连接 / 切换后调用）
+  function readChainId() {
+    return ethReq('eth_chainId').then(function (cid) { state.chainId = cid; return cid; });
+  }
+
+  // 可选：一键切回 Sepolia（非默认链时头部出现的快捷按钮）
+  function switchToSepolia() {
+    if (!hasMM()) return;
+    return ethReq('wallet_switchEthereumChain', [{ chainId: SEPOLIA_CHAIN_ID }]).catch(function (e) {
+      // 链未添加 → 引导用户添加 Sepolia
+      if (e && (e.code === 4902 || /unrecognized|not added|missing chain/i.test((e && e.message) || ''))) {
+        return ethReq('wallet_addEthereumChain', SEPOLIA_PARAMS);
+      }
+      throw e;
+    }).then(function () {
+      return readChainId();
+    }).then(function (cid) {
+      renderWalletState();
+      showErr('已切换回 Sepolia (chainId 11155111)。', true);
+      if (state.account) loadMyPubs(null, false);
+    }).catch(function (e) {
+      if (e && e.code === 4001) showErr('已取消切换网络 —— 仍可使用当前网络发布。', true);
+      else showErr('切换网络失败：' + ((e && e.message) || e) + ' —— 仍可使用当前网络发布。', true);
     });
   }
 
@@ -354,44 +399,77 @@
     return ethReq('eth_requestAccounts').then(function (accs) {
       state.mode = 'mm';
       state.account = (accs && accs[0]) || null;
-      return ensureSepolia();
+      return readChainId();
     }).then(function () {
       renderWalletState();
-      if (state.account && isSepolia()) loadMyPubs(null, false);
+      if (state.account) loadMyPubs(null, false);
     }).catch(function (e) {
       state.account = null;
       renderWalletState();
       if (e && e.code === 4001) showErr('连接已被取消。');
-      else if (e && (e.code === 4902 || /switch/i.test(e.message || ''))) showErr('必须切换到 Sepolia 测试网（chainId 11155111）才能发布，请在 MetaMask 中确认切换。', true);
       else showErr('连接失败：' + ((e && e.message) || e));
     });
   }
 
-  /* ---------- 私钥模式（无 MetaMask 的兜底：本地签名 + PublicNode 广播） ---------- */
+  /* ---------- 私钥模式（无 MetaMask 的兜底：本地签名 + 所选网络 RPC 广播） ---------- */
+  // 用 networks.js 配置填充网络下拉（默认 Sepolia）
+  function fillPkChainSelect() {
+    var sel = $('pk-chain');
+    if (!sel) return;
+    sel.innerHTML = '';
+    ['mainnet', 'testnet'].forEach(function (type) {
+      var og = document.createElement('optgroup');
+      og.label = type === 'mainnet' ? '主网 / L2' : '测试网';
+      Object.keys(window.NETWORKS || {}).forEach(function (cid) {
+        var n = window.NETWORKS[cid];
+        if (n.type !== type) return;
+        var op = document.createElement('option');
+        op.value = cid;
+        op.textContent = n.name + ' (' + parseInt(cid, 16) + ')';
+        if (cid === SEPOLIA_CHAIN_ID) op.selected = true;
+        og.appendChild(op);
+      });
+      sel.appendChild(og);
+    });
+    // 恢复上次选择的私钥网络
+    try {
+      var saved = localStorage.getItem(LOCAL_PK_CHAIN_KEY);
+      if (saved && window.NETWORKS && window.NETWORKS[saved]) sel.value = saved;
+    } catch (e) { /* 隐私模式，忽略 */ }
+  }
+
   function connectByPK() {
     var pk = $('pk').value.trim();
     if (!pk) { showErr('请先粘贴私钥。'); return; }
     if (!hasEthers()) { showErr('ethers 库未加载（CDN 不可达），私钥模式暂不可用，请刷新重试。'); return; }
+    var cid = $('pk-chain').value || SEPOLIA_CHAIN_ID;
+    if (!chainMeta(cid)) cid = SEPOLIA_CHAIN_ID;
     try {
-      var provider = new window.ethers.JsonRpcProvider(RPC_URL);
+      var provider = new window.ethers.JsonRpcProvider(chainRpc(cid));
       var w = new window.ethers.Wallet(pk, provider);
       state.mode = 'pk';
       state.wallet = w;
       state.account = w.address;
-      state.chainId = SEPOLIA_CHAIN_ID; // 私钥模式的 provider 固定指向 Sepolia
-      try { localStorage.setItem(LOCAL_PK_KEY, pk); } catch (e) { /* 隐私模式下 localStorage 不可用，忽略 */ }
+      state.chainId = cid; // 私钥模式的 provider 指向所选网络
+      try {
+        localStorage.setItem(LOCAL_PK_KEY, pk);
+        localStorage.setItem(LOCAL_PK_CHAIN_KEY, cid);
+      } catch (e) { /* 隐私模式下 localStorage 不可用，忽略 */ }
       $('pk').value = '';
       hidePkPanel();
       hideErr();
       renderWalletState();
-      loadMyPubs(null, false);
+      loadMyPubs(null, false); // 内部按网络分流：默认链查历史，非默认链显示提示
     } catch (e) {
       showErr('私钥格式无效：' + ((e && e.message) || e) + '（应为 0x 开头的 64 位十六进制）');
     }
   }
 
   function logout() {
-    try { localStorage.removeItem(LOCAL_PK_KEY); } catch (e) { /* ignore */ }
+    try {
+      localStorage.removeItem(LOCAL_PK_KEY);
+      localStorage.removeItem(LOCAL_PK_CHAIN_KEY);
+    } catch (e) { /* ignore */ }
     state.mode = null;
     state.wallet = null;
     state.account = null;
@@ -401,7 +479,18 @@
     renderWalletState();
   }
 
-  /* ---------- 发布（自发自收 + data） ---------- */
+  /* ---------- 发布（任意网络 · 自定义接收地址 + data） ---------- */
+  // 接收地址：用户填写则校验使用；留空用默认发布广场地址
+  function getToAddr() {
+    var v = $('to-addr').value.trim();
+    if (!v) return TARGET_ADDR;
+    if (!/^0x[0-9a-fA-F]{40}$/.test(v)) {
+      showErr('接收地址格式不正确：应为 0x 开头的 40 位十六进制地址（或留空使用默认地址 0x…6666666666）。');
+      return null;
+    }
+    return v;
+  }
+
   function updateSrcInfo() {
     var src = $('src').value;
     var bytes = utf8Len(src);
@@ -410,7 +499,8 @@
     info.className = 'info' + (bytes > MAX_BYTES ? ' over' : '');
     info.textContent = src.length + ' 字符 · ' + fmtSize(bytes) + ' · 预计 gas ≈ ' + estGas(hex).toLocaleString()
       + (bytes > WARN_BYTES ? '（偏大，建议精简）' : '');
-    setPublishEnabled(!!state.account && isSepolia() && !state.publishing && !!src.trim() && bytes <= MAX_BYTES);
+    // 网络不再作为发布前置条件：任何已配置网络都可发布（非默认链仅提示）
+    setPublishEnabled(!!state.account && !state.publishing && !!src.trim() && bytes <= MAX_BYTES);
   }
 
   function publish() {
@@ -419,24 +509,24 @@
     var bytes = utf8Len(src);
     if (bytes > MAX_BYTES) { showErr('源码过大（' + fmtSize(bytes) + '），请控制在 100KB 以内。'); return; }
     if (!state.account) { showErr('请先连接钱包（MetaMask 或私钥）。'); return; }
+    var toAddr = getToAddr();
+    if (!toAddr) return;
     hideErr();
     state.publishing = true;
     setPublishEnabled(false);
     $('publish').textContent = '等待确认 ...';
 
     var data = '0x' + strToHex(src);
-    // 发送自发自收交易：MetaMask 模式走 eth_sendTransaction（发送前复核链 ID），私钥模式走本地签名广播
     var txPromise;
     if (state.mode === 'pk' && state.wallet) {
-      txPromise = Promise.resolve(state.wallet.sendTransaction({ to: state.account, value: 0, data: data }));
+      // 私钥模式：本地签名，to 可为任意地址（含自己的钱包），经所选网络 RPC 广播
+      txPromise = Promise.resolve(state.wallet.sendTransaction({ to: toAddr, value: 0, data: data }));
     } else {
-      txPromise = ethReq('eth_chainId').then(function (cid) {
-        if (cid !== SEPOLIA_CHAIN_ID) {
-          throw { code: 'WRONG_NET', message: '当前网络不是 Sepolia（chainId ' + parseInt(cid, 16) + '），请切换后重试。' };
-        }
+      // MetaMask 模式：广播前复核一次网络（保证与页面显示一致），任意网络均放行
+      txPromise = readChainId().then(function () {
         return ethReq('eth_sendTransaction', [{
           from: state.account,
-          to: state.account,
+          to: toAddr,
           value: '0x0',
           data: data
         }]);
@@ -444,14 +534,14 @@
     }
     txPromise.then(function (hash) {
       showResult(hash, bytes);
-      loadMyPubs(null, false);
+      if (state.account) loadMyPubs(null, false);
     }).catch(function (e) {
       if (e && e.code === 4001) showErr('已取消：你在 MetaMask 中拒绝了这笔交易。', true);
-      else if (e && e.code === 'WRONG_NET') showErr(e.message, true);
+      else if (/internal accounts/i.test((e && e.message) || '')) showErr('MetaMask 不允许向自己钱包内的账户发送带 data 的交易（扩展安全策略）。请刷新页面重试；如仍报错，可改用「私钥连接」模式发布。', true);
       else showErr('发布失败：' + ((e && e.message) || e));
     }).then(function () {
       state.publishing = false;
-      $('publish').textContent = '② 发布到链上（自发自收交易）';
+      $('publish').textContent = '② 发布到链上';
       renderWalletState();
     });
   }
@@ -465,23 +555,49 @@
     ok.appendChild(el('div', 'big', '✓ 已广播！等待出块确认 ...'));
     var hashBox = el('div', 'hash', hash);
     ok.appendChild(hashBox);
-    var acts = el('div', 'acts');
-    var a1 = el('a', 'btn ghost', '在链上浏览器中查看详情 ↗');
-    a1.href = 'chain-browser.html#tx=' + hash;
-    a1.target = '_blank'; a1.rel = 'noopener';
-    var a2 = el('a', 'btn ghost', 'Blockscout ↗');
-    a2.href = 'https://eth-sepolia.blockscout.com/tx/' + hash;
-    a2.target = '_blank'; a2.rel = 'noopener';
-    acts.appendChild(a1); acts.appendChild(a2);
-    ok.appendChild(acts);
-    ok.appendChild(el('div', 'note', 'data 共 ' + bytes + ' 字节 · 约 10-30 秒后可在下方「我的发布」中看到（Blockscout 索引延迟），点「刷新」即可'));
+    // 交易信息摘要：网络 / 接收地址
+    var metaLine = el('div', 'note', '网络：' + chainName(state.chainId) + ' (chainId ' + (state.chainId ? parseInt(state.chainId, 16) : '?') + ') · 接收地址：' + getToAddrShown());
     body.appendChild(ok);
+    ok.insertBefore(metaLine, hashBox);
+    var acts = el('div', 'acts');
+    // 链上浏览器详情链接带链ID 前缀：任意链发布的交易都能直达详情
+    var a1 = el('a', 'btn ghost', '在链上浏览器中查看详情 ↗');
+    a1.href = 'chain-browser.html#tx=' + (state.chainId || SEPOLIA_CHAIN_ID) + ':' + hash;
+    a1.target = '_blank'; a1.rel = 'noopener';
+    acts.appendChild(a1);
+    if (isDefault()) {
+      var a2 = el('a', 'btn ghost', 'Blockscout ↗');
+      a2.href = 'https://eth-sepolia.blockscout.com/tx/' + hash;
+      a2.target = '_blank'; a2.rel = 'noopener';
+      acts.appendChild(a2);
+    }
+    ok.appendChild(acts);
+    ok.appendChild(el('div', 'note', 'data 共 ' + bytes + ' 字节 · 约 10-30 秒后可查看（索引延迟）'));
     box.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  /* ---------- 我的发布（查询自己钱包地址） ---------- */
+  // 结果区显示的接收地址（输入框留空时显示默认地址）
+  function getToAddrShown() {
+    var v = $('to-addr').value.trim();
+    return v || TARGET_ADDR;
+  }
+
+  /* ---------- 我的发布（查询自己钱包地址；仅默认链有 Blockscout 数据源） ---------- */
   function loadMyPubs(cursor, keepOld) {
-    if (!state.account || state.mpLoading) return;
+    if (!state.account) return;
+    // 非默认链：Blockscout 只服务 Sepolia，无法查历史 → 明确提示，但不影响发布
+    if (!isDefault()) {
+      var mpErr = $('mp-err');
+      mpErr.textContent = '历史交易查询仅支持 Sepolia（Blockscout 公共 API 数据源）。当前网络为 '
+        + chainName(state.chainId) + ' —— 发布不受影响，发布成功后可用「在链上浏览器中查看详情」直达该交易。';
+      mpErr.style.display = 'block';
+      $('mp-stats').innerHTML = '';
+      $('mp-list').innerHTML = '';
+      $('mp-more').innerHTML = '';
+      $('mypubs').classList.remove('hidden');
+      return;
+    }
+    if (state.mpLoading) return;
     state.mpLoading = true;
     var mpErr = $('mp-err');
     mpErr.style.display = 'none';
@@ -585,7 +701,7 @@
 
       var h = el('span');
       var ha = el('a', 'mono', it.hash.slice(0, 10) + '…');
-      ha.href = 'chain-browser.html#tx=' + it.hash;
+      ha.href = 'chain-browser.html#tx=' + SEPOLIA_CHAIN_ID + ':' + it.hash;
       ha.target = '_blank'; ha.rel = 'noopener';
       ha.title = it.hash + '（在新窗口打开详情）';
       h.appendChild(ha);
@@ -593,7 +709,7 @@
 
       row.onclick = function (e) {
         if (e.target.tagName === 'A') return;
-        window.open('chain-browser.html#tx=' + it.hash, '_blank');
+        window.open('chain-browser.html#tx=' + SEPOLIA_CHAIN_ID + ':' + it.hash, '_blank');
       };
       list.appendChild(row);
     });
@@ -618,6 +734,7 @@
   $('pk-btn').onclick = function () { showPkPanel(); $('pk').focus(); };
   $('pk-go').onclick = connectByPK;
   $('pk-cancel').onclick = hidePkPanel;
+  $('switch-sep').onclick = function () { switchToSepolia(); };
   $('pk').addEventListener('keydown', function (e) { if (e.key === 'Enter') connectByPK(); });
   $('publish').onclick = publish;
   $('mp-refresh').onclick = function () { loadMyPubs(null, false); };
@@ -636,17 +753,23 @@
     try { pk = localStorage.getItem(LOCAL_PK_KEY); } catch (e) { /* 隐私模式，忽略 */ }
     if (pk && hasEthers()) {
       try {
-        var provider = new window.ethers.JsonRpcProvider(RPC_URL);
+        var savedCid = null;
+        try { savedCid = localStorage.getItem(LOCAL_PK_CHAIN_KEY); } catch (e) { /* ignore */ }
+        if (!savedCid || !chainMeta(savedCid)) savedCid = SEPOLIA_CHAIN_ID;
+        var provider = new window.ethers.JsonRpcProvider(chainRpc(savedCid));
         var w = new window.ethers.Wallet(pk, provider);
         state.mode = 'pk';
         state.wallet = w;
         state.account = w.address;
-        state.chainId = SEPOLIA_CHAIN_ID;
+        state.chainId = savedCid;
         renderWalletState();
         loadMyPubs(null, false);
         return;
       } catch (e) {
-        try { localStorage.removeItem(LOCAL_PK_KEY); } catch (e2) { /* ignore */ }
+        try {
+          localStorage.removeItem(LOCAL_PK_KEY);
+          localStorage.removeItem(LOCAL_PK_CHAIN_KEY);
+        } catch (e2) { /* ignore */ }
       }
     }
     if (hasMM()) {
@@ -655,9 +778,9 @@
         if (accs && accs.length) {
           state.mode = 'mm';
           state.account = accs[0];
-          return ensureSepolia().then(function () {
+          return readChainId().then(function () {
             renderWalletState();
-            if (isSepolia()) loadMyPubs(null, false);
+            if (state.account) loadMyPubs(null, false);
           });
         }
         renderWalletState();
@@ -673,23 +796,28 @@
       state.account = (accs && accs[0]) || null;
       renderWalletState();
       if (state.account) {
-        ensureSepolia().then(function () {
+        readChainId().then(function () {
           renderWalletState();
-          if (isSepolia()) loadMyPubs(null, false);
+          if (state.account) loadMyPubs(null, false);
         });
       } else {
         $('mypubs').classList.add('hidden');
       }
     });
+    // 用户在 MetaMask 中切换网络 → 提示（后续发布将使用新网络；仍允许用该网络发布）
     window.ethereum.on('chainChanged', function () {
       if (state.mode === 'pk') return;
-      ethReq('eth_chainId').then(function (cid) {
-        state.chainId = cid;
+      readChainId().then(function () {
         renderWalletState();
-        if (isSepolia() && state.account) loadMyPubs(null, false);
+        if (state.account) {
+          showErr('网络已切换为 ' + chainName(state.chainId) + ' (chainId ' + parseInt(state.chainId, 16)
+            + ') —— 后续发布将在该链进行。', true);
+          loadMyPubs(null, false);
+        }
       });
     });
   }
+  fillPkChainSelect();
   restoreSession();
   updateSrcInfo();
 })();

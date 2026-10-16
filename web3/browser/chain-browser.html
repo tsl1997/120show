@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>链上浏览器 · Sepolia</title>
+<script src="networks.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -37,9 +38,7 @@
     padding: 10px 14px; font-size: 13px; margin-bottom: 12px;
   }
   .stats { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
-  .stat {
-    background: #111827; border: 1px solid #1f2937; padding: 10px 16px; min-width: 150px;
-  }
+  .stat { background: #111827; border: 1px solid #1f2937; padding: 10px 16px; min-width: 150px; }
   .stat .k { font-size: 11px; color: #64748b; letter-spacing: 1px; }
   .stat .v { font-size: 20px; color: #e2e8f0; font-weight: 700; margin-top: 2px; }
   .stat .v small { font-size: 12px; color: #64748b; font-weight: 400; }
@@ -79,6 +78,9 @@
   .dmeta { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 8px 20px; padding: 14px 16px; border-bottom: 1px solid #17202c; }
   .dmeta .item .k { font-size: 11px; color: #64748b; }
   .dmeta .item .v { font-size: 12.5px; color: #cbd5e1; word-break: break-all; }
+  .chain-tag { display: inline-flex; align-items: center; gap: 7px; }
+  .chain-tag .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+  .chain-tag .ttype { font-size: 10px; padding: 0 5px; border: 1px solid #1f2937; color: #64748b; }
   .tabs { display: flex; gap: 6px; padding: 12px 16px 0; }
   .tabs button {
     background: transparent; border: 1px solid #1f2937; color: #94a3b8;
@@ -87,21 +89,52 @@
   .tabs button.on { background: #0c2233; color: #7dd3fc; border-color: #1e3a5f; }
   .pane { padding: 14px 16px 16px; display: none; }
   .pane.on { display: block; }
+  .pane.inline { display: block; } /* 常显面板：预览/文本，直接出现在 dbody */
+  #pane-view { padding: 10px; }
+  /* 折叠区：具体信息（meta + 工具 + tabs + 源码/HEX）默认收起，点击「交易详细信息」展开 */
+  .dfold { border-top: 1px solid #17202c; }
+  .dfold .dtools { padding: 14px 16px 0; }
+  .dfold .nodata { padding: 10px 16px 0; font-size: 12px; }
+  .dfold .tabs { padding: 12px 16px 0; }
+  .dfold .pane { padding: 14px 16px 16px; }
   .pane pre {
     background: #060a0f; border: 1px solid #17202c; padding: 14px; font-size: 12px;
     color: #a7f3d0; max-height: 420px; overflow: auto; white-space: pre-wrap; word-break: break-all;
   }
   .pane .hex { color: #7dd3fc; }
-  #preview { width: 100%; height: 460px; border: 1px solid #17202c; background: #fff; }
+  /* 预览框尽量占满可视区：打开详情一眼看到渲染的网页 */
+  #preview { width: 100%; height: calc(100vh - 290px); min-height: 520px; border: 1px solid #17202c; background: #fff; }
   .nodata { padding: 20px 16px; color: #64748b; font-size: 13px; }
   .dtools { display: flex; gap: 8px; padding: 0 16px 14px; flex-wrap: wrap; }
   .dtools .btn { padding: 5px 12px; font-size: 12px; }
   .loading { padding: 30px; text-align: center; color: #64748b; }
-  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #1e3a5f; border-top-color: #38bdf8; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: -2px; margin-right: 8px; }
+  .spinner {
+    display: inline-block; width: 14px; height: 14px; border: 2px solid #1e3a5f;
+    border-top-color: #38bdf8; border-radius: 50%; animation: spin 0.8s linear infinite;
+    vertical-align: -2px; margin-right: 8px;
+  }
   @keyframes spin { to { transform: rotate(360deg); } }
   .hidden { display: none !important; }
   .hrow { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
   .hacts { display: flex; gap: 8px; flex-wrap: wrap; }
+  /* ---------- 使用说明面板 ---------- */
+  .help-panel {
+    border: 1px solid #1e3a5f; background: #0d141c; padding: 16px 20px; margin-bottom: 20px;
+    font-size: 13px; line-height: 1.9; color: #94a3b8;
+  }
+  .help-panel h3 { color: #7dd3fc; font-size: 13px; letter-spacing: 1px; margin: 16px 0 6px; }
+  .help-panel h3:first-child { margin-top: 0; }
+  .help-panel b { color: #cbd5e1; }
+  .help-panel code {
+    background: #060a0f; border: 1px solid #17202c; padding: 1px 6px; color: #a7f3d0;
+    font-size: 12px; word-break: break-all;
+  }
+  .help-panel ul { list-style: none; padding: 0; }
+  .help-panel li { padding: 2px 0; }
+  .help-panel .chain-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 6px 18px; margin-top: 6px; }
+  .help-panel .chain-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #94a3b8; }
+  .help-panel .chain-item .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .help-panel .chain-item .cid { color: #475569; font-size: 11px; }
   @media (max-width: 860px) {
     .lhead { display: none; }
     .row { grid-template-columns: 1fr 1fr; row-gap: 4px; }
@@ -114,18 +147,23 @@
     <div class="hrow">
       <h1>◈ ON-CHAIN BROWSER <span class="dim" id="subtitle">// 链上浏览器</span></h1>
       <div class="hacts">
-        <button class="btn" id="deploy-btn" title="打开发布页：粘贴网页源码，通过 MetaMask 自传交易写上链">部署网页 ↗</button>
+        <button class="btn" id="deploy-btn" title="打开发布页：粘贴网页源码，通过 MetaMask 或私钥发布上链">部署网页 ↗</button>
+        <button class="btn ghost" id="help-btn">使用说明</button>
+        <button class="btn ghost" id="lang-btn">EN</button>
       </div>
     </div>
     <div class="netline" id="netline">正在连接 Sepolia 网络 ...</div>
   </header>
+
+  <!-- 使用说明（默认折叠，点击「使用说明」展开） -->
+  <div id="help-panel" class="help-panel hidden"></div>
 
   <!-- 列表模式 -->
   <div id="list-ui">
     <div class="query">
       <input id="addr" spellcheck="false" autocomplete="off"
         value="0x0000000000000000000000000000000666666666"
-        placeholder="输入以太坊地址（0x…40位）或交易哈希（0x…64位）">
+        placeholder="链ID:交易哈希（如 11155111:0x…）· 地址 · 交易哈希">
       <button id="go">检索</button>
     </div>
     <div class="err" id="err"></div>
@@ -134,17 +172,20 @@
     <div class="more" id="more"></div>
   </div>
 
-  <!-- 交易详情模式（#tx=0x... 路由） -->
+  <!-- 交易详情模式（#tx=<chainId>:<hash> 或 #tx=<hash> 路由） -->
   <div id="detail-ui" class="hidden">
     <div class="detail-ui">
       <div class="dhead">
         <span class="h" id="dh"></span>
         <span class="acts">
+          <button class="btn ghost" id="dmeta-toggle">▸ 交易详细信息</button>
+          <button class="btn ghost" id="dshare">复制链接</button>
+          <a class="btn ghost" id="dext" target="_blank" rel="noopener">Explorer ↗</a>
           <button class="btn ghost" id="dback">← 返回交易列表</button>
-          <a class="btn ghost" id="dext" target="_blank" rel="noopener">Blockscout ↗</a>
         </span>
       </div>
-      <div class="dmeta" id="dmeta"></div>
+      <div class="dmeta hidden" id="dmeta"></div>
+      <div class="dfold hidden" id="dfold"></div>
       <div id="dbody"></div>
     </div>
   </div>
@@ -154,12 +195,196 @@
 (function () {
   'use strict';
 
-  var API = 'https://eth-sepolia.blockscout.com/api/v2';
-  var RPC = 'https://ethereum-sepolia-rpc.publicnode.com';
+  /* ==================== 网络配置（来自 networks.js） ==================== */
+  var NETWORKS = window.NETWORKS || {};
+  var API = 'https://eth-sepolia.blockscout.com/api/v2'; // 列表模式数据源（Sepolia）
   var DEFAULT_ADDR = '0x0000000000000000000000000000000666666666';
   var PAGE_SIZE = 20;
+  var LANG_KEY = 'cb_lang';
 
-  var state = { addr: '', items: [], cursor: null, counters: null, loading: false, loadedOnce: false };
+  function defaultChain() {
+    for (var k in NETWORKS) { if (NETWORKS[k].default) return k; }
+    return '0xaa36a7';
+  }
+  function chainMeta(chainId) { return NETWORKS[String(chainId || '').toLowerCase()] || null; }
+
+  /* ==================== i18n ==================== */
+  var I18N = {
+    zh: {
+      subtitle: '// 链上浏览器',
+      docTitle: '链上浏览器 · Sepolia',
+      deployBtn: '部署网页 ↗',
+      helpBtn: '使用说明',
+      langBtn: 'EN',
+      netConnecting: '正在连接 Sepolia 网络 ...',
+      netOk: '● 已连接 {chain} (chainId {cid}) · 交易详情走各链 RPC 直查',
+      netBad: '● RPC 异常 (chainId={cid}) · 仅 API 模式',
+      netDown: '● RPC 不可达 · 仅 API 模式',
+      placeholder: '链ID:交易哈希（如 11155111:0x…）· 地址 · 交易哈希',
+      search: '检索',
+      loadingList: '正在检索 {addr} 的交易 ...',
+      statTotal: '总交易数',
+      statTokens: '代币转账',
+      statLoaded: '已加载',
+      emptyList: '该地址在 Sepolia 上没有交易记录。',
+      lhead: ['#', '方向', '对方地址', '数值', 'DATA', '时间', '区块', 'HASH'],
+      dirIn: '← 接收',
+      dirOut: '→ 发出',
+      dirSelf: '⟳ 自发',
+      pending: '待确认',
+      badgeData: 'DATA',
+      loadMore: '加载更多（每页 {n} 条）',
+      moreNote: '还有更多历史交易，点击继续翻页（按区块倒序）',
+      allLoaded: '已加载全部 {n} 笔',
+      openNewWinTitle: '（在新窗口打开详情）',
+      retryMore: '重试加载更多',
+      errInvalid: '输入格式不正确：可输入 0x 开头的 40 位地址、64 位交易哈希，或「链ID:哈希」（如 11155111:0x…）。',
+      errUnknownChain: '未知的链 ID：{cid}。网络配置中没有这条链，请求被拒绝。支持的链请查看「使用说明」。',
+      errRateLimit: 'Blockscout 公共 API 限流（429），请稍等几秒后重试。',
+      errListFail: '检索失败：{msg}（Blockscout 公共节点繁忙时可稍后重试）',
+      errTxNotFound: '交易 {hash}… 在 {chain} 上不存在（或尚未被节点索引），请检查哈希与链 ID。',
+      errTxLookupFail: '查询交易失败（RPC 与 API 均不可达），请稍后重试。',
+      errDetailFail: '读取交易失败：{chain} RPC 不可达，请稍后重试或点击「← 返回交易列表」。',
+      dback: '← 返回交易列表',
+      txTitle: 'TX {hash}',
+      metaChain: '链',
+      metaFrom: 'FROM',
+      metaTo: 'TO',
+      metaValue: '数值',
+      metaBlock: '区块',
+      metaTime: '时间',
+      metaGasLimit: 'GAS LIMIT',
+      metaGasPrice: 'GAS PRICE',
+      metaNonce: 'NONCE',
+      metaStatus: '状态',
+      statusOk: '✓ 成功',
+      statusFail: '✗ 失败',
+      statusPending: '待确认',
+      contractCreate: '(合约创建)',
+      noData: '该交易未携带 data —— 这是一笔纯转账（input = 0x）。',
+      copyHex: '复制 HEX',
+      copySrc: '复制源码',
+      downloadHtml: '下载 .html',
+      dataNote: 'data 共 {b} 字节（{size}）· 解码方式：UTF-8 · 检测到 HTML 文档',
+      dataNotePlain: 'data 共 {b} 字节（{size}）· 解码方式：UTF-8',
+      paneView: '网页预览',
+      paneSrc: '源码',
+      paneText: '文本内容',
+      paneHex: '原始 HEX',
+      loadingTx: '正在从链上读取这笔交易 ...',
+      copied: '已复制 ✓',
+      dlFail: '下载失败：{msg}',
+      dmetaToggle: '交易详细信息',
+      dshare: '复制链接',
+      helpWhat: '一个纯前端的链上网页浏览器：网页源码可以编码进以太坊交易的 data 字段永久上链，本工具负责把链上数据原样读回并渲染。',
+      helpQueryTitle: '三种检索方式',
+      helpQuery1: '地址（0x 开头的 40 位）→ 在默认链 Sepolia 上列出该地址的交易（Blockscout 数据源）。',
+      helpQuery2: '交易哈希（64 位）→ 在默认链 Sepolia 上打开该交易详情。',
+      helpQuery3: '链ID + 交易哈希（如 <code>11155111:0x…</code> 或 <code>0xaa36a7 0x…</code>，分隔符支持空格 / 冒号 / 逗号）→ 先在网络配置中查找该链，<b>找不到则拒绝请求</b>；找到后用该链的公共 RPC 直接查询。无论网页发布在哪条链，都能由此读到。',
+      helpChainsTitle: '支持的链',
+      helpMainnet: '主网 / 主流 L2',
+      helpTestnet: '测试网',
+      helpPublishTitle: '发布网页',
+      helpPublish: '点击右上角「部署网页 ↗」打开发布台：连接 MetaMask（或私钥模式），粘贴网页源码即可发布，把源码写进链上。',
+      helpDataTitle: '数据通道',
+      helpData: '交易详情：各链公共 RPC 直查（免密钥，CORS 均已实测放行）。地址列表：Sepolia 走 Blockscout 公共 API。网络配置见 <code>networks.js</code>（新增链只改这一个文件）。'
+    },
+    en: {
+      subtitle: '// On-chain browser',
+      docTitle: 'On-chain browser · Sepolia',
+      deployBtn: 'Deploy ↗',
+      helpBtn: 'Guide',
+      langBtn: '中文',
+      netConnecting: 'Connecting to Sepolia ...',
+      netOk: '● Connected to {chain} (chainId {cid}) · tx details via direct RPC',
+      netBad: '● RPC error (chainId={cid}) · API-only mode',
+      netDown: '● RPC unreachable · API-only mode',
+      placeholder: 'chainId:txHash (e.g. 11155111:0x…) · address · txHash',
+      search: 'Search',
+      loadingList: 'Loading transactions of {addr} ...',
+      statTotal: 'Total txs',
+      statTokens: 'Token transfers',
+      statLoaded: 'Loaded',
+      emptyList: 'No transactions found for this address on Sepolia.',
+      lhead: ['#', 'Direction', 'Counterparty', 'Value', 'DATA', 'Time', 'Block', 'HASH'],
+      dirIn: '← In',
+      dirOut: '→ Out',
+      dirSelf: '⟳ Self',
+      pending: 'Pending',
+      badgeData: 'DATA',
+      loadMore: 'Load more ({n}/page)',
+      moreNote: 'More history available — click to load (newest first)',
+      allLoaded: 'All {n} txs loaded',
+      openNewWinTitle: ' (open detail in new window)',
+      retryMore: 'Retry',
+      errInvalid: 'Invalid input: enter a 40-char address, a 64-char tx hash, or "chainId:hash" (e.g. 11155111:0x…).',
+      errUnknownChain: 'Unknown chain ID: {cid}. This chain is not in the network config — request rejected. See "Guide" for supported chains.',
+      errRateLimit: 'Blockscout public API rate limit (429) — please retry in a few seconds.',
+      errListFail: 'Query failed: {msg} (Blockscout public node busy, retry later)',
+      errTxNotFound: 'Tx {hash}… not found on {chain} (or not yet indexed) — check the hash and chain ID.',
+      errTxLookupFail: 'Query failed (RPC and API both unreachable), please retry.',
+      errDetailFail: 'Failed to read tx: {chain} RPC unreachable — retry later or click "← Back to list".',
+      dback: '← Back to list',
+      txTitle: 'TX {hash}',
+      metaChain: 'Chain',
+      metaFrom: 'FROM',
+      metaTo: 'TO',
+      metaValue: 'Value',
+      metaBlock: 'Block',
+      metaTime: 'Time',
+      metaGasLimit: 'GAS LIMIT',
+      metaGasPrice: 'GAS PRICE',
+      metaNonce: 'NONCE',
+      metaStatus: 'Status',
+      statusOk: '✓ Success',
+      statusFail: '✗ Failed',
+      statusPending: 'Pending',
+      contractCreate: '(contract creation)',
+      noData: 'This transaction carries no data — it is a plain transfer (input = 0x).',
+      copyHex: 'Copy HEX',
+      copySrc: 'Copy source',
+      downloadHtml: 'Download .html',
+      dataNote: 'data: {b} bytes ({size}) · decoded as UTF-8 · HTML document detected',
+      dataNotePlain: 'data: {b} bytes ({size}) · decoded as UTF-8',
+      paneView: 'Preview',
+      paneSrc: 'Source',
+      paneText: 'Text',
+      paneHex: 'Raw HEX',
+      loadingTx: 'Loading transaction from chain ...',
+      copied: 'Copied ✓',
+      dlFail: 'Download failed: {msg}',
+      dmetaToggle: 'Tx details',
+      dshare: 'Copy link',
+      helpWhat: 'A pure front-end on-chain browser: web page source can be encoded into a transaction\'s data field for permanent storage. This tool reads it back and renders it as-is.',
+      helpQueryTitle: 'Three ways to search',
+      helpQuery1: 'Address (40 hex chars) → list transactions on the default chain Sepolia (Blockscout data source).',
+      helpQuery2: 'Transaction hash (64 hex) → open the tx detail on the default chain Sepolia.',
+      helpQuery3: 'Chain ID + tx hash (e.g. <code>11155111:0x…</code> or <code>0xaa36a7 0x…</code>; separators: space / colon / comma) → the chain is looked up in the network config first; <b>if not found, the request is rejected</b>. Otherwise the tx is read directly from that chain\'s public RPC — regardless of which chain the page was published on.',
+      helpChainsTitle: 'Supported chains',
+      helpMainnet: 'Mainnet / L2',
+      helpTestnet: 'Testnets',
+      helpPublishTitle: 'Publish a page',
+      helpPublish: 'Click "Deploy ↗" to open the publisher: connect MetaMask (or private-key mode), paste your page source and publish it on-chain.',
+      helpDataTitle: 'Data sources',
+      helpData: 'Tx details: direct queries to each chain\'s public RPC (keyless, CORS verified). Address listing: Sepolia via Blockscout public API. Network config lives in <code>networks.js</code> — add chains there only.'
+    }
+  };
+
+  var lang = 'zh';
+  try {
+    var saved = localStorage.getItem(LANG_KEY);
+    if (saved === 'zh' || saved === 'en') lang = saved;
+  } catch (e) { /* 隐私模式 */ }
+
+  function t(key, vars) {
+    var s = (I18N[lang] && I18N[lang][key]) || I18N.zh[key] || key;
+    if (vars) {
+      for (var k in vars) s = s.split('{' + k + '}').join(vars[k]);
+    }
+    return s;
+  }
+
+  var state = { addr: '', items: [], cursor: null, counters: null, loading: false, loadedOnce: false, helpOpen: false, tx: null };
 
   function $(id) { return document.getElementById(id); }
   function el(tag, cls, text) {
@@ -178,7 +403,7 @@
     } catch (e) { return '0'; }
   }
   function fmtTime(ts) {
-    if (!ts) return '待确认';
+    if (!ts) return t('pending');
     try {
       var d = new Date(ts);
       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' +
@@ -196,6 +421,7 @@
   }
   function hasData(it) { return it.raw_input && it.raw_input !== '0x' && it.raw_input.length > 2; }
   function isAddr(a) { return /^0x[a-fA-F0-9]{40}$/.test(a); }
+  function isTxHash(h) { return /^0x[a-fA-F0-9]{64}$/.test(h); }
   function showErr(msg) { var e = $('err'); e.textContent = msg; e.style.display = 'block'; }
   function hideErr() { $('err').style.display = 'none'; }
   function baseUrl() { return location.href.split('#')[0]; }
@@ -208,60 +434,96 @@
     });
   }
 
-  function rpcCall(method, params) {
-    return fetch(RPC, {
+  /* 任意链的 RPC 调用（免密钥公共端点） */
+  function rpcCall(chainId, method, params) {
+    var net = chainMeta(chainId);
+    if (!net) return Promise.reject(new Error('UNKNOWN_CHAIN'));
+    return fetch(net.rpc, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: method, params: params })
-    }).then(function (r) { return r.json(); }).then(function (j) {
-      if (j.error || !j.result) throw new Error('rpc');
-      return j.result;
-    });
+    }).then(function (r) { return r.json(); });
   }
 
-  // 原始 RPC 调用（不把 null 结果当错误——交易不存在时 result 为 null）
-  function rpcRaw(method, params) {
-    return fetch(RPC, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: method, params: params })
-    }).then(function (r) { return r.json(); }).then(function (j) {
+  // 校验交易哈希是否存在：RPC 为主，Blockscout 复核（防节点未同步，仅默认链有 Blockscout）
+  function checkTxExists(chainId, hash) {
+    return rpcCall(chainId, 'eth_getTransactionByHash', [hash]).then(function (j) {
       if (j.error) throw new Error('rpc');
-      return j.result;
-    });
-  }
-
-  // 校验交易哈希是否存在：RPC 为主，Blockscout 复核（防节点未同步）
-  function checkTxExists(hash) {
-    return rpcRaw('eth_getTransactionByHash', [hash]).then(function (tx) {
-      if (tx) return true;
-      return fetchJSON(API + '/transactions/' + hash).then(function (j) { return !!j.hash; })
-        .catch(function () { return false; });
+      if (j.result) return true;
+      if (chainId === defaultChain()) {
+        return fetchJSON(API + '/transactions/' + hash).then(function (jt) { return !!jt.hash; })
+          .catch(function () { return false; });
+      }
+      return false;
     }).catch(function () {
-      return fetchJSON(API + '/transactions/' + hash).then(function (j) { return !!j.hash; })
-        .catch(function () { throw new Error('lookup'); });
+      if (chainId === defaultChain()) {
+        return fetchJSON(API + '/transactions/' + hash).then(function (jt) { return !!jt.hash; })
+          .catch(function () { throw new Error('lookup'); });
+      }
+      throw new Error('lookup');
     });
   }
 
   /* ---------- 网络状态 ---------- */
   function checkNetwork() {
-    rpcCall('eth_chainId', []).then(function (cid) {
+    var def = defaultChain();
+    rpcCall(def, 'eth_chainId', []).then(function (j) {
       var n = $('netline');
       n.innerHTML = '';
-      if (parseInt(cid, 16) === 11155111) {
-        n.appendChild(el('span', 'ok', '● 已连接 Sepolia (chainId 11155111)'));
-        n.appendChild(document.createTextNode(' · RPC + Blockscout 双通道'));
+      if (j && j.result) {
+        // 正常连接：不显示状态说明（界面保持干净，直接看内容）
+        n.classList.add('hidden');
       } else {
-        n.appendChild(el('span', 'bad', '● RPC 异常 (chainId=' + parseInt(cid, 16) + ') · 仅 API 模式'));
+        n.classList.remove('hidden');
+        var net = chainMeta(def);
+        n.appendChild(el('span', 'bad', t('netBad', { cid: parseInt(def, 16) })));
       }
     }).catch(function () {
       var n = $('netline');
       n.innerHTML = '';
-      n.appendChild(el('span', 'bad', '● RPC 不可达 · 仅 API 模式'));
+      n.classList.remove('hidden');
+      n.appendChild(el('span', 'bad', t('netDown')));
     });
   }
 
-  /* ---------- 路由：列表模式 / 交易详情模式 ---------- */
+  /* ==================== 检索解析 ==================== */
+  // '11155111' → '0xaa36a7'；'0xAA36A7' → '0xaa36a7'；无效返回 null
+  function normalizeChainId(s) {
+    if (/^\d+$/.test(s)) {
+      var n = parseInt(s, 10);
+      if (n > 0 && n < 1e15) return '0x' + n.toString(16);
+      return null;
+    }
+    if (/^0x[0-9a-fA-F]+$/.test(s)) return s.toLowerCase();
+    return null;
+  }
+
+  // 解析检索输入：链ID+哈希 / 地址 / 哈希
+  function parseQuery(q) {
+    q = String(q || '').trim();
+    var parts = q.split(/[\s,:;|#@]+/).filter(function (s) { return s.length > 0; });
+    if (parts.length >= 2 && isTxHash(parts[parts.length - 1])) {
+      var cid = normalizeChainId(parts[0]);
+      if (cid) return { type: 'chainTx', chainId: cid, hash: parts[parts.length - 1] };
+    }
+    if (isAddr(q)) return { type: 'addr' };
+    if (isTxHash(q)) return { type: 'tx', chainId: defaultChain(), hash: q };
+    return { type: 'invalid' };
+  }
+
+  /* ==================== 路由：列表模式 / 交易详情模式 ==================== */
+  // #tx=<chainId>:<hash> 或 #tx=<hash>（默认链）
+  function parseTxParam(param) {
+    var parts = String(param || '').split(':');
+    if (parts.length === 2 && isTxHash(parts[1])) {
+      var cid = normalizeChainId(parts[0]);
+      if (cid) return { chainId: cid, hash: parts[1] };
+      return null;
+    }
+    if (isTxHash(param)) return { chainId: defaultChain(), hash: param };
+    return null;
+  }
+
   function route() {
     var h = location.hash;
     if (h.indexOf('#tx=') === 0 && h.length > 4) {
@@ -272,27 +534,41 @@
   }
 
   function showListMode() {
+    state.tx = null;
     $('detail-ui').classList.add('hidden');
     $('list-ui').classList.remove('hidden');
-    $('subtitle').textContent = '// 链上浏览器';
-    document.title = '链上浏览器 · Sepolia';
+    $('subtitle').textContent = t('subtitle');
+    document.title = t('docTitle');
     if (!state.loadedOnce) {
       state.loadedOnce = true;
       load(DEFAULT_ADDR, null, false);
     }
   }
 
-  function showDetailMode(hash) {
+  function showDetailMode(param) {
+    var parsed = parseTxParam(param);
     $('list-ui').classList.add('hidden');
     $('detail-ui').classList.remove('hidden');
-    $('subtitle').textContent = '// 交易详情';
-    document.title = 'TX ' + hash.slice(0, 14) + '… · 链上浏览器';
-    renderDetail(hash);
+    if (!parsed) {
+      state.tx = null;
+      $('subtitle').textContent = t('subtitle');
+      document.title = t('docTitle');
+      var body = $('dbody');
+      body.innerHTML = '';
+      body.appendChild(el('div', 'nodata', t('errInvalid')));
+      return;
+    }
+    state.tx = { chainId: parsed.chainId, hash: parsed.hash };
+    var net = chainMeta(parsed.chainId);
+    $('subtitle').textContent = '// ' + (net ? net.name : parsed.chainId);
+    // 标签标题默认「TX 短哈希 · 站点名」；链上数据加载后若含 <title> 会替换为网页标题
+    document.title = t('txTitle', { hash: short(parsed.hash) }) + ' · ' + t('docTitle');
+    renderDetail(parsed.chainId, parsed.hash);
   }
 
-  /* ---------- 列表模式 ---------- */
+  /* ==================== 列表模式（默认链 · Blockscout） ==================== */
   function openTx(hash) {
-    window.open(baseUrl() + '#tx=' + hash, '_blank');
+    window.open(baseUrl() + '#tx=' + defaultChain() + ':' + hash, '_blank');
   }
 
   function load(addr, cursor, keepOld) {
@@ -305,9 +581,9 @@
       $('stats').innerHTML = '';
       $('more').innerHTML = '';
       state.addr = addr;
-      $('list').appendChild(el('div', 'loading', '<span class="spinner"></span>正在检索 ' + short(addr) + ' 的交易 ...'));
+      $('list').appendChild(el('div', 'loading', '<span class="spinner"></span>' + t('loadingList', { addr: short(addr) })));
     } else {
-      $('more').innerHTML = '<span class="spinner"></span>加载中 ...';
+      $('more').innerHTML = '<span class="spinner"></span>';
     }
 
     // 每页固定 20 条；Blockscout 的翻页游标不回带 items_count，需每次显式携带
@@ -333,12 +609,12 @@
     }).catch(function (e) {
       state.loading = false;
       var msg = e.message === 'RATE_LIMIT'
-        ? 'Blockscout 公共 API 限流（429），请稍等几秒后重试。'
-        : '检索失败：' + e.message + '（Blockscout 公共节点繁忙时可稍后重试）';
+        ? t('errRateLimit')
+        : t('errListFail', { msg: e.message });
       showErr(msg);
       if (keepOld) {
         $('more').innerHTML = '';
-        var retry = el('button', 'btn', '重试加载更多');
+        var retry = el('button', 'btn', t('retryMore'));
         retry.onclick = function () { load(state.addr, state.cursor, true); };
         $('more').appendChild(retry);
       } else {
@@ -361,17 +637,17 @@
       s.appendChild(vv);
       stats.appendChild(s);
     }
-    stat('总交易数', Number(c.transactions_count || 0).toLocaleString(), '笔');
-    stat('代币转账', Number(c.token_transfers_count || 0).toLocaleString(), '笔');
-    stat('已加载', state.items.length, '笔（每页 ' + PAGE_SIZE + '）');
+    stat(t('statTotal'), Number(c.transactions_count || 0).toLocaleString(), '');
+    stat(t('statTokens'), Number(c.token_transfers_count || 0).toLocaleString(), '');
+    stat(t('statLoaded'), state.items.length, '（每页 ' + PAGE_SIZE + '）');
 
     var list = $('list');
     list.innerHTML = '';
     if (!state.items.length) {
-      list.appendChild(el('div', 'loading', '该地址在 Sepolia 上没有交易记录。'));
+      list.appendChild(el('div', 'loading', t('emptyList')));
     }
     var head = el('div', 'lhead');
-    ['#', '方向', '对方地址', '数值 (ETH)', 'DATA', '时间', '区块', 'HASH'].forEach(function (t) { head.appendChild(el('span', null, t)); });
+    t('lhead').forEach(function (x) { head.appendChild(el('span', null, x)); });
     list.appendChild(head);
 
     state.items.forEach(function (it, i) {
@@ -382,7 +658,7 @@
       var otherHash = other && other.hash ? other.hash : '';
 
       row.appendChild(el('span', 'c-dim', String(i + 1)));
-      row.appendChild(el('span', 'dir ' + dir, dir === 'in' ? '← 接收' : (dir === 'self' ? '⟳ 自发' : '→ 发出')));
+      row.appendChild(el('span', 'dir ' + dir, dir === 'in' ? t('dirIn') : (dir === 'self' ? t('dirSelf') : t('dirOut'))));
 
       var cp = el('span');
       var a = el('a', 'mono c-blue', short(otherHash));
@@ -397,21 +673,21 @@
       var ds = el('span');
       var b = fmtBytes(it.raw_input);
       if (b !== null) {
-        ds.appendChild(el('span', 'badge' + (looksLikeHtml(it.raw_input) ? ' html' : ''), 'DATA ' + fmtSize(b)));
+        ds.appendChild(el('span', 'badge' + (looksLikeHtml(it.raw_input) ? ' html' : ''), t('badgeData') + ' ' + fmtSize(b)));
       } else {
         ds.appendChild(el('span', 'c-dim', '—'));
       }
       row.appendChild(ds);
 
       row.appendChild(el('span', 'c-dim', fmtTime(it.timestamp)));
-      row.appendChild(el('span', it.block_number == null ? 'c-amber' : 'mono', it.block_number == null ? '待确认' : Number(it.block_number).toLocaleString()));
+      row.appendChild(el('span', it.block_number == null ? 'c-amber' : 'mono', it.block_number == null ? t('pending') : Number(it.block_number).toLocaleString()));
 
       // 哈希：真实链接，点击在新窗口打开交易详情
       var h = el('span');
       var ha = el('a', 'mono', it.hash.slice(0, 10) + '…');
-      ha.href = baseUrl() + '#tx=' + it.hash;
+      ha.href = baseUrl() + '#tx=' + defaultChain() + ':' + it.hash;
       ha.target = '_blank'; ha.rel = 'noopener';
-      ha.title = it.hash + '（在新窗口打开详情）';
+      ha.title = it.hash + t('openNewWinTitle');
       h.appendChild(ha);
       row.appendChild(h);
 
@@ -425,149 +701,224 @@
     var more = $('more');
     more.innerHTML = '';
     if (state.cursor) {
-      var btn = el('button', 'btn', '加载更多（每页 ' + PAGE_SIZE + ' 条）');
+      var btn = el('button', 'btn', t('loadMore', { n: PAGE_SIZE }));
       btn.onclick = function () { load(state.addr, state.cursor, true); };
       more.appendChild(btn);
-      more.appendChild(el('div', 'note', '还有更多历史交易，点击继续翻页（按区块倒序）'));
+      more.appendChild(el('div', 'note', t('moreNote')));
     } else if (state.items.length) {
-      more.appendChild(el('div', 'note', '已加载全部 ' + state.items.length + ' 笔'));
+      more.appendChild(el('div', 'note', t('allLoaded', { n: state.items.length })));
     }
   }
 
-  /* ---------- 交易详情模式 ---------- */
-  function renderDetail(hash) {
+  /* ==================== 交易详情模式（纯 RPC · 任意链） ==================== */
+  // 从链上网页源码提取 <title>（解码常见 HTML 实体 + 截断），取不到返回 ''
+  function extractDocTitle(text) {
+    var m = String(text || '').match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+    if (!m) return '';
+    var s = m[1].replace(/\s+/g, ' ').trim();
+    if (!s) return '';
+    var ents = { amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", apos: "'", nbsp: ' ' };
+    s = s.replace(/&(amp|lt|gt|quot|#39|apos|nbsp);/g, function (_, e) { return ents[e] || _; });
+    return s.slice(0, 80);
+  }
+
+  function renderDetail(chainId, hash) {
+    var net = chainMeta(chainId);
     var d = $('detail-ui');
     d.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    $('dh').textContent = 'TX ' + hash;
-    $('dext').href = 'https://eth-sepolia.blockscout.com/tx/' + hash;
+    $('dh').textContent = t('txTitle', { hash: hash });
+    // 折叠态复位：每次打开交易详情，具体信息默认收起（一眼看渲染网页）
+    state.metaOpen = false;
+    updateMetaToggle();
+
+    // 外链按钮：该链配置了 explorer 才显示
+    var dext = $('dext');
+    if (net && net.explorer) {
+      dext.href = net.explorer.split('{hash}').join(hash);
+      dext.textContent = net.name + ' Explorer ↗';
+      dext.style.display = '';
+    } else {
+      dext.style.display = 'none';
+    }
 
     var meta = $('dmeta');
     meta.innerHTML = '';
+    var fold = $('dfold');
+    fold.innerHTML = '';
     var body = $('dbody');
     body.innerHTML = '';
-    body.appendChild(el('div', 'loading', '<span class="spinner"></span>正在从链上读取这笔交易 ...'));
+    body.appendChild(el('div', 'loading', '<span class="spinner"></span>' + t('loadingTx')));
 
-    // 双通道：Blockscout 取完整元信息，RPC 取权威 input；互为兜底
-    var bsTx = fetchJSON(API + '/transactions/' + hash).catch(function () { return null; });
-    var rpcTx = rpcCall('eth_getTransactionByHash', [hash]).catch(function () { return null; });
-
-    Promise.all([bsTx, rpcTx]).then(function (res) {
-      var bs = res[0], rpc = res[1];
-      if (!bs && !rpc) {
+    // 纯 RPC 三连查：交易本体 → 区块（时间戳）→ 回执（状态/实际 gas）
+    loadTxFromRpc(chainId, hash).then(function (tx) {
+      if (!tx) {
         body.innerHTML = '';
-        body.appendChild(el('div', 'nodata', '读取交易失败：Blockscout 与 RPC 均不可达，请稍后重试或点击「← 返回交易列表」。'));
+        body.appendChild(el('div', 'nodata', t('errTxNotFound', { hash: hash.slice(0, 14), chain: net ? net.name : chainId })));
         return;
       }
-      // input 优先用 RPC（链上权威），失败回退 Blockscout raw_input
-      var input = (rpc && rpc.input && rpc.input !== '0x') ? rpc.input
-        : (bs && bs.raw_input ? bs.raw_input : '0x');
-
-      // meta：优先 Blockscout 完整信息；失败时用 RPC 结果降级展示
-      renderMeta(bs, rpc);
-      renderDataViews(input, bs, rpc);
+      renderMeta(chainId, tx);
+      renderDataViews(tx.input || '0x');
     }).catch(function () {
       body.innerHTML = '';
-      body.appendChild(el('div', 'nodata', '读取交易失败，请稍后重试。'));
+      body.appendChild(el('div', 'nodata', t('errDetailFail', { chain: net ? net.name : chainId })));
     });
   }
 
-  function renderMeta(bs, rpc) {
-    var meta = $('dmeta');
-    meta.innerHTML = '';
-    function mi(k, v) {
-      var i = el('div', 'item');
-      i.appendChild(el('div', 'k', k));
-      i.appendChild(el('div', 'v mono', v));
-      meta.appendChild(i);
-    }
-    if (bs) {
-      mi('FROM', bs.from && bs.from.hash ? bs.from.hash : '?');
-      mi('TO', bs.to && bs.to.hash ? bs.to.hash : '(合约创建)');
-      mi('数值', fmtEth(bs.value) + ' ETH');
-      mi('区块', bs.block_number == null ? '待确认' : Number(bs.block_number).toLocaleString());
-      mi('状态', bs.status === 'ok' ? '✓ 成功' : (bs.status === 'error' ? '✗ 失败' : '—'));
-      mi('GAS', bs.gas_used ? Number(bs.gas_used).toLocaleString() + ' / ' + Number(bs.gas_limit).toLocaleString() : '—');
-      mi('时间', fmtTime(bs.timestamp));
-      mi('方法', bs.method || (hasData(bs) ? '自定义 data' : '转账'));
-    } else if (rpc) {
-      mi('FROM', rpc.from || '?');
-      mi('TO', rpc.to || '(合约创建)');
-      mi('数值', fmtEth(rpc.value) + ' ETH');
-      mi('区块', rpc.blockNumber ? Number(rpc.blockNumber).toLocaleString() : '待确认');
-      mi('GAS', rpc.gas ? Number(rpc.gas).toLocaleString() : '—');
-      mi('nonce', rpc.nonce !== undefined ? String(rpc.nonce) : '—');
-      mi('说明', '元信息来自 RPC（Blockscout 不可达）');
-    }
+  function loadTxFromRpc(chainId, hash) {
+    return rpcCall(chainId, 'eth_getTransactionByHash', [hash]).then(function (j) {
+      if (j.error) throw new Error('rpc');
+      if (!j.result) return null; // 交易不存在
+      var tx = j.result;
+      var jobs = [];
+      // 补时间戳
+      if (tx.blockNumber) {
+        jobs.push(rpcCall(chainId, 'eth_getBlockByNumber', [tx.blockNumber, false]).then(function (jb) {
+          if (jb && jb.result && jb.result.timestamp) {
+            tx.timestamp = parseInt(jb.result.timestamp, 16);
+          }
+        }).catch(function () { /* 时间戳缺失不致命 */ }));
+      }
+      // 补回执（状态 + gasUsed）
+      if (tx.blockNumber) {
+        jobs.push(rpcCall(chainId, 'eth_getTransactionReceipt', [hash]).then(function (jr) {
+          if (jr && jr.result) {
+            tx.status = jr.result.status;
+            tx.gasUsed = jr.result.gasUsed;
+          }
+        }).catch(function () { /* 回执缺失不致命 */ }));
+      }
+      return Promise.all(jobs).then(function () { return tx; });
+    });
   }
 
-  function renderDataViews(input, bs, rpc) {
+  function renderMeta(chainId, tx) {
+    var meta = $('dmeta');
+    meta.innerHTML = '';
+    var net = chainMeta(chainId);
+    function mi(k, vNode) {
+      var i = el('div', 'item');
+      i.appendChild(el('div', 'k', k));
+      var v = el('div', 'v mono');
+      if (typeof vNode === 'string') v.textContent = vNode;
+      else v.appendChild(vNode);
+      i.appendChild(v);
+      meta.appendChild(i);
+    }
+
+    // 链徽标
+    var chainTag = el('span', 'chain-tag');
+    if (net) {
+      var dot = el('span', 'dot');
+      dot.style.background = net.color || '#64748b';
+      chainTag.appendChild(dot);
+      chainTag.appendChild(document.createTextNode(net.name));
+      chainTag.appendChild(el('span', 'ttype', net.type === 'mainnet' ? (lang === 'zh' ? '主网' : 'MAINNET') : (lang === 'zh' ? '测试网' : 'TESTNET')));
+      chainTag.appendChild(document.createTextNode(' (' + parseInt(chainId, 16) + ')'));
+    } else {
+      chainTag.textContent = chainId;
+    }
+    mi(t('metaChain'), chainTag);
+
+    mi(t('metaFrom'), tx.from || '?');
+    mi(t('metaTo'), tx.to || t('contractCreate'));
+    mi(t('metaValue'), fmtEth(tx.value) + ' ' + (net ? net.symbol : ''));
+    mi(t('metaBlock'), tx.blockNumber ? Number(tx.blockNumber).toLocaleString() : t('statusPending'));
+    mi(t('metaTime'), tx.timestamp ? fmtTime(tx.timestamp * 1000) : t('statusPending'));
+    mi(t('metaGasLimit'), tx.gas ? Number(tx.gas).toLocaleString() : '—');
+    mi(t('metaGasPrice'), tx.gasPrice ? Number(tx.gasPrice).toLocaleString() : '—');
+    mi(t('metaNonce'), tx.nonce !== undefined ? String(tx.nonce) : '—');
+    if (tx.status === '0x1') mi(t('metaStatus'), t('statusOk'));
+    else if (tx.status === '0x0') mi(t('metaStatus'), t('statusFail'));
+    else if (!tx.blockNumber) mi(t('metaStatus'), t('statusPending'));
+  }
+
+  function renderDataViews(input) {
     var body = $('dbody');
     body.innerHTML = '';
+    var fold = $('dfold');
+    fold.innerHTML = '';
     var bytes = hexToBytes(input);
     var b = bytes.length;
 
     if (!b) {
-      body.appendChild(el('div', 'nodata', '该交易未携带 data —— 这是一笔纯转账（input = 0x）。'));
+      body.appendChild(el('div', 'nodata', t('noData')));
       return;
     }
 
     var text = decodeText(bytes);
     var htmlish = /^\s*<(!doctype|html)/i.test(text) || /<\s*(html|body|head)\b/i.test(text);
 
+    // 浏览器标签标题：链上网页自己的 <title>（有则「网页标题 · TX 短哈希」，无则保持默认 TX 标题）
+    var docTitle = extractDocTitle(text);
+    if (docTitle) {
+      document.title = docTitle + ' · TX ' + (state.tx ? short(state.tx.hash) : '');
+    }
+
+    // 工具行（复制 HEX / 复制源码 / 下载）→ 折叠区
     var tools = el('div', 'dtools');
     function toolBtn(label, fn) {
       var btn = el('button', 'btn ghost', label);
       btn.onclick = fn;
       tools.appendChild(btn);
     }
-    toolBtn('复制 HEX', function () { copy(input); });
-    toolBtn('复制源码', function () { copy(text); });
-    if (htmlish) toolBtn('下载 .html', function () { download(text, 'onchain-payload.html'); });
+    toolBtn(t('copyHex'), function () { copy(input); });
+    toolBtn(t('copySrc'), function () { copy(text); });
+    if (htmlish) toolBtn(t('downloadHtml'), function () { download(text, 'onchain-payload.html'); });
+    fold.appendChild(tools);
 
+    // tabs 与面板：预览/文本常显（直接放 dbody），源码/HEX 进折叠区用 tab 切换
     var tabs = el('div', 'tabs');
-    var panes = [];
-    function addPane(id, label, cls) {
-      var btn = el('button', null, label);
-      var pane = el('div', 'pane ' + (cls || ''));
+    var tabPanes = [];
+    function addPane(id, label, container, inline) {
+      var pane = el('div', 'pane' + (inline ? ' inline' : ''));
       pane.id = 'pane-' + id;
-      tabs.appendChild(btn);
-      body.appendChild(pane);
-      panes.push({ btn: btn, pane: pane });
-      btn.onclick = function () {
-        panes.forEach(function (p) { p.btn.classList.remove('on'); p.pane.classList.remove('on'); });
-        btn.classList.add('on'); pane.classList.add('on');
-      };
+      container.appendChild(pane);
+      if (label) {
+        var btn = el('button', null, label);
+        tabs.appendChild(btn);
+        tabPanes.push({ btn: btn, pane: pane });
+        btn.onclick = function () {
+          tabPanes.forEach(function (p) { p.btn.classList.remove('on'); p.pane.classList.remove('on'); });
+          btn.classList.add('on'); pane.classList.add('on');
+        };
+      }
       return pane;
     }
 
-    body.appendChild(tools);
-    body.appendChild(tabs);
-    body.appendChild(el('div', 'nodata', 'data 共 ' + b + ' 字节（' + fmtSize(b) + '） · 解码方式：UTF-8' + (htmlish ? ' · 检测到 HTML 文档' : '')));
+    fold.appendChild(tabs);
+    fold.appendChild(el('div', 'nodata', htmlish
+      ? t('dataNote', { b: b, size: fmtSize(b) })
+      : t('dataNotePlain', { b: b, size: fmtSize(b) })));
 
-    var paneSrc;
     if (htmlish) {
-      var paneView = addPane('view', '网页预览');
+      // 网页预览：常显大 iframe（无 tab，一眼看到渲染结果）
+      var paneView = addPane('view', null, body, true);
       var ifr = document.createElement('iframe');
       ifr.id = 'preview';
       ifr.sandbox = 'allow-scripts';
       ifr.srcdoc = text;
       paneView.appendChild(ifr);
-      panes[0].btn.classList.add('on'); panes[0].pane.classList.add('on');
-      paneSrc = addPane('src', '源码');
+      // 源码 / HEX → 折叠区
+      var paneSrc = addPane('src', t('paneSrc'), fold, false);
       var pre1 = el('pre');
       pre1.textContent = text;
       paneSrc.appendChild(pre1);
     } else {
-      paneSrc = addPane('src', '文本内容');
+      // 非 HTML：文本直接常显
+      var paneText = addPane('text', null, body, true);
       var pre2 = el('pre');
       pre2.textContent = text;
-      paneSrc.appendChild(pre2);
-      panes[0].btn.classList.add('on'); panes[0].pane.classList.add('on');
+      paneText.appendChild(pre2);
     }
-    var paneHex = addPane('hex', '原始 HEX');
+    var paneHex = addPane('hex', t('paneHex'), fold, false);
     var pre3 = el('pre', 'hex');
     pre3.textContent = input;
     paneHex.appendChild(pre3);
+    // 折叠区内默认选中第一个 tab（源码 / 或仅 HEX）
+    if (tabPanes.length) {
+      tabPanes[0].btn.classList.add('on');
+      tabPanes[0].pane.classList.add('on');
+    }
   }
 
   function looksLikeHtml(hex) {
@@ -596,15 +947,15 @@
     }
   }
 
-  function copy(t) {
+  function copy(txt) {
     function done() {
       var old = document.title;
-      document.title = '已复制 ✓';
+      document.title = t('copied');
       setTimeout(function () { document.title = old; }, 1200);
     }
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(t).then(done, function () { legacy(t); done(); });
-    } else { legacy(t); done(); }
+      navigator.clipboard.writeText(txt).then(done, function () { legacy(txt); done(); });
+    } else { legacy(txt); done(); }
     function legacy(x) {
       var ta = document.createElement('textarea');
       ta.value = x; document.body.appendChild(ta); ta.select();
@@ -621,47 +972,145 @@
       a.href = url; a.download = name;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
-    } catch (e) { showErr('下载失败：' + e.message); }
+    } catch (e) { showErr(t('dlFail', { msg: e.message })); }
   }
 
-  /* ---------- 事件 ---------- */
+  /* ==================== 使用说明面板 ==================== */
+  // 具体信息（meta + 工具 + tabs + 源码/HEX）默认收起，点击「交易详细信息」展开
+  function updateMetaToggle() {
+    $('dmeta-toggle').textContent = (state.metaOpen ? '▾ ' : '▸ ') + t('dmetaToggle');
+    var hidden = !state.metaOpen;
+    $('dmeta').classList.toggle('hidden', hidden);
+    $('dfold').classList.toggle('hidden', hidden);
+  }
+
+  function renderHelp() {
+    var p = $('help-panel');
+    p.innerHTML = '';
+    function h3(s) { p.appendChild(el('h3', null, s)); }
+    function div(s) { var d = el('div'); d.innerHTML = s; p.appendChild(d); }
+
+    h3(t('helpQueryTitle'));
+    var ul = el('ul');
+    [t('helpQuery1'), t('helpQuery2'), t('helpQuery3')].forEach(function (s) {
+      var li = el('li'); li.innerHTML = s; ul.appendChild(li);
+    });
+    p.appendChild(ul);
+
+    h3(t('helpChainsTitle'));
+    ['mainnet', 'testnet'].forEach(function (type) {
+      var sub = el('div', null, type === 'mainnet' ? t('helpMainnet') : t('helpTestnet'));
+      sub.style.cssText = 'color:#64748b;font-size:12px;margin-top:10px;letter-spacing:1px';
+      p.appendChild(sub);
+      var grid = el('div', 'chain-grid');
+      Object.keys(NETWORKS).forEach(function (cid) {
+        var n = NETWORKS[cid];
+        if (n.type !== type) return;
+        var item = el('div', 'chain-item');
+        var dot = el('span', 'dot');
+        dot.style.background = n.color || '#64748b';
+        item.appendChild(dot);
+        item.appendChild(document.createTextNode(n.name));
+        item.appendChild(el('span', 'cid', parseInt(cid, 16)));
+        grid.appendChild(item);
+      });
+      p.appendChild(grid);
+    });
+
+    h3(t('helpPublishTitle'));
+    div(t('helpPublish'));
+
+    h3(t('helpDataTitle'));
+    div(t('helpData'));
+  }
+
+  function toggleHelp() {
+    state.helpOpen = !state.helpOpen;
+    $('help-panel').classList.toggle('hidden', !state.helpOpen);
+    if (state.helpOpen) renderHelp();
+  }
+
+  /* ==================== 语言切换 ==================== */
+  function applyLang() {
+    $('lang-btn').textContent = t('langBtn');
+    $('help-btn').textContent = t('helpBtn');
+    $('deploy-btn').textContent = t('deployBtn');
+    $('go').textContent = t('search');
+    $('addr').placeholder = t('placeholder');
+    $('dback').textContent = t('dback');
+    $('dshare').textContent = t('dshare');
+    updateMetaToggle();
+    document.title = t('docTitle');
+    if (state.helpOpen) renderHelp();
+  }
+
+  // 即时切换语言（不刷新页面）：重渲染当前模式
+  function setLang(l) {
+    lang = l;
+    try { localStorage.setItem(LANG_KEY, l); } catch (e) { /* 隐私模式 */ }
+    applyLang();
+    checkNetwork();
+    if (state.tx) {
+      renderDetail(state.tx.chainId, state.tx.hash);
+    } else if (state.loadedOnce && !$('list-ui').classList.contains('hidden')) {
+      render();
+    }
+  }
+
+  /* ==================== 事件 ==================== */
   function onSearch() {
     var q = $('addr').value.trim();
     hideErr();
-    if (isAddr(q)) {
+    var parsed = parseQuery(q);
+    if (parsed.type === 'addr') {
       state.loadedOnce = false;
       load(q, null, false);
       return;
     }
-    if (/^0x[a-fA-F0-9]{64}$/.test(q)) {
+    if (parsed.type === 'tx' || parsed.type === 'chainTx') {
+      var net = chainMeta(parsed.chainId);
+      if (!net) {
+        showErr(t('errUnknownChain', { cid: parsed.chainId }));
+        return;
+      }
       var btn = $('go');
       btn.disabled = true;
-      checkTxExists(q).then(function (ok) {
+      checkTxExists(parsed.chainId, parsed.hash).then(function (ok) {
         btn.disabled = false;
         if (ok) {
-          window.open(baseUrl() + '#tx=' + q, '_blank');
+          window.open(baseUrl() + '#tx=' + parsed.chainId + ':' + parsed.hash, '_blank');
         } else {
-          showErr('交易 ' + q.slice(0, 14) + '… 不存在（或尚未被节点索引），请检查哈希是否正确。');
+          showErr(t('errTxNotFound', { hash: parsed.hash.slice(0, 14), chain: net.name }));
         }
       }).catch(function () {
         btn.disabled = false;
-        showErr('查询交易失败（RPC 与 API 均不可达），请稍后重试。');
+        showErr(t('errTxLookupFail'));
       });
       return;
     }
-    showErr('输入格式不正确：请输入 0x 开头的 40 位地址或 64 位交易哈希。');
+    showErr(t('errInvalid'));
   }
+
   $('go').onclick = onSearch;
   $('deploy-btn').onclick = function () { window.open('deploy.html', '_blank'); };
+  $('help-btn').onclick = toggleHelp;
+  $('lang-btn').onclick = function () { setLang(lang === 'zh' ? 'en' : 'zh'); };
   $('addr').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('go').click(); });
+  $('dmeta-toggle').onclick = function () {
+    state.metaOpen = !state.metaOpen;
+    updateMetaToggle();
+  };
+  // 分享：复制当前页面网址（含 #tx= 路由参数），发给别人打开即直达该交易详情
+  $('dshare').onclick = function () { copy(location.href); };
   $('dback').onclick = function () {
-    // 清掉 hash，回到列表模式（replaceState 不触发 hashchange，手动路由）
+    state.tx = null;
     history.replaceState(null, '', baseUrl());
     route();
   };
   window.addEventListener('hashchange', route);
 
-  /* ---------- 启动 ---------- */
+  /* ==================== 启动 ==================== */
+  applyLang();
   checkNetwork();
   route();
 })();
