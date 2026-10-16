@@ -21,7 +21,7 @@ window.BM_STORIES.push(
 window.BM_GIFTS = window.BM_GIFTS || [];
 window.BM_GIFTS.push(
   { id: 'bmg_whitehorse', name: '白色骏马', icon: '🐎', tag: '行', type: '神兽', price: 200, desc: '父母留下的快马——"白马啸西风"的标志。' },
-  { id: 'bmg_tianling_cage', name: '天铃鸟羽哨', icon: '🐦', tag: '玩', type: '宝物', price: 120, desc: '草原恋歌的信物。' },
-  { id: 'bmg_gaochang_map', name: '高昌迷宫地图', icon: '🗺️', tag: '玩', type: '宝物', price: 220, desc: '父母用命护下的藏宝图。' },
-  { id: 'bmg_hadake_knife', name: '哈萨克短刀', icon: '🔪', tag: '玩', type: '宝物', price: 130, desc: '草原少年的成人礼。' }
+  { id: 'bmg_tianling_cage', name: '天铃鸟羽哨', icon: '🐦', tag: '玩', type: '宝物', price: 120, desc: '仿天铃鸟叫声的羽哨，吹响时像草原恋歌——李文秀在寂寞夜里听了一整段少年时光。' },
+  { id: 'bmg_gaochang_map', name: '高昌迷宫地图', icon: '🗺️', tag: '玩', type: '宝物', price: 220, desc: '白马带着的李文秀父母用性命护下的高昌藏宝图。' },
+  { id: 'bmg_hadake_knife', name: '哈萨克短刀', icon: '🔪', tag: '玩', type: '宝物', price: 130, desc: '哈萨克少年的成人礼短刀，皮鞘上的花纹磨得发亮，苏普佩着它第一次猎狼，也算护过李文秀一回。' }
 );

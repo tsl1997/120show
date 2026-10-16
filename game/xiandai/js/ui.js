@@ -124,14 +124,22 @@ const U = {
           const q = questById(x.qid);
           if(!q) return "";
           const pr = questProgress(q);
-          const t = q.target.item ? ITEMS[q.target.item].name : "「"+q.target.tag+"」物品";
+          const t = questTargetText(q);
           const done = pr.have >= pr.need;
-          return `<div class="tk"><span>${q.name}<small>${t} ${pr.have}/${pr.need}</small></span><b class="${done?"good":"lbl"}">${done?"可交付":"进行中"}</b></div>`;
+          const left = questDeadlineLeft(q, x);
+          const dl = left !== null ? `<small>剩${left}天</small>` : "";
+          return `<div class="tk"><span>${q.name}<small>${t} ${pr.have}/${pr.need}${dl}</small></span><b class="${done?"good":"lbl"}">${done?"可交付":"进行中"}</b></div>`;
         }).join("");
+    }
+
+    let trustHtml = "";
+    if(S.world==="80"){
+      trustHtml = `<div class="mini-h"><span class="lbl">钱家信任 ${S.qianTrust}/100 · 身份：${identityName()}</span></div>`;
     }
 
     this.el("side").innerHTML = `
       <div class="panel"><h3>背包 (${packWeight()}/${backpackCap()})</h3><div class="pd">${pack}</div></div>
+      ${trustHtml?`<div class="panel"><div class="pd">${trustHtml}</div></div>`:""}
       ${questHtml?`<div class="panel"><div class="pd">${questHtml}</div></div>`:""}
       ${tickets?`<div class="panel"><div class="pd">${tickets}</div></div>`:""}
       ${bankHtml?`<div class="panel"><div class="pd">${bankHtml}</div></div>`:""}
@@ -912,23 +920,42 @@ const U = {
     if(!npc) return "";
     const list = QUESTS.filter(q=>q.npc===npc);
     if(!list.length) return "";
+    const isQian = ["李婶","钱老大爷","钱所长","钱厂长"].includes(npc);
+    const trustLine = isQian ? `<div class="note">钱家信任：${S.qianTrust}/100 · 你的身份：${identityName()}</div>` : "";
     const active = S.quests.find(x=>questById(x.qid) && questById(x.qid).npc===npc);
     if(active){
       const q = questById(active.qid);
       const pr = questProgress(q);
       const done = pr.have >= pr.need;
+      const left = questDeadlineLeft(q, active);
+      const dl = left !== null ? ` · 剩余 ${left} 天` : "";
+      let prText;
+      if(q.target.targets){
+        prText = "需要：" + q.target.targets.map((t,i)=>{
+          const have = t.item ? packQty(t.item) : tagCount(t.tag);
+          return `${ITEMS[t.item].name} ${have}/${t.qty}`;
+        }).join("、");
+      } else if(q.target.check === "bank_live_min"){
+        prText = `需要：活期存款≥${fmtFen(q.target.amtFen)} 存满 ${q.target.days} 天（已存 ${pr.have}/${q.target.days} 天）`;
+      } else {
+        prText = `需要：${questTargetText(q)}（已有 ${pr.have}/${pr.need}）`;
+      }
       return `<div class="panel"><h3>任务 · ${q.name}</h3><div class="pd">
+        ${trustLine}
         <div class="note">${q.desc}</div>
-        <div class="note">需要：${questTargetText(q)}（已有 ${pr.have}/${pr.need}） · 奖励：${questRewardText(q)}</div>
+        <div class="note">${prText}${dl} · 奖励：${questRewardText(q)}</div>
+        ${q.note?`<div class="note">${q.note}</div>`:""}
         <div class="btnrow"><button class="btn prim" data-qsubmit="${q.id}" ${done?"":"disabled"}>交付任务</button></div>
       </div></div>`;
     }
-    const first = list.find(q=>!questDone(q.id));
+    const first = list.find(q=>!questDone(q.id) && questGateOk(q).ok);
     if(!first) return "";
     return `<div class="panel"><h3>可接任务</h3><div class="pd">
+      ${trustLine}
       <div class="row"><span class="nm">${first.name}<small>${questRewardText(first)}</small></span>
         <button class="btn" data-qtake="${first.id}">接取</button></div>
-      <div class="note">${first.desc}</div>
+      <div class="note">${first.desc}${first.deadline?`（${first.deadline}天内交付）`:""}</div>
+      ${first.note?`<div class="note">${first.note}</div>`:""}
       <div class="note">同一NPC一次只能接1个任务，完成后再来接下一条。</div>
     </div></div>`;
   },

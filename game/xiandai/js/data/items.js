@@ -28,6 +28,7 @@ const ITEMS = {
   latiao: { name:"辣条",   unit:"包", cat:"食物", tags:["食物","稀奇"], use:{hp:10,mood:5},  exp:true, strong:{price:3, priceHi:5}, note:"麻辣解馋；80年代稀奇零食" },
   flashlight:{ name:"手电筒", unit:"个", cat:"电子", tags:["日用品","电子"], use:{note:"带回80年代卖给黑市"}, exp:false, strong:{price:25, priceHi:35}, note:"80年代电子紧俏货，卖给黑市" },
   battery:{ name:"电池",   unit:"个", cat:"电子", tags:["日用品","电子"], use:{note:"与手电筒配套，卖给黑市"}, exp:false, strong:{price:3, priceHi:5}, note:"和手电筒搭配出售" },
+  ebwatch:{ name:"电子表", unit:"块", cat:"电子", tags:["日用品","电子","奢侈品2"], exp:false, strong:{price:40, priceHi:60}, modern:40, price80:40, note:"80年代稀罕的电子表，黑市紧俏货；食品厂订单用" },
   sugar:  { name:"白糖",   unit:"斤", cat:"补品", tags:["食物","补品"], use:{hp:40,mood:35}, exp:true, hidden:true, strong:{price:15, priceHi:20}, note:"可卖黑市，或送孕妇张姨/王大姐" },
 
   /* ---------- 80年代 · 粮店（张姨） ---------- */

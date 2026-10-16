@@ -9,6 +9,8 @@
 const CITIES = (window.TRAVEL_CITIES || []).slice();
 const CITY_BY_ID = {};
 CITIES.forEach(c => { CITY_BY_ID[c.id] = c; });
+/* 出生城市（武汉）：存档里的城市 id 失效时的回退目标，renderHUD / renderCity 共用 */
+function homeCity() { return CITY_BY_ID['wuhan'] || CITIES[0] || null; }
 
 /* ---------- 系列收藏（动漫/特摄/全球主题） ---------- */
 const SERIES = (window.TRAVEL_SERIES || []).slice();
@@ -49,6 +51,58 @@ const ECON = {
 };
 const FOREIGN_TAG = '✈️出境';
 
+/* ---------- 多币种与环球银行 ----------
+ * 境外条目 price 为当地货币计价；境内与异世界仍为 ¥。
+ * 汇率：1 外币 = rate 元。境外消费优先用外币现金（无手续费），
+ * 否则直接刷卡按 1.05 倍汇率折 ¥ 扣款；去银行先兑换则免手续费。
+ * 存款每到一个新城结算 1% 利息。 */
+const FX = {
+  US: { cur: 'USD', sym: '$', name: '美元', rate: 7.2 },
+  JP: { cur: 'JPY', sym: '¥JP', name: '日元', rate: 0.048 },
+  KR: { cur: 'KRW', sym: '₩', name: '韩元', rate: 0.0052 },
+  TH: { cur: 'THB', sym: '฿', name: '泰铢', rate: 0.20 },
+  SG: { cur: 'SGD', sym: 'S$', name: '新加坡元', rate: 5.4 },
+  MY: { cur: 'MYR', sym: 'RM', name: '林吉特', rate: 1.6 },
+  ID: { cur: 'IDR', sym: 'Rp', name: '印尼盾', rate: 0.00045 },
+  VN: { cur: 'VND', sym: '₫', name: '越南盾', rate: 0.00028 },
+  IN: { cur: 'INR', sym: '₹', name: '卢比', rate: 0.086 },
+  AE: { cur: 'AED', sym: 'د.إ', name: '迪拉姆', rate: 1.96 },
+  EG: { cur: 'EGP', sym: 'E£', name: '埃及镑', rate: 0.15 },
+  KE: { cur: 'KES', sym: 'KSh', name: '先令', rate: 0.056 },
+  ZA: { cur: 'ZAR', sym: 'R', name: '兰特', rate: 0.39 },
+  FR: { cur: 'EUR', sym: '€', name: '欧元', rate: 7.8 },
+  DE: { cur: 'EUR', sym: '€', name: '欧元', rate: 7.8 },
+  IT: { cur: 'EUR', sym: '€', name: '欧元', rate: 7.8 },
+  ES: { cur: 'EUR', sym: '€', name: '欧元', rate: 7.8 },
+  AT: { cur: 'EUR', sym: '€', name: '欧元', rate: 7.8 },
+  PT: { cur: 'EUR', sym: '€', name: '欧元', rate: 7.8 },
+  NL: { cur: 'EUR', sym: '€', name: '欧元', rate: 7.8 },
+  GR: { cur: 'EUR', sym: '€', name: '欧元', rate: 7.8 },
+  GB: { cur: 'GBP', sym: '£', name: '英镑', rate: 9.2 },
+  CH: { cur: 'CHF', sym: 'Fr', name: '瑞郎', rate: 8.2 },
+  CZ: { cur: 'CZK', sym: 'Kč', name: '克朗', rate: 0.31 },
+  RU: { cur: 'RUB', sym: '₽', name: '卢布', rate: 0.079 },
+  CA: { cur: 'CAD', sym: 'C$', name: '加元', rate: 5.3 },
+  AU: { cur: 'AUD', sym: 'A$', name: '澳元', rate: 4.8 },
+  NZ: { cur: 'NZD', sym: 'NZ$', name: '纽元', rate: 4.4 },
+  BR: { cur: 'BRL', sym: 'R$', name: '雷亚尔', rate: 1.26 },
+  MX: { cur: 'MXN', sym: 'Mex$', name: '比索', rate: 0.42 },
+  EC: { cur: 'USD', sym: '$', name: '美元', rate: 7.2 },
+  MV: { cur: 'USD', sym: '$', name: '美元', rate: 7.2 },
+  // 南极洲无主权货币，各国科考后勤通用美元结算
+  AQ: { cur: 'USD', sym: '$', name: '美元', rate: 7.2 },
+};
+const SWIPE_FEE = 1.05;     // 直接刷卡的手续费倍率
+const BANK_INTEREST = 0.01; // 存款每到一个新城的利息
+function fxOf(city) { return !city || city.cc === 'CN' || city.world === 'isekai' ? null : (FX[city.cc] || null); }
+function priceCNY(city, local) { const f = fxOf(city); return f ? Math.ceil(local * f.rate) : local; }
+function fmtLocal(n, f) { const v = Math.round(n); return f.sym + v.toLocaleString('en-US'); }
+function fmtPrice(city, price) {
+  const f = fxOf(city);
+  if (!f || !price) return fmtMoney(price);
+  return fmtLocal(price, f) + '（≈' + fmtMoney(priceCNY(city, price)) + '）';
+}
+
 /* ---------- 存档 ---------- */
 const SAVE_KEY = 'travel_book_game_v1';
 function defaultState() {
@@ -70,6 +124,8 @@ function defaultState() {
     bookOpen: {},         // 图鉴手风琴展开状态
     seriesCat: null,      // 系列收藏·层级1：类别
     seriesSel: null,      // 系列收藏·层级3：选中系列
+    bank: { deposit: 0, base: 1 },  // 银行存款与起息时已到访城市数
+    cash: {},             // 外币现金 { USD: 120, ... }
   };
 }
 let S = load();
@@ -94,8 +150,10 @@ function isForeign(city) { return city.cc !== 'CN'; }
 
 /* ---------- 系列配色（同一副本内多系列用不同底色区分，主角金/其余自动分配） ---------- */
 const SERIES_PALETTE = ['#d4a017', '#c0392b', '#2e86c1', '#16a085', '#8e44ad', '#d35400', '#e84393', '#27ae60', '#34495e', '#c0392b', '#f39c12', '#2980b9', '#7f8c8d', '#6c3483', '#1abc9c', '#e74c3c', '#5d6d7e', '#af7ac5', '#d68910', '#5499c7'];
+const HEX_COLOR = /^#[0-9a-f]{3}$|^#[0-9a-f]{6}$/i;
 function seriesColor(sr) {
-  if (sr && sr.color) return sr.color;
+  // 只接受合法 hex：该值会被直接拼进 style 属性，必须校验（避免数据里的 color 注入样式）
+  if (sr && typeof sr.color === 'string' && HEX_COLOR.test(sr.color.trim())) return sr.color.trim();
   const id = sr && sr.id ? sr.id : '';
   let h = 0;
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
@@ -115,7 +173,7 @@ function rewardOf(city, kind, item) {
   const f = isForeign(city) ? 'foreign' : 'cn';
   if (kind === 'story') return ECON.STORY_R[f];
   if (kind === 'series') kind = 'souvenir';
-  const price = Math.max(0, +item.price || 0);
+  const price = priceCNY(city, Math.max(0, +item.price || 0));
   return Math.max(ECON.MIN_R[f][kind], Math.round(price * ECON.RATES[f][kind]));
 }
 function cityStat(city) {
@@ -134,7 +192,7 @@ function allStat() {
 function bagItems() {
   const out = [];
   CITIES.forEach(c => cityItems(c, 'souvenir').forEach(it => { if (S.collected[it.id]) out.push({ city: c, it }); }));
-  SERIES.forEach(sr => sr.items.forEach(it => { if (S.collected[it.id]) out.push({ city: CITY_BY_ID[it.city] || sr.items[0] && { name: '系列收藏', flag: '🌟' }, it }); }));
+  SERIES.forEach(sr => sr.items.forEach(it => { if (S.collected[it.id]) out.push({ city: CITY_BY_ID[it.city] || { name: '系列收藏', flag: '🌟' }, it }); }));
   return out;
 }
 function hasVisa(city) {
@@ -158,8 +216,12 @@ $('#modal-wrap').addEventListener('click', e => { if (e.target.id === 'modal-wra
 /* ---------- HUD ---------- */
 function renderHUD() {
   $('#hud-money').textContent = fmtMoney(S.money);
-  const c = CITY_BY_ID[S.city] || CITIES[0];
+  const c = CITY_BY_ID[S.city] || homeCity();
   $('#hud-city').textContent = c ? c.name : '—';
+  const f = fxOf(c);
+  $('#hud-cash').textContent = f ? fmtLocal(S.cash[f.cur] || 0, f) : '—';
+  const cashEl = document.getElementById('hud-cash');
+  if (cashEl) cashEl.parentElement.style.display = f ? '' : 'none';
   const a = allStat();
   $('#hud-progress').textContent = a.got + '/' + a.total;
 }
@@ -172,10 +234,16 @@ const KIND_META = {
   series:   { tab: 'series',   label: '系列收藏', btn: '收藏', icon: '🌟' },
 };
 function renderCity() {
-  const c = CITY_BY_ID[S.city];
+  let c = CITY_BY_ID[S.city];
+  if (!c) {
+    // 存档里的城市 id 已失效（城市被删/改名）：回退到出生城市并修正存档，避免白屏
+    c = homeCity();
+    if (!c) { $('#view').innerHTML = '<div class="bag-empty">数据未加载，请检查 data 文件。</div>'; return; }
+    S.city = c.id;
+    save();
+  }
   const LB = c.labels || {};
   const LBof = (k, f) => (LB[k] != null ? LB[k] : f);
-  if (!c) { $('#view').innerHTML = '<div class="bag-empty">数据未加载，请检查 data 文件。</div>'; return; }
   const st = cityStat(c);
   const done = st.got === st.total && st.total > 0;
   const foreign = isForeign(c);
@@ -215,13 +283,13 @@ function renderCity() {
           <div class="item-name">${esc(it.name)}</div>
           <div class="item-tags"><span class="tagchip t-${tag}">${tag}</span><span class="tagchip">${esc(type)}</span></div>
         </div>
-        <div class="item-price ${price ? '' : 'free'}">${price ? fmtMoney(price) : '免费'}</div>
+        <div class="item-price ${price ? '' : 'free'}">${price ? fmtPrice(c, price) : '免费'}</div>
       </div>
       <div class="item-desc">${got ? esc(it.desc) : '？？？（收集后解锁介绍）'}</div>
       <div class="item-foot">
         ${got
           ? '<button class="btn-do done-btn">✓ 已入图鉴</button>'
-          : `<button class="btn-do" data-act="collect" data-kind="${kind}" data-item="${it.id}">${LBof(kind + 'B', KIND_META[kind].btn)}${price ? ' ' + fmtMoney(price) : ''}</button>
+          : `<button class="btn-do" data-act="collect" data-kind="${kind}" data-item="${it.id}">${LBof(kind + 'B', KIND_META[kind].btn)}${price ? ' ' + (fxOf(c) ? fmtLocal(price, fxOf(c)) : fmtMoney(price)) : ''}</button>
              <span class="reward-hint">${rw}</span>`}
       </div>
     </div>`;
@@ -487,7 +555,7 @@ function renderSeriesBook() {
     <div class="book-city-body">
       <div style="font-size:12px;color:var(--ink2);line-height:1.7;padding:8px 4px">
         <b>${esc(sr.years)} · ${esc(sr.author)}</b>　主题：${esc(sr.theme)}<br>
-        主角：${esc(sr.protagonist)}　<sapn style="color:var(--gold)">「${esc(sr.slogan)}」</sapn><br>
+        主角：${esc(sr.protagonist)}　<span style="color:var(--gold)">「${esc(sr.slogan)}」</span><br>
         ${esc(sr.background)}<br>${esc(sr.story)}
       </div>
       <div class="bk-grid">`;
@@ -502,6 +570,19 @@ function renderSeriesBook() {
 }
 
 /* ================= 视图：图鉴 ================= */
+/* 单城图鉴格子：按需渲染。201 城 × 全部条目一次性进 DOM 会有上万节点，折叠状态不应渲染 */
+function bookBodyHTML(c, kind) {
+  let h = '<div class="bk-grid">';
+  cityItems(c, kind).forEach(it => {
+    const got = !!S.collected[it.id];
+    h += `<div class="bk-cell ${got ? 'got' : ''}">
+      <span class="bk-ico">${got ? it.icon : '❓'}</span>
+      <span class="bk-name">${got ? esc(it.name) : '<span class="bk-unknown">？？？？</span>'}</span>
+      <span class="bk-sub">${got ? esc(it.desc.slice(0, 18)) + '…' : '尚未收集'}</span>
+    </div>`;
+  });
+  return h + '</div>';
+}
 function renderBook() {
   const tabs = [['spot', '📍 景点打卡'], ['souvenir', '🛍️ 特色周边'], ['story', '💬 奇闻趣事'], ['series', '🌟 系列收藏']];
   let html = `<div class="book-tabs">${tabs.map(([k, l]) =>
@@ -517,7 +598,8 @@ function renderBook() {
     byCountry[cn].forEach(c => {
       const list = cityItems(c, kind);
       const g = list.filter(i => S.collected[i.id]).length;
-      const open = !!S.bookOpen[c.id + kind];
+      const key = c.id + kind;
+      const open = !!S.bookOpen[key];
       html += `
       <div class="book-city ${open ? 'open' : ''}">
         <div class="book-city-head" data-act="toggleBook" data-city="${c.id}" data-kind="${kind}">
@@ -525,16 +607,8 @@ function renderBook() {
           <span class="bprog">${g}/${list.length}${g === list.length && list.length ? ' 🏆' : ''}</span>
           <span class="arrow">▶</span>
         </div>
-        <div class="book-city-body"><div class="bk-grid">`;
-      list.forEach(it => {
-        const got = !!S.collected[it.id];
-        html += `<div class="bk-cell ${got ? 'got' : ''}">
-          <span class="bk-ico">${got ? it.icon : '❓'}</span>
-          <span class="bk-name">${got ? esc(it.name) : '<span class="bk-unknown">？？？？</span>'}</span>
-          <span class="bk-sub">${got ? esc(it.desc.slice(0, 18)) + '…' : '尚未收集'}</span>
-        </div>`;
-      });
-      html += '</div></div></div>';
+        <div class="book-city-body"${open ? ' data-filled="1"' : ''}>${open ? bookBodyHTML(c, kind) : ''}</div>
+      </div>`;
     });
   });
   $('#view').innerHTML = html;
@@ -561,7 +635,102 @@ function renderBag() {
   $('#view').innerHTML = html;
 }
 
-/* ================= 视图：事务所 ================= */
+/* ================= 视图：事务所（护照+签证+环球银行） ================= */
+function bankHTML() {
+  const f = fxOf(CITY_BY_ID[S.city]);
+  const disp = n => fmtMoney(Math.round(n));
+  let h = `<div class="map-group-title" style="margin-top:18px">🏦 环球银行</div>
+  <div class="office-note">存款每到一个新城结算 <b>1%</b> 利息；外币按实时汇率兑换（境外直接刷卡另收 <b>5%</b> 手续费，所以先兑换更划算）。低面值货币请按当地习惯输入较大数额（如日元一次兑 10000）。</div>
+  <div class="doc-card"><span class="doc-ico">🏦</span>
+    <div class="doc-info"><h4>存款账户</h4><p>当前余额 <b>${disp(S.bank.deposit)}</b>（另持现金 ${disp(S.money)}）</p></div>
+    <span class="doc-state ok">${S.visited.length - 1} 城已计息</span>
+  </div>
+  <div class="doc-card"><div class="doc-info" style="width:100%">
+    <h4>💰 存入 / 取出</h4>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;align-items:center">
+      <input type="number" min="1" step="1" id="bank-amt" placeholder="金额（元）" style="width:120px;padding:6px 8px;border:1px solid #c9bfae;border-radius:8px">
+      <button class="btn-doc" data-act="bankInInput">存入</button>
+      <button class="btn-doc" data-act="bankOutInput">取出</button>
+      <button class="btn-doc" data-act="bankAll">全部存入</button>
+      <button class="btn-doc" data-act="bankOutAll">全部取出</button>
+    </div>
+  </div></div>
+  <div class="map-group-title">💱 外汇兑换${f ? '（当前所在地：' + f.name + '）' : ''}</div>`;
+  const ccs = [...new Set(CITIES.filter(c => isForeign(c) && c.world !== 'isekai').map(c => c.cc))];
+  const curSeen = new Set();
+  // 按汇率降序：值钱货币在前
+  const list = [];
+  ccs.forEach(cc => { const f = FX[cc]; if (f && !curSeen.has(f.cur)) { curSeen.add(f.cur); list.push([cc, f]); } });
+  list.sort((a, b) => b[1].rate - a[1].rate);
+  list.forEach(([cc, f]) => {
+    const have = S.cash[f.cur] || 0;
+    // 建议单次兑换的默认额度：约 ¥1000 等值，取整到当地习惯位数
+    const sug = Math.max(1, Math.round(1000 / f.rate / (f.rate < 0.01 ? 1000 : f.rate < 0.5 ? 100 : 10)) * (f.rate < 0.01 ? 1000 : f.rate < 0.5 ? 100 : 10));
+    h += `<div class="doc-card"><span class="doc-ico">💱</span>
+      <div class="doc-info" style="width:100%"><h4>${f.name} ${f.sym}${f.cur}</h4>
+        <p>汇率 1 ${f.cur} = ${f.rate} 元 · 持有 ${fmtLocal(have, f)}（≈${fmtMoney(Math.round(have * f.rate))}）</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;align-items:center">
+          <input type="number" min="1" step="1" data-fxinput="${f.cur}" value="${sug}" style="width:110px;padding:6px 8px;border:1px solid #c9bfae;border-radius:8px">
+          <button class="btn-doc" data-act="fxBuy" data-cc="${cc}">兑入</button>
+          <button class="btn-doc" data-act="fxSellSome" data-cc="${cc}">兑回</button>
+          <button class="btn-doc" data-act="fxSell" data-cc="${cc}">全部兑回</button>
+        </div>
+      </div></div>`;
+  });
+  return h;
+}
+function renderBank() { $('#view').innerHTML = bankHTML(); }
+function fxInputVal(cur) {
+  const el = document.querySelector('[data-fxinput="' + cur + '"]');
+  if (!el) return 0;
+  const v = Math.floor(+el.value);
+  return v > 0 ? v : 0;
+}
+function bankDeposit(amt) {
+  amt = amt === 'all' ? S.money : Math.min(+amt, S.money);
+  if (amt <= 0) { toast('💰 没有可存入的旅行基金'); return; }
+  S.money -= amt; S.bank.deposit += amt;
+  save(); renderHUD(); renderBank();
+  toast('🏦 存入 <b>' + fmtMoney(amt) + '</b>，每到一个新城结算 1% 利息', 'reward');
+}
+function bankWithdraw(amt) {
+  amt = amt === 'all' ? S.bank.deposit : Math.min(amt, S.bank.deposit);
+  if (amt <= 0) { toast('🏦 存款余额为 0 或金额无效'); return; }
+  S.bank.deposit -= amt; S.money += amt;
+  save(); renderHUD(); renderBank();
+  toast('🏦 取出 <b>' + fmtMoney(amt) + '</b>', 'reward');
+}
+function fxBuy(cc, amt) {
+  const f = FX[cc]; if (!f) return;
+  if (!amt) amt = fxInputVal(f.cur);
+  if (!amt) { toast('💱 请先输入要兑换的' + f.name + '金额'); return; }
+  const cny = Math.round(amt * f.rate);
+  if (S.money < cny) { toast('💰 余额不够兑换 ' + fmtLocal(amt, f) + '（需 ' + fmtMoney(cny) + '）'); return; }
+  S.money -= cny;
+  S.cash[f.cur] = (S.cash[f.cur] || 0) + amt;
+  save(); renderHUD(); renderBank();
+  toast(`💱 兑换 <b>${fmtLocal(amt, f)}</b>（≈${fmtMoney(cny)}），银行汇率无手续费`, 'reward');
+}
+function fxSellSome(cc) {
+  const f = FX[cc]; if (!f) return;
+  const amt = fxInputVal(f.cur);
+  if (!amt) { toast('💱 请先输入要兑回的' + f.name + '金额'); return; }
+  const have = S.cash[f.cur] || 0;
+  if (amt > have) { toast('💱 持有的' + f.name + '不够（现持有 ' + fmtLocal(have, f) + '）'); return; }
+  const cny = Math.round(amt * f.rate);
+  S.cash[f.cur] = have - amt; S.money += cny;
+  save(); renderHUD(); renderBank();
+  toast(`💱 ${fmtLocal(amt, f)} 兑回 <b>${fmtMoney(cny)}</b>`, 'reward');
+}
+function fxSell(cc) {
+  const f = FX[cc]; if (!f) return;
+  const have = S.cash[f.cur] || 0;
+  if (have <= 0) { toast('💱 没有可换回的' + f.name); return; }
+  const cny = Math.round(have * f.rate);
+  S.cash[f.cur] = 0; S.money += cny;
+  save(); renderHUD(); renderBank();
+  toast(`💱 ${fmtLocal(have, f)} 换回 <b>${fmtMoney(cny)}</b>`, 'reward');
+}
 function renderOffice() {
   let html = `
   <div class="office-note">🛂 出国旅行前需要：<b>护照</b>（一次办理，终身有效，工本费${fmtMoney(ECON.PASSPORT_COST)}）→ <b>签证</b>（按国家办理一次）。免签国家无需签证。出境图鉴的奖励比国内更丰厚！</div>
@@ -594,7 +763,21 @@ function renderOffice() {
         : `<button class="btn-doc" data-act="visa" data-cc="${c.cc}">办理 ${fmtMoney(c.visa.cost)}</button>`}
     </div>`;
   });
-  $('#view').innerHTML = html;
+  $('#view').innerHTML = html + bankHTML();
+}
+
+/* ---------- 境外付款：优先外币现金，不足则刷卡（+5% 手续费折 ¥） ---------- */
+function payForeign(city, localCost) {
+  const f = fxOf(city);
+  const have = S.cash[f.cur] || 0;
+  if (have >= localCost) {
+    S.cash[f.cur] = have - localCost;
+    return { ok: true, msg: fmtLocal(localCost, f) + ' 现金支付' };
+  }
+  const cny = priceCNY(city, localCost) * SWIPE_FEE;
+  if (S.money < cny) return { ok: false, msg: '现金与余额都不足，可去🏦环球银行兑换' + f.name };
+  S.money -= cny;
+  return { ok: true, msg: '刷卡 ' + fmtLocal(localCost, f) + '（含5%手续费 ' + fmtMoney(Math.round(cny)) + '）' };
 }
 
 /* ================= 动作 ================= */
@@ -603,13 +786,22 @@ function collect(kind, itemId) {
   const it = cityItems(c, kind).find(i => i.id === itemId);
   if (!it || S.collected[itemId]) return;
   const price = Math.max(0, +it.price || 0);
-  if (S.money < price) { toast('💰 旅行基金不足！先去点亮更多免费图鉴攒攒钱～'); return; }
-  S.money -= price;
+  const foreignPrice = fxOf(c) ? priceCNY(c, price) : price;
+  if (S.money < foreignPrice && !(fxOf(c) && price)) { toast('💰 旅行基金不足！先去点亮更多免费图鉴攒攒钱～'); return; }
+  let payMsg = '';
+  if (fxOf(c) && price) {
+    const pay = payForeign(c, price);
+    if (!pay.ok) { toast('💰 ' + pay.msg); return; }
+    payMsg = pay.msg;
+  } else {
+    if (S.money < price) { toast('💰 旅行基金不足！先去点亮更多免费图鉴攒攒钱～'); return; }
+    S.money -= price;
+  }
   S.collected[itemId] = { k: kind };
   const rw = rewardOf(c, kind, it);
   S.money += rw;
   const verb = kind === 'spot' ? '打卡成功' : kind === 'souvenir' ? '收入背包' : '涨知识了';
-  toast(`${it.icon} ${esc(it.name)} ${verb}！奖励 <b>+${fmtMoney(rw)}</b>`, 'reward');
+  toast(`${it.icon} ${esc(it.name)} ${verb}！${payMsg ? payMsg + '，' : ''}奖励 <b>+${fmtMoney(rw)}</b>`, 'reward');
   // 城市全收集检查
   const st = cityStat(c);
   if (st.got === st.total && !S.cityBonus[c.id]) {
@@ -638,9 +830,21 @@ function goCity(cityId, tIdx) {
     if (!hasVisa(to)) { toast(`🛂 还没有${to.country}的签证，先去事务所办理～`); return; }
   }
   if (S.money < t.cost) { toast('💰 旅行基金不够买票！先在本城多收集一些图鉴～'); return; }
+  const firstVisit = !S.visited.includes(cityId);
   S.money -= t.cost;
   S.city = cityId;
-  if (!S.visited.includes(cityId)) S.visited.push(cityId);
+  if (firstVisit) {
+    S.visited.push(cityId);
+    // 到新城结算存款利息（1%/城）
+    if (S.bank && S.bank.deposit > 0) {
+      const n = S.visited.length - 1 - (S.bank.base || 1);
+      if (n > 0) {
+        const gain = Math.round(S.bank.deposit * Math.pow(1 + BANK_INTEREST, n)) - S.bank.deposit;
+        if (gain > 0) { S.bank.deposit += gain; S.money += gain; setTimeout(() => toast(`🏦 存款利息结算 <b>+${fmtMoney(gain)}</b>`, 'reward'), 900); }
+      }
+      S.bank.base = S.visited.length - 1;
+    }
+  }
   S.subTab = 'spot';
   save();
   toast(`${t.icon} 花费 <b>${fmtMoney(t.cost)}</b> 乘${t.name}前往 ${to.flag} ${esc(to.name)}`);
@@ -666,6 +870,7 @@ function buyVisa(cc) {
   toast(`🛂 ${esc(c.country)}签证到手！可以出发了`, 'reward');
   renderOffice();
 }
+
 function showIntro() {
   showModal(`<h3>🌱 序章 · 图鉴觉醒</h3>
   <div class="m-body">你出生在九省通衢的江城——武汉。
@@ -714,10 +919,25 @@ document.addEventListener('click', e => {
   else if (act === 'go') goCity(t.dataset.city, +t.dataset.t);
   else if (act === 'passport') buyPassport();
   else if (act === 'visa') buyVisa(t.dataset.cc);
+  else if (act === 'bankAll') bankDeposit('all');
+  else if (act === 'bankInInput') bankDeposit(Math.floor(+($('#bank-amt') || {}).value || 0));
+  else if (act === 'bankOutInput') bankWithdraw(Math.floor(+($('#bank-amt') || {}).value || 0));
+  else if (act === 'bankOutAll') bankWithdraw('all');
+  else if (act === 'fxBuy') fxBuy(t.dataset.cc);
+  else if (act === 'fxSellSome') fxSellSome(t.dataset.cc);
+  else if (act === 'fxSell') fxSell(t.dataset.cc);
   else if (act === 'toggleBook') {
     const key = t.dataset.city + t.dataset.kind;
     S.bookOpen[key] = !S.bookOpen[key]; save();
     const box = t.closest('.book-city'); box.classList.toggle('open');
+    if (S.bookOpen[key]) {
+      // 展开时才把格子写进 DOM（折叠状态不渲染）
+      const body = box.querySelector('.book-city-body');
+      if (body && !body.dataset.filled) {
+        body.innerHTML = bookBodyHTML(CITY_BY_ID[t.dataset.city], t.dataset.kind);
+        body.dataset.filled = '1';
+      }
+    }
   }
   else if (act === 'closeModal') closeModal();
   else if (act === 'resetYes') { S = defaultState(); S.seenIntro = true; save(); closeModal(); renderHUD(); switchTab('city'); toast('🔄 旅程重新开始，欢迎回到武汉！'); }

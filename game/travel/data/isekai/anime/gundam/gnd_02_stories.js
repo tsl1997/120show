@@ -4,7 +4,7 @@ window.GND_STORIES.push(
   { id: 'gndv_meet', name: 'Side7·与高达的相遇', icon: '🤖', desc: '在袭击警报中闯入机密工房的少年，与静静伫立的白色巨人目光相遇，命运就此转动。' },
   { id: 'gndv_firstsortie', name: '高达初动·白色恶魔降生', icon: '🌟', desc: '一边翻说明书一边操纵的初战，击退两台扎古的那一刻，阿姆罗与高达一同觉醒。' },
   { id: 'gndv_charspeed', name: '红色彗星·夏亚登场', icon: '☄️', desc: '以三倍速穿梭战场的赤色扎古如流星突袭，白色基地的每一仗都因此蒙上阴影。' },
-  { id: 'gndv_whitebase', name: '白色基地的逃避行', icon: '🚢', desc: '失去舰长与大半乘员的残舰载着难民冲出Side7，无名的漂流之舰自此启程。' },
+  { id: 'gndv_whitebase', name: '白色基地的逃避行', icon: '🚢', desc: '失去舰长与大半乘员的残舰载着难民冲出SIDE 7，无名的漂流之舰自此启程。' },
   { id: 'gndv_garma', name: '加尔马·扎比的殒落', icon: '💐', desc: '太过相信战友而中计的加尔马战死沙场，扎比家第一次尝到血缘被战争撕碎的痛。' },
   { id: 'gndv_ramba', name: '兰巴·拉尔的特攻', icon: '⚔️', desc: '明知必死仍向高达举起武器的蓝色巨星，用尽最后一口气发起同归于尽的冲锋。' },
   { id: 'gndv_atlantic', name: '横渡大西洋的钢铁之旅', icon: '🌊', desc: '白色基地潜入深海又破浪而出，在机群与炮火之间为贾布罗开辟回家的航线。' },

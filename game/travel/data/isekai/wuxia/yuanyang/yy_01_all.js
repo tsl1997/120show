@@ -2,8 +2,8 @@
 window.YY_SPOTS = window.YY_SPOTS || [];
 window.YY_SPOTS.push(
   { id: 'yyp_biaolu', name: '晋陕镖路', icon: '🛤️', price: 0, desc: '"铁鞭镇八方"押送鸳鸯刀的官道——一路鸡飞狗跳。' },
-  { id: 'yyp_xiaoyuan', name: '任飞燕夫妇的山林', icon: '🌲', price: 0, desc: '林玉龙任飞燕吵吵闹闹的夫妻档战场。' },
-  { id: 'yyp_xiaobanhe', name: '萧半和的府邸', icon: '🏡', price: 0, desc: '寿宴结亲与双刀合璧的大团圆之地。' }
+  { id: 'yyp_xiaoyuan', name: '任飞燕夫妇的山林', icon: '🌲', price: 0, desc: '林玉龙任飞燕夫妻档，吵吵闹闹的鸳鸯刀战场。' },
+  { id: 'yyp_xiaobanhe', name: '萧半和的府邸', icon: '🏡', price: 0, desc: '萧半和的府邸——寿宴结亲与双刀合璧的大团圆之地，笑声里藏着太监真相。' }
 );
 window.YY_STORIES = window.YY_STORIES || [];
 window.YY_STORIES.push(
@@ -19,6 +19,6 @@ window.YY_STORIES.push(
 window.YY_GIFTS = window.YY_GIFTS || [];
 window.YY_GIFTS.push(
   { id: 'yyg_yuanyang', name: '鸳鸯双刀', icon: '🗡️', tag: '玩', type: '宝物', price: 260, desc: '一长一短雌雄双刀——"仁者无敌"的武林寓言。' },
-  { id: 'yyg_fuqi', name: '夫妻刀法谱', icon: '💞', tag: '玩', type: '秘籍', price: 200, desc: '心意相通才灵光的合璧刀法。' },
-  { id: 'yyg_tiebian', name: '周威信的铁鞭', icon: '🥢', tag: '玩', type: '宝物', price: 110, desc: '"铁鞭镇八方"的家伙。' }
+  { id: 'yyg_fuqi', name: '夫妻刀法谱', icon: '💞', tag: '玩', type: '秘籍', price: 200, desc: '夫妻刀法，心意相通才灵光的合璧武林绝学。' },
+  { id: 'yyg_tiebian', name: '周威信的铁鞭', icon: '🥢', tag: '玩', type: '宝物', price: 110, desc: '周威信的"铁鞭镇八方"，名号响亮家伙沉，遇敌先想着跑。' }
 );

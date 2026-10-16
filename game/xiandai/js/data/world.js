@@ -16,6 +16,6 @@ const WORLDS = {
 /* ---------------- 住房（街道办） ---------------- */
 const HOUSES = {
   hutong:   { name:"城南四合院", rent:10, cap:50, cond:"无" },
-  brick:    { name:"城南砖瓦房", rent:20, cap:70, cond:"需要职业" },
-  building: { name:"城南小楼房", rent:50, cap:100, cond:"需要科长级别职位" },
+  brick:    { name:"城南砖瓦房", rent:20, cap:70, cond:"需要街道办登记（完成李婶的落脚委托）" },
+  building: { name:"城南小楼房", rent:50, cap:100, cond:"需要单位身份（成为食品厂供货员）" },
 };

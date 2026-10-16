@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeployBot | Hoodi 策略执行台</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.1/ethers.umd.min.js"></script>
+    <title>DeployBot | 多链策略执行台</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.15.0/ethers.umd.min.js"></script>
     <style>
         :root {
             --bg1: #fff8ff;
@@ -96,7 +96,7 @@
 
         .field { margin-bottom: 10px; }
         label { display: block; font-size: 12px; color: #7384b1; font-weight: 700; margin-bottom: 6px; }
-        input[type="text"], input[type="number"], select {
+        input[type="text"], input[type="number"], select, textarea {
             width: 100%;
             border: 1px solid #dbe8ff;
             border-radius: 12px;
@@ -105,11 +105,14 @@
             outline: none;
             color: var(--text-main);
             background: #fff;
+            font-family: inherit;
         }
-        input:focus, select:focus { border-color: #b9ceff; box-shadow: 0 0 0 4px rgba(121, 181, 255, 0.16); }
+        textarea { resize: vertical; line-height: 1.5; }
+        input:focus, select:focus, textarea:focus { border-color: #b9ceff; box-shadow: 0 0 0 4px rgba(121, 181, 255, 0.16); }
 
         .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .row4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 
         .btn {
             border: none; border-radius: 12px; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer;
@@ -185,7 +188,7 @@
 
         @media (max-width: 980px) {
             .grid { grid-template-columns: 1fr; }
-            .row2, .row3 { grid-template-columns: 1fr; }
+            .row2, .row3, .row4 { grid-template-columns: 1fr; }
             .tabs { flex-direction: column; }
         }
     </style>
@@ -199,7 +202,7 @@
                 <a class="back" href="../index.html" target="_blank" rel="noopener noreferrer">返回主页</a>
             </div>
             <h1>DeployBot 策略执行台</h1>
-            <p class="subtitle">默认网络 Hoodi（560048），生成钱包、资金检测、策略执行与结果导出一体化。</p>
+            <p class="subtitle">多链测试网策略执行台：生成钱包、资金检测、策略执行与结果导出一体化。支持自定义 RPC 与多节点故障转移。</p>
         </header>
 
         <div class="grid">
@@ -208,10 +211,30 @@
                 <div class="hint">先生成初始钱包，手动转入测试 ETH，点击“已发送并检查余额”。秘钥仅保存在当前浏览器内存。</div>
 
                 <div class="field">
-                    <label>网络</label>
-                    <select id="networkSelect">
-                        <option value="hoodi">Hoodi Testnet (ChainId: 560048 / 0x88bb0)</option>
-                    </select>
+                    <label>网络（内置常见测试网，选项末尾可选「自定义 RPC」）</label>
+                    <select id="networkSelect"></select>
+                </div>
+
+                <div id="customNetPanel" style="display:none;">
+                    <div class="row2">
+                        <div class="field">
+                            <label>网络名称（可选）</label>
+                            <input type="text" id="customNetName" placeholder="例如: My Testnet">
+                        </div>
+                        <div class="field">
+                            <label>ChainId（十进制或 0x 十六进制，可选）</label>
+                            <input type="text" id="customNetChainId" placeholder="例如: 11155111 或 0xaa36a7">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>RPC 地址（每行一个，可填多个自动故障转移）</label>
+                        <textarea id="customNetRpc" rows="2" placeholder="https://your-rpc-1&#10;https://your-rpc-2"></textarea>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>备用 RPC（可选，每行一个，追加在所选网络之后）</label>
+                    <textarea id="backupRpc" rows="2" placeholder="https://backup-rpc-1&#10;https://backup-rpc-2"></textarea>
                 </div>
 
                 <div class="row2">
@@ -230,7 +253,7 @@
                         <label>地址操作 / 水龙头</label>
                         <div class="row2" style="grid-template-columns: 1fr auto; margin: 0;">
                             <button class="btn soft" id="copyAddrBtn" disabled>复制地址</button>
-                            <a class="btn soft" href="https://hoodi-faucet.pk910.de/" target="_blank" rel="noopener noreferrer" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">去水龙头</a>
+                            <a class="btn soft" id="faucetLink" href="../tool/testnet.html" target="_blank" rel="noopener noreferrer" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">去水龙头</a>
                         </div>
                     </div>
                 </div>
@@ -242,6 +265,7 @@
                     <button class="tab active" id="tabDragonfly" data-tab="dragonfly">蜻蜓点水</button>
                     <button class="tab" id="tabFactory" data-tab="factory">工厂分发</button>
                     <button class="tab" id="tabBinary" data-tab="binary">二叉树策略</button>
+                    <button class="tab" id="tabOneToMany" data-tab="onetoMany">一夫当关</button>
                 </div>
 
                 <div id="panelDragonfly">
@@ -302,6 +326,32 @@
                     </div>
                 </div>
 
+                <div id="panelOneToMany" style="display:none;">
+                    <div class="row2">
+                        <div class="field">
+                            <label>分钱包数量（「边生成边发送」模式下作为上限保护）</label>
+                            <input type="number" id="owWalletCount" min="1" max="5000" value="50">
+                        </div>
+                        <div class="field">
+                            <label>每个分钱包金额 (ETH)</label>
+                            <input type="number" id="owAmountEth" min="0" step="0.000001" value="0.001">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>分发模式</label>
+                        <select id="owMode">
+                            <option value="fixed">先生成后发送（先生成 N 个分钱包，再按顺序发送）</option>
+                            <option value="drain">边生成边发送（直到主钱包金额消耗完）</option>
+                        </select>
+                    </div>
+                    <div class="hint" style="margin-bottom:0;">
+                        1:N 普通转账，单线程顺序发送：每笔使用自增 nonce，发完不逐笔等确认，最后统一等待上链。
+                        使用流程：初始钱包领取水龙头资金 → 点「已发送并检查余额」→ 执行本策略。
+                        「边生成边发送」会持续生成并发送，直到余额不足以再支付一笔「金额 + 预留 Gas」为止，此时数量字段作为上限保护。
+                        单笔 gasLimit 固定 500000；余额预留按实际消耗的 21000 gas × maxFeePerGas 计算——EIP-1559 下实际 Gas 价不会超过 maxFeePerGas，所以这是手续费硬上界，能贴近「消耗完」而不至于付不出手续费。
+                    </div>
+                </div>
+
                 <div class="row2">
                     <div class="field">
                         <label>优先手续费 (Gwei)</label>
@@ -358,12 +408,114 @@
     <script type="module">
         const { ethers } = window;
 
+        // 网络信息取自 ../text/config.js 的 testnet 项（chainId / rpc / symbol），
+        // 并为常用链补充公共备用 RPC，以便多节点故障转移。新增网络时同步维护此处即可。
+        const CUSTOM_NET_KEY = '__custom__';
+        const DEFAULT_NET_KEY = '0x88bb0';
+
+        // 普通转账 gasLimit：以太坊升级后 21000 已不够用，统一按 500000 预留
+        const PLAIN_SEND_GAS_LIMIT = 500000n;
+        // EOA → EOA 普通转账实际消耗的 gas 恒为 21000，用于余额预留估算。
+        // EIP-1559 下 effectiveGasPrice ≤ maxFeePerGas，故 21000 × maxFeePerGas 是手续费硬上界。
+        const PLAIN_SEND_GAS_UNITS = 21000n;
+
         const NETWORKS = {
-            hoodi: {
-                name: 'Hoodi Testnet',
-                rpc: 'https://ethereum-hoodi-rpc.publicnode.com',
-                chainIdHex: '0x88bb0',
-                chainIdDec: 560048
+            '0x88bb0': {
+                name: 'Hoodi Testnet', chainIdHex: '0x88bb0', chainIdDec: 560048, symbol: 'ETH',
+                rpcs: ['https://0xrpc.io/hoodi', 'https://ethereum-hoodi-rpc.publicnode.com'],
+                faucet: 'https://hoodi-faucet.pk910.de/'
+            },
+            '0xaa36a7': {
+                name: 'Sepolia', chainIdHex: '0xaa36a7', chainIdDec: 11155111, symbol: 'ETH',
+                rpcs: ['https://sepolia.drpc.org', 'https://ethereum-sepolia-rpc.publicnode.com'],
+                faucet: 'https://sepolia-faucet.pk910.de/'
+            },
+            '0x15eb': {
+                name: 'opBNB Testnet', chainIdHex: '0x15eb', chainIdDec: 5611, symbol: 'tBNB',
+                rpcs: ['https://opbnb-testnet-rpc.bnbchain.org'],
+                faucet: 'https://www.bnbchain.org/en/testnet-faucet'
+            },
+            '0x61': {
+                name: 'BSC Testnet', chainIdHex: '0x61', chainIdDec: 97, symbol: 'tBNB',
+                rpcs: ['https://bsc-testnet-rpc.publicnode.com'],
+                faucet: 'https://www.bnbchain.org/en/testnet-faucet'
+            },
+            '0x14a34': {
+                name: 'Base Sepolia', chainIdHex: '0x14a34', chainIdDec: 84532, symbol: 'ETH',
+                rpcs: ['https://base-sepolia-rpc.publicnode.com'],
+                faucet: 'https://www.coinbase.com/faucets/base-ethereum-sepolia-faucet'
+            },
+            '0x66eee': {
+                name: 'Arbitrum Sepolia', chainIdHex: '0x66eee', chainIdDec: 421614, symbol: 'ETH',
+                rpcs: ['https://arbitrum-sepolia-rpc.publicnode.com'],
+                faucet: 'https://faucet.quicknode.com/arbitrum/sepolia'
+            },
+            '0xaa37dc': {
+                name: 'OP Sepolia', chainIdHex: '0xaa37dc', chainIdDec: 11155420, symbol: 'ETH',
+                rpcs: ['https://optimism-sepolia.drpc.org'],
+                faucet: 'https://faucet.quicknode.com/optimism/sepolia'
+            },
+            '0x515': {
+                name: 'Unichain Sepolia', chainIdHex: '0x515', chainIdDec: 1301, symbol: 'ETH',
+                rpcs: ['https://unichain-sepolia-rpc.publicnode.com'], faucet: ''
+            },
+            '0xdede': {
+                name: 'Sonic Blaze Testnet', chainIdHex: '0xdede', chainIdDec: 57054, symbol: 'S',
+                rpcs: ['https://sonic-blaze-rpc.publicnode.com'], faucet: ''
+            },
+            '0xa869': {
+                name: 'Avalanche Fuji', chainIdHex: '0xa869', chainIdDec: 43113, symbol: 'AVAX',
+                rpcs: ['https://avalanche-fuji-c-chain-rpc.publicnode.com'],
+                faucet: 'https://faucet.avax.network/'
+            },
+            '0x138b': {
+                name: 'Mantle Sepolia', chainIdHex: '0x138b', chainIdDec: 5003, symbol: 'MNT',
+                rpcs: ['https://rpc.sepolia.mantle.xyz'],
+                faucet: 'https://faucet.sepolia.mantle.xyz/'
+            },
+            '0x13fb': {
+                name: 'Citrea Testnet', chainIdHex: '0x13fb', chainIdDec: 5115, symbol: 'cBTC',
+                rpcs: ['https://rpc.testnet.citrea.xyz'], faucet: ''
+            },
+            '0x18233': {
+                name: 'Plume Testnet', chainIdHex: '0x18233', chainIdDec: 98867, symbol: '',
+                rpcs: ['https://testnet-rpc.plume.org'], faucet: ''
+            },
+            '0x940': {
+                name: 'KiteAI Testnet', chainIdHex: '0x940', chainIdDec: 2368, symbol: '',
+                rpcs: ['https://rpc-testnet.gokite.ai'], faucet: ''
+            },
+            '0x350b': {
+                name: 'Intuition Testnet', chainIdHex: '0x350b', chainIdDec: 13579, symbol: '',
+                rpcs: ['https://testnet.rpc.intuition.systems'], faucet: ''
+            },
+            '0xaa39db': {
+                name: 'RISE Testnet', chainIdHex: '0xaa39db', chainIdDec: 11155931, symbol: 'ETH',
+                rpcs: ['https://testnet.riselabs.xyz'], faucet: ''
+            },
+            '0x899': {
+                name: 'Stable Testnet', chainIdHex: '0x899', chainIdDec: 2201, symbol: '',
+                rpcs: ['https://rpc.testnet.stable.xyz'], faucet: ''
+            },
+            '0x7e5': {
+                name: 'Ronin Saigon', chainIdHex: '0x7e5', chainIdDec: 2021, symbol: 'RON',
+                rpcs: ['https://saigon-testnet.roninchain.com/rpc'], faucet: ''
+            },
+            '0xa5bd': {
+                name: 'Tempo Testnet', chainIdHex: '0xa5bd', chainIdDec: 42429, symbol: 'TEMPO',
+                rpcs: ['https://rpc.testnet.tempo.xyz'], faucet: ''
+            },
+            '0xc488': {
+                name: 'Somnia Testnet', chainIdHex: '0xc488', chainIdDec: 50312, symbol: 'SOM',
+                rpcs: ['https://dream-rpc.somnia.network'], faucet: ''
+            },
+            '0x4cef52': {
+                name: 'Arc Testnet', chainIdHex: '0x4cef52', chainIdDec: 5042002, symbol: 'ARC',
+                rpcs: ['https://rpc.testnet.arc.io'], faucet: ''
+            },
+            '0x164ce': {
+                name: 'Giwa Sepolia', chainIdHex: '0x164ce', chainIdDec: 91342, symbol: 'ETH',
+                rpcs: ['https://sepolia-rpc.giwa.io'], faucet: ''
             }
         };
 
@@ -377,6 +529,7 @@
             compiled: null,
             compilePromise: null,
             walletRows: [],
+            rowIndex: new Map(),
             page: 1,
             pageSize: 20,
             deployedFactoryAddress: null
@@ -384,6 +537,12 @@
 
         const el = {
             networkSelect: document.getElementById('networkSelect'),
+            customNetPanel: document.getElementById('customNetPanel'),
+            customNetName: document.getElementById('customNetName'),
+            customNetChainId: document.getElementById('customNetChainId'),
+            customNetRpc: document.getElementById('customNetRpc'),
+            backupRpc: document.getElementById('backupRpc'),
+            faucetLink: document.getElementById('faucetLink'),
             genBtn: document.getElementById('genBtn'),
             checkBtn: document.getElementById('checkBtn'),
             rootAddress: document.getElementById('rootAddress'),
@@ -395,18 +554,24 @@
             tabDragonfly: document.getElementById('tabDragonfly'),
             tabFactory: document.getElementById('tabFactory'),
             tabBinary: document.getElementById('tabBinary'),
+            tabOneToMany: document.getElementById('tabOneToMany'),
             panelDragonfly: document.getElementById('panelDragonfly'),
             panelFactory: document.getElementById('panelFactory'),
             panelBinary: document.getElementById('panelBinary'),
+            panelOneToMany: document.getElementById('panelOneToMany'),
             dfPathCount: document.getElementById('dfPathCount'),
             dfPercent: document.getElementById('dfPercent'),
             fcWalletCount: document.getElementById('fcWalletCount'),
             fcBatchSize: document.getElementById('fcBatchSize'),
             fcDepositPercent: document.getElementById('fcDepositPercent'),
             fcDeployAfter: document.getElementById('fcDeployAfter'),
+            fcDeployThreads: document.getElementById('fcDeployThreads'),
             btRoundCount: document.getElementById('btRoundCount'),
             btSplitPercent: document.getElementById('btSplitPercent'),
             btMaxThreads: document.getElementById('btMaxThreads'),
+            owWalletCount: document.getElementById('owWalletCount'),
+            owAmountEth: document.getElementById('owAmountEth'),
+            owMode: document.getElementById('owMode'),
             fcWarn: document.getElementById('fcWarn'),
             maxPriorityGwei: document.getElementById('maxPriorityGwei'),
             maxFeeGwei: document.getElementById('maxFeeGwei'),
@@ -433,14 +598,123 @@
             el.runStatus.innerHTML = `<span class="${isErr ? 'bad' : 'ok'}">${msg}</span>`;
         }
 
+        function parseChainId(raw) {
+            const v = String(raw || '').trim();
+            if (!v) return { chainIdHex: null, chainIdDec: null };
+            if (/^0x[0-9a-f]+$/i.test(v)) {
+                const dec = Number(BigInt(v));
+                return { chainIdHex: '0x' + dec.toString(16), chainIdDec: dec };
+            }
+            if (/^\d+$/.test(v)) {
+                const dec = Number(v);
+                return { chainIdHex: '0x' + dec.toString(16), chainIdDec: dec };
+            }
+            return { chainIdHex: null, chainIdDec: null };
+        }
+
+        function splitLines(value) {
+            return String(value || '').split('\n').map(s => s.trim()).filter(Boolean);
+        }
+
         function getSelectedNetwork() {
-            return NETWORKS[el.networkSelect.value] || NETWORKS.hoodi;
+            if (el.networkSelect.value === CUSTOM_NET_KEY) {
+                const ids = parseChainId(el.customNetChainId.value);
+                return {
+                    name: (el.customNetName.value || '').trim() || '自定义网络',
+                    chainIdHex: ids.chainIdHex,
+                    chainIdDec: ids.chainIdDec,
+                    symbol: '',
+                    rpcs: splitLines(el.customNetRpc.value),
+                    faucet: '',
+                    isCustom: true
+                };
+            }
+            return NETWORKS[el.networkSelect.value] || NETWORKS[DEFAULT_NET_KEY];
+        }
+
+        // 内置 RPC + 用户填写的备用 RPC，共同构成故障转移候选列表
+        function getRpcList() {
+            const net = getSelectedNetwork();
+            const list = [...(net.rpcs || [])];
+            for (const url of splitLines(el.backupRpc.value)) {
+                if (!list.includes(url)) list.push(url);
+            }
+            return list;
+        }
+
+        function getNetUnit() {
+            return getSelectedNetwork().symbol || '原生代币';
+        }
+
+        function resetProvider() {
+            state.provider = null;
+        }
+
+        // 单个 RPC 直接用 JsonRpcProvider；多个 RPC 用 FallbackProvider（quorum=1）做自动切换
+        function createProvider(rpcList, chainIdDec) {
+            if (!rpcList.length) throw new Error('未配置 RPC 地址');
+            const network = chainIdDec || undefined;
+            if (rpcList.length === 1) return new ethers.JsonRpcProvider(rpcList[0], network);
+
+            const configs = rpcList.map((url, i) => ({
+                provider: new ethers.JsonRpcProvider(url, network),
+                priority: i + 1,
+                weight: 1,
+                stallTimeout: 2500
+            }));
+
+            try {
+                return new ethers.FallbackProvider(configs, network, { quorum: 1 });
+            } catch (e) {
+                log(`多节点聚合不可用，回退单节点: ${e.message || e}`);
+                return new ethers.JsonRpcProvider(rpcList[0], network);
+            }
         }
 
         function getProvider() {
-            const net = getSelectedNetwork();
-            if (!state.provider) state.provider = new ethers.JsonRpcProvider(net.rpc, net.chainIdDec);
+            if (!state.provider) {
+                const net = getSelectedNetwork();
+                state.provider = createProvider(getRpcList(), net.chainIdDec);
+            }
             return state.provider;
+        }
+
+        function updateFaucetLink() {
+            const net = getSelectedNetwork();
+            el.faucetLink.href = net.faucet || '../tool/testnet.html';
+            el.faucetLink.textContent = net.faucet ? '去水龙头' : '测试网速查';
+        }
+
+        function populateNetworkSelect() {
+            const keys = [DEFAULT_NET_KEY, ...Object.keys(NETWORKS).filter(k => k !== DEFAULT_NET_KEY)];
+            el.networkSelect.innerHTML = '';
+            for (const key of keys) {
+                const net = NETWORKS[key];
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.textContent = `${net.name} (ChainId: ${net.chainIdDec} / ${net.chainIdHex})`;
+                el.networkSelect.appendChild(opt);
+            }
+            const custom = document.createElement('option');
+            custom.value = CUSTOM_NET_KEY;
+            custom.textContent = '自定义 RPC（未列出的网络 / 自行指定节点）';
+            el.networkSelect.appendChild(custom);
+            el.networkSelect.value = DEFAULT_NET_KEY;
+        }
+
+        function handleNetworkChange() {
+            const isCustom = el.networkSelect.value === CUSTOM_NET_KEY;
+            el.customNetPanel.style.display = isCustom ? 'block' : 'none';
+            resetProvider();
+            updateFaucetLink();
+            const net = getSelectedNetwork();
+            const rpcs = getRpcList();
+            log(`已切换网络: ${net.name}${net.chainIdHex ? ` (${net.chainIdHex})` : ''}，RPC 节点 ${rpcs.length} 个`);
+            if (state.rootWallet) {
+                state.rootBalanceWei = 0n;
+                el.runBtn.disabled = true;
+                setWalletStatus(`网络已切换为 ${net.name}，请重新点击“已发送并检查余额”`);
+            }
         }
 
         function toWeiByGwei(gweiStr) {
@@ -498,25 +772,38 @@
             return `${addr.slice(0, 8)}...${addr.slice(-6)}`;
         }
 
+        // 大批量生成钱包时避免每行都触发整表重绘（O(n^2) 卡顿）
+        let renderScheduled = false;
+        function scheduleRender() {
+            if (renderScheduled) return;
+            renderScheduled = true;
+            requestAnimationFrame(() => {
+                renderScheduled = false;
+                renderWalletTable();
+            });
+        }
+
         function addWalletRow(strategy, wallet, status, note) {
-            state.walletRows.push({
+            const row = {
                 idx: state.walletRows.length + 1,
                 strategy,
                 address: wallet.address,
                 privateKey: wallet.privateKey,
                 status,
                 note
-            });
-            renderWalletTable();
+            };
+            state.walletRows.push(row);
+            state.rowIndex.set(wallet.address.toLowerCase(), row);
+            scheduleRender();
         }
 
         function updateWalletStatus(address, status, note) {
-            const row = state.walletRows.find(r => r.address.toLowerCase() === address.toLowerCase());
+            const row = state.rowIndex.get(address.toLowerCase());
             if (row) {
                 row.status = status;
                 row.note = note;
             }
-            renderWalletTable();
+            scheduleRender();
         }
 
         function renderWalletTable() {
@@ -603,14 +890,20 @@
             await Promise.all(runners);
         }
 
+        const STRATEGY_VIEWS = [
+            ['dragonfly', el.tabDragonfly, el.panelDragonfly],
+            ['factory', el.tabFactory, el.panelFactory],
+            ['binary', el.tabBinary, el.panelBinary],
+            ['onetoMany', el.tabOneToMany, el.panelOneToMany]
+        ];
+
         function setStrategy(strategy) {
             state.strategy = strategy;
-            el.tabDragonfly.classList.toggle('active', strategy === 'dragonfly');
-            el.tabFactory.classList.toggle('active', strategy === 'factory');
-            el.tabBinary.classList.toggle('active', strategy === 'binary');
-            el.panelDragonfly.style.display = strategy === 'dragonfly' ? 'block' : 'none';
-            el.panelFactory.style.display = strategy === 'factory' ? 'block' : 'none';
-            el.panelBinary.style.display = strategy === 'binary' ? 'block' : 'none';
+            for (const [key, tab, panel] of STRATEGY_VIEWS) {
+                const active = key === strategy;
+                tab.classList.toggle('active', active);
+                panel.style.display = active ? 'block' : 'none';
+            }
         }
 
         function updateFactoryWarning() {
@@ -707,10 +1000,19 @@
                 return { roundCount, splitPct, maxThreads, ...fee };
             }
 
+            if (state.strategy === 'onetoMany') {
+                const walletCount = Number(el.owWalletCount.value);
+                const amountEth = Number(el.owAmountEth.value);
+                const mode = el.owMode.value === 'drain' ? 'drain' : 'fixed';
+                if (!Number.isInteger(walletCount) || walletCount <= 0) throw new Error('分钱包数量必须为正整数');
+                if (!(amountEth > 0)) throw new Error('每个分钱包金额必须大于 0');
+                return { mode, walletCount, amountEth, ...fee };
+            }
+
             const walletCount = Number(el.fcWalletCount.value);
             const batchSize = Number(el.fcBatchSize.value);
             const depositPct = Number(el.fcDepositPercent.value);
-            const deployThreads = Number(document.getElementById('fcDeployThreads').value);
+            const deployThreads = Number(el.fcDeployThreads.value);
             if (!Number.isInteger(walletCount) || walletCount <= 0) throw new Error('生成钱包数量必须为正整数');
             if (!Number.isInteger(batchSize) || batchSize <= 0) throw new Error('每批发送数量必须为正整数');
             if (!(depositPct > 0 && depositPct <= 0.99)) throw new Error('存款百分比必须在 (0, 0.99]');
@@ -727,11 +1029,13 @@
 
         async function sendWithFee(wallet, txReq) {
             const fee = await getAdaptiveFeeOverrides();
+            // gasLimit 统一按普通转账上限兜底，调用方可自行覆盖
+            const base = { gasLimit: PLAIN_SEND_GAS_LIMIT, ...txReq };
             try {
-                return await wallet.sendTransaction({ ...txReq, ...fee });
+                return await wallet.sendTransaction({ ...base, ...fee });
             } catch (e) {
                 const gasPrice = fee.maxFeePerGas;
-                return await wallet.sendTransaction({ ...txReq, gasPrice });
+                return await wallet.sendTransaction({ ...base, gasPrice });
             }
         }
 
@@ -897,6 +1201,27 @@ contract ETHTransferFactory {
             }
             await instance.deploymentTransaction().wait();
             return new ethers.Contract(instance.target, compiled.factoryAbi, fromWallet);
+        }
+
+        async function deployContractsForAll(wallets, threads, label) {
+            if (!wallets.length) return;
+            log(`开始执行「${label}」，并发线程: ${threads}`);
+            let done = 0;
+            await runWithConcurrency(wallets, threads, async (w) => {
+                if (state.stopFlag) return;
+                try {
+                    const fixedAddr = await deployFixedContract(w);
+                    updateWalletStatus(w.address, '已部署', `合约: ${shortAddr(fixedAddr)}`);
+                } catch (e) {
+                    updateWalletStatus(w.address, '部署失败', e.message || 'unknown');
+                } finally {
+                    done += 1;
+                    if (done % 20 === 0 || done === wallets.length) {
+                        log(`部署进度: ${done}/${wallets.length}`);
+                    }
+                }
+            });
+            log(`「${label}」完成。`);
         }
 
         async function runDragonfly(params) {
@@ -1084,26 +1409,146 @@ contract ETHTransferFactory {
             }
 
             if (params.deployAfter) {
-                log(`开始执行“分发后部署固定合约”，并发线程: ${params.deployThreads}`);
-                let done = 0;
-                await runWithConcurrency(wallets, params.deployThreads, async (w) => {
-                    if (state.stopFlag) return;
-                    try {
-                        const fixedAddr = await deployFixedContract(w);
-                        updateWalletStatus(w.address, '已部署', `合约: ${shortAddr(fixedAddr)}`);
-                    } catch (e) {
-                        updateWalletStatus(w.address, '部署失败', e.message || 'unknown');
-                    } finally {
-                        done += 1;
-                        if (done % 20 === 0 || done === wallets.length) {
-                            log(`部署进度: ${done}/${wallets.length}`);
-                        }
-                    }
-                });
-                log('分发后部署流程完成。');
+                await deployContractsForAll(wallets, params.deployThreads, '分发后部署固定合约');
             }
 
             log('工厂分发策略执行完成。');
+        }
+
+        // 等待一批同账户交易上链：同账户 nonce 递增，最后一笔确认即代表前面的都已上链
+        async function confirmBurst(sent) {
+            if (!sent.length) return { ok: 0, failed: 0 };
+            const last = sent[sent.length - 1];
+            log(`等待最后一笔 (nonce ${last.tx.nonce}) 上链确认...`);
+            try {
+                await last.tx.wait(1, 300000);
+            } catch (e) {
+                log(`最后一笔等待超时或异常: ${e.message || e}`);
+            }
+
+            log(`逐笔核对 ${sent.length} 笔回执...`);
+            let ok = 0, failed = 0, done = 0;
+            await runWithConcurrency(sent, 20, async (item) => {
+                let success = false;
+                try {
+                    const rc = await getProvider().getTransactionReceipt(item.tx.hash);
+                    success = !!rc && Number(rc.status) === 1;
+                } catch (_) {
+                    success = false;
+                }
+
+                if (success) {
+                    ok += 1;
+                    updateWalletStatus(item.wallet.address, '已收款', '已上链确认');
+                } else {
+                    failed += 1;
+                    updateWalletStatus(item.wallet.address, '确认失败', '未上链或回执异常');
+                }
+                done += 1;
+                if (done % 50 === 0 || done === sent.length) log(`回执核对: ${done}/${sent.length}`);
+            });
+            return { ok, failed };
+        }
+
+        // 一夫当关：1:N 普通转账。单线程顺序发送 + 自增 nonce，发完不逐笔等确认，最后统一等上链。
+        async function runOneToMany(params) {
+            const modeLabel = params.mode === 'drain' ? '边生成边发送（直到金额耗尽）' : '先生成后发送';
+            log(`开始执行【一夫当关】策略（1:N 普通转账，单线程顺序发送，模式：${modeLabel}）`);
+
+            const provider = getProvider();
+            const root = state.rootWallet.connect(provider);
+            const amountWei = ethers.parseEther(String(params.amountEth));
+            if (amountWei <= 0n) throw new Error('每个分钱包金额必须大于 0');
+
+            // 手续费整轮取一次快照并复用，避免逐笔取价造成 nonce 与费率错配
+            const fee = await getAdaptiveFeeOverrides();
+            const perGas = fee.maxFeePerGas || fee.gasPrice || 0n;
+            const feeFields = fee.maxFeePerGas
+                ? { maxFeePerGas: fee.maxFeePerGas, maxPriorityFeePerGas: fee.maxPriorityFeePerGas }
+                : { gasPrice: fee.gasPrice };
+
+            const gasLimit = PLAIN_SEND_GAS_LIMIT;
+            // 预留按实际消耗的 21000 gas × maxFeePerGas 计算（硬上界），而非按 gasLimit 上限
+            const gasCost = perGas * PLAIN_SEND_GAS_UNITS;
+            const perSendCost = amountWei + gasCost;
+
+            const generated = [];
+            let planned;
+
+            if (params.mode === 'fixed') {
+                planned = params.walletCount;
+                const bal = await provider.getBalance(root.address);
+                const need = perSendCost * BigInt(planned);
+                if (bal < need) {
+                    throw new Error(`余额不足：${planned} 笔共需约 ${formatEth(need)}（金额 ${formatEth(amountWei)} + 预留 Gas ${formatEth(gasCost)}/笔），当前 ${formatEth(bal)}。请先领水或减少数量。`);
+                }
+                log(`先生成 ${planned} 个分钱包...`);
+                for (let i = 0; i < planned; i++) {
+                    const w = ethers.Wallet.createRandom().connect(provider);
+                    generated.push(w);
+                    addWalletRow('一夫当关', w, '已生成', '待分发');
+                }
+                renderWalletTable();
+            } else {
+                const startBal = await provider.getBalance(root.address);
+                if (startBal < perSendCost) {
+                    throw new Error(`余额不足以完成至少一笔分发：单笔需约 ${formatEth(perSendCost)}（金额 ${formatEth(amountWei)} + 预留 Gas ${formatEth(gasCost)}），当前 ${formatEth(startBal)}`);
+                }
+                planned = Number(startBal / perSendCost);
+                if (planned > params.walletCount) planned = params.walletCount;
+                log(`初始余额 ${formatEth(startBal)}，单笔预留 ${formatEth(perSendCost)}（金额 ${formatEth(amountWei)} + Gas ${formatEth(gasCost)}，即 21000 × ${perGas} wei 硬上界），数量上限 ${params.walletCount} → 本次预计分发 ${planned} 个`);
+            }
+
+            // ---- 单线程顺序发送：显式自增 nonce，发完不等确认 ----
+            let nonce = await provider.getTransactionCount(root.address, 'pending');
+            log(`起始 nonce = ${nonce}，开始顺序发送 ${planned} 笔...`);
+
+            const sent = [];
+            for (let i = 0; i < planned; i++) {
+                if (state.stopFlag) break;
+
+                let w;
+                if (params.mode === 'fixed') {
+                    w = generated[i];
+                } else {
+                    w = ethers.Wallet.createRandom().connect(provider);
+                    generated.push(w);
+                    addWalletRow('一夫当关', w, '已生成', '边生成边发送');
+                }
+
+                try {
+                    const tx = await root.sendTransaction({
+                        to: w.address,
+                        value: amountWei,
+                        nonce,
+                        gasLimit,
+                        ...feeFields
+                    });
+                    nonce += 1;
+                    sent.push({ wallet: w, tx });
+                    updateWalletStatus(w.address, '已发送', `nonce ${tx.nonce} 待确认`);
+                    if (sent.length % 10 === 0) log(`已发出 ${sent.length}/${planned} 笔，当前 nonce ${nonce}`);
+                } catch (e) {
+                    updateWalletStatus(w.address, '发送失败', e.message || 'send failed');
+                    log(`第 ${i + 1} 笔发送失败: ${e.message || e}`);
+                    // 失败可能发生在已广播之后，重新同步一次 pending nonce 避免后续撞号
+                    try {
+                        nonce = await provider.getTransactionCount(root.address, 'pending');
+                    } catch (_) {}
+                }
+            }
+
+            log(`发送阶段结束，共发出 ${sent.length} 笔。`);
+
+            // ---- 最后统一等待链上确认 ----
+            const { ok, failed } = await confirmBurst(sent);
+            renderWalletTable();
+
+            let endBalText = '—';
+            try {
+                endBalText = formatEth(await provider.getBalance(root.address));
+            } catch (_) {}
+            log(`一夫当关执行完成：成功 ${ok} 笔，失败 ${failed} 笔，主钱包剩余 ${endBalText}。`);
         }
 
         async function runStrategy() {
@@ -1129,10 +1574,13 @@ contract ETHTransferFactory {
                     await runDragonfly(params);
                 } else if (state.strategy === 'binary') {
                     await runBinaryTree(params);
+                } else if (state.strategy === 'onetoMany') {
+                    await runOneToMany(params);
                 } else {
                     await runFactory(params);
                 }
                 setRunStatus('执行完成');
+                renderWalletTable();
             } catch (e) {
                 setRunStatus(`执行失败: ${e.message || e}`, true);
                 log(`错误: ${e.message || e}`);
@@ -1148,16 +1596,18 @@ contract ETHTransferFactory {
             const bal = await getProvider().getBalance(state.rootWallet.address);
             state.rootBalanceWei = bal;
             const eth = formatEth(bal);
-            setWalletStatus(`当前余额: ${eth} ETH`, bal <= 0n);
-            log(`余额检查: ${state.rootWallet.address} = ${eth} ETH`);
+            const unit = getNetUnit();
+            setWalletStatus(`当前余额: ${eth} ${unit}`, bal <= 0n);
+            log(`余额检查: ${state.rootWallet.address} = ${eth} ${unit}`);
             el.runBtn.disabled = bal <= 0n;
         }
 
         function generateRootWallet() {
-            state.provider = null;
+            resetProvider();
             state.rootWallet = ethers.Wallet.createRandom();
             state.rootBalanceWei = 0n;
             state.walletRows = [];
+            state.rowIndex = new Map();
             state.page = 1;
             state.deployedFactoryAddress = null;
 
@@ -1191,6 +1641,21 @@ contract ETHTransferFactory {
         el.tabDragonfly.onclick = () => setStrategy('dragonfly');
         el.tabFactory.onclick = () => setStrategy('factory');
         el.tabBinary.onclick = () => setStrategy('binary');
+        el.tabOneToMany.onclick = () => setStrategy('onetoMany');
+        el.networkSelect.onchange = handleNetworkChange;
+        el.customNetChainId.addEventListener('change', () => {
+            resetProvider();
+            log('自定义 ChainId 已更新，RPC 连接已重置。');
+        });
+        el.customNetRpc.addEventListener('change', () => {
+            resetProvider();
+            log(`自定义 RPC 已更新，当前候选节点 ${getRpcList().length} 个。`);
+        });
+        el.backupRpc.addEventListener('change', () => {
+            resetProvider();
+            const list = getRpcList();
+            log(`备用 RPC 已更新，当前候选节点 ${list.length} 个。`);
+        });
         el.prevPageBtn.onclick = () => {
             if (state.page > 1) state.page--;
             renderWalletTable();
@@ -1204,9 +1669,11 @@ contract ETHTransferFactory {
         el.downloadTxtBtn.onclick = exportTxt;
         el.fcWalletCount.addEventListener('input', updateFactoryWarning);
 
+        populateNetworkSelect();
+        handleNetworkChange();
         renderWalletTable();
         updateFactoryWarning();
-        log('DeployBot 已加载。默认网络: Hoodi');
+        log(`DeployBot 已加载。内置 ${Object.keys(NETWORKS).length} 个测试网，默认网络: ${NETWORKS[DEFAULT_NET_KEY].name}`);
     </script>
 </body>
 </html>

@@ -18,6 +18,13 @@
       --mint: #71d9c4;
       --lavender: #b59cff;
       --card-bg: rgba(255,255,255,0.86);
+      --sep-a: #7fb3ff;
+      --sep-b: #5b8ff9;
+      --hoodi-a: #71d9c4;
+      --hoodi-b: #3fb3a1;
+      --lts-sep: #8b7cf6;
+      --lts-hoodi: #3fb3a1;
+      --now: #e8536d;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -42,7 +49,7 @@
       border-radius: 26px;
       box-shadow: 0 16px 40px rgba(131,152,206,0.2);
       padding: 24px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
     .hero h1 {
       font-size: 28px;
@@ -57,11 +64,421 @@
       color: transparent;
     }
     .hero p { margin: 6px 0 0; color: var(--sub); font-size: 14px; }
+    .hero-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    /* 北京时间（固定 Asia/Shanghai，不随本机时区变化） */
+    .hero-clock {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      background: rgba(255,255,255,.72);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 16px;
+    }
+    .hc-label { font-size: 11.5px; font-weight: 800; color: var(--sub); letter-spacing: .3px; }
+    .hc-time {
+      font-size: 23px;
+      font-weight: 900;
+      color: #2d3f69;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: .5px;
+      line-height: 1;
+    }
+    .hc-date { font-size: 12px; font-weight: 700; color: var(--sub); }
 
+    /* ---------- ETH 中央舞台 ---------- */
+    .eth-stage { margin-bottom: 26px; }
+    .stage-note {
+      text-align: center;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--sub);
+      margin-bottom: 14px;
+      line-height: 1.6;
+    }
+    .stage-note b { color: #2d3f69; }
+    .stage-note .hot {
+      color: #8a5a00;
+      background: linear-gradient(90deg, #ffe9b8, #ffd98a);
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-weight: 800;
+    }
+
+    /* 三条长条：整行铺开，把时间轴拉到最宽 */
+    .eth-rows { display: flex; flex-direction: column; gap: 14px; }
+    .eth-row {
+      position: relative;
+      border-radius: 22px;
+      padding: 18px 24px 16px 30px;
+      border: 1px solid #dfe9ff;
+      box-shadow: 0 12px 28px rgba(128,153,212,0.16);
+      transition: transform .2s ease, box-shadow .2s ease;
+      overflow: hidden;
+      background: #fff;
+    }
+    .eth-row:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(128,153,212,0.22); }
+    .eth-row::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 6px;
+    }
+    .eth-row.sep { background: linear-gradient(120deg, #eaf3ff, #f8fbff 58%); }
+    .eth-row.sep::before { background: linear-gradient(180deg, var(--sep-a), var(--sep-b)); }
+    .eth-row.hoodi { background: linear-gradient(120deg, #e9faf6, #f6fffd 58%); }
+    .eth-row.hoodi::before { background: linear-gradient(180deg, var(--hoodi-a), var(--hoodi-b)); }
+    .eth-row.primary {
+      border: 1.5px solid #ffc46b;
+      box-shadow: 0 14px 32px rgba(255,180,100,0.26), inset 0 0 0 1px rgba(255,208,138,.35);
+    }
+    .eth-row.primary:hover { box-shadow: 0 18px 38px rgba(255,180,100,0.34); }
+
+    .er-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .er-id { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .er-names { min-width: 0; }
+    .er-span { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    .er-tags { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .er-tags .lts-tag { margin-top: 0; }
+    .er-tags .eth-endnote { margin-top: 0; margin-left: 0; }
+
+    .er-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .er-status { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .er-status .st {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #2d3f69;
+    }
+    .er-links { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .er-links .eth-detail { margin-top: 0; width: auto; padding: 7px 14px; }
+
+    .eth-badge {
+      position: absolute;
+      top: 18px; right: 18px;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 5px 12px;
+      border-radius: 999px;
+      letter-spacing: .3px;
+      white-space: nowrap;
+    }
+    /* 长条里徽章改为跟随标题的行内样式 */
+    .eth-row .eth-badge {
+      position: static;
+      margin-left: 8px;
+      vertical-align: middle;
+      font-size: 10.5px;
+      padding: 3px 10px;
+    }
+    .badge-primary {
+      color: #8a5a00;
+      background: linear-gradient(90deg, #ffe6ab, #ffd073);
+      box-shadow: 0 4px 12px rgba(255,180,80,.38);
+    }
+    .badge-next { color: #0d6e5b; background: #c9f2e7; }
+    .badge-off { color: #6d7ca6; background: #e8ecf5; }
+    .badge-future { color: #6a4fc9; background: #e6ddff; }
+
+    /* 下一代测试网长条：与其他两条同级，用虚线边框区分「预测」 */
+    .eth-row.future {
+      background: linear-gradient(120deg, #f4f0ff, #fbf9ff 58%);
+      border: 1.5px dashed #c9b6ff;
+    }
+    .eth-row.future::before { background: linear-gradient(180deg, #b59cff, #8b7cf6); }
+    .future .eth-icon { background: linear-gradient(135deg, #b59cff, #8b7cf6); box-shadow: 0 8px 18px rgba(139,124,246,.30); }
+    .future .eth-span .years { color: #6a4fc9; }
+    .future .lts-tag { color: #6a4fc9; background: rgba(139,124,246,.14); }
+    .tl-bar.unknown { background: repeating-linear-gradient(45deg, #f2eeff, #f2eeff 6px, #e7e0fb 6px, #e7e0fb 12px); }
+    .tl-open {
+      position: absolute;
+      top: -6px; bottom: -6px;
+      width: 3px;
+      border-radius: 2px;
+      background: #37c98b;
+      transform: translateX(-50%);
+      z-index: 3;
+    }
+    .tl-open::after {
+      content: '';
+      position: absolute;
+      top: -4px; left: 50%;
+      transform: translateX(-50%);
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #37c98b;
+      animation: openPulse 2s ease-in-out infinite;
+    }
+    @keyframes openPulse {
+      0%,100% { box-shadow: 0 0 0 4px rgba(55,201,139,.20); }
+      50%     { box-shadow: 0 0 0 8px rgba(55,201,139,.06); }
+    }
+    .tl-q {
+      position: absolute;
+      right: 7px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      font-weight: 900;
+      color: #8b7cf6;
+    }
+    .status-plan { background: #b59cff; animation: dotBlinkViolet 1.8s ease-in-out infinite; }
+    @keyframes dotBlinkViolet {
+      0%,100% { box-shadow: 0 0 0 3px rgba(181,156,255,.22); }
+      50%     { box-shadow: 0 0 0 6px rgba(181,156,255,.06); }
+    }
+    .er-note {
+      margin-top: 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      line-height: 1.7;
+      color: #6a5a9a;
+      background: rgba(240,236,255,.75);
+      border-left: 3px solid #b59cff;
+      border-radius: 0 10px 10px 0;
+      padding: 8px 12px;
+    }
+    .er-note b { color: #4a3d80; }
+
+    .eth-icon {
+      width: 42px; height: 42px;
+      border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; color: #fff;
+      flex: none;
+    }
+    .sep .eth-icon { background: linear-gradient(135deg, var(--sep-a), var(--sep-b)); box-shadow: 0 8px 18px rgba(91,143,249,.32); }
+    .hoodi .eth-icon { background: linear-gradient(135deg, var(--hoodi-a), var(--hoodi-b)); box-shadow: 0 8px 18px rgba(63,179,161,.30); }
+    .eth-name { font-size: 20px; font-weight: 900; color: #2d3f69; line-height: 1.15; }
+    .eth-tag { font-size: 10.5px; color: var(--sub); font-weight: 600; margin-top: 3px; line-height: 1.45; }
+
+    .eth-span {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 0;
+    }
+    .eth-span .years {
+      font-size: 31px;
+      font-weight: 900;
+      letter-spacing: .5px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    .sep .eth-span .years { color: #3f6fd8; }
+    .hoodi .eth-span .years { color: #2c8f7d; }
+    .eth-span .years .arrow { color: #a9b8dd; margin: 0 8px; font-weight: 700; }
+    .eth-span .unit { font-size: 11px; font-weight: 700; color: var(--sub); }
+    .lts-tag {
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-top: 8px;
+    }
+    .sep .lts-tag { color: #5b48c9; background: rgba(139,124,246,.14); }
+    .hoodi .lts-tag { color: #0d6e5b; background: rgba(63,179,161,.14); }
+    .eth-endnote {
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #a8563a;
+      background: rgba(255,226,200,.6);
+      border-radius: 999px;
+      padding: 3px 10px;
+      margin-top: 8px;
+      margin-left: 6px;
+    }
+
+    /* ---------- 时间轴（长条里拉满整行宽度） ---------- */
+    .tl { margin: 10px 0 2px; padding-top: 28px; }
+    .tl-bar {
+      position: relative;
+      height: 18px;
+      border-radius: 999px;
+      background: #eef3ff;
+    }
+    .tl-normal {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      border-radius: 999px 0 0 999px;
+    }
+    .sep .tl-normal { background: linear-gradient(90deg, #b7d3ff, var(--sep-b)); }
+    .hoodi .tl-normal { background: linear-gradient(90deg, #b6ecdf, var(--hoodi-b)); }
+    .tl-lts {
+      position: absolute;
+      top: 0; bottom: 0;
+      border-radius: 0 999px 999px 0;
+    }
+    .sep .tl-lts { background: repeating-linear-gradient(45deg, var(--lts-sep), var(--lts-sep) 6px, #b3a5ff 6px, #b3a5ff 12px); }
+    .hoodi .tl-lts { background: repeating-linear-gradient(45deg, #2f9c8b, #2f9c8b 6px, #59c4b0 6px, #59c4b0 12px); }
+    .tl-lts-mark {
+      position: absolute;
+      top: -5px; bottom: -5px;
+      width: 0;
+      border-left: 2px dashed rgba(139,124,246,.6);
+    }
+    .hoodi .tl-lts-mark { border-left-color: rgba(63,179,161,.6); }
+    .tl-cursor {
+      position: absolute;
+      top: -6px; bottom: -6px;
+      width: 3px;
+      border-radius: 2px;
+      background: var(--now);
+      transform: translateX(-50%);
+      z-index: 3;
+    }
+    .tl-cursor::after {
+      content: '';
+      position: absolute;
+      top: -4px; left: 50%;
+      transform: translateX(-50%);
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--now);
+      animation: cursorPulse 2s ease-in-out infinite;
+    }
+    @keyframes cursorPulse {
+      0%,100% { box-shadow: 0 0 0 4px rgba(232,83,109,.20); }
+      50%     { box-shadow: 0 0 0 8px rgba(232,83,109,.06); }
+    }
+    .tl-now {
+      position: absolute;
+      top: -30px;
+      transform: translateX(-50%);
+      font-size: 10px;
+      font-weight: 800;
+      color: #fff;
+      background: var(--now);
+      padding: 2px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      z-index: 4;
+    }
+    .tl-now::after {
+      content: '';
+      position: absolute;
+      bottom: -3px; left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 6px; height: 6px;
+      background: var(--now);
+    }
+    .tl-scale {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      margin-top: 9px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--sub);
+    }
+    .tl-scale-lts {
+      position: absolute;
+      top: 0;
+      transform: translateX(-50%);
+      font-size: 10.5px;
+      font-weight: 800;
+      color: var(--lts-sep);
+    }
+    .hoodi .tl-scale-lts { color: #2c8f7d; }
+
+    /* ---------- 状态 / 剩余 ---------- */
+    .status-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+    .status-run { background: #37c98b; animation: dotBlink 1.8s ease-in-out infinite; }
+    .status-lts { background: var(--lts-sep); }
+    .status-off { background: #a0a8bd; }
+    @keyframes dotBlink {
+      0%,100% { box-shadow: 0 0 0 3px rgba(55,201,139,.20); }
+      50%     { box-shadow: 0 0 0 6px rgba(55,201,139,.05); }
+    }
+    .eth-remain { font-size: 12px; color: var(--sub); font-weight: 600; }
+    .eth-remain b { color: #2d3f69; font-weight: 900; font-variant-numeric: tabular-nums; }
+
+    /* ---------- 快捷入口 ---------- */
+    .eth-links a {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.8);
+      border: 1px solid #e0eaff;
+      color: #5271c4;
+      text-decoration: none;
+      transition: .15s ease;
+    }
+    .eth-links a:hover { border-color: #cddcff; transform: translateY(-1px); box-shadow: 0 5px 12px rgba(131,152,206,.18); }
+    .eth-detail {
+      margin-top: 14px;
+      width: 100%;
+      font-size: 12.5px;
+      font-weight: 800;
+      padding: 9px 14px;
+      border-radius: 12px;
+      border: 1px dashed #cddcff;
+      background: rgba(255,255,255,.55);
+      color: #5271c4;
+      cursor: pointer;
+      transition: .15s ease;
+    }
+    .eth-detail:hover { background: #fff; border-style: solid; }
+
+    .handoff {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--sub);
+      background: rgba(255,255,255,.62);
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+      padding: 11px 16px;
+      line-height: 1.7;
+    }
+    .handoff b { color: #2d3f69; }
+
+    /* ---------- 其他网络 grid ---------- */
     .grid {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
       gap: 16px;
+    }
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 6px 0 14px;
+      font-size: 14px;
+      font-weight: 900;
+      color: #354977;
+      letter-spacing: .3px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--line), transparent);
     }
 
     .card {
@@ -144,14 +561,103 @@
       font-weight: 700;
       background: rgba(49,64,105,0.1);
     }
+    .l1-pill {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(121,181,255,.20);
+      color: #3f6fd8;
+      vertical-align: middle;
+      letter-spacing: .2px;
+    }
+    .l1-tag {
+      display: inline-block;
+      font-style: normal;
+      font-size: 9px;
+      font-weight: 800;
+      margin-left: 5px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(121,181,255,.18);
+      color: #3f6fd8;
+    }
+    .card-note {
+      margin-top: 12px;
+      font-size: 11.5px;
+      font-weight: 600;
+      line-height: 1.65;
+      padding: 8px 11px;
+      border-radius: 0 10px 10px 0;
+      border-left: 3px solid #ffc46b;
+      background: rgba(255,242,214,.55);
+      color: #7a6034;
+    }
+    .card-note b { color: #5a4620; }
+    .card-note.info {
+      border-left-color: #79b5ff;
+      background: rgba(228,241,255,.62);
+      color: #45628f;
+    }
+    .card-note.info b { color: #2d4a75; }
     .net-list .net-item:hover {
       transform: translateY(-2px);
       border-color: #cddcff;
       box-shadow: 0 6px 14px rgba(131,152,206,0.2);
     }
 
+    /* ---------- 图例卡 ---------- */
+    .card.legend .lg-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 12px;
+      color: var(--sub);
+      font-weight: 600;
+      padding: 5px 0;
+      line-height: 1.4;
+    }
+    .lg-swatch { width: 26px; height: 11px; border-radius: 999px; flex: none; }
+    .card.life .life-row {
+      font-size: 11px;
+      color: var(--sub);
+      font-weight: 600;
+      line-height: 1.7;
+      padding: 4px 0;
+    }
+    .card.life .life-row b { color: #354977; }
+    .card.life .life-ref {
+      margin-top: 10px;
+      padding-top: 9px;
+      border-top: 1px dashed #e2e9fb;
+      font-size: 10.5px;
+      font-weight: 600;
+      line-height: 1.6;
+      color: #9aa0bd;
+    }
+    .card.life .life-ref a { color: #5271c4; text-decoration: none; font-weight: 700; }
+    .card.life .life-ref a:hover { text-decoration: underline; }
+    .lg-cursor { width: 3px; height: 14px; border-radius: 2px; background: var(--now); position: relative; margin: 0 11px; }
+    .lg-cursor::after {
+      content: '';
+      position: absolute;
+      top: -2px; left: 50%;
+      transform: translateX(-50%);
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--now);
+    }
+
     @media (max-width: 900px) {
       .card { grid-column: span 12; }
+      .eth-row { padding: 16px 16px 14px 22px; }
+      .er-top { gap: 12px; }
+      .er-span { align-items: flex-start; }
+      .er-tags { justify-content: flex-start; }
+      .eth-span .years { font-size: 26px; }
+      .hc-time { font-size: 19px; }
+      .er-bottom { flex-direction: column; align-items: flex-start; }
     }
 
     /* ---- Modal ---- */
@@ -258,28 +764,31 @@
     .modal::-webkit-scrollbar { width: 5px; }
     .modal::-webkit-scrollbar-track { background: transparent; }
     .modal::-webkit-scrollbar-thumb { background: #d0dcf0; border-radius: 4px; }
-
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 10px;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--sub);
-      text-decoration: none;
-      transition: 0.15s;
-    }
-    .back-link:hover { color: var(--text); }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header class="hero">
-      <h1>🔬 <span class="accent">Testnet Info</span></h1>
-      <p>多链测试网络信息速查 · 点击任一网络查看详情</p>
+      <div class="hero-top">
+        <h1>🔬 <span class="accent">Testnet Info</span></h1>
+        <div class="hero-clock">
+          <span class="hc-label">北京时间</span>
+          <span class="hc-time" id="clockTime">--:--:--</span>
+          <span class="hc-date" id="clockDate">加载中…</span>
+        </div>
+      </div>
+      <p>以太坊测试网时间线 · 多链测试网络速查 · 点击任一网络查看详情</p>
     </header>
 
+    <!-- ETH 中央舞台：三条长条时间线 -->
+    <section class="eth-stage">
+      <div class="stage-note" id="stageNote"></div>
+      <div class="eth-rows" id="ethRows"></div>
+      <div class="handoff" id="handoff"></div>
+    </section>
+
+    <!-- 其他测试网 -->
+    <div class="section-title">🌐 其他测试网络速查</div>
     <main class="grid" id="app"></main>
   </div>
 
@@ -294,10 +803,54 @@
   </div>
 
 <script>
+/* ===================== ETH 测试网时间线数据 ===================== */
+const ETH_NETS = [
+  {
+    name: 'Sepolia', icon: '◆', cls: 'sep',
+    start: '2021-01-01', ltsStart: '2027-01-01', end: '2027-09-30',
+    endNote: '预计 2027-09-30 关闭（预测）',
+    tag: 'Ethereum 主力测试网 · Chain ID 11155111',
+    links: [
+      ['PoW Faucet', 'https://sepolia-faucet.pk910.de/'],
+      ['Alchemy 水龙头', 'https://www.alchemy.com/faucets/ethereum-sepolia'],
+      ['Etherscan', 'https://sepolia.etherscan.io'],
+      ['官网', 'https://sepolia.dev/']
+    ]
+  },
+  {
+    name: 'Hoodi', icon: '✦', cls: 'hoodi',
+    start: '2025-01-01', ltsStart: '2030-01-01', end: '2030-12-31',
+    tag: 'Ethereum 下一代测试网 · Chain ID 17000',
+    links: [
+      ['PoW Faucet', 'https://hoodi-faucet.pk910.de/'],
+      ['Etherscan', 'https://hoodi.etherscan.io/'],
+      ['Beaconcha.in', 'https://hoodi.beaconcha.in/'],
+      ['官网', 'https://hoodi.dev/']
+    ]
+  }
+];
+
+/* 下一代以太坊测试网（时间预测，非官方公告） */
+const FUTURE_NET = {
+  name: '下一代以太坊测试网',
+  openLabel: '2027 年 3 — 4 月',
+  closeLabel: '2027-09-30',
+  gap: '约 6 个月迁移窗口',
+  reason: 'Sepolia 预计 2027-09-30 关闭。以太坊基金会通常会在旧网停运前数月上线新测试网，给开发者留出迁移与验证的时间，因此新网预计在 2027 年 3 — 4 月开启。',
+  disclaimer: '新网名称与规格尚未公布，此处仅为基于历史节奏的时间预测，请以以太坊基金会官方公告为准。'
+};
+
+/* ===================== 多链测试网数据 ===================== */
 const NETWORKS = [
   {
     category: 'BTC', icon: '₿', cn: '比特币',
     items: [
+      { name: 'Signet', max: '0.0001', data: [
+        ['官网', '<a href="https://bitcoinops.org/en/topics/signet/" target="_blank">bitcoinops.org</a> (BIP 325)'],
+        ['浏览器', '<a href="https://mempool.space/signet" target="_blank">mempool.space</a> &middot; <a href="https://explorer.bc-2.jp/" target="_blank">explorer.bc-2.jp</a>'],
+        ['水龙头', '<a href="https://bitcoinsignetfaucet.com/" target="_blank">bitcoinsignetfaucet.com</a> &middot; <a href="https://signetfaucet.com/" target="_blank">signetfaucet.com</a>'],
+        ['领取量', '1,000 ~ 10,000 sats / 次（每 IP/地址 24h 最多 5 次）'],
+      ]},
       { name: 'testnet3', max: '0.01', data: [
         ['官网', '<a href="https://bitcoincore.org/" target="_blank">bitcoincore.org</a>'],
         ['浏览器', '<a href="https://blockstream.info/testnet/" target="_blank">blockstream.info</a> &middot; <a href="https://mempool.space/testnet" target="_blank">mempool.space</a>'],
@@ -320,12 +873,17 @@ const NETWORKS = [
         ['浏览器', '<a href="https://sepolia.etherscan.io" target="_blank">etherscan.io</a> &middot; <a href="https://eth-sepolia.blockscout.com/" target="_blank">blockscout</a>'],
         ['水龙头', '<a href="https://sepolia-faucet.pk910.de/" target="_blank">PoW Faucet</a> (32) &middot; <a href="https://www.alchemy.com/faucets/ethereum-sepolia" target="_blank">Alchemy</a> (0.1)'],
         ['领取量', '0.1 ~ 32 ETH / 次'],
+        ['运行时间', '2021 — 2027 · 第 2027 年为延长 LTS 年'],
+        ['关闭时间', '预计 <b>2027-09-30</b>（预测）'],
+        ['Chain ID', '11155111'],
       ]},
       { name: 'Hoodi', max: '33', data: [
         ['官网', '<a href="https://hoodi.dev/" target="_blank">hoodi.dev</a>'],
         ['浏览器', '<a href="https://hoodi.etherscan.io/" target="_blank">etherscan.io</a> &middot; <a href="https://eth-hoodi.blockscout.com/" target="_blank">blockscout</a> &middot; <a href="https://hoodi.beaconcha.in/" target="_blank">beaconcha.in</a>'],
         ['水龙头', '<a href="https://hoodi-faucet.pk910.de/" target="_blank">PoW Faucet</a> (33)'],
         ['领取量', '0.1 ~ 33 ETH / 次'],
+        ['运行时间', '2025 — 2030 · 第 2030 年为延长 LTS 年'],
+        ['Chain ID', '17000'],
       ]},
     ]
   },
@@ -366,9 +924,9 @@ const NETWORKS = [
     ]
   },
   {
-    category: 'Polygon', icon: '◆', cn: '印度侧链',
+    category: '其他侧链', icon: '◈', cn: 'Other Sidechains',
     items: [
-      { name: 'Amoy', max: '1', data: [
+      { name: 'Polygon Amoy', max: '1', data: [
         ['官网', '<a href="https://polygon.technology/" target="_blank">polygon.technology</a>'],
         ['浏览器', '<a href="https://amoy.polygonscan.com/" target="_blank">amoy.polygonscan.com</a>'],
         ['水龙头', '<a href="https://faucet.polygon.technology/" target="_blank">faucet.polygon.technology</a> &middot; <a href="https://www.alchemy.com/faucets/polygon-amoy" target="_blank">Alchemy</a> (0.1)'],
@@ -376,11 +934,6 @@ const NETWORKS = [
         ['Chain ID', '80002'],
         ['RPC', '<a href="https://polygon-amoy.drpc.org" target="_blank">polygon-amoy.drpc.org</a>'],
       ]},
-    ]
-  },
-  {
-    category: 'ARC', icon: '◈', cn: '网弧',
-    items: [
       { name: 'ARC Testnet', max: '20', data: [
         ['官网', '<a href="https://www.arc.io/" target="_blank">arc.io</a>'],
         ['浏览器', '<a href="https://testnet.arcscan.app/" target="_blank">testnet.arcscan.app</a>'],
@@ -393,6 +946,8 @@ const NETWORKS = [
   },
   {
     category: 'CEX Testnets', icon: '◆', cn: '交易所',
+    noteType: 'warn',
+    note: '⚠ 其中 <b>Base Sepolia</b> 与 <b>GIWA</b> 以 Ethereum Sepolia 作为 L1，Sepolia 关闭（预测 2027-09-30）后这两个测试网也将同步停止。',
     items: [
       { name: 'BSC Testnet', max: '0.3', exchange: '币安', data: [
         ['官网', '<a href="https://www.bnbchain.org/" target="_blank">bnbchain.org</a> <span class="ex-tag">币安</span>'],
@@ -426,7 +981,7 @@ const NETWORKS = [
         ['RPC', '<a href="https://testrpc.xlayer.tech" target="_blank">testrpc.xlayer.tech</a>'],
         ['Chain ID', '195'],
       ]},
-      { name: 'GIWA', max: '0.005', exchange: 'Upbit', data: [
+      { name: 'GIWA', max: '0.005', exchange: 'Upbit', l1: 'Sepolia', data: [
         ['官网', '<a href="https://giwa.io/home" target="_blank">giwa.io</a> <span class="ex-tag">Upbit</span>'],
         ['浏览器', '<a href="https://sepolia-explorer.giwa.io/" target="_blank">sepolia-explorer.giwa.io</a>'],
         ['水龙头', '<a href="https://faucet.giwa.io/" target="_blank">faucet.giwa.io</a> (0.005)'],
@@ -434,7 +989,7 @@ const NETWORKS = [
         ['Chain ID', '91342'],
         ['RPC', '<a href="https://sepolia-rpc.giwa.io" target="_blank">sepolia-rpc.giwa.io</a>'],
       ]},
-      { name: 'Base Sepolia', max: '0.01', exchange: 'Coinbase', data: [
+      { name: 'Base Sepolia', max: '0.01', exchange: 'Coinbase', l1: 'Sepolia', data: [
         ['官网', '<a href="https://base.org/" target="_blank">base.org</a> <span class="ex-tag">Coinbase</span>'],
         ['浏览器', '<a href="https://sepolia.basescan.org/" target="_blank">basescan.org</a> &middot; <a href="https://base-sepolia.blockscout.com/" target="_blank">blockscout</a>'],
         ['Chain ID', '84532'],
@@ -444,8 +999,11 @@ const NETWORKS = [
       ]},
     ]
   },
-    {
+  {
     category: 'Hoodi L2s', icon: '▦', cn: 'Hoodi 二层',
+    l1: 'Hoodi',
+    noteType: 'info',
+    note: 'ℹ 生命周期理论上与 Hoodi 一致（至 2030 年 LTS 延长支持年）；但二层项目方可能自行重置测试网，实际寿命以各项目官方公告为准。',
     items: [
       { name: 'Morph', max: '~0.01', data: [
         ['官网', '<a href="https://www.morphl2.io/" target="_blank">morphl2.io</a>'],
@@ -469,6 +1027,9 @@ const NETWORKS = [
   },
   {
     category: 'Sepolia L2s', icon: '▦', cn: 'Sepolia 二层',
+    l1: 'Sepolia',
+    noteType: 'warn',
+    note: '⚠ 全部以 Ethereum Sepolia 作为 L1，Sepolia 关闭（预测 2027-09-30）后这些二层网络将同步停止。',
     items: [
       { name: 'ARB Sepolia', max: '0.01', data: [
         ['官网', '<a href="https://arbitrum.io/" target="_blank">arbitrum.io</a>'],
@@ -542,40 +1103,327 @@ const NETWORKS = [
 
 const COLOR_MAP = {
   'BTC': 'c1', 'Ethereum': 'c2', 'Solana': 'c3',
-  'TRON': 'c4', 'Polygon': 'c5', 'ARC': 'c9',
+  'TRON': 'c4', '其他侧链': 'c5',
   'CEX Testnets': 'c6', 'Hoodi L2s': 'c7', 'Sepolia L2s': 'c8'
 };
+
+/* ===================== 工具函数 ===================== */
+const DAY = 86400000;
+function D(s) { const p = s.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+function clamp(v, a, b) { return Math.min(Math.max(v, a), b); }
+function humanDays(d) {
+  if (d <= 0) return '已到期';
+  const y = Math.floor(d / 365);
+  const m = Math.floor((d % 365) / 30);
+  if (y > 0) return '约 ' + y + ' 年 ' + m + ' 个月';
+  if (m > 0) return '约 ' + m + ' 个月';
+  return d + ' 天';
+}
+function statusOf(net, now) {
+  const s = D(net.start), l = D(net.ltsStart), e = D(net.end);
+  if (now < s) return { text: '待上线', dot: 'status-off', cls: 'off' };
+  if (now < l) return { text: '正常运行中', dot: 'status-run', cls: 'run' };
+  if (now < e) return { text: 'LTS 延长支持中', dot: 'status-lts', cls: 'lts' };
+  return { text: '已停止运行', dot: 'status-off', cls: 'off' };
+}
+/* 推荐逻辑：优先推荐仍在运营期内的测试网；两者都在时，优先未进入 LTS 的那个 */
+function primaryIdx(now) {
+  const a = ETH_NETS[0], b = ETH_NETS[1];
+  const aAlive = now < D(a.end), bAlive = now < D(b.end);
+  if (aAlive && !bAlive) return 0;
+  if (!aAlive && bAlive) return 1;
+  if (!aAlive && !bAlive) return -1;
+  const aLts = now >= D(a.ltsStart), bLts = now >= D(b.ltsStart);
+  if (!aLts && bLts) return 0;
+  if (aLts && !bLts) return 1;
+  return 0;
+}
+
+/* ===================== 渲染 ETH 中央舞台 ===================== */
+function renderEthStage(now) {
+  const primary = primaryIdx(now);
+  const cards = document.getElementById('ethRows');
+
+  const rows = ETH_NETS.map(function (n, i) {
+    const s = D(n.start), l = D(n.ltsStart), e = D(n.end);
+    const total = e - s;
+    const pct = clamp((now - s) / total * 100, 0, 100);
+    const ltsPct = clamp((l - s) / total * 100, 0, 100);
+    const isPrimary = i === primary;
+    const st = statusOf(n, now);
+    const daysLeft = Math.ceil((e - now) / DAY);
+    const startY = s.getFullYear(), ltsY = l.getFullYear(), endY = e.getFullYear();
+    const endScale = n.endNote
+      ? endY + '-' + String(e.getMonth() + 1).padStart(2, '0') + ' · 关闭'
+      : endY + ' · 停运';
+
+    let badge;
+    if (isPrimary) {
+      badge = '<span class="eth-badge badge-primary">★ 当前主力测试网</span>';
+    } else if (now < e) {
+      badge = '<span class="eth-badge badge-next">◆ 继任者 · 未来主力</span>';
+    } else {
+      badge = '<span class="eth-badge badge-off">已停运</span>';
+    }
+
+    const remain = daysLeft > 0
+      ? '距 LTS 支持结束还有 <b>' + daysLeft + '</b> 天（' + humanDays(daysLeft) + '）'
+      : 'LTS 支持已结束';
+
+    const links = n.links.map(function (lk) {
+      return '<a href="' + lk[1] + '" target="_blank" rel="noopener">' + lk[0] + '</a>';
+    }).join('');
+
+    const tagLeft = clamp(pct, 6, 94);
+
+    return ''
+      + '<div class="eth-row ' + n.cls + (isPrimary ? ' primary' : '') + '">'
+      +   '<div class="er-top">'
+      +     '<div class="er-id">'
+      +       '<div class="eth-icon">' + n.icon + '</div>'
+      +       '<div class="er-names">'
+      +         '<div class="eth-name">' + n.name + badge + '</div>'
+      +         '<div class="eth-tag">' + n.tag + '</div>'
+      +       '</div>'
+      +     '</div>'
+      +     '<div class="er-span">'
+      +       '<div class="eth-span">'
+      +         '<span class="years">' + startY + '<span class="arrow">—</span>' + endY + '</span>'
+      +         '<span class="unit">运行区间</span>'
+      +       '</div>'
+      +       '<div class="er-tags">'
+      +         '<span class="lts-tag">第 ' + ltsY + ' 年 · LTS 延长支持年</span>'
+      +         (n.endNote ? '<span class="eth-endnote">🕘 ' + n.endNote + '</span>' : '')
+      +       '</div>'
+      +     '</div>'
+      +   '</div>'
+      +   '<div class="tl">'
+      +     '<div class="tl-bar">'
+      +       '<div class="tl-normal" style="width:' + ltsPct + '%"></div>'
+      +       '<div class="tl-lts" style="left:' + ltsPct + '%;width:' + (100 - ltsPct) + '%"></div>'
+      +       '<div class="tl-lts-mark" style="left:' + ltsPct + '%"></div>'
+      +       '<div class="tl-cursor" id="cur-' + i + '" style="left:' + pct + '%"></div>'
+      +       '<div class="tl-now" id="now-' + i + '" style="left:' + tagLeft + '%">现在</div>'
+      +     '</div>'
+      +     '<div class="tl-scale">'
+      +       '<span>' + startY + ' · 上线</span>'
+      +       '<span class="tl-scale-lts" style="left:' + ltsPct + '%">LTS ' + ltsY + '</span>'
+      +       '<span>' + endScale + '</span>'
+      +     '</div>'
+      +   '</div>'
+      +   '<div class="er-bottom">'
+      +     '<div class="er-status">'
+      +       '<span class="st" id="st-' + i + '"><span class="status-dot ' + st.dot + '"></span>' + st.text + '</span>'
+      +       '<span class="eth-remain" id="rm-' + i + '">' + remain + '</span>'
+      +     '</div>'
+      +     '<div class="er-links">'
+      +       links
+      +       '<button class="eth-detail" onclick="openModal(\'Ethereum\', \'' + n.name + '\')">查看完整详情 →</button>'
+      +     '</div>'
+      +   '</div>'
+      + '</div>';
+  });
+  // 顺序：Sepolia → 下一代测试网（预测） → Hoodi
+  cards.innerHTML = rows[0] + futureRowHtml() + rows[1];
+
+  // 顶部推荐提示（随当前时间与推荐对象变化）
+  const note = document.getElementById('stageNote');
+  const sepAlive = now < D(ETH_NETS[0].end);
+  if (primary === 0) {
+    note.innerHTML = '当前主力测试网：<span class="hot">' + ETH_NETS[0].name + '</span> &nbsp;·&nbsp; '
+      + ETH_NETS[1].name + ' 为下一代测试网，' + D(ETH_NETS[0].ltsStart).getFullYear() + ' 年 '
+      + ETH_NETS[0].name + ' 进入 LTS 后正式接棒';
+  } else if (primary === 1) {
+    note.innerHTML = (sepAlive
+      ? ETH_NETS[0].name + ' 已进入 LTS 延长支持期'
+      : ETH_NETS[0].name + ' 已停止运行')
+      + ' &nbsp;·&nbsp; 当前主力测试网：<span class="hot">' + ETH_NETS[1].name + '</span>';
+  } else {
+    note.innerHTML = '两个以太坊测试网均已停止运行';
+  }
+
+  // 底部交棒说明（随状态变化）
+  const a = ETH_NETS[0], b = ETH_NETS[1];
+  const aAlive = now < D(a.end), bAlive = now < D(b.end);
+  let tip;
+  const aLts = now >= D(a.ltsStart);
+  if (aAlive && bAlive && !aLts) {
+    tip = a.name + ' 的第 ' + D(a.ltsStart).getFullYear() + ' 年、' + b.name + ' 的第 ' + D(b.ltsStart).getFullYear()
+      + ' 年为 LTS 延长支持年；建议现在就开始在 ' + b.name + ' 上做迁移测试。';
+  } else if (aAlive && bAlive) {
+    tip = a.name + ' 已进入 LTS 延长支持期，预计 ' + a.end + ' 关闭；下一代测试网预计 '
+      + FUTURE_NET.openLabel + ' 开启（预测），请尽快完成迁移。';
+  } else if (!aAlive && bAlive) {
+    tip = a.name + ' 已停运，' + b.name + ' 为当前主力；下一代测试网预计 ' + FUTURE_NET.openLabel + ' 开启（预测）。';
+  } else {
+    tip = '两个测试网均已停运，请以以太坊基金会官方公告为准。';
+  }
+  document.getElementById('handoff').innerHTML =
+    '🔄 继任路线：<b>' + a.name + '（' + D(a.start).getFullYear() + ' — ' + D(a.end).getFullYear() + '）</b>'
+    + ' &nbsp;→&nbsp; '
+    + '<b>' + b.name + '（' + D(b.start).getFullYear() + ' — ' + D(b.end).getFullYear() + '）</b>'
+    + '<br>' + tip;
+}
+
+/* ===================== 下一代测试网长条（与 Sepolia / Hoodi 同级） ===================== */
+function futureRowHtml() {
+  return ''
+    + '<div class="eth-row future">'
+    +   '<div class="er-top">'
+    +     '<div class="er-id">'
+    +       '<div class="eth-icon">⚡</div>'
+    +       '<div class="er-names">'
+    +         '<div class="eth-name">下一代测试网<span class="eth-badge badge-future">◇ 时间预测 · 待上线</span></div>'
+    +         '<div class="eth-tag">Ethereum 下一代测试网 · 名称待公布</div>'
+    +       '</div>'
+    +     '</div>'
+    +     '<div class="er-span">'
+    +       '<div class="eth-span">'
+    +         '<span class="years">2027<span class="arrow">—</span>?</span>'
+    +         '<span class="unit">预测开启年</span>'
+    +       '</div>'
+    +       '<div class="er-tags"><span class="lts-tag">LTS 年限待定</span></div>'
+    +     '</div>'
+    +   '</div>'
+    +   '<div class="tl">'
+    +     '<div class="tl-bar unknown">'
+    +       '<div class="tl-open" style="left:3%"></div>'
+    +       '<div class="tl-q">?</div>'
+    +     '</div>'
+    +     '<div class="tl-scale"><span>2027 · 开启（预测）</span><span>寿命待定</span></div>'
+    +   '</div>'
+    +   '<div class="er-note"><b>预测依据：</b>预计在 Sepolia 关闭（' + FUTURE_NET.closeLabel
+    +     '）前数月开启，预留约 6 个月迁移窗口；按提案寿命上限，预计运营约 5 年。</div>'
+    +   '<div class="er-bottom">'
+    +     '<div class="er-status">'
+    +       '<span class="st"><span class="status-dot status-plan"></span>待上线（预测）</span>'
+    +       '<span class="eth-remain">预计 <b>' + FUTURE_NET.openLabel + '</b> 开启</span>'
+    +     '</div>'
+    +     '<div class="er-links">'
+    +       '<button class="eth-detail" onclick="openFutureModal()">查看预测详情 →</button>'
+    +     '</div>'
+    +   '</div>'
+    + '</div>';
+}
+
+/* ===================== 动态更新（游标 / 状态 / 剩余天数） ===================== */
+function updateEthTiming(now) {
+  ETH_NETS.forEach(function (n, i) {
+    const s = D(n.start), l = D(n.ltsStart), e = D(n.end);
+    const total = e - s;
+    const pct = clamp((now - s) / total * 100, 0, 100);
+    const cursor = document.getElementById('cur-' + i);
+    const nowTag = document.getElementById('now-' + i);
+    if (cursor) cursor.style.left = pct + '%';
+    if (nowTag) nowTag.style.left = clamp(pct, 6, 94) + '%';
+
+    const st = statusOf(n, now);
+    const stEl = document.getElementById('st-' + i);
+    if (stEl) stEl.innerHTML = '<span class="status-dot ' + st.dot + '"></span>' + st.text;
+
+    const rmEl = document.getElementById('rm-' + i);
+    if (rmEl) {
+      const daysLeft = Math.ceil((e - now) / DAY);
+      rmEl.innerHTML = daysLeft > 0
+        ? '距 LTS 支持结束还有 <b>' + daysLeft + '</b> 天（' + humanDays(daysLeft) + '）'
+        : 'LTS 支持已结束';
+    }
+  });
+}
+
+/* ===================== 渲染其他网络 grid ===================== */
 const app = document.getElementById('app');
-NETWORKS.forEach(g => {
+NETWORKS.forEach(function (g) {
+  if (g.category === 'Ethereum') return; // ETH 已提升到中央舞台
   const card = document.createElement('div');
   card.className = 'card ' + (COLOR_MAP[g.category] || 'c1');
   let netHtml = '';
-  g.items.forEach(n => {
-    const ex = n.exchange ? `<i class="ex-tag">${n.exchange}</i>` : '';
-    netHtml += `<span class="net-item" onclick="event.stopPropagation();openModal('${g.category}', '${n.name}', this)">${n.name} <b>${n.max}</b>${ex}</span>`;
+  g.items.forEach(function (n) {
+    const ex = n.exchange ? '<i class="ex-tag">' + n.exchange + '</i>' : '';
+    const l1 = n.l1 ? '<i class="l1-tag">L1 · ' + n.l1 + '</i>' : '';
+    netHtml += '<span class="net-item" onclick="event.stopPropagation();openModal(\'' + g.category + '\', \'' + n.name + '\', this)">' + n.name + ' <b>' + n.max + '</b>' + ex + l1 + '</span>';
   });
-  card.innerHTML = `<h2>${g.icon} ${g.category} <span class="cn">${g.cn}</span></h2><div class="sub">${g.items.length} 个测试网络</div><div class="net-list">${netHtml}</div>`;
+  const pill = g.l1 ? ' <span class="l1-pill">L1 · ' + g.l1 + '</span>' : '';
+  const note = g.note ? '<div class="card-note ' + (g.noteType || 'warn') + '">' + g.note + '</div>' : '';
+  card.innerHTML = '<h2>' + g.icon + ' ' + g.category + ' <span class="cn">' + g.cn + '</span>' + pill + '</h2><div class="sub">' + g.items.length + ' 个测试网络</div><div class="net-list">' + netHtml + '</div>' + note;
   app.appendChild(card);
 });
 
+/* 图例卡 + 生命周期规则卡（把 3×3 排满） */
+(function () {
+  const legend = document.createElement('div');
+  legend.className = 'card c10 legend';
+  legend.innerHTML =
+    '<h2>🎨 时间轴图例</h2><div class="sub">顶部 ETH 时间轴怎么读</div>'
+    + '<div class="lg-row"><span class="lg-swatch" style="background:linear-gradient(90deg,#b7d3ff,#5b8ff9)"></span>正常运营期</div>'
+    + '<div class="lg-row"><span class="lg-swatch" style="background:repeating-linear-gradient(45deg,#8b7cf6,#8b7cf6 5px,#b3a5ff 5px,#b3a5ff 10px)"></span>LTS 延长支持年（停运前最后一年）</div>'
+    + '<div class="lg-row"><span class="lg-swatch" style="background:repeating-linear-gradient(45deg,#f2eeff,#f2eeff 5px,#e7e0fb 5px,#e7e0fb 10px)"></span>寿命未定（预测网络）</div>'
+    + '<div class="lg-row"><span class="lg-cursor"></span>当前时间游标（随日期推进）</div>';
+  app.appendChild(legend);
+
+  const life = document.createElement('div');
+  life.className = 'card c2 life';
+  life.innerHTML =
+    '<h2>📖 生命周期规则</h2><div class="sub">测试网什么时候会停</div>'
+    + '<div class="life-row">🕘 <b>LTS 年</b>：停运前最后一年的延长支持，仍可用但官方建议尽快迁移</div>'
+    + '<div class="life-row">🔗 <b>二层网络</b>：寿命跟随其 L1，L1 停运则同步停止（如 Sepolia L2s）</div>'
+    + '<div class="life-row">📅 <b>预测时间</b>：非官方公告，实际以以太坊基金会与项目方为准</div>'
+    + '<div class="life-row">🔮 <b>可预测测试网</b>：按固定日程<b>每 2 年</b>上线一个新测试网，寿命上限 <b>5 年</b>（4 年运营 + 1 年 LTS）</div>'
+    + '<div class="life-row">⏱ <b>测试网并行规则</b>：新旧网并行运行，任意时刻至少保留 <b>2 个</b>可用测试网，平均每 4 年才需迁移一次</div>'
+    + '<div class="life-ref">参考文档：<a href="https://ethereum-magicians.org/t/proposal-predictable-ethereum-testnet-lifecycle/11575" target="_blank" rel="noopener">Proposal: Predictable Ethereum Testnet Lifecycle</a></div>';
+  app.appendChild(life);
+})();
+
+/* ===================== 时钟 ===================== */
+const clockTime = document.getElementById('clockTime');
+const clockDate = document.getElementById('clockDate');
+function tick() {
+  const now = new Date();
+  // 只显示北京时间：固定时区 Asia/Shanghai，不随本机时区变化
+  clockTime.textContent = now.toLocaleTimeString('zh-CN', { hour12: false, timeZone: 'Asia/Shanghai' });
+  clockDate.textContent = now.toLocaleDateString('zh-CN', {
+    year: 'numeric', month: 'long', day: 'numeric', weekday: 'long', timeZone: 'Asia/Shanghai'
+  });
+  updateEthTiming(now);
+}
+
+/* ===================== 详情 Modal ===================== */
 function openModal(category, name, el) {
-  // find data
   for (const g of NETWORKS) {
     if (g.category !== category) continue;
     for (const n of g.items) {
       if (n.name !== name) continue;
-      const exLabel = n.exchange ? ` <span class="ex-tag" style="font-size:11px">${n.exchange}</span>` : '';
-      document.getElementById('modalTitle').innerHTML = `${g.icon} ${category} <span class="cn">${g.cn}</span> — ${name}${exLabel} <span class="max-badge">${n.max}</span>`;
+      const exLabel = n.exchange ? ' <span class="ex-tag" style="font-size:11px">' + n.exchange + '</span>' : '';
+      document.getElementById('modalTitle').innerHTML = g.icon + ' ' + category + ' <span class="cn">' + g.cn + '</span> — ' + name + exLabel + ' <span class="max-badge">' + n.max + '</span>';
       let html = '';
-      n.data.forEach(row => {
-        html += `<div class="row"><span class="label">${row[0]}</span><span>${row[1]}</span></div>`;
+      n.data.forEach(function (row) {
+        html += '<div class="row"><span class="label">' + row[0] + '</span><span>' + row[1] + '</span></div>';
       });
+      if (n.l1) {
+        html += '<div class="row"><span class="label">L1</span><span>Ethereum ' + n.l1 + '（' + n.l1 + ' 关闭后本网将同步停止）</span></div>';
+      }
       document.getElementById('modalBody').innerHTML = html;
       document.getElementById('modalOverlay').classList.add('show');
       document.body.style.overflow = 'hidden';
       return;
     }
   }
+}
+
+function openFutureModal() {
+  document.getElementById('modalTitle').innerHTML =
+    '⚡ Ethereum <span class="cn">以太坊</span> — 下一代测试网 <span class="max-badge">预测</span>';
+  document.getElementById('modalBody').innerHTML = ''
+    + '<div class="row"><span class="label">状态</span><span>未上线 · 时间预测</span></div>'
+    + '<div class="row"><span class="label">预测开启</span><span><b>' + FUTURE_NET.openLabel + '</b></span></div>'
+    + '<div class="row"><span class="label">预测依据</span><span>' + FUTURE_NET.reason + '</span></div>'
+    + '<div class="row"><span class="label">迁移窗口</span><span>' + FUTURE_NET.gap
+    + '（Sepolia 预计 ' + FUTURE_NET.closeLabel + ' 关闭，新网开启后有并行期）</span></div>'
+    + '<div class="row"><span class="label">参考</span><span>'
+    + '<a href="https://ethereum.org/en/developers/docs/networks/" target="_blank">ethereum.org/networks</a></span></div>'
+    + '<div class="row"><span class="label">注意</span><span>' + FUTURE_NET.disclaimer + '</span></div>';
+  document.getElementById('modalOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
 }
 
 function closeModal(e) {
@@ -588,9 +1436,14 @@ function closeModal(e) {
   document.body.style.overflow = '';
 }
 
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') closeModal();
 });
+
+/* ===================== 启动 ===================== */
+renderEthStage(new Date());
+tick();
+setInterval(tick, 1000);
 </script>
 </body>
 </html>

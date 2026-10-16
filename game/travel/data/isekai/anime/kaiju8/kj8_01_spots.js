@@ -9,7 +9,7 @@ window.KJ8_SPOTS.push(
   { id: 'kj8p_kaiju', name: '怪兽出没的都市', icon: '🏙️', price: 0, desc: '哥斯拉级大怪兽登陆的东京街头，防卫队迎战的废墟战场。' },
   { id: 'kj8p_shinjuku', name: '新宿怪兽战', icon: '🌆', price: 0, desc: '防卫队在新宿与巨大怪兽的首次大规模作战舞台。' },
   { id: 'kj8p_doctor', name: '防卫队医院', icon: '🏥', price: 0, desc: '怪兽清扫队员的日常医院——卡夫卡治疗与检查的地方。' },
-  { id: 'kj8p_under', name: '地下怪兽研究所', icon: '🔬', price: 0, desc: '研究怪兽样本与怪兽化者的秘密设施。' },
+  { id: 'kj8p_under', name: '地下怪兽研究所', icon: '🔬', price: 0, desc: '防卫队深处的秘密设施，解剖怪兽样本、监控怪兽化者，卡夫卡的秘密一旦曝光就会被送进这里。' },
   { id: 'kj8p_quarry', name: '怪兽9号之巢', icon: '🕳️', price: 0, desc: '能操控怪兽的9号盘踞的基地——怪兽灾害的真正黑手。' },
   { id: 'kj8p_final', name: '最终决战地', icon: '⚔️', price: 0, desc: '防卫队总力战与怪兽9号的终局——人与怪兽的边界。' }
 );

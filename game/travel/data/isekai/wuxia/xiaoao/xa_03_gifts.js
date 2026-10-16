@@ -1,6 +1,7 @@
 /* 异世界·笑傲江湖 分册03：武功秘籍与神兵 */
 window.XA_GIFTS = window.XA_GIFTS || [];
 window.XA_GIFTS.push(
+  { id: 'xag_hongyi', name: '东方不败的绣花红衣', icon: '🧵', tag: '衣', type: '服饰', price: 160, desc: '黑木崖上的绣花红衣，针脚里藏着一统江湖的野心与"莲弟"的柔情。' },
   { id: 'xag_dugu9', name: '独孤九剑', icon: '⚔️', tag: '玩', type: '秘籍', price: 320, desc: '总诀式、破剑式、破刀式……"无招胜有招"的剑道至境。' },
   { id: 'xag_pixie', name: '辟邪剑谱', icon: '📜', tag: '玩', type: '秘籍', price: 280, desc: '"欲练此功，必先自宫"——葵花宝典的残本，江湖血案之源。' },
   { id: 'xag_kuihua', name: '葵花宝典', icon: '🌸', tag: '玩', type: '秘籍', price: 300, desc: '前朝宫中宦官所创——东方不败绣花针的出处。' },
@@ -10,7 +11,7 @@ window.XA_GIFTS.push(
   { id: 'xag_chongling', name: '冲灵剑法', icon: '💞', tag: '玩', type: '秘籍', price: 180, desc: '令狐冲岳灵珊合创的双人剑法——青梅竹马的回忆。' },
   { id: 'xag_hengshan5', name: '衡山五神剑', icon: '🎻', tag: '玩', type: '秘籍', price: 200, desc: '莫大先生的"潇湘夜雨"——回环往复的杀招。' },
   { id: 'xag_songfeng', name: '松风剑法', icon: '🌪️', tag: '玩', type: '秘籍', price: 150, desc: '青城派的看家剑法——余沧海的灭门凶器。' },
-  { id: 'xag_bingzhen', name: '寒冰真气', icon: '❄️', tag: '玩', type: '秘籍', price: 200, desc: '左冷禅防吸星大法的暗手。' },
+  { id: 'xag_bingzhen', name: '寒冰真气', icon: '❄️', tag: '玩', type: '秘籍', price: 200, desc: '左冷禅苦练的寒冰真气，专为克制任我行吸星大法而设的暗手。' },
   { id: 'xag_needle', name: '东方不败的绣花针', icon: '🧵', tag: '玩', type: '宝物', price: 220, desc: '以针为剑快逾闪电——天下第一的终结兵器。' },
   { id: 'xag_xiaoao_score', name: '《笑傲江湖》曲谱', icon: '🎶', tag: '玩', type: '宝物', price: 260, desc: '曲洋刘正风毕生绝学——琴箫合奏的自由之歌。' },
   { id: 'xag_qin', name: '任盈盈的瑶琴', icon: '🎼', tag: '玩', type: '宝物', price: 180, desc: '绿竹巷的琴音——"婆婆"的知音信物。' },

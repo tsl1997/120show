@@ -14,5 +14,5 @@ window.SM_SPOTS.push(
   { id: 'smp_deadmoon', name: '死亡月亮马戏团', icon: '🎪', price: 0, desc: '尼黑伦尼亚的恶梦马戏团，亚马逊四重奏的舞台。' },
   { id: 'smp_galaxia', name: '银河影法阵（Galactica）', icon: '🌌', price: 0, desc: '最终章：银河斗技场，加拉西亚与星之战士的终焉之地。' },
   { id: 'smp_juuban', name: '汉堡店Crown', icon: '🍔', price: 0, desc: '五人组的放学据点，"点一个汉堡五个人分"的贫穷日常。' },
-  { id: 'smp_mugen_bridge', name: '麻布十番商店街', icon: '🏮', price: 0, desc: '小兔的购物天堂，变身前的平凡街道。' }
+  { id: 'smp_mugen_bridge', name: '麻布十番商店街', icon: '🏮', price: 0, desc: '无限地带的商店街，小兔放学必逛的平凡天堂。' }
 );

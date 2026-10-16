@@ -4,11 +4,11 @@ window.GB_SPOTS.push(
   /* ---- 原档沿用条目 ---- */
   { id: 'london_bigmuseum', name: '大英博物馆', icon: '🏛️', price: 0, desc: '八百万件藏品免费参观：罗塞塔石碑、埃及木乃伊、中国瓷器。一周都看不完，"世界文明的仓库"名不虚传。' },
   { id: 'london_bigben', name: '大本钟·议会大厦', icon: '🕰️', price: 0, desc: '泰晤士河畔的哥特式钟楼，钟声精准得像英国人的手表。威斯敏斯特桥上是最佳机位，红色双层巴士从钟下驶过。' },
-  { id: 'london_tower', name: '伦敦塔·塔桥', icon: '🌉', price: 160, desc: '千年王冠珠宝藏在这里，乌鸦传说守护王国。塔桥开桥让大船通过时，全桥人都在举手机。' },
-  { id: 'london_eye', name: '伦敦眼', icon: '🎡', price: 130, desc: '135米泰晤士河畔的巨型摩天轮，转一圈三十分钟。透明舱里看大本钟和金融城天际线，"城市在他脚下旋转"。' },
+  { id: 'london_tower', name: '伦敦塔·塔桥', icon: '🌉', price: 35, desc: '千年王冠珠宝藏在这里，乌鸦传说守护王国。塔桥开桥让大船通过时，全桥人都在举手机。' },
+  { id: 'london_eye', name: '伦敦眼', icon: '🎡', price: 32, desc: '135米泰晤士河畔的巨型摩天轮，转一圈三十分钟。透明舱里看大本钟和金融城天际线，"城市在他脚下旋转"。' },
   { id: 'london_buckingham', name: '白金汉宫换岗', icon: '👑', price: 0, desc: '上午十一点的红衣卫兵换岗仪式，鼓乐与黑熊皮帽同框。人群举着手机等"高帽卫兵转身"，英式严谨全在这里。' },
   { id: 'london_camden', name: '卡姆登市集', icon: '🎸', price: 0, desc: '朋克文化发源地之一的市集，皮衣、黑胶、异域小吃。运河边的"彩绘门面"，随手一拍都是英伦街拍。' },
-  { id: 'london_greenwich', name: '格林威治天文台', icon: '🌐', price: 70, desc: '本初子午线在这里，一脚东半球一脚西半球。天文台山顶俯瞰金丝雀码头金融城，时间从这里"出发"。' },
+  { id: 'london_greenwich', name: '格林威治天文台', icon: '🌐', price: 18, desc: '本初子午线在这里，一脚东半球一脚西半球。天文台山顶俯瞰金丝雀码头金融城，时间从这里"出发"。' },
   /* ---- 博物馆延伸 ---- */
   { id: 'gbp_national', name: '国家美术馆·特拉法加广场', icon: '🖼️', price: 0, desc: '从达·芬奇到梵高的 2300 幅作品免费看。广场鸽子与喷泉，特拉法尔加海战的纳尔逊雕像。' },
   { id: 'gbp_tate', name: '泰特现代美术馆', icon: '🎨', price: 0, desc: '发电厂改的现代艺术圣殿，涡轮大厅的巨型装置每个时期都换。"工业废墟里的现当代艺术"。' },
@@ -21,15 +21,15 @@ window.GB_SPOTS.push(
   { id: 'gbp_covent', name: '科文特花园', icon: '🎭', price: 0, desc: '皇家歌剧院前的玻璃顶市集，街头艺人全天表演。苹果市场与 Piazza 二楼，"伦敦的街头剧场"。' },
   { id: 'gbp_soho', name: 'Soho 中国城', icon: '🥟', price: 0, desc: '伦敦的华埠与同志酒吧混居，唐人街牌楼与霓虹灯。马杀鸡店与粉红三角并存，"伦敦最不羁的夜场"。' },
   /* ---- 教堂与历史 ---- */
-  { id: 'gbp_westminster', name: '威斯敏斯特教堂', icon: '⛪', price: 70, desc: '英国君主加冕与王族墓地，牛顿、达尔文、丘吉尔都长眠于此。"诗人角"还有莎士比亚纪念碑。' },
-  { id: 'gbp_st_pauls', name: '圣保罗大教堂', icon: '⛪', price: 70, desc: '克里斯托弗·雷恩的巴洛克穹顶，戴安娜与撒切尔的葬礼在此。爬上回音廊是伦敦的"硬核考验"。' },
-  { id: 'gbp_windsor', name: '温莎城堡一日', icon: '🏰', price: 120, desc: '火车半小时到最古老的皇家城堡。女王伊丽莎白二世长眠于圣乔治礼拜堂。"英国皇室的根"。' },
+  { id: 'gbp_westminster', name: '威斯敏斯特教堂', icon: '⛪', price: 29, desc: '英国君主加冕与王族墓地，牛顿、达尔文、丘吉尔都长眠于此。"诗人角"还有莎士比亚纪念碑。' },
+  { id: 'gbp_st_pauls', name: '圣保罗大教堂', icon: '⛪', price: 26, desc: '克里斯托弗·雷恩的巴洛克穹顶，戴安娜与撒切尔的葬礼在此。爬上回音廊是伦敦的"硬核考验"。' },
+  { id: 'gbp_windsor', name: '温莎城堡一日', icon: '🏰', price: 32, desc: '火车半小时到最古老的皇家城堡。女王伊丽莎白二世长眠于圣乔治礼拜堂。"英国皇室的根"。' },
   /* ---- 现代与文化 ---- */
   { id: 'gbp_abbey', name: 'Abbey Road 斑马线', icon: '🎸', price: 0, desc: '披头士 1969 年专辑封面取景地。录音棚还在营业，斑马线被无数游客"走"过无数次。' },
   { id: 'gbp_harrod', name: '哈罗德百货', icon: '🏬', price: 0, desc: '骑士桥的埃及风格百货，戴安娜与 Dodi 的最后晚餐就在这里。玩具部与食品部是"伦敦奢华教科书"。' },
-  { id: 'gbp_shard', name: '碎片大厦·The Shard', icon: '🏙️', price: 150, desc: '西欧最高楼 310 米，第 72 层观景台俯瞰全伦敦。透明地板悬在云端，"恐高者的极限挑战"。' },
+  { id: 'gbp_shard', name: '碎片大厦·The Shard', icon: '🏙️', price: 37, desc: '西欧最高楼 310 米，第 72 层观景台俯瞰全伦敦。透明地板悬在云端，"恐高者的极限挑战"。' },
   /* ---- 周边与远郊 ---- */
-  { id: 'gbp_stone', name: '巨石阵一日', icon: '🗿', price: 220, desc: '火车+巴士一日来回。史前环形石阵，"人类史前文明的未解之谜"。' },
-  { id: 'gbp_bath', name: '巴斯一日', icon: '♨️', price: 180, desc: '罗马时代温泉，简·奥斯汀故居。巴斯石建筑被列为世界遗产。' },
-  { id: 'gbp_cotswolds', name: '科茨沃尔德乡村', icon: '🌾', price: 200, desc: '蜂蜜色石屋的英国田园，Bibury 与 Bourton-on-the-Water 小村。"英伦乡村电影取景地"。' }
+  { id: 'gbp_stone', name: '巨石阵一日', icon: '🗿', price: 75, desc: '火车+巴士一日来回。史前环形石阵，"人类史前文明的未解之谜"。' },
+  { id: 'gbp_bath', name: '巴斯一日', icon: '♨️', price: 90, desc: '罗马时代温泉，简·奥斯汀故居。巴斯石建筑被列为世界遗产。' },
+  { id: 'gbp_cotswolds', name: '科茨沃尔德乡村', icon: '🌾', price: 70, desc: '蜂蜜色石屋的英国田园，Bibury 与 Bourton-on-the-Water 小村。"英伦乡村电影取景地"。' }
 );

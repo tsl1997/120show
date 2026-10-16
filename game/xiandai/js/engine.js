@@ -47,6 +47,9 @@ function newState(){
     housing:"hutong", rentPaidTo:0, rentOwed:false,
     factoryOpen:false, factoryBuyouts:0, factoryExtra:0, factoryLastMonthBuyout:false,
     risk:0,
+    qianTrust:0,   // 钱家信任 0-100（好感=喜不喜欢你，信任=敢不敢担保你）
+    identity:1,    // 身份梯度 1黑户 2有住址 3有担保 4有单位 5个体户 …
+    unlocks:{},    // 任务解锁标记（unlock:"key" 完成时置 true）
     exp:0, quests:[], questDone:{},
     hs:{ day:-1, entry:null, cur:null, stalls:[], mine:{ slot:-1, items:[], opened:false } },
     lottery:[],
@@ -69,6 +72,9 @@ function migrate(s){
   if(s.exp===undefined) s.exp = 0;
   if(!Array.isArray(s.quests)) s.quests = [];
   if(!s.questDone) s.questDone = {};
+  if(s.qianTrust === undefined) s.qianTrust = 0;
+  if(s.identity === undefined) s.identity = 1;
+  if(!s.unlocks) s.unlocks = {};
   if(!s.hs) s.hs = { day:-1, entry:null, cur:null, stalls:[], mine:{ slot:-1, items:[], opened:false } };
   if(!Array.isArray(s.lottery)) s.lottery = [];
   if(!s.net) s.net = { shopOpen:false, shopLevel:1, shopExp:0, listings:[], orders:[], bought:[], goods:[], goodsDay:-1, soldAll:0, soldMonth:0, earnAll:0, earnMonth:0, statDay:-1 };
@@ -292,6 +298,7 @@ function settleDay(slept){
   S.dayStats = { "26":{inc:0,exp:0}, "80":{inc:0,exp:0} };
   if(S.net && S.net.shopOpen){ netGenOrders(); netDeliver(); }
   if(S.net) netRefreshGoods(false); // 每月自动刷阿狸bb货源
+  questDeadlineTick(); // 任务逾期结算（在日期推进后判定）
   snap.assets = S.world === "80" ? Math.round((moneyWallet()+moneyPig())/100) : S.money["26"];
   return snap;
 }
@@ -317,7 +324,7 @@ function refreshShopStock(id){
   /* 食品厂：上月是否清空库存 */
   if(id === "shipinchang"){
     const prevEmpty = Object.keys(st).length>0 && Object.values(st).every(v => v<=0);
-    if(prevEmpty){ S.factoryBuyouts++; if(S.factoryBuyouts >= 12){ log("连续12个月买空食品厂！钱厂长开放区域货运与特殊批文！","good"); } }
+    if(prevEmpty){ S.factoryBuyouts++; if(S.factoryBuyouts >= 12 && !S.unlocks["huoyun"]){ applyUnlocks("huoyun"); } }
     else if(nowDay()>1){ S.factoryBuyouts = 0; }
   }
 
@@ -509,6 +516,29 @@ function addAff(npc, n){
         refreshShopStock(id);
       }
     }
+  }
+}
+
+/* ---------------- 钱家信任 / 身份 / 解锁 ---------------- */
+const IDENTITY_NAMES = { 1:"黑户/外来者", 2:"有住址", 3:"有担保", 4:"有单位（供货员）", 5:"个体户", 6:"红帽子企业", 7:"区里挂号" };
+function addTrust(n){
+  const before = S.qianTrust;
+  S.qianTrust = Math.max(0, Math.min(100, S.qianTrust + n));
+  if(n > 0) log("钱家信任 +"+n+"（当前 "+S.qianTrust+"/100）。","good");
+  else if(n < 0) log("钱家信任 "+n+"（当前 "+S.qianTrust+"/100）。","warn");
+  return S.qianTrust !== before;
+}
+function identityName(){ return IDENTITY_NAMES[S.identity] || "黑户/外来者"; }
+/* 任务 unlock 标记落地（部分标记带副作用） */
+function applyUnlocks(keys){
+  for(const k of [].concat(keys||[])){
+    if(S.unlocks[k]) continue;
+    S.unlocks[k] = true;
+    if(k === "identity2"){ S.identity = Math.max(S.identity, 2); log("身份提升：有住址（街道办已登记）。砖瓦房可以租了。","good"); }
+    else if(k === "identity3"){ S.identity = Math.max(S.identity, 3); log("身份提升：有担保（钱所长愿意替你担保）。","good"); }
+    else if(k === "identity4"){ S.identity = Math.max(S.identity, 4); log("身份提升：有单位（红星食品厂供货员）。小楼房可以租了。","good"); }
+    else if(k === "factory"){ S.factoryOpen = true; log("钱厂长认可你了！红星食品厂开放。","good"); }
+    else if(k === "huoyun"){ log("连续买空食品厂，钱厂长开放区域货运资格！","good"); }
   }
 }
 
@@ -1237,8 +1267,8 @@ function changeHousing(k){
   const h = HOUSES[k];
   if(!h) return {ok:false,msg:"无此房"};
   if(k === S.housing) return {ok:false,msg:"你现在就住这里"};
-  if(k==="brick" && !S.hasJob) return {ok:false,msg:"砖瓦房需要职业（尚未开放）"};
-  if(k==="building") return {ok:false,msg:"小楼房需要科长职位（尚未开放）"};
+  if(k==="brick" && S.identity < 2 && !S.hasJob) return {ok:false,msg:"砖瓦房需要街道办登记（完成李婶的落脚委托）"};
+  if(k==="building" && S.identity < 4) return {ok:false,msg:"小楼房需要单位身份（成为食品厂供货员）"};
   S.housing = k;
   return {ok:true,msg:"搬到了"+h.name+"（容量"+h.cap+"，月租"+h.rent+"元）"};
 }
@@ -1272,28 +1302,81 @@ function questById(qid){ return QUESTS.find(q=>q.id===qid); }
 function questActive(qid){ return S.quests.some(x=>x.qid===qid); }
 function questDone(qid){ return !!S.questDone[qid]; }
 function activeQuestOf(npc){ return S.quests.find(x=>questById(x.qid) && questById(x.qid).npc===npc); }
+/* ---- schema v2 ----
+   target:  {item,qty} 单物品 | {tag,qty} 标签 | {targets:[{item,qty},...]} 多物品全交
+             | {check:"bank_live_min", amtFen, days} 条件型（活期存款≥amtFen 且持续 days 天）
+   deadline: 接取后 N 天内交付，逾期触发 onFail（信任惩罚，可重接）
+   minTrust: 接取需钱家信任 ≥ 此值
+   reqUnlock: 接取需已完成带此 unlock 的任务
+   rewards:  {aff, money, exp, item, itemQty, trust}
+   unlock:   完成后置 S.unlocks[key]=true（见 applyUnlocks）
+   onFail:   {trust:-15, retry:true} 逾期/失败时的处理（信任惩罚，可重接） */
+function questDeadlineLeft(q, entry){
+  if(!q.deadline) return null;
+  return q.deadline - (nowDay() - (entry && entry.day !== undefined ? entry.day : 0));
+}
+function questTargetList(q){
+  if(q.target.targets) return q.target.targets;
+  if(q.target.item || q.target.tag) return [q.target];
+  return [];
+}
 function questTargetText(q){
-  if(q.target.item) return ITEMS[q.target.item].name+" ×"+q.target.qty;
-  if(q.target.tag) return "符合「"+q.target.tag+"」的物品 ×"+q.target.qty;
-  return "";
+  if(q.target.check === "bank_live_min"){
+    return "活期存折存款≥"+fmtFen(q.target.amtFen)+" 且存满 "+q.target.days+" 天";
+  }
+  return questTargetList(q).map(t=>{
+    if(t.item) return ITEMS[t.item].name+" ×"+t.qty;
+    return "符合「"+t.tag+"」的物品 ×"+t.qty;
+  }).join("、");
 }
 function questRewardText(q){
   const rw = q.rewards||{};
   const parts=[];
   if(rw.aff) parts.push("好感+"+rw.aff);
+  if(rw.trust) parts.push("钱家信任+"+rw.trust);
   if(rw.money) parts.push("现金"+rw.money+"元");
   if(rw.exp) parts.push("经验+"+rw.exp);
   if(rw.item) parts.push(ITEMS[rw.item].name+(rw.itemQty>1?"×"+rw.itemQty:""));
   return parts.join(" · ");
 }
 function questProgress(q){
-  if(q.target.item) return { have: packQty(q.target.item), need: q.target.qty };
-  if(q.target.tag){
-    let have = 0;
-    for(const it of S.backpack){ if((ITEMS[it.id].tags||[]).includes(q.target.tag)) have += it.qty; }
-    return { have, need: q.target.qty };
+  const entry = S.quests.find(x=>x.qid===q.id);
+  if(q.target.check === "bank_live_min"){
+    const live = S.bank.filter(b=>b.type==="live").reduce((s,b)=>s+b.amt,0);
+    if(live >= q.target.amtFen){
+      if(entry && entry.metDay === undefined) entry.metDay = nowDay();
+      if(entry && entry.metDay !== undefined) return { have: nowDay()-entry.metDay, need: q.target.days };
+      return { have: 0, need: q.target.days };
+    }
+    if(entry) entry.metDay = undefined; // 余额跌破则重新计时
+    return { have: 0, need: q.target.days };
   }
+  const list = questTargetList(q);
+  if(list.length > 1){
+    let allOk = true;
+    const parts = list.map(t=>{
+      const have = t.item ? packQty(t.item) : tagCount(t.tag);
+      if(have < t.qty) allOk = false;
+      return have;
+    });
+    return { have: allOk ? 1 : 0, need: 1, parts, list };
+  }
+  const t = list[0];
+  if(t && t.item) return { have: packQty(t.item), need: t.qty };
+  if(t && t.tag) return { have: tagCount(t.tag), need: t.qty };
   return { have:0, need:0 };
+}
+function tagCount(tag){
+  let n = 0;
+  for(const it of S.backpack){ if((ITEMS[it.id].tags||[]).includes(tag)) n += it.qty; }
+  return n;
+}
+function questGateOk(q){
+  if(q.minTrust !== undefined && S.qianTrust < q.minTrust)
+    return {ok:false,msg:"钱家信任不足（需 "+q.minTrust+"，当前 "+S.qianTrust+"）"};
+  if(q.reqUnlock && !S.unlocks[q.reqUnlock])
+    return {ok:false,msg:"前置条件未达成，先完成前面的委托"};
+  return {ok:true};
 }
 function takeQuest(qid){
   const q = questById(qid);
@@ -1302,9 +1385,24 @@ function takeQuest(qid){
   if(questActive(qid)) return {ok:false,msg:"这个任务已经接了"};
   if(S.loc !== NPCS[q.npc].place) return {ok:false,msg:"只能在"+q.npc+"那里接取任务"};
   if(activeQuestOf(q.npc)) return {ok:false,msg:q.npc+"有任务在身，完成后再来接新任务"};
-  S.quests.push({ qid });
-  log("接取任务：「"+q.name+"」","good");
+  const gate = questGateOk(q);
+  if(!gate.ok) return gate;
+  S.quests.push({ qid, day: nowDay() });
+  log("接取任务：「"+q.name+"」"+(q.deadline?"（"+q.deadline+" 天内交付）":""),"good");
   return {ok:true};
+}
+/* 逾期结算：日结算时检查所有有期限的任务 */
+function questDeadlineTick(){
+  for(const e of S.quests.slice()){
+    const q = questById(e.qid);
+    if(!q || !q.deadline) continue;
+    if(nowDay() - e.day > q.deadline){
+      const fail = q.onFail || { trust:0, retry:true };
+      if(fail.trust) addTrust(fail.trust);
+      S.quests = S.quests.filter(x=>x.qid!==e.qid);
+      log("任务「"+q.name+"」逾期未交付"+(fail.trust?"，钱家信任"+fail.trust:"")+(fail.retry===false?"。":"，可以重新接取。"),"err");
+    }
+  }
 }
 function submitQuest(qid){
   const q = questById(qid);
@@ -1312,24 +1410,28 @@ function submitQuest(qid){
   if(!questActive(qid)) return {ok:false,msg:"还没有接这个任务"};
   if(S.loc !== NPCS[q.npc].place) return {ok:false,msg:"只能在"+q.npc+"那里提交任务"};
   const pr = questProgress(q);
-  if(pr.have < pr.need) return {ok:false,msg:"还缺 "+questTargetText(q)+"（已有 "+pr.have+"）"};
+  if(pr.have < pr.need) return {ok:false,msg:"条件未达成：还缺 "+questTargetText(q)};
   /* 消耗物品 */
-  if(q.target.item){
-    subPack(q.target.item, q.target.qty);
-  } else if(q.target.tag){
-    let left = q.target.qty;
-    for(const it of S.backpack){
-      if(left<=0) break;
-      if((ITEMS[it.id].tags||[]).includes(q.target.tag)){
-        const take = Math.min(it.qty, left);
-        subPack(it.id, take);
-        left -= take;
+  for(const t of questTargetList(q)){
+    if(t.item){
+      if(packQty(t.item) < t.qty) return {ok:false,msg:"背包里 "+ITEMS[t.item].name+" 不够了"};
+      subPack(t.item, t.qty);
+    } else if(t.tag){
+      let left = t.qty;
+      for(const it of S.backpack){
+        if(left<=0) break;
+        if((ITEMS[it.id].tags||[]).includes(t.tag)){
+          const take = Math.min(it.qty, left);
+          subPack(it.id, take);
+          left -= take;
+        }
       }
     }
   }
   /* 发放奖励 */
   const rw = q.rewards||{};
   if(rw.aff) addAff(q.npc, rw.aff);
+  if(rw.trust) addTrust(rw.trust);
   if(rw.exp){
     const before = levelOf(S.exp);
     S.exp += rw.exp;
@@ -1337,9 +1439,10 @@ function submitQuest(qid){
   }
   if(rw.money){
     if((NPCS[q.npc]||{}).world === "26"){ S.money["26"] += rw.money; addInc(rw.money); }
-    else addMoneyFen("wallet", Math.round(rw.money*100), true);
+    else { addMoneyFen("wallet", Math.round(rw.money*100), true); addInc(rw.money); }
   }
   if(rw.item) addPack(rw.item, rw.itemQty||1);
+  if(q.unlock) applyUnlocks(q.unlock);
   S.questDone[qid] = true;
   S.quests = S.quests.filter(x=>x.qid!==qid);
   log("完成任务「"+q.name+"」！","good");

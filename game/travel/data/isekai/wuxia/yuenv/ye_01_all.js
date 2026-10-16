@@ -11,7 +11,7 @@ window.YE_STORIES.push(
   { id: 'yec_fanli', name: '范蠡', icon: '🧠', desc: '越国大夫，"三千越甲可吞吴"的谋主——阿青心中的人物。' },
   { id: 'yec_xishi', name: '西施', icon: '🌺', desc: '倾国倾城的浣纱女——被阿青一棒剑气所伤，"西子捧心"成为绝美。' },
   { id: 'yec_goujian', name: '勾践', icon: '👑', desc: '卧薪尝胆的越王——"十年生聚，十年教训"。' },
-  { id: 'yec_wenzhong', name: '文种', icon: '📜', desc: '越国大夫，"伐吴九术"的谋臣。' },
+  { id: 'yec_wenzhong', name: '文种', icon: '📜', desc: '文种——越国大夫，献伐吴九术的谋臣，功成后难逃属镂之剑。' },
   { id: 'yec_baiyuan', name: '白猿', icon: '🐒', desc: '通臂神猿——阿青的"师父"，竹棒为剑的始祖。' },
   { id: 'yec_bajianshi', name: '越国八名剑士', icon: '⚔️', desc: '被阿青一根竹棒全数击败——越王惊叹"剑术天授"。' },
   { id: 'yev_swords_training', name: '越女教剑', icon: '🎋', desc: '越国剑士偷学阿青剑法影子——三年灭吴的底气。' },
@@ -22,5 +22,5 @@ window.YE_GIFTS = window.YE_GIFTS || [];
 window.YE_GIFTS.push(
   { id: 'yeg_bamboo', name: '阿青的竹棒', icon: '🎋', tag: '玩', type: '宝物', price: 240, desc: '牧羊棒胜过千剑——"越女剑法"的兵器原型。' },
   { id: 'yeg_yuenv_jian', name: '越女剑法（传承）', icon: '⚔️', tag: '玩', type: '秘籍', price: 300, desc: '白猿剑法的影子——后世剑术的源头传说。' },
-  { id: 'yeg_xiangluo', name: '西施的浣纱', icon: '🧵', tag: '玩', type: '宝物', price: 150, desc: '苎萝溪畔的轻纱——倾国倾城的注脚。' }
+  { id: 'yeg_xiangluo', name: '西施的浣纱', icon: '🧵', tag: '玩', type: '宝物', price: 150, desc: '苎萝溪畔的轻纱，西施浣纱倾国倾城的注脚。' }
 );

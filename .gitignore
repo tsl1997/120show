@@ -1,0 +1,6 @@
+# WorkBuddy AI 工作数据（记忆 / 日志 / 会话缓存），不纳入版本控制
+.workbuddy-ai/
+
+# 系统生成的垃圾文件
+.DS_Store
+Thumbs.db

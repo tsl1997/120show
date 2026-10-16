@@ -15,8 +15,8 @@
     desc: '汽车城：福特、通用、克莱斯勒三巨头的故乡，摩城音乐从这里响起，废墟与复兴并存，底特律人更努力。',
     travel: [{ name: '飞机', icon: '✈️', cost: 7300 }],
     visa: { cost: 1400, note: 'B1/B2访客签证（需面签）' },
-    spots: (window.DE_SPOTS = window.DE_SPOTS || []),
-    souvenirs: (window.DE_GIFTS = window.DE_GIFTS || []),
-    stories: (window.DE_STORIES = window.DE_STORIES || [])
+    spots: (window.US_DET_SPOTS = window.US_DET_SPOTS || []),
+    souvenirs: (window.US_DET_GIFTS = window.US_DET_GIFTS || []),
+    stories: (window.US_DET_STORIES = window.US_DET_STORIES || [])
   });
 })();

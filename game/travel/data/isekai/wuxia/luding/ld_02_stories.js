@@ -8,7 +8,7 @@ window.LD_STORIES.push(
   { id: 'ldc_ake', name: '阿珂', icon: '🌹', desc: '陈近南之女、九难之徒——韦小宝追得最苦的夫人。' },
   { id: 'ldc_suquan', name: '苏荃', icon: '💜', desc: '神龙教洪夫人——教主夫人改嫁韦爵爷的大姐头。' },
   { id: 'ldc_fangyi', name: '方怡&沐剑屏', icon: '🎀', desc: '沐王府的两朵花——一个骗过韦小宝，一个被哄进通吃岛。' },
-  { id: 'ldc_zengrou', name: '曾柔', icon: '🎲', desc: '王屋派的温柔刺客——骰子定情。' },
+  { id: 'ldc_zengrou', name: '曾柔', icon: '🎲', desc: '王屋派曾柔，骰子定情韦小宝的温柔小刺客。' },
   { id: 'ldc_jianning', name: '建宁公主', icon: '⚡', desc: '假公主真野性——又打又咬的"千刀万剐"王妃。' },
   { id: 'ldc_jiunan', name: '九难（长平公主）', icon: '🕯️', desc: '独臂神尼——前明公主的复仇与阿珂的师父。' },
   { id: 'ldc_haidaifu', name: '海大富', icon: '🕶️', desc: '阴阳眼的老公公——化骨绵掌与"宫里的鬼话"。' },

@@ -1,11 +1,12 @@
 /* 异世界·飞狐外传 分册01：全量数据（地点/人物事件/武功） */
 window.FH_SPOTS = window.FH_SPOTS || [];
 window.FH_SPOTS.push(
+  { id: 'fhg_jinzhuang', name: '商家堡武师短打劲装', icon: '🥋', tag: '衣', type: '服饰', price: 120, desc: '商家堡门下弟子的短打劲装，袖口束紧方便使刀——"天下第一堡"的体面。' },
   { id: 'fhp_shangjiabao', name: '商家堡', icon: '🏚️', price: 0, desc: '大雨商家堡——胡斐初出江湖的第一场恩怨大火。' },
   { id: 'fhp_foshan', name: '佛山·钟家祠堂', icon: '🏮', price: 0, desc: '南霸天凤天南的恶霸地界——为钟阿四一家讨公道。' },
   { id: 'fhp_hunan_hall', name: '湖南掌门大会', icon: '🍶', price: 0, desc: '福康安的天下掌门人大会——江湖被朝廷收编的名利场。' },
   { id: 'fhp_yaowangmiao', name: '药王庄', icon: '🌿', price: 0, desc: '"毒手药王"的苗谷药园——程灵素的七心海棠。' },
-  { id: 'fhp_beijing_fh', name: '北京·福府', icon: '🏛️', price: 0, desc: '福康安的相府——凤天南的靠山。' }
+  { id: 'fhp_beijing_fh', name: '北京·福府', icon: '🏛️', price: 0, desc: '北京福康安的相府，凤天南进京攀附的靠山所在。' }
 );
 window.FH_STORIES = window.FH_STORIES || [];
 window.FH_STORIES.push(
@@ -29,11 +30,11 @@ window.FH_STORIES.push(
 window.FH_GIFTS = window.FH_GIFTS || [];
 window.FH_GIFTS.push(
   { id: 'fhg_hudao', name: '胡家刀法', icon: '🔪', tag: '玩', type: '秘籍', price: 280, desc: '辽东胡家绝学，快刀纵横——胡斐的家传刀法。' },
-  { id: 'fhg_miaojian', name: '苗家剑法', icon: '⚔️', tag: '玩', type: '秘籍', price: 260, desc: '苗人凤的天下第一剑。' },
+  { id: 'fhg_miaojian', name: '苗家剑法', icon: '⚔️', tag: '玩', type: '秘籍', price: 260, desc: '苗人凤打遍天下无敌手的苗家剑，招招堂堂正正，号称天下第一剑。' },
   { id: 'fhg_qixin', name: '七心海棠', icon: '🌸', tag: '玩', type: '神药', price: 260, desc: '天下毒物之首——程灵素培育的绝命之花。' },
   { id: 'fhg_yaowang_shen', name: '《药王神篇》', icon: '📖', tag: '玩', type: '经文', price: 260, desc: '毒手药王的医毒总纲——"用药如用兵"。' },
   { id: 'fhg_lengyue', name: '冷月宝刀', icon: '🌙', tag: '玩', type: '宝物', price: 240, desc: '袁紫衣所赠的宝刀——胡斐的成名兵器。' },
   { id: 'fhg_taiji_fh', name: '赵半山的太极拳', icon: '☯️', tag: '玩', type: '秘籍', price: 220, desc: '以柔克刚的借力打力——义结金兰所授。' },
   { id: 'fhg_tiesuanpan', name: '凤天南的铁算盘', icon: '🧮', tag: '玩', type: '宝物', price: 140, desc: '南霸天的算盘兵器——算计田产与狠毒。' },
-  { id: 'fhg_haitang_poison', name: '解药锦囊', icon: '💊', tag: '食', type: '神药', price: 160, desc: '程灵素留给胡斐的救命锦囊。' }
+  { id: 'fhg_haitang_poison', name: '解药锦囊', icon: '💊', tag: '食', type: '神药', price: 160, desc: '程灵素留给胡斐的救命锦囊，七心海棠的毒解药。' }
 );

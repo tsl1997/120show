@@ -15,8 +15,8 @@
     desc: '"硅丘"·现场音乐之都：德州首府，SXSW 与奥斯汀限定的"Keep Austin Weird"，国会大道桥下150万只蝙蝠起飞。',
     travel: [{ name: '飞机', icon: '✈️', cost: 7400 }],
     visa: { cost: 1400, note: 'B1/B2访客签证（需面签）' },
-    spots: (window.AU_SPOTS = window.AU_SPOTS || []),
-    souvenirs: (window.AU_GIFTS = window.AU_GIFTS || []),
-    stories: (window.AU_STORIES = window.AU_STORIES || [])
+    spots: (window.US_AUS_SPOTS = window.US_AUS_SPOTS || []),
+    souvenirs: (window.US_AUS_GIFTS = window.US_AUS_GIFTS || []),
+    stories: (window.US_AUS_STORIES = window.US_AUS_STORIES || [])
   });
 })();

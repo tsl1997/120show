@@ -11,7 +11,7 @@ window.ST_SPOTS.push(
   { id: 'stp_jianzhong', name: '剑魔独孤求败的剑冢', icon: '⚔️', price: 0, desc: '利剑、紫薇软剑、玄铁重剑、木剑——剑魔毕生的四段境界埋剑处。' },
   { id: 'stp_shendi', name: '山洪海潮练剑谷', icon: '🌊', price: 0, desc: '神雕带杨过迎潮练剑之地——内力在山洪怒海中脱胎换骨。' },
   { id: 'stp_fenglingdu', name: '风陵渡口', icon: '🏡', price: 0, desc: '郭襄初闻"神雕侠"传说之地——"一见杨过误终身"。' },
-  { id: 'stp_wanshou', name: '万兽山庄', icon: '🐆', price: 0, desc: '史家兄弟驯兽之地，九尾灵狐的传说。' },
+  { id: 'stp_wanshou', name: '万兽山庄', icon: '🐆', price: 0, desc: '万兽山庄，史家兄弟驯兽之地，九尾灵狐的所在。' },
   { id: 'stp_heilongtan2', name: '黑龙潭', icon: '🌑', price: 0, desc: '瑛姑隐居处，"神雕侠"替人解恩怨的寻访之地。' },
   { id: 'stp_yuanmen', name: '蒙古大营', icon: '⛺', price: 0, desc: '忽必烈帐下的高手云集处——金轮、尹克西、潇湘子的阴谋窝。' },
   { id: 'stp_huashan3', name: '华山之巅（第三次论剑）', icon: '⛰️', price: 0, desc: '新五绝诞生：东邪、西狂、南僧、北侠、中顽童。' }

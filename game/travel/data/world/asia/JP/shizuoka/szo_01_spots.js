@@ -2,18 +2,18 @@
 window.SZO_SPOTS = window.SZO_SPOTS || [];
 window.SZO_SPOTS.push(
   /* ---- 沿用原条目 ---- */
-  { id: 'shizuoka_chibimaruko', name: '樱桃小丸子主题馆', icon: '👧', price: 15, desc: '小丸子故乡清水市的"丸繁商社"场景重现。教室与客厅原样复刻，"爷爷的味道"。' },
+  { id: 'shizuoka_chibimaruko', name: '樱桃小丸子主题馆', icon: '👧', price: 600, desc: '小丸子故乡清水市的"丸繁商社"场景重现。教室与客厅原样复刻，"爷爷的味道"。' },
   { id: 'shizuoka_miho', name: '三保松原（羽衣松）', icon: '🌊', price: 0, desc: '世界遗产，"天女羽衣"传说的松林。海滩上富士山与三保松原同框，"浮岛绘"实景。' },
-  { id: 'shizuoka_sumpu', name: '骏府城公园', icon: '🏯', price: 40, desc: '德川家康"大御所时代"的居城。家康手植柑橘树后裔仍在，红叶季夜灯。' },
+  { id: 'shizuoka_sumpu', name: '骏府城公园', icon: '🏯', price: 500, desc: '德川家康"大御所时代"的居城。家康手植柑橘树后裔仍在，红叶季夜灯。' },
   { id: 'shizuoka_shimizu', name: '清水港·樱桃小丸子乐园', icon: '🚢', price: 0, desc: '"清水金枪鱼"与樱虾渔港。S-Pulse Dream Plaza 的商场，海风与小丸子同在。' },
-  { id: 'shizuoka_kunozan', name: '久能山东照宫', icon: '⛩️', price: 40, desc: '德川家康长眠之地，彩色雕刻"东照权现"。罗生门与楼门工艺精绝。' },
-  { id: 'shizuoka_atami', name: '热海温泉·MOA美术馆', icon: '♨️', price: 50, desc: '"热海七汤"千年温泉街。MOA美术馆的"红白梅图屏风"，海景露台咖啡。' },
-  { id: 'shizuoka_kakegawa', name: '挂川城·二之丸御殿', icon: '🏯', price: 50, desc: '东海名城，"御殿+天守"组合罕见。茶室体验与庭园，"城下町的优雅"。' },
+  { id: 'shizuoka_kunozan', name: '久能山东照宫', icon: '⛩️', price: 500, desc: '德川家康长眠之地，彩色雕刻"东照权现"。罗生门与楼门工艺精绝。' },
+  { id: 'shizuoka_atami', name: '热海温泉·MOA美术馆', icon: '♨️', price: 1300, desc: '"热海七汤"千年温泉街。MOA美术馆的"红白梅图屏风"，海景露台咖啡。' },
+  { id: 'shizuoka_kakegawa', name: '挂川城·二之丸御殿', icon: '🏯', price: 600, desc: '东海名城，"御殿+天守"组合罕见。茶室体验与庭园，"城下町的优雅"。' },
   /* ---- 富士山与富士宫 ---- */
   { id: 'szop_sengen', name: '富士山本宫浅间大社', icon: '⛩️', price: 0, desc: '富士山信仰的总本宫，涌玉池清泉终年不涸。朱红楼门与神山同框，登山客启程前都要来此求一枚平安符。' },
   { id: 'szop_shiraito', name: '白丝瀑布', icon: '🏞️', price: 0, desc: '富士山雪水化作数百道细流从岩壁垂下，如白丝帘幕。步道尽头水雾扑面，阳光斜照时还能撞见迷你彩虹。' },
   { id: 'szop_fuji5th', name: '富士宫口五合目', icon: '🗻', price: 0, desc: '富士宫路线的半山腰，海拔两千四百米的登山前哨。天气好时云海铺到天边，山小屋灯火守着每个登顶的人。' },
-  { id: 'szop_fujicenter', name: '富士山世界遗产中心', icon: '🏛️', price: 15, desc: '倒锥形建筑倒映水面，像一只盛着神山的玉杯。沿坡道缓登而上，从火山诞生讲到庶民信仰，一趟看懂富士山。' },
+  { id: 'szop_fujicenter', name: '富士山世界遗产中心', icon: '🏛️', price: 300, desc: '倒锥形建筑倒映水面，像一只盛着神山的玉杯。沿坡道缓登而上，从火山诞生讲到庶民信仰，一趟看懂富士山。' },
   { id: 'szop_satta', name: '萨埵峠', icon: '🌅', price: 0, desc: '由比与富士市间的东海道旧道，自古便是眺富士的天险。渔港与渡轮在脚下，富士山隔海湾立成屏风，浮世绘的构图。' },
   /* ---- 静冈市·清水·骏河湾沿岸 ---- */
   { id: 'szop_nihondaira', name: '日本平', icon: '🌄', price: 0, desc: '静冈市南缘的高台，骏河湾与富士山同框入镜。乘缆车滑向久能山，山顶茶寮喝一杯煎茶，看夕阳把海面染金。' },

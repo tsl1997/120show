@@ -37,7 +37,7 @@ window.SD_STORIES.push(
   { id: 'sdc_yinggu', name: '瑛姑（神算子）', icon: '🧮', desc: '一灯的爱妃，周伯通的旧爱——为救子算尽天机。' },
   { id: 'sdc_yuzhi', name: '渔樵耕读', icon: '🎣', desc: '一灯座下四大弟子：点苍渔隐、樵子、武三通、朱子柳。' },
   { id: 'sdc_quan7', name: '全真七子', icon: '☯️', desc: '马钰、丘处机、谭处端、刘处玄、王处一、郝大通、孙不二——天罡北斗阵。' },
-  { id: 'sdc_luguan', name: '陆冠英', icon: '⛵', desc: '太湖群豪之主，桃花岛记名弟子。' },
+  { id: 'sdc_luguan', name: '陆冠英', icon: '⛵', desc: '陆冠英——太湖群豪之主，桃花岛记名弟子，水寨之上的少帅。' },
   { id: 'sdc_shangu', name: '傻姑', icon: '🌱', desc: '曲灵风之女，桃花岛的痴傻见证人——铁枪庙真相的关键。' },
   { id: 'sdc_qu_linfeng', name: '曲灵风', icon: '🖼️', desc: '黄药师的大弟子，腿废后盗画抚养傻姑。' },
   /* ---- 大事件 ---- */

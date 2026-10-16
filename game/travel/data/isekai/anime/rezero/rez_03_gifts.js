@@ -1,7 +1,7 @@
 /* 异世界·Re从零开始 分册03：特色宝物 */
 window.REZ_GIFTS = window.REZ_GIFTS || [];
 window.REZ_GIFTS.push(
-  { id: 'rezg_phone', name: '昴的手机', icon: '📱', price: 0, desc: '昴带到异世界的手机，充电宝用完后只剩"怀旧的电子垃圾"。' },
+  { id: 'rezg_phone', name: '昴的手机', icon: '📱', tag: '玩', type: '宝物', price: 0, desc: '昴带到异世界的手机，充电宝用完后只剩"怀旧的电子垃圾"。' },
   { id: 'rezg_hoodie', name: '昴的卫衣', icon: '🧥', tag: '衣', type: '服饰', price: 140, desc: '昴在地球穿的连帽卫衣，异世界的"来自地球的证明"。' },
   { id: 'rezg_spirits', name: '精灵契约之石', icon: '🔮', tag: '玩', type: '宝物', price: 200, desc: '帕克与爱蜜莉雅的精灵契约石——火与冰的守护。' },
   { id: 'rezg_emilia_brooch', name: '爱蜜莉雅的胸针', icon: '💎', tag: '衣', type: '服饰', price: 220, desc: '爱蜜莉雅胸前的银白胸针，王国选民的标志。' },

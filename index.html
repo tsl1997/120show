@@ -69,20 +69,10 @@
 
         .hero-top {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
             gap: 14px;
             flex-wrap: wrap;
-        }
-
-        .pill {
-            font-size: 12px;
-            font-weight: 700;
-            color: #8d5d9d;
-            background: linear-gradient(90deg, #ffe3f2, #eaf3ff);
-            border: 1px solid #efdbff;
-            border-radius: 999px;
-            padding: 6px 12px;
         }
 
         .social {
@@ -310,7 +300,6 @@
     <div class="wrap">
         <header class="hero">
             <div class="hero-top">
-                <span class="pill">动漫风主页样板</span>
                 <nav class="social" aria-label="外部链接">
                     <a href="https://github.com/xsbtc" target="_blank" rel="noopener noreferrer">GitHub</a>
                     <a href="https://twitter.com/btc_xs" target="_blank" rel="noopener noreferrer">X / 推特</a>
@@ -334,6 +323,7 @@
             <button class="tab-btn" type="button" data-cat="vision">视觉交互</button>
             <button class="tab-btn" type="button" data-cat="tools">内容工具</button>
             <button class="tab-btn" type="button" data-cat="game">小游戏</button>
+            <button class="tab-btn" type="button" data-cat="life">生活实用</button>
         </nav>
 
         <main class="grid" id="projectGrid">
@@ -488,6 +478,39 @@
                         <p>出生武汉点亮旅行图鉴，打卡景点、收藏特产、见证名场面，环游中国与世界。</p>
                     </div>
                     <span class="link">开始出发 -></span>
+                </a>
+            </article>
+
+            <article class="item span-4 game-cat">
+                <a class="card pink" href="./game/xiandai/index.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">双界倒卖</span>
+                        <h3>两界人生 1980/2026</h3>
+                        <p>现代买工业品带去 80 年代卖，80 年代收票证古董带回现代变现，两头赚差价。</p>
+                    </div>
+                    <span class="link">开始穿越 -></span>
+                </a>
+            </article>
+
+            <article class="item span-4 game-cat">
+                <a class="card peach" href="./game/maoyi/index.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">双界倒卖</span>
+                        <h3>贸易倒爷1980</h3>
+                        <p>尾单毛衣卖回 80 年代黑市，猴票茅台带回现代变现。躲工商、扛严打，从摆摊到办厂。</p>
+                    </div>
+                    <span class="link">开始穿越 -></span>
+                </a>
+            </article>
+
+            <article class="item span-6 life-cat">
+                <a class="card mint" href="./life/cook/index.html" target="_blank" rel="noopener noreferrer">
+                    <div>
+                        <span class="tag">饮食搭配</span>
+                        <h3>懒人营养厨房</h3>
+                        <p>选一个中国地域，按当地蔬菜作物一键生成荤素汤主食均衡套餐，含用量、做法与购物清单。</p>
+                    </div>
+                    <span class="link">开始配餐 -></span>
                 </a>
             </article>
 

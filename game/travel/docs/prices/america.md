@@ -1,0 +1,24 @@
+# 美洲核价记录（append-only）
+- 2026-09-09 atlanta：spots 11+gifts 19 全部核定（USD）。水族馆 $45、鲸鲨潜水 $350、丽思 $380。✅
+- 2026-09-09 austin：spots 7+gifts 19 全部核定（USD）。Franklin BBQ $35、SXSW $250-500、Driskill $320。✅
+- 2026-09-09 boston：spots 6+gifts 19 全部核定（USD）。龙虾卷 $28、观鲸 $65、后湾酒店 $320。✅
+- 2026-09-09 chicago：spots 9+gifts 18 全部核定（USD，中部×0.9）。深盘披萨 $28、Bulls $90、河景酒店 $200。✅
+- 2026-09-09 dallas：spots 7+gifts 19 全部核定（USD）。牛排 $55、牛仔帽靴 $120、六旗 $75。✅
+- 2026-09-09 detroit：spots 9+gifts 17 全部核定（USD，中部×0.9）。亨利福特 $32、Coney Dog $5、酒店 $110-160。✅
+- 2026-09-09 honolulu：spots 7+gifts 17 全部核定（USD，夏威夷×1.1）。Luau $150、文化中心 $130、海景酒店 $450。✅
+- 2026-09-09 houston：spots 7+gifts 20 全部核定（USD）。NASA $30、Brisket $28、Post Oak $400。✅
+- 2026-09-09 lasvegas：spots 11+gifts 21 全部核定（USD）。O秀 $200、Sphere $150、名厨牛排 $150、直升机 $250、主题酒店 $300。✅
+- 2026-09-09 losangeles：spots 10+gifts 20 全部核定（USD，加州×1.1）。迪士尼/环球 $160-169、比佛利酒店 $850、冲浪 $100、In-N-Out $8。✅
+- 2026-09-09 miami：spots 10+gifts 21 全部核定（USD）。Heat $90、气垫船 $55、南海滩酒店 $280。✅
+- 2026-09-09 minneapolis：spots 3+gifts 17 全部核定（USD，中部×0.9）。Paisley Park $60、Juicy Lucy $16。✅
+- 2026-09-09 neworleans：spots 7+gifts 16 全部核定（USD）。二战博物馆 $30、爵士夜 $25、法区民宿 $190。✅
+- 2026-09-09 newyork：spots 15条+gifts 25条全部核定（USD）。酒店 $1500/五星、门票 $28-65、百老汇 $199、NBA $150。✅
+- 2026-09-09 orlando：spots 10+gifts 12 全部核定（USD）。迪士尼 $154、环球 $179、魔杖 $65。✅
+- 2026-09-09 philadelphia：spots 4+gifts 16 全部核定（USD）。芝士牛排 $15、艺术博物馆 $25。✅
+- 2026-09-09 rio：spots 9+gifts 18 全部核定（BRL）。基督像 R$90、烤肉自助 R$150、海景酒店 R$800。✅
+- 2026-09-09 sandiego：spots 4+gifts 16 全部核定（USD，加州×1.1）。动物园 $76、观鲸 $70。✅
+- 2026-09-09 sanfrancisco：spots 8+gifts 20 全部核定（USD，加州×1.1）。恶魔岛 $55、勇士NBA $120、海景酒店 $450。✅
+- 2026-09-09 seattle：spots 9+gifts 14 全部核定（USD）。太空针 $35、Fairmont $420、水上飞机 $120。✅
+- 2026-09-09 toronto：spots 8+gifts 17 全部核定（CAD）。CN塔 C$45、尼亚加拉一日 C$95、Canada Goose C$1000。✅
+- 2026-09-09 vancouver：spots 5+gifts 17 全部核定（CAD）。吊桥 C$65、观鲸 C$160、滑雪 C$120。✅
+- 2026-09-09 washington：spots 1+gifts 17 全部核定（USD）。间谍博物馆 $35、Willard $450、蓝蟹 $55。✅

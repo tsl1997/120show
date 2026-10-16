@@ -13,7 +13,7 @@ window.SD_SPOTS.push(
   { id: 'sdp_yanjing', name: '燕京·金国王府', icon: '🏛️', price: 0, desc: '完颜洪烈的赵王府，杨康"小王爷"十八年的锦绣牢笼。' },
   { id: 'sdp_dali_yideng', name: '大理·一灯隐居处', icon: '🛕', price: 0, desc: '段皇爷出家后的桃源，渔樵耕读守着一年一度的救人之诺。' },
   { id: 'sdp_mingxia', name: '明霞岛（荒岛）', icon: '🏝️', price: 0, desc: '郭靖黄蓉与欧阳叔侄流落的荒岛，斗智斗勇的生存局。' },
-  { id: 'sdp_linan', name: '临安大内皇宫', icon: '🏮', price: 0, desc: '郭靖黄蓉夜探禁宫寻武穆遗书的险地。' },
+  { id: 'sdp_linan', name: '临安大内皇宫', icon: '🏮', price: 0, desc: '郭靖黄蓉夜探临安大内禁宫，只为寻武穆遗书的一场惊天豪赌。' },
   { id: 'sdp_heiflong', name: '黑龙潭', icon: '🌑', price: 0, desc: '瑛姑隐居的泥沼地，"神算子"的复仇计算所。' },
   { id: 'sdp_taoyuan', name: '桃源县·渔樵耕读', icon: '🌾', price: 0, desc: '一灯座下四大弟子的守关卡，树阵与水田的考验。' }
 );

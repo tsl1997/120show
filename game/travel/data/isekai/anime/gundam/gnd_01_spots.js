@@ -2,7 +2,7 @@
 window.GND_SPOTS = window.GND_SPOTS || [];
 window.GND_SPOTS.push(
   { id: 'gndp_side7', name: 'Side7·绿色诺亚殖民卫星', icon: '🛰️', price: 0, desc: 'V作战机密工房所在的殖民卫星，少年阿姆罗与高达命运相遇的起点。' },
-  { id: 'gndp_whitebase', name: '白色基地·战舰内', icon: '🚢', price: 60, desc: '舷号SCV-70的联邦强袭登陆舰，载着Side7难民一路漂流到宇宙尽头的移动母舰。' },
+  { id: 'gndp_whitebase', name: '白色基地·战舰内', icon: '🚢', price: 60, desc: '舷号SCV-70的联邦强袭登陆舰，载着SIDE 7难民一路漂流到宇宙尽头的移动母舰。' },
   { id: 'gndp_launchdeck', name: '白色基地·出击甲板', icon: '🚀', price: 0, desc: '高达起降的升降平台，每一道闸门开启都是一次冲向战场的勇气见证。' },
   { id: 'gndp_luna2', name: '月神二号宇宙要塞', icon: '🌙', price: 90, desc: '巡弋在航路上的联邦宇宙军港要塞，补给维修与归队都要经过的钢铁闸门。' },
   { id: 'gndp_loum', name: '鲁姆战役宙域', icon: '🕊️', price: 0, desc: '一年战争初期最惨烈的战场残骸带，无数战舰与机师在此无声长眠。' },

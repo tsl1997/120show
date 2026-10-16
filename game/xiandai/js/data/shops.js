@@ -28,6 +28,7 @@ const SHOPS = {
               {item:"latiao", min:20, max:30, price:0.5},
               {item:"flashlight", min:1, max:5, price:10},
               {item:"battery",min:10, max:50, price:1},
+              {item:"ebwatch", min:1, max:3, price:40},
             ],
             hiddenStock:[ {item:"sugar", min:1, max:10, price:3} ] },
   wangfugui:{ id:"wangfugui", name:"收藏家（王富贵）", world:"26", npc:"王富贵", kind:"collector" },

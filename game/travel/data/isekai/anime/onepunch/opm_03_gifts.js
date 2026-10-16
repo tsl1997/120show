@@ -2,7 +2,7 @@
 window.OPM_GIFTS = window.OPM_GIFTS || [];
 window.OPM_GIFTS.push(
   { id: 'opmg_cape', name: '英雄红披风', icon: '🧣', tag: '衣', type: '服饰', price: 180, desc: '埼玉的英雄披风，虽然常被吐槽"你明明不需要"——却是当英雄的执念。' },
-  { id: 'opmg_gloves', name: '红色拳套', icon: '🥊', tag: '玩', type: '宝物', price: 150, desc: '埼玉的红色拳套，训练与揍怪人两用。' },
+  { id: 'opmg_gloves', name: '红色拳套', icon: '🥊', tag: '玩', type: '宝物', price: 150, desc: '埼玉老师的红色拳套，超市特卖买的，揍怪人照样一拳。' },
   { id: 'opmg_badge', name: '英雄协会徽章', icon: '🎖️', tag: '玩', type: '徽章', price: 120, desc: '刻着"C级英雄"的徽章，埼玉的资格证与"最强"的日常讽刺。' },
   { id: 'opmg_bald', name: '光头手办', icon: '🪆', tag: '玩', type: '手办', price: 160, desc: '油光锃亮的埼玉光头手办——据说能辟邪镇宅。' },
   { id: 'opmg_cyborg', name: '杰诺斯机体', icon: '🤖', tag: '玩', type: '手办', price: 280, desc: 'S级杰诺斯的机械躯体，火力全开的改造人核心。' },

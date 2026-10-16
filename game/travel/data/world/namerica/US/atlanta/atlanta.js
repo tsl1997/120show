@@ -15,8 +15,8 @@
     desc: '新南方之都：可口可乐与CNN总部，马丁路德金的家乡，《飘》的故事舞台， peach 州的现代奇迹。',
     travel: [{ name: '飞机', icon: '✈️', cost: 7400 }],
     visa: { cost: 1400, note: 'B1/B2访客签证（需面签）' },
-    spots: (window.AT_SPOTS = window.AT_SPOTS || []),
-    souvenirs: (window.AT_GIFTS = window.AT_GIFTS || []),
-    stories: (window.AT_STORIES = window.AT_STORIES || [])
+    spots: (window.US_ATL_SPOTS = window.US_ATL_SPOTS || []),
+    souvenirs: (window.US_ATL_GIFTS = window.US_ATL_GIFTS || []),
+    stories: (window.US_ATL_STORIES = window.US_ATL_STORIES || [])
   });
 })();

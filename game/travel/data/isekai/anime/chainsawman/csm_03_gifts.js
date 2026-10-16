@@ -7,7 +7,7 @@ window.CSM_GIFTS.push(
   { id: 'csmg_suit', name: '公安恶魔猎手外套', icon: '🧥', tag: '衣', type: '服饰', price: 180, desc: '对魔特异课的黑色制服，电次与秋的同款战袍。' },
   { id: 'csmg_pochita', name: '波奇塔布偶', icon: '🧸', tag: '玩', type: '手办', price: 200, desc: '粉色小电锯狗波奇塔的布偶——"它是我最好的朋友"。' },
   { id: 'csmg_blood', name: '帕瓦的血之斧', icon: '🩸', tag: '玩', type: '宝物', price: 180, desc: '血之恶魔帕瓦用血凝成的武器——恶魔的暴力美学。' },
-  { id: 'csmg_cigarette', name: '秋的香烟', icon: '🚬', tag: '玩', type: '收藏卡', price: 30, desc: '秋总叼着的烟，压着灭门之仇的沉默。' },
+  { id: 'csmg_cigarette', name: '秋的香烟', icon: '🚬', tag: '玩', type: '收藏卡', price: 30, desc: '秋总指间夹着的香烟，烟雾里压着全家被枪魔杀害的灭门之仇，也压着他对未来从不出口的温柔。' },
   { id: 'csmg_cat', name: '帕瓦的猫', icon: '🐈', tag: '玩', type: '收藏卡', price: 60, desc: '帕瓦嘴上说要"吃掉"，实际宝贝得不行的猫——恶魔的温柔。' },
   { id: 'csmg_movie', name: '电影票根', icon: '🎫', tag: '游', type: '收藏卡', price: 40, desc: '电次与玛奇玛看电影的票根——被支配的"约会"。' },
   { id: 'csmg_donut', name: '电次的甜甜圈', icon: '🍩', tag: '食', type: '美食', price: 25, desc: '电次最爱吃的甜甜圈，穷小子对"甜"的执念。' }

@@ -1,7 +1,7 @@
 /* 异世界·星际牛仔 分册02：剧情名场面 */
 window.CBB_STORIES = window.CBB_STORIES || [];
 window.CBB_STORIES.push(
-  { id: 'cbbv_opening', name: 'Tank! 开场', icon: '🎷', desc: '菅野洋子的爵士前奏响起，斯派克翻转着登场——没有一部动画能像Cowboy这样开场。' },
+  { id: 'cbbv_opening', name: 'Tank! 开场', icon: '🎷', desc: '菅野洋子的爵士前奏响起，斯派克翻转着登场——没有一部动画能像《星际牛仔》这样开场。' },
   { id: 'cbbv_mushroom', name: '毒蘑菇大冒险', icon: '🍄', desc: '全团误食毒蘑菇，斯派克在幻觉里"解决"了最荒唐的悬赏——胡闹却经典。' },
   { id: 'cbbv_jupiter_jazz', name: '杰特的过去·木星爵士', icon: '🎹', desc: '杰特回到木星，面对背叛自己的旧搭档——"比起玫瑰，我更喜欢看它凋谢前"。' },
   { id: 'cbbv_blackdog', name: '斯派克的旧日', icon: '🐕', desc: '红龙会与薇丝的往事浮出水面，斯派克不断在"过去"与"现在"间挣扎。' },

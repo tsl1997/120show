@@ -15,8 +15,8 @@
     desc: '加州的阳光后花园：圣地亚哥动物园的世界级保育，中途岛航母与胜利之吻，拉霍亚的海豹滩，墨西哥风情的边境之城。',
     travel: [{ name: '飞机', icon: '✈️', cost: 7000 }],
     visa: { cost: 1400, note: 'B1/B2访客签证（需面签）' },
-    spots: (window.SD_SPOTS = window.SD_SPOTS || []),
-    souvenirs: (window.SD_GIFTS = window.SD_GIFTS || []),
-    stories: (window.SD_STORIES = window.SD_STORIES || [])
+    spots: (window.US_SD_SPOTS = window.US_SD_SPOTS || []),
+    souvenirs: (window.US_SD_GIFTS = window.US_SD_GIFTS || []),
+    stories: (window.US_SD_STORIES = window.US_SD_STORIES || [])
   });
 })();

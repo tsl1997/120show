@@ -30,6 +30,7 @@ game/xiandai/
 │   ├── lottery.js          # 刮刮乐 000-999 倍率表（由 CSV 生成，勿手改）
 │   ├── engine.js           # 游戏逻辑（买卖/鉴定/任务/服装/穿越/网购/黑市/街区/存档）
 │   └── ui.js               # 界面渲染 + 点击事件分发
+├── smoke-test.js           # Node 冒烟测试（钱家任务链全流程断言，改任务/引擎后跑 node smoke-test.js）
 ├── doc/                    # 设计文档
 │   ├── 1系统设计总纲.md     #   整体蓝图
 │   ├── 2用户设计初稿.md     #   ★ 需求/规则权威来源（玩家怎么玩、每个地点规则）
@@ -64,7 +65,8 @@ game/xiandai/
 5. **物品属性标签带数字=等级**（如 `奢侈品3`），决定物品名颜色（1黑/2绿/3蓝/4紫/5金）；无数字=1级。
 6. **营业时间**：商店写 `hours:[[9,15]]` 或 `[[9,11],[14,17]]`，打烊进不去；黑市走夜间(18-次日6)规则；不写=全天。
 7. **80年代钱是票证系统**：现金/粮票/布票等存于 `S.walletT`（随身）/`S.pigT`（储钱罐），按最小单位存（现金分/粮票两/布票分米）。改 80 年代金钱逻辑前先看 engine 的票据函数（`autoPayMoney`/`addMoneyFen` 等）。
-8. **每个系统有独立状态字段**（`S.lottery`、`S.net`、`S.hs` 黑市、`S.street` 街区），新加的 state 要同时补 `newState()` 和 `migrate()`（兼容旧档）。
+8. **每个系统有独立状态字段**（`S.lottery`、`S.net`、`S.hs` 黑市、`S.street` 街区、`S.qianTrust` 钱家信任、`S.identity` 身份梯度1-7、`S.unlocks` 任务解锁标记），新加的 state 要同时补 `newState()` 和 `migrate()`（兼容旧档）。
+11. **任务系统是 schema v2**（doc/8 钱家链）：`deadline` 逾期触发 `onFail`（扣信任可重接）；`unlock` 完成时置 `S.unlocks[key]`（identity2/3/4、factory 等带副作用，见 engine 的 `applyUnlocks`）；`reqUnlock`/`minTrust` 是接取门槛；`rewards.trust` 加钱家信任。改完任务必须跑 `node smoke-test.js`。
 9. **穿越**：仅两边的家（home26/home80）可穿越，携带量 = `travelCap()`（3+扩容），背包容量 30，家容量 50。
 10. **体力/时间**：每小时默认 -10；前往地点 30 分钟 -5；等待1小时 -5；吃饭不扣。改时间逻辑看 `passMinutes/passHour`。
 

@@ -1,7 +1,7 @@
 /* 异世界·连城诀 分册01：全量数据（地点/人物事件/武功） */
 window.LC_SPOTS = window.LC_SPOTS || [];
 window.LC_SPOTS.push(
-  { id: 'lcp_xiangxiang', name: '湘西·沅陵乡野', icon: '🌾', price: 0, desc: '狄云的家乡——被诬入狱的起点。' },
+  { id: 'lcp_xiangxiang', name: '湘西·沅陵乡野', icon: '🌾', price: 0, desc: '狄云的湘西沅陵乡野老家，朴实少年被诬陷入狱的噩梦起点。' },
   { id: 'lcp_jail', name: '荆州死牢', icon: '⛓️', price: 0, desc: '狄云与丁典相知的黑牢——穿骨钉骨的五年。' },
   { id: 'lcp_xuegu', name: '大雪山谷', icon: '🏔️', price: 0, desc: '血刀门雪谷困局——水笙与狄云的冰窟岁月。' },
   { id: 'lcp_jiangling', name: '江陵城', icon: '🏮', price: 0, desc: '万震山的"言传身教"与连城宝藏的收官之地。' }
@@ -19,8 +19,8 @@ window.LC_STORIES.push(
   { id: 'lcc_huatiegan', name: '花铁干', icon: '🐺', desc: '"落花流水"四侠之一——雪谷里露馅的伪君子。' },
   { id: 'lcc_xuedao', name: '血刀老祖', icon: '🩸', desc: '血刀门掌门——"落花流水"的雪山猎人。' },
   { id: 'lcc_shuidai', name: '水岱&陆天抒&刘乘风', icon: '⚔️', desc: '南四奇"落花流水"——雪谷群侠的滑铁卢。' },
-  { id: 'lcc_lingtuihui', name: '凌退思', icon: '🖤', desc: '荆州知府，活埋亲女的财迷父亲。' },
-  { id: 'lcc_wantong', name: '万圭', icon: '🐍', desc: '万震山之子——抢妻构陷的纨绔。' },
+  { id: 'lcc_lingtuihui', name: '凌退思', icon: '🖤', desc: '荆州知府凌退思，为宝藏活埋亲女儿的财迷父亲。' },
+  { id: 'lcc_wantong', name: '万圭', icon: '🐍', desc: '万震山之子万圭，抢妻构陷师弟的阴毒纨绔，砌墙藏妻的恶行令人发指。' },
   { id: 'lcc_dingdian_love', name: '丁典与凌霜华之恋', icon: '🌼', desc: '狱窗边的菊花——人淡如菊的生死相守。' },
   { id: 'lcc_shenzhao', name: '神照经大成', icon: '📖', desc: '丁典传功狄云——起死回生的第一内功。' },
   { id: 'lcc_blood_knife', name: '血刀刀法', icon: '🩸', desc: '诡诈的邪派刀法——"披风滚刀"的绝处逢生。' },
@@ -31,10 +31,10 @@ window.LC_STORIES.push(
 window.LC_GIFTS = window.LC_GIFTS || [];
 window.LC_GIFTS.push(
   { id: 'lcg_shenzhao2', name: '《神照经》', icon: '📖', tag: '玩', type: '秘籍', price: 300, desc: '天下第一内功，起死回生——丁典的狱中绝学。' },
-  { id: 'lcg_xuedao2', name: '血刀刀法（秘本）', icon: '🩸', tag: '玩', type: '秘籍', price: 220, desc: '血刀门的诡诈刀法。' },
-  { id: 'lcg_xue_knife', name: '血刀', icon: '🗡️', tag: '玩', type: '宝物', price: 180, desc: '血红弯刀——血刀老祖的信物。' },
+  { id: 'lcg_xuedao2', name: '血刀刀法（秘本）', icon: '🩸', tag: '玩', type: '秘籍', price: 220, desc: '血刀老祖的血刀刀法，狠辣诡诈，专走偏锋。' },
+  { id: 'lcg_xue_knife', name: '血刀', icon: '🗡️', tag: '玩', type: '宝物', price: 180, desc: '血刀老祖的血红弯刀，刀光过处血雨腥风，恶名震彻川藏。' },
   { id: 'lcg_tangshi', name: '《唐诗选辑》', icon: '📜', tag: '玩', type: '经文', price: 240, desc: '连城剑法的密码书——数字藏头诗的宝藏之钥。' },
-  { id: 'lcg_liancheng_jian', name: '连城剑法', icon: '⚔️', tag: '玩', type: '秘籍', price: 240, desc: '藏于剑招数字中的寻宝法门。' },
-  { id: 'lcg_chrysanthemum', name: '窗台绿菊', icon: '🌼', tag: '玩', type: '宝物', price: 120, desc: '丁典与凌霜华的知音之花。' },
+  { id: 'lcg_liancheng_jian', name: '连城剑法', icon: '⚔️', tag: '玩', type: '秘籍', price: 240, desc: '连城剑法，剑招数字里藏着宝藏口诀的寻宝法门。' },
+  { id: 'lcg_chrysanthemum', name: '窗台绿菊', icon: '🌼', tag: '玩', type: '宝物', price: 120, desc: '丁典与凌霜华窗前对菊的知音之花，是人鬼殊途也斩不断的深情。' },
   { id: 'lcg_ufu_knife', name: '乌蚕衣', icon: '🥋', tag: '衣', type: '宝物', price: 180, desc: '丁典所赠的软甲——刀枪不入的保命内衣。' }
 );

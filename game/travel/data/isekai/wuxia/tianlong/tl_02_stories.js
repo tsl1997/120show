@@ -31,7 +31,7 @@ window.TL_STORIES.push(
   /* ---- 丐帮与中原 ---- */
   { id: 'tlc_quanqing', name: '全冠清', icon: '🐍', desc: '丐帮的阴谋家，杏子林政变的幕后推手。' },
   { id: 'tlc_kangmin', name: '马夫人康敏', icon: '🕷️', desc: '"我要让你身败名裂"——白世镜与全冠清的毒妇棋手。' },
-  { id: 'tlc_baishijing', name: '白世镜', icon: '🪞', desc: '丐帮执法长老，被康敏拿捏的伪君子。' },
+  { id: 'tlc_baishijing', name: '白世镜', icon: '🪞', desc: '丐帮执法长老白世镜，被康敏拿捏的伪君子。' },
   { id: 'tlc_xiaoyuanshan', name: '萧远山', icon: '🐺', desc: '萧峰之父，雁门关外一怒杀四师的辽人武士——藏身少林三十年。' },
   { id: 'tlc_murongbo', name: '慕容博', icon: '🎭', desc: '"已死"的慕容老爷，雁门关阴谋的始作俑者——假传音讯的祸首。' },
   { id: 'tlc_saodi_seng', name: '扫地僧', icon: '🧹', desc: '藏经阁的无名老僧——一掌"点化"萧远山慕容博的天花板存在。' },
@@ -43,7 +43,7 @@ window.TL_STORIES.push(
   { id: 'tlc_yelvhongji', name: '耶律洪基', icon: '🐎', desc: '辽国皇帝，萧峰的结拜大哥——"南朝不可侵"的野心与背叛。' },
   { id: 'tlc_wanyan', name: '完颜阿骨打', icon: '🏹', desc: '女真首领，萧峰的生死之交——草原上的豪气汉子。' },
   { id: 'tlc_xue_medicine', name: '薛神医', icon: '🌿', desc: '聚贤庄群雄之一，"杀人名医"薛慕华。' },
-  { id: 'tlc_zhaoqiansun', name: '赵钱孙', icon: '🎭', desc: '雁门关旧人，忘却姓名的疯癫高手。' },
+  { id: 'tlc_zhaoqiansun', name: '赵钱孙', icon: '🎭', desc: '赵钱孙——雁门关外幸存的旧人，忘却姓名的疯癫高手。' },
   { id: 'tlc_tangong', name: '谭公谭婆', icon: '🍶', desc: '聚贤庄旧友，"打是亲骂是爱"的欢喜冤家。' },
   /* ---- 大事件 ---- */
   { id: 'tlv_yanmen_ambush', name: '雁门关伏击战', icon: '🏯', desc: '三十年前的错误伏击——慕容博假讯害得萧远山家破人亡，一切悲剧的原点。' },

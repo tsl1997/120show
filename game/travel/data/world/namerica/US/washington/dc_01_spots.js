@@ -24,5 +24,5 @@ window.DC_SPOTS.push(
   { id: 'dcp_library', name: '国会图书馆', icon: '📚', price: 0, desc: '世界最大图书馆。Jefferson Building 穹顶壁画文艺复兴。馆藏 1.7 亿，"美国的知识宝库"。' },
   /* ---- 周边与远郊 ---- */
   { id: 'dcp_arlington', name: '阿灵顿国家公墓', icon: '⚰️', price: 0, desc: '波托马克河对岸的无名战士墓。肯尼迪的"永恒之火"在此，"美国军人荣誉之地"。' },
-  { id: 'dcp_mt_vernon', name: '弗农山庄', icon: '🏛️', price: 100, desc: '华盛顿的故乡乔治宅。车程 30 分钟，' + '美国独立战争前的种植园。"国父的根"。' }
+  { id: 'dcp_mt_vernon', name: '弗农山庄', icon: '🏛️', price: 28, desc: '华盛顿的故乡乔治宅。车程 30 分钟，' + '美国独立战争前的种植园。"国父的根"。' }
 );

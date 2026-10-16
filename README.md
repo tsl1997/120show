@@ -47,6 +47,25 @@ python -m http.server 8000
 
 > 说明：由于多个页面通过 CDN 加载前端依赖，离线环境或网络受限环境下可能出现资源加载失败。
 
+### 依赖版本约定
+
+为避免 CDN 版本漂移，前端依赖统一锁定到以下版本，新增页面请沿用：
+
+| 依赖 | 锁定版本 | 来源 | 用途 |
+| --- | --- | --- | --- |
+| `ethers` | `6.15.0` | cdnjs | 全部 EVM 页面 |
+| `@solana/web3.js` | `1.99.0` | jsdelivr | SOL 钱包 / 转账 / 余额 |
+| `tronweb` | `5.3.2` | unpkg | TRX 钱包 / 转账 / 余额 |
+| `viem` | `2.44.4` | esm.sh | `web3/aa.html` 账号抽象 |
+| `solc` | `0.8.30` | esm.sh | 前端合约编译 |
+| `vue` | `3.5.22` | bootcdn | `text/` 子项目 |
+
+说明：
+
+- `@solana/web3.js` 的稳定最新版为 `1.99.0`；`2.x` / `3.x` 目前仍是 preview / rc，暂不升级。
+- `text/archive/` 下的历史页面保留其当时的依赖版本，不做统一升级。
+- MediaPipe（`face_mesh` / `hands` / `camera_utils`）目前仍按 jsdelivr 最新路径加载，尚未锁版本。
+
 ## 页面与模块导航
 
 ### 主页入口
@@ -72,8 +91,8 @@ Web3 工具统一由 `web3/index.html` 作为合集入口，按功能分类：
   - `airdrop/balance-trx.html`：TRX 测试网余额检查（txt / csv 导入）。
   - `airdrop/balance-sol.html`：SOL 测试网余额检查（txt / csv 导入）。
 - **部署与合约**
-  - `web3/deploy.html`：合约部署测试台。
-  - `web3/deploybot.html`：DeployBot 执行台（策略自动化）。
+  - `web3/deploy.html`：合约部署测试台（前端编译，固定仅允许 Sepolia）。
+  - `web3/deploybot.html`：DeployBot 执行台。内置 22 个常见测试网（取自 `text/config.js`），支持自定义 RPC 与备用 RPC 多节点故障转移；四种策略：蜻蜓点水、工厂分发、二叉树、一夫当关（1:N 普通转账，单线程顺序发送、自增 nonce、发完统一等确认；余额预留按 21000 gas × maxFeePerGas 计算，gasLimit 固定 500000）。
 - **协议与实验**
   - `web3/send.html`：以太坊转账全景（含 EOA 与 CREATE2 场景展示）。
   - `web3/aa.html`：AA 账号体验台（Sepolia 相关流程）。

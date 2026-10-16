@@ -1,6 +1,7 @@
 /* 异世界·天龙八部 分册03：武功秘籍与神兵 */
 window.TL_GIFTS = window.TL_GIFTS || [];
 window.TL_GIFTS.push(
+  { id: 'tlg_kaoyangtui', name: '雁门关外烤羊腿', icon: '🍖', tag: '食', type: '美食', price: 55, desc: '萧峰最惦记的关外烤羊腿，配烈酒大口吃肉——"燕云十八飞骑"的下酒菜。' },
   { id: 'tlg_liumai', name: '六脉神剑谱', icon: '☝️', tag: '玩', type: '秘籍', price: 320, desc: '大理段氏最高武学，六指剑气无形无质——"一阳指为基，六剑为峰"。' },
   { id: 'tlg_yiyangzhi', name: '一阳指', icon: '👆', tag: '玩', type: '秘籍', price: 220, desc: '段氏家传指法，隔空点穴与凌空点穴——天龙寺五本论剑的功夫。' },
   { id: 'tlg_beiming', name: '北冥神功卷轴', icon: '🌀', tag: '玩', type: '秘籍', price: 300, desc: '逍遥派绝学，吸人内力为己用——段誉的"北冥真气"。' },
@@ -22,8 +23,8 @@ window.TL_GIFTS.push(
   { id: 'tlg_shenxian_statue', name: '神仙姊姊玉像', icon: '🪷', tag: '玩', type: '宝物', price: 240, desc: '无量山洞底的绝世玉像——王语嫣神似的前世佳人。' },
   { id: 'tlg_langhuan_books', name: '琅嬛玉洞书谱', icon: '📜', tag: '玩', type: '秘籍', price: 280, desc: '天下武学尽收其中——逍遥派收藏的武学总纲。' },
   { id: 'tlg_haanshi_garden', name: '还施水阁藏书', icon: '🏛️', tag: '玩', type: '秘籍', price: 240, desc: '燕子坞的武学宝库，"以彼之道"的情报库。' },
-  { id: 'tlg_qianlong_xinfa', name: '修罗刀', icon: '🗡️', tag: '玩', type: '宝物', price: 180, desc: '秦红棉的修罗刀——母女双刀的凶器。' },
-  { id: 'tlg_dianying_diao', name: '闪电貂', icon: '🐿️', tag: '玩', type: '神兽', price: 160, desc: '钟灵的灵兽，快如闪电的毒貂。' },
+  { id: 'tlg_qianlong_xinfa', name: '修罗刀', icon: '🗡️', tag: '玩', type: '宝物', price: 180, desc: '修罗刀秦红棉的刀法，母女双刀齐出的凶器。' },
+  { id: 'tlg_dianying_diao', name: '闪电貂', icon: '🐿️', tag: '玩', type: '神兽', price: 160, desc: '钟灵的闪电貂，快如闪电一口封喉，毒貂通灵最护主。' },
   { id: 'tlg_iron_mask', name: '游坦之的铁面', icon: '⛓️', tag: '衣', type: '宝物', price: 140, desc: '烙在脸上的铁面——阿紫给"庄聚贤"的残酷礼物。' },
   { id: 'tlg_liaowang_knife', name: '萧峰的断箭', icon: '🏹', tag: '玩', type: '宝物', price: 240, desc: '雁门关外的折箭——"教单于折箭，六军辟易"的英雄信物。' },
   { id: 'tlg_luxiang_jade', name: '八部天龙护身符', icon: '🕊️', tag: '玩', type: '宝物', price: 160, desc: '"天龙八部"皆是人间的悲欢众生——金庸的佛喻之作。' },
