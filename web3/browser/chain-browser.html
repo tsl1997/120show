@@ -19,12 +19,18 @@
   .netline { margin-top: 6px; font-size: 12px; color: #64748b; }
   .netline .ok { color: #34d399; }
   .netline .bad { color: #f87171; }
-  .query { display: flex; gap: 10px; margin: 18px 0 14px; }
+  .query { display: flex; gap: 10px; margin: 18px 0 14px; flex-wrap: wrap; }
   .query input {
-    flex: 1; background: #111827; border: 1px solid #1f2937; color: #e2e8f0;
+    flex: 1; min-width: 220px; background: #111827; border: 1px solid #1f2937; color: #e2e8f0;
     padding: 10px 14px; font: inherit; font-size: 13px; outline: none;
   }
   .query input:focus { border-color: #38bdf8; }
+  .query select {
+    flex: none; max-width: 215px; background: #111827; border: 1px solid #1f2937; color: #e2e8f0;
+    padding: 10px 10px; font: inherit; font-size: 13px; outline: none; cursor: pointer;
+  }
+  .query select:focus { border-color: #38bdf8; }
+  .query select option, .query select optgroup { background: #111827; color: #e2e8f0; }
   .query button, .btn {
     background: transparent; color: #7dd3fc; border: 1px solid #1e3a5f; padding: 10px 20px;
     font: inherit; font-size: 13px; font-weight: 400; cursor: pointer; white-space: nowrap;
@@ -43,6 +49,11 @@
   .stat .v { font-size: 20px; color: #e2e8f0; font-weight: 700; margin-top: 2px; }
   .stat .v small { font-size: 12px; color: #64748b; font-weight: 400; }
   .list { border: 1px solid #1f2937; }
+  /* 列表区提示（如该链无公共地址索引） */
+  .listnote {
+    border: 1px solid #78350f; background: #1c1207; color: #fbbf24;
+    padding: 16px; font-size: 13px; line-height: 1.9;
+  }
   .lhead, .row {
     display: grid; grid-template-columns: 52px 130px 150px 120px 90px 170px 90px 110px;
     gap: 8px; padding: 9px 14px; align-items: center; font-size: 12.5px;
@@ -64,6 +75,7 @@
     background: #1c1207; white-space: nowrap;
   }
   .badge.html { border-color: #1e3a5f; color: #7dd3fc; background: #0c1a2b; }
+  .badge.list { border-color: #065f46; color: #34d399; background: #052e22; }
   a { color: #7dd3fc; text-decoration: none; }
   a:hover { text-decoration: underline; }
   .more { margin-top: 12px; text-align: center; }
@@ -152,7 +164,7 @@
         <button class="btn ghost" id="lang-btn">EN</button>
       </div>
     </div>
-    <div class="netline" id="netline">正在连接 Sepolia 网络 ...</div>
+    <div class="netline" id="netline">正在连接网络 ...</div>
   </header>
 
   <!-- 使用说明（默认折叠，点击「使用说明」展开） -->
@@ -161,6 +173,7 @@
   <!-- 列表模式 -->
   <div id="list-ui">
     <div class="query">
+      <select id="net-sel" title="网络选择"></select>
       <input id="addr" spellcheck="false" autocomplete="off"
         value="0x0000000000000000000000000000000666666666"
         placeholder="链ID:交易哈希（如 11155111:0x…）· 地址 · 交易哈希">
@@ -197,7 +210,7 @@
 
   /* ==================== 网络配置（来自 networks.js） ==================== */
   var NETWORKS = window.NETWORKS || {};
-  var API = 'https://eth-sepolia.blockscout.com/api/v2'; // 列表模式数据源（Sepolia）
+  var CHAIN_KEY = 'cb_chain'; // 网络选择框的 localStorage 记忆键
   var DEFAULT_ADDR = '0x0000000000000000000000000000000666666666';
   var PAGE_SIZE = 20;
   var LANG_KEY = 'cb_lang';
@@ -207,6 +220,47 @@
     return '0xaa36a7';
   }
   function chainMeta(chainId) { return NETWORKS[String(chainId || '').toLowerCase()] || null; }
+  function chainName(cid) {
+    var n = chainMeta(cid);
+    return n ? n.name : String(cid);
+  }
+  // 地址列表 API：读 networks.js 的 api 字段（Blockscout API v2，免密钥 + CORS 放行）；
+  // 留空的链没有公共地址索引，纯 RPC 无法枚举地址的普通转账
+  function listApi(cid) {
+    var n = chainMeta(cid);
+    return (n && n.api) || null;
+  }
+  // 当前浏览链：网络选择框的值（无效则回退默认链）
+  function currentChain() {
+    var v = '';
+    try { v = $('net-sel').value; } catch (e) { /* DOM 未就绪 */ }
+    return chainMeta(v) ? v.toLowerCase() : defaultChain();
+  }
+
+  // 网络选择框：从 networks.js 读取全部链（主网/测试网分组），默认选中默认链，记忆上次选择
+  function fillNetSelect() {
+    var sel = $('net-sel');
+    if (!sel) return;
+    sel.innerHTML = '';
+    sel.title = t('netSelTitle');
+    ['mainnet', 'testnet'].forEach(function (type) {
+      var ids = Object.keys(NETWORKS).filter(function (cid) { return NETWORKS[cid].type === type; });
+      if (!ids.length) return;
+      var g = document.createElement('optgroup');
+      g.label = type === 'mainnet' ? t('helpMainnet') : t('helpTestnet');
+      ids.forEach(function (cid) {
+        var n = NETWORKS[cid];
+        var o = document.createElement('option');
+        o.value = cid;
+        o.textContent = n.name + ' (' + parseInt(cid, 16) + ')' + (cid === defaultChain() ? ' · ' + t('netDefault') : '');
+        g.appendChild(o);
+      });
+      sel.appendChild(g);
+    });
+    var saved = null;
+    try { saved = localStorage.getItem(CHAIN_KEY); } catch (e) { /* 隐私模式 */ }
+    sel.value = (saved && chainMeta(saved)) ? String(saved).toLowerCase() : defaultChain();
+  }
 
   /* ==================== i18n ==================== */
   var I18N = {
@@ -220,13 +274,15 @@
       netOk: '● 已连接 {chain} (chainId {cid}) · 交易详情走各链 RPC 直查',
       netBad: '● RPC 异常 (chainId={cid}) · 仅 API 模式',
       netDown: '● RPC 不可达 · 仅 API 模式',
-      placeholder: '链ID:交易哈希（如 11155111:0x…）· 地址 · 交易哈希',
+      netSelTitle: '选择网络：检索与详情查询按此链进行',
+      netDefault: '默认',
+      placeholder: '交易哈希（按所选网络查询）· 地址 · 链ID:交易哈希（如 11155111:0x…）',
       search: '检索',
       loadingList: '正在检索 {addr} 的交易 ...',
       statTotal: '总交易数',
       statTokens: '代币转账',
       statLoaded: '已加载',
-      emptyList: '该地址在 Sepolia 上没有交易记录。',
+      emptyList: '该地址在 {chain} 上没有交易记录。',
       lhead: ['#', '方向', '对方地址', '数值', 'DATA', '时间', '区块', 'HASH'],
       dirIn: '← 接收',
       dirOut: '→ 发出',
@@ -240,6 +296,7 @@
       retryMore: '重试加载更多',
       errInvalid: '输入格式不正确：可输入 0x 开头的 40 位地址、64 位交易哈希，或「链ID:哈希」（如 11155111:0x…）。',
       errUnknownChain: '未知的链 ID：{cid}。网络配置中没有这条链，请求被拒绝。支持的链请查看「使用说明」。',
+      errNoListApi: '当前网络 {chain} 没有公共地址索引（Blockscout API）—— 暂不支持地址列表检索。可直接输入交易哈希，经该链 RPC 查询详情。',
       errRateLimit: 'Blockscout 公共 API 限流（429），请稍等几秒后重试。',
       errListFail: '检索失败：{msg}（Blockscout 公共节点繁忙时可稍后重试）',
       errTxNotFound: '交易 {hash}… 在 {chain} 上不存在（或尚未被节点索引），请检查哈希与链 ID。',
@@ -278,16 +335,17 @@
       dshare: '复制链接',
       helpWhat: '一个纯前端的链上网页浏览器：网页源码可以编码进以太坊交易的 data 字段永久上链，本工具负责把链上数据原样读回并渲染。',
       helpQueryTitle: '三种检索方式',
-      helpQuery1: '地址（0x 开头的 40 位）→ 在默认链 Sepolia 上列出该地址的交易（Blockscout 数据源）。',
-      helpQuery2: '交易哈希（64 位）→ 在默认链 Sepolia 上打开该交易详情。',
+      helpQuery1: '地址（0x 开头的 40 位）→ 在所选网络列出该地址的交易（配置了 Blockscout 公共索引的链才支持，见下方链列表的「地址列表」标注；其余链会提示改用哈希检索）。',
+      helpQuery2: '交易哈希（64 位）→ 在网络选择框所选链上打开该交易详情（默认 Sepolia，所有链都支持）。',
       helpQuery3: '链ID + 交易哈希（如 <code>11155111:0x…</code> 或 <code>0xaa36a7 0x…</code>，分隔符支持空格 / 冒号 / 逗号）→ 先在网络配置中查找该链，<b>找不到则拒绝请求</b>；找到后用该链的公共 RPC 直接查询。无论网页发布在哪条链，都能由此读到。',
       helpChainsTitle: '支持的链',
       helpMainnet: '主网 / 主流 L2',
       helpTestnet: '测试网',
+      helpListBadge: '地址列表',
       helpPublishTitle: '发布网页',
       helpPublish: '点击右上角「部署网页 ↗」打开发布台：连接 MetaMask（或私钥模式），粘贴网页源码即可发布，把源码写进链上。',
       helpDataTitle: '数据通道',
-      helpData: '交易详情：各链公共 RPC 直查（免密钥，CORS 均已实测放行）。地址列表：Sepolia 走 Blockscout 公共 API。网络配置见 <code>networks.js</code>（新增链只改这一个文件）。'
+      helpData: '交易详情：各链公共 RPC 直查（免密钥，CORS 均已实测放行）。地址列表：配置了 <code>api</code> 字段的链走各自 Blockscout 公共 API v2（免密钥 + CORS）；其余链暂无公共地址索引，只能用交易哈希 RPC 查询。网络配置见 <code>networks.js</code>（新增链只改这一个文件）。'
     },
     en: {
       subtitle: '// On-chain browser',
@@ -299,13 +357,15 @@
       netOk: '● Connected to {chain} (chainId {cid}) · tx details via direct RPC',
       netBad: '● RPC error (chainId={cid}) · API-only mode',
       netDown: '● RPC unreachable · API-only mode',
-      placeholder: 'chainId:txHash (e.g. 11155111:0x…) · address · txHash',
+      netSelTitle: 'Pick network: searches and detail queries run on this chain',
+      netDefault: 'DEFAULT',
+      placeholder: 'tx hash (queried on the selected network) · address · chainId:txHash (e.g. 11155111:0x…)',
       search: 'Search',
       loadingList: 'Loading transactions of {addr} ...',
       statTotal: 'Total txs',
       statTokens: 'Token transfers',
       statLoaded: 'Loaded',
-      emptyList: 'No transactions found for this address on Sepolia.',
+      emptyList: 'No transactions found for this address on {chain}.',
       lhead: ['#', 'Direction', 'Counterparty', 'Value', 'DATA', 'Time', 'Block', 'HASH'],
       dirIn: '← In',
       dirOut: '→ Out',
@@ -319,6 +379,7 @@
       retryMore: 'Retry',
       errInvalid: 'Invalid input: enter a 40-char address, a 64-char tx hash, or "chainId:hash" (e.g. 11155111:0x…).',
       errUnknownChain: 'Unknown chain ID: {cid}. This chain is not in the network config — request rejected. See "Guide" for supported chains.',
+      errNoListApi: '{chain} has no public address index (Blockscout API) — address listing is not available on this chain yet. Enter a tx hash to query details via that chain\'s RPC.',
       errRateLimit: 'Blockscout public API rate limit (429) — please retry in a few seconds.',
       errListFail: 'Query failed: {msg} (Blockscout public node busy, retry later)',
       errTxNotFound: 'Tx {hash}… not found on {chain} (or not yet indexed) — check the hash and chain ID.',
@@ -357,16 +418,17 @@
       dshare: 'Copy link',
       helpWhat: 'A pure front-end on-chain browser: web page source can be encoded into a transaction\'s data field for permanent storage. This tool reads it back and renders it as-is.',
       helpQueryTitle: 'Three ways to search',
-      helpQuery1: 'Address (40 hex chars) → list transactions on the default chain Sepolia (Blockscout data source).',
-      helpQuery2: 'Transaction hash (64 hex) → open the tx detail on the default chain Sepolia.',
+      helpQuery1: 'Address (40 hex chars) → list the address\'s transactions on the selected network (only chains with a Blockscout index — marked "list" in the chain list below; others prompt for a hash search instead).',
+      helpQuery2: 'Transaction hash (64 hex) → open the tx detail on the chain selected in the network picker (default: Sepolia; works on every chain).',
       helpQuery3: 'Chain ID + tx hash (e.g. <code>11155111:0x…</code> or <code>0xaa36a7 0x…</code>; separators: space / colon / comma) → the chain is looked up in the network config first; <b>if not found, the request is rejected</b>. Otherwise the tx is read directly from that chain\'s public RPC — regardless of which chain the page was published on.',
       helpChainsTitle: 'Supported chains',
       helpMainnet: 'Mainnet / L2',
       helpTestnet: 'Testnets',
+      helpListBadge: 'list',
       helpPublishTitle: 'Publish a page',
       helpPublish: 'Click "Deploy ↗" to open the publisher: connect MetaMask (or private-key mode), paste your page source and publish it on-chain.',
       helpDataTitle: 'Data sources',
-      helpData: 'Tx details: direct queries to each chain\'s public RPC (keyless, CORS verified). Address listing: Sepolia via Blockscout public API. Network config lives in <code>networks.js</code> — add chains there only.'
+      helpData: 'Tx details: direct queries to each chain\'s public RPC (keyless, CORS verified). Address listing: chains with an <code>api</code> field use their own Blockscout public API v2 (keyless + CORS); the rest have no public address index yet, so use a tx hash with RPC instead. Network config lives in <code>networks.js</code> — add chains there only.'
     }
   };
 
@@ -384,7 +446,7 @@
     return s;
   }
 
-  var state = { addr: '', items: [], cursor: null, counters: null, loading: false, loadedOnce: false, helpOpen: false, tx: null };
+  var state = { addr: '', items: [], cursor: null, counters: null, loading: false, loadedOnce: false, helpOpen: false, tx: null, errNote: null, pageSize: null };
 
   function $(id) { return document.getElementById(id); }
   function el(tag, cls, text) {
@@ -445,19 +507,20 @@
     }).then(function (r) { return r.json(); });
   }
 
-  // 校验交易哈希是否存在：RPC 为主，Blockscout 复核（防节点未同步，仅默认链有 Blockscout）
+  // 校验交易哈希是否存在：RPC 为主，Blockscout 复核（防节点未同步，仅配置了列表 API 的链有 Blockscout）
   function checkTxExists(chainId, hash) {
+    var api = listApi(chainId);
     return rpcCall(chainId, 'eth_getTransactionByHash', [hash]).then(function (j) {
       if (j.error) throw new Error('rpc');
       if (j.result) return true;
-      if (chainId === defaultChain()) {
-        return fetchJSON(API + '/transactions/' + hash).then(function (jt) { return !!jt.hash; })
+      if (api) {
+        return fetchJSON(api + '/transactions/' + hash).then(function (jt) { return !!jt.hash; })
           .catch(function () { return false; });
       }
       return false;
     }).catch(function () {
-      if (chainId === defaultChain()) {
-        return fetchJSON(API + '/transactions/' + hash).then(function (jt) { return !!jt.hash; })
+      if (api) {
+        return fetchJSON(api + '/transactions/' + hash).then(function (jt) { return !!jt.hash; })
           .catch(function () { throw new Error('lookup'); });
       }
       throw new Error('lookup');
@@ -466,8 +529,8 @@
 
   /* ---------- 网络状态 ---------- */
   function checkNetwork() {
-    var def = defaultChain();
-    rpcCall(def, 'eth_chainId', []).then(function (j) {
+    var cid = currentChain();
+    rpcCall(cid, 'eth_chainId', []).then(function (j) {
       var n = $('netline');
       n.innerHTML = '';
       if (j && j.result) {
@@ -475,8 +538,8 @@
         n.classList.add('hidden');
       } else {
         n.classList.remove('hidden');
-        var net = chainMeta(def);
-        n.appendChild(el('span', 'bad', t('netBad', { cid: parseInt(def, 16) })));
+        var net = chainMeta(cid);
+        n.appendChild(el('span', 'bad', t('netBad', { cid: parseInt(cid, 16) })));
       }
     }).catch(function () {
       var n = $('netline');
@@ -507,7 +570,7 @@
       if (cid) return { type: 'chainTx', chainId: cid, hash: parts[parts.length - 1] };
     }
     if (isAddr(q)) return { type: 'addr' };
-    if (isTxHash(q)) return { type: 'tx', chainId: defaultChain(), hash: q };
+    if (isTxHash(q)) return { type: 'tx', chainId: currentChain(), hash: q };
     return { type: 'invalid' };
   }
 
@@ -520,7 +583,7 @@
       if (cid) return { chainId: cid, hash: parts[1] };
       return null;
     }
-    if (isTxHash(param)) return { chainId: defaultChain(), hash: param };
+    if (isTxHash(param)) return { chainId: currentChain(), hash: param };
     return null;
   }
 
@@ -566,17 +629,25 @@
     renderDetail(parsed.chainId, parsed.hash);
   }
 
-  /* ==================== 列表模式（默认链 · Blockscout） ==================== */
+  /* ==================== 列表模式（所选链 · Blockscout 索引） ==================== */
   function openTx(hash) {
-    window.open(baseUrl() + '#tx=' + defaultChain() + ':' + hash, '_blank');
+    window.open(baseUrl() + '#tx=' + currentChain() + ':' + hash, '_blank');
   }
 
   function load(addr, cursor, keepOld) {
     if (state.loading) return;
+    var api = listApi(currentChain());
+    if (!api) {
+      // 该链没有配置地址列表 API（networks.js 无 api 字段）——列表区给出明确提示（i18n 键 + 变量，切语言即时更新）
+      state.errNote = { key: 'errNoListApi', vars: { chain: chainName(currentChain()) } };
+      render();
+      return;
+    }
+    state.errNote = null;
     state.loading = true;
     hideErr();
     if (!keepOld) {
-      state.items = []; state.cursor = null; state.counters = null;
+      state.items = []; state.cursor = null; state.counters = null; state.pageSize = null;
       $('list').innerHTML = '';
       $('stats').innerHTML = '';
       $('more').innerHTML = '';
@@ -594,16 +665,19 @@
         if (cursor[k] !== null && cursor[k] !== undefined) p.push(encodeURIComponent(k) + '=' + encodeURIComponent(cursor[k]));
       }
     }
-    var listUrl = API + '/addresses/' + addr + '/transactions?' + p.join('&');
+    var listUrl = api + '/addresses/' + addr + '/transactions?' + p.join('&');
 
     Promise.all([
-      fetchJSON(API + '/addresses/' + addr + '/counters'),
+      fetchJSON(api + '/addresses/' + addr + '/counters'),
       fetchJSON(listUrl)
     ]).then(function (res) {
       state.counters = res[0];
       var page = res[1];
       state.items = keepOld ? state.items.concat(page.items || []) : (page.items || []);
       state.cursor = page.next_page_params || null;
+      // 部分 Blockscout 实例有最小页大小（如 50）：items_count 小于最小值时被忽略，
+      // 以实际返回条数作为有效页大小，保证「每页 N」与「加载更多」的计数诚实
+      if (page.items && page.items.length > PAGE_SIZE) state.pageSize = page.items.length;
       render();
       state.loading = false;
     }).catch(function (e) {
@@ -628,6 +702,15 @@
   function render() {
     var stats = $('stats');
     stats.innerHTML = '';
+    var list = $('list');
+    list.innerHTML = '';
+    var more = $('more');
+    more.innerHTML = '';
+    // 列表模式在该链不可用（如无公共地址索引）：列表区给出提示，不渲染旧数据
+    if (state.errNote) {
+      list.appendChild(el('div', 'listnote', t(state.errNote.key, state.errNote.vars)));
+      return;
+    }
     var c = state.counters || {};
     function stat(k, v, unit) {
       var s = el('div', 'stat');
@@ -639,12 +722,10 @@
     }
     stat(t('statTotal'), Number(c.transactions_count || 0).toLocaleString(), '');
     stat(t('statTokens'), Number(c.token_transfers_count || 0).toLocaleString(), '');
-    stat(t('statLoaded'), state.items.length, '（每页 ' + PAGE_SIZE + '）');
+    stat(t('statLoaded'), state.items.length, '（每页 ' + (state.pageSize || PAGE_SIZE) + '）');
 
-    var list = $('list');
-    list.innerHTML = '';
     if (!state.items.length) {
-      list.appendChild(el('div', 'loading', t('emptyList')));
+      list.appendChild(el('div', 'loading', t('emptyList', { chain: chainName(currentChain()) })));
     }
     var head = el('div', 'lhead');
     t('lhead').forEach(function (x) { head.appendChild(el('span', null, x)); });
@@ -685,7 +766,7 @@
       // 哈希：真实链接，点击在新窗口打开交易详情
       var h = el('span');
       var ha = el('a', 'mono', it.hash.slice(0, 10) + '…');
-      ha.href = baseUrl() + '#tx=' + defaultChain() + ':' + it.hash;
+      ha.href = baseUrl() + '#tx=' + currentChain() + ':' + it.hash;
       ha.target = '_blank'; ha.rel = 'noopener';
       ha.title = it.hash + t('openNewWinTitle');
       h.appendChild(ha);
@@ -701,7 +782,7 @@
     var more = $('more');
     more.innerHTML = '';
     if (state.cursor) {
-      var btn = el('button', 'btn', t('loadMore', { n: PAGE_SIZE }));
+      var btn = el('button', 'btn', t('loadMore', { n: state.pageSize || PAGE_SIZE }));
       btn.onclick = function () { load(state.addr, state.cursor, true); };
       more.appendChild(btn);
       more.appendChild(el('div', 'note', t('moreNote')));
@@ -1012,6 +1093,8 @@
         item.appendChild(dot);
         item.appendChild(document.createTextNode(n.name));
         item.appendChild(el('span', 'cid', parseInt(cid, 16)));
+        // 配置了 Blockscout 地址列表 API 的链加标注
+        if (n.api) item.appendChild(el('span', 'badge list', t('helpListBadge')));
         grid.appendChild(item);
       });
       p.appendChild(grid);
@@ -1040,6 +1123,7 @@
     $('dback').textContent = t('dback');
     $('dshare').textContent = t('dshare');
     updateMetaToggle();
+    fillNetSelect(); // 选择框分组标签随语言刷新（选中项从 localStorage 恢复，不丢失）
     document.title = t('docTitle');
     if (state.helpOpen) renderHelp();
   }
@@ -1059,7 +1143,8 @@
 
   /* ==================== 事件 ==================== */
   function onSearch() {
-    var q = $('addr').value.trim();
+    // 空输入兜底为广场地址（与首屏默认检索一致）
+    var q = $('addr').value.trim() || DEFAULT_ADDR;
     hideErr();
     var parsed = parseQuery(q);
     if (parsed.type === 'addr') {
@@ -1092,6 +1177,14 @@
   }
 
   $('go').onclick = onSearch;
+  // 网络选择：切换后记忆选择，并用新链重新检索输入框内容
+  // （哈希 → 该链 RPC 直查开详情；地址 → 仅默认链有列表，其他链给出提示；「链ID:哈希」以输入为准）
+  $('net-sel').addEventListener('change', function () {
+    var cid = $('net-sel').value;
+    try { localStorage.setItem(CHAIN_KEY, cid); } catch (e) { /* 隐私模式 */ }
+    checkNetwork(); // 探测新链 RPC 连通性（异常才显示 netline）
+    onSearch();
+  });
   $('deploy-btn').onclick = function () { window.open('deploy.html', '_blank'); };
   $('help-btn').onclick = toggleHelp;
   $('lang-btn').onclick = function () { setLang(lang === 'zh' ? 'en' : 'zh'); };

@@ -9,12 +9,14 @@
  *   color     链品牌色（UI 徽标用）
  *   symbol    链原生币符号
  *   explorer  区块浏览器外链模板，{hash} 会被交易哈希替换（留空则不显示外链按钮）
+ *   api       地址列表 API（Blockscout API v2 格式，免密钥 + CORS 放行；留空则该链不支持
+ *             地址列表检索——检索框给地址时会提示改用交易哈希 RPC 查询）
  *   default   是否为默认链（只有一条，用于「只输入哈希、不指定链」的查询）
  *   note      备注（如端口限制）
  *
  * 检索规则：输入 <chainId>:<交易哈希>（如 11155111:0xabc... 或 0xaa36a7:0xabc...），
  * 先在本配置里查链，查不到直接拒绝；查到后用该链的 rpc 查询交易。
- * 单独输入地址或哈希时，走默认链（Sepolia）的列表/查询逻辑。
+ * 单独输入地址或哈希时，走网络选择框所选链（无效回退默认链 Sepolia）的列表/查询逻辑。
  *
  * RPC 验证记录（2026-10-17，curl 带 Origin 实测 eth_chainId + access-control-allow-origin）：
  *   - 所有 publicnode/drpc 端点：CORS 通配 *
@@ -22,6 +24,22 @@
  *   - Arc 官方 RPC 的 CORS 仅放行 http://localhost:8080 —— 请用默认端口启动本地服务器
  *   - text 原配置中的 Sonic Blaze（RPC 已下线）与 Ronin Saigon（RPC 实际 chainId=0x31769 与
  *     配置键 0x7e5 不符）已剔除；Tempo 的 chainId 按 RPC 实际返回修正为 0xa5bf
+ *
+ * api（地址列表）验证记录（2026-10-17，实测免密钥 + CORS + 真实数据）：
+ *   - Blockscout 实例：eth / eth-sepolia / base / base-sepolia / arbitrum / arbitrum-sepolia /
+ *     polygon / zksync / explorer.optimism.io / testnet-explorer.optimism.io / scrollscan /
+ *     gnosisscan / celo / testnet-explorer.plume.org / shannon-explorer.somnia.network /
+ *     testnet.kitescan.ai / sepolia-explorer.giwa.io —— 全部 api/v2/addresses/<addr>/
+ *     transactions 免密钥返回 JSON，access-control-allow-origin: *
+ *   - Base / Arbitrum / Polygon 主网实例在 Cloudflare 后：curl 会被人机验证拦截，
+ *     但真实浏览器指纹可透明通过（无头 Chrome 跨域 fetch 实测 200 + JSON）——
+ *     浏览器端可用；非浏览器客户端（curl/服务端）会被挑战
+ *   - 不支持地址列表的链：Linea / Blast / Mantle / Taiko / opBNB / BSC / Avalanche /
+ *     Unichain / Citrea（API 无 CORS 头）/ Intuition（实例 500）/ RISE / Stable / Tempo /
+ *     Arc / Scroll Sepolia / Hoodi / Mantle Sepolia / opBNB Testnet / BSC Testnet ——
+ *     这些链的浏览器多为 Etherscan 系（需 API key）或不存在 Blockscout 实例
+ *   - Routescan（api.routescan.io）虽免密钥且覆盖 Blast 等链，但响应不含交易 input
+ *     数据，无法识别链上网页，故不采用
  */
 window.NETWORKS = {
 
@@ -29,32 +47,38 @@ window.NETWORKS = {
   "0x1": {
     name: "Ethereum", rpc: "https://ethereum-rpc.publicnode.com",
     type: "mainnet", color: "#627eea", symbol: "ETH",
-    explorer: "https://etherscan.io/tx/{hash}", default: false
+    explorer: "https://etherscan.io/tx/{hash}", default: false,
+    api: "https://eth.blockscout.com/api/v2"
   },
   "0xa4b1": {
     name: "Arbitrum One", rpc: "https://arbitrum-one-rpc.publicnode.com",
     type: "mainnet", color: "#28a0f0", symbol: "ETH",
-    explorer: "https://arbiscan.io/tx/{hash}", default: false
+    explorer: "https://arbiscan.io/tx/{hash}", default: false,
+    api: "https://arbitrum.blockscout.com/api/v2"
   },
   "0x2105": {
     name: "Base", rpc: "https://base-rpc.publicnode.com",
     type: "mainnet", color: "#0052ff", symbol: "ETH",
-    explorer: "https://basescan.org/tx/{hash}", default: false
+    explorer: "https://basescan.org/tx/{hash}", default: false,
+    api: "https://base.blockscout.com/api/v2"
   },
   "0xa": {
     name: "Optimism", rpc: "https://optimism-rpc.publicnode.com",
     type: "mainnet", color: "#ff0420", symbol: "ETH",
-    explorer: "https://optimistic.etherscan.io/tx/{hash}", default: false
+    explorer: "https://optimistic.etherscan.io/tx/{hash}", default: false,
+    api: "https://explorer.optimism.io/api/v2"
   },
   "0x89": {
     name: "Polygon PoS", rpc: "https://polygon-bor-rpc.publicnode.com",
     type: "mainnet", color: "#8247e5", symbol: "POL",
-    explorer: "https://polygonscan.com/tx/{hash}", default: false
+    explorer: "https://polygonscan.com/tx/{hash}", default: false,
+    api: "https://polygon.blockscout.com/api/v2"
   },
   "0x82750": {
     name: "Scroll", rpc: "https://rpc.scroll.io",
     type: "mainnet", color: "#ffd3ad", symbol: "ETH",
-    explorer: "https://scrollscan.com/tx/{hash}", default: false
+    explorer: "https://scrollscan.com/tx/{hash}", default: false,
+    api: "https://scrollscan.com/api/v2"
   },
   "0xe708": {
     name: "Linea", rpc: "https://linea-rpc.publicnode.com",
@@ -64,7 +88,8 @@ window.NETWORKS = {
   "0x144": {
     name: "zkSync Era", rpc: "https://mainnet.era.zksync.io",
     type: "mainnet", color: "#8c8dfc", symbol: "ETH",
-    explorer: "https://explorer.zksync.io/tx/{hash}", default: false
+    explorer: "https://zksync.blockscout.com/tx/{hash}", default: false,
+    api: "https://zksync.blockscout.com/api/v2"
   },
   "0x13e31": {
     name: "Blast", rpc: "https://blast-rpc.publicnode.com",
@@ -84,7 +109,8 @@ window.NETWORKS = {
   "0x64": {
     name: "Gnosis", rpc: "https://gnosis-rpc.publicnode.com",
     type: "mainnet", color: "#10b981", symbol: "xDAI",
-    explorer: "https://gnosisscan.io/tx/{hash}", default: false
+    explorer: "https://gnosisscan.io/tx/{hash}", default: false,
+    api: "https://gnosisscan.io/api/v2"
   },
   "0xcc": {
     name: "opBNB", rpc: "https://opbnb-mainnet-rpc.bnbchain.org",
@@ -96,22 +122,26 @@ window.NETWORKS = {
   "0xaa36a7": {
     name: "Sepolia", rpc: "https://ethereum-sepolia-rpc.publicnode.com",
     type: "testnet", color: "#6366f1", symbol: "SepoliaETH",
-    explorer: "https://eth-sepolia.blockscout.com/tx/{hash}", default: true
+    explorer: "https://eth-sepolia.blockscout.com/tx/{hash}", default: true,
+    api: "https://eth-sepolia.blockscout.com/api/v2"
   },
   "0x66eee": {
     name: "Arbitrum Sepolia", rpc: "https://arbitrum-sepolia-rpc.publicnode.com",
     type: "testnet", color: "#3b82f6", symbol: "ETH",
-    explorer: "https://sepolia.arbiscan.io/tx/{hash}", default: false
+    explorer: "https://sepolia.arbiscan.io/tx/{hash}", default: false,
+    api: "https://arbitrum-sepolia.blockscout.com/api/v2"
   },
   "0xaa37dc": {
     name: "OP Sepolia", rpc: "https://optimism-sepolia.drpc.org",
     type: "testnet", color: "#ff0000", symbol: "ETH",
-    explorer: "https://sepolia-optimism.etherscan.io/tx/{hash}", default: false
+    explorer: "https://sepolia-optimism.etherscan.io/tx/{hash}", default: false,
+    api: "https://testnet-explorer.optimism.io/api/v2"
   },
   "0x14a34": {
     name: "Base Sepolia", rpc: "https://base-sepolia-rpc.publicnode.com",
     type: "testnet", color: "#3b82f6", symbol: "ETH",
-    explorer: "https://sepolia.basescan.org/tx/{hash}", default: false
+    explorer: "https://sepolia.basescan.org/tx/{hash}", default: false,
+    api: "https://base-sepolia.blockscout.com/api/v2"
   },
   "0x515": {
     name: "Unichain Sepolia", rpc: "https://unichain-sepolia-rpc.publicnode.com",
@@ -136,12 +166,14 @@ window.NETWORKS = {
   "0x18233": {
     name: "Plume", rpc: "https://testnet-rpc.plume.org",
     type: "testnet", color: "#9333ea", symbol: "PLUME",
-    explorer: "https://testnet-explorer.plume.org/tx/{hash}", default: false
+    explorer: "https://testnet-explorer.plume.org/tx/{hash}", default: false,
+    api: "https://testnet-explorer.plume.org/api/v2"
   },
   "0x940": {
     name: "KiteAI", rpc: "https://rpc-testnet.gokite.ai",
     type: "testnet", color: "#0ea5e9", symbol: "KITE",
-    explorer: "https://testnet.kitescan.ai/tx/{hash}", default: false
+    explorer: "https://testnet.kitescan.ai/tx/{hash}", default: false,
+    api: "https://testnet.kitescan.ai/api/v2"
   },
   "0x88bb0": {
     name: "Hoodi", rpc: "https://0xrpc.io/hoodi",
@@ -183,12 +215,14 @@ window.NETWORKS = {
   "0x164ce": {
     name: "Giwa", rpc: "https://sepolia-rpc.giwa.io",
     type: "testnet", color: "#14b8a6", symbol: "ETH",
-    explorer: "", default: false
+    explorer: "https://sepolia-explorer.giwa.io/tx/{hash}", default: false,
+    api: "https://sepolia-explorer.giwa.io/api/v2"
   },
   "0xc488": {
     name: "Somnia", rpc: "https://dream-rpc.somnia.network",
     type: "testnet", color: "#8b5cf6", symbol: "SOM",
-    explorer: "https://shannon-explorer.somnia.network/tx/{hash}", default: false
+    explorer: "https://shannon-explorer.somnia.network/tx/{hash}", default: false,
+    api: "https://shannon-explorer.somnia.network/api/v2"
   },
   "0x15eb": {
     name: "opBNB Testnet", rpc: "https://opbnb-testnet-rpc.bnbchain.org",
