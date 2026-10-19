@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>网页索引 · Sepolia</title>
+<script src="networks.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.17.0/dist/ethers.umd.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0b0f14; color: #d6e2ee;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, Menlo, "Courier New", "PingFang SC", "Microsoft YaHei", monospace;
+    font-size: 14px; line-height: 1.6;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 20px 60px; }
+  header { margin-bottom: 18px; }
+  .hrow { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  h1 { font-size: 26px; letter-spacing: 1px; color: #7dd3fc; }
+  h1 .dim { color: #475569; font-weight: 400; }
+  .hacts { display: flex; gap: 8px; flex-wrap: wrap; }
+  .netline { margin-top: 6px; font-size: 12px; color: #64748b; }
+  .netline .ok { color: #34d399; }
+  .netline .bad { color: #f87171; }
+  .netline .warn { color: #fbbf24; }
+  .btn {
+    background: transparent; color: #7dd3fc; border: 1px solid #1e3a5f; padding: 10px 20px;
+    font: inherit; font-size: 13px; font-weight: 400; cursor: pointer; white-space: nowrap;
+    text-decoration: none; display: inline-block;
+  }
+  .btn:hover { background: #0c1a2b; border-color: #38bdf8; color: #a5f8ff; }
+  .btn:hover { background: #0c1a2b; border-color: #38bdf8; color: #a5e8ff; }
+  .btn.ghost { background: transparent; color: #7dd3fc; border: 1px solid #1e3a5f; font-weight: 400; text-decoration: none; display: inline-block; }
+  .btn.ghost:hover { background: #0c1a2b; border-color: #38bdf8; color: #a5e8ff; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn.primary { background: #155e75; color: #a5f3fc; border-color: #155e75; font-weight: 700; }
+  .btn.primary:hover { background: #0e7490; border-color: #0e7490; color: #cffafe; }
+  .err {
+    display: none; background: #3b1219; border: 1px solid #7f1d1d; color: #fca5a5;
+    padding: 10px 14px; font-size: 13px; margin-bottom: 12px;
+  }
+  .err.warn { background: #2a1f06; border-color: #78350f; color: #fbbf24; }
+  .panel { border: 1px solid #1f2937; background: #111827; margin-bottom: 20px; }
+  .panel-h { padding: 12px 16px; border-bottom: 1px solid #1f2937; font-size: 13px; color: #94a3b8; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .panel-h b { color: #e2e8f0; font-weight: 700; }
+  .panel-b { padding: 16px; }
+  .arch {
+    border: 1px solid #1e3a5f; background: #0d141c; padding: 12px 16px; margin-bottom: 20px;
+    font-size: 12px; color: #94a3b8; line-height: 1.9;
+  }
+  .arch code { background: #060a0f; border: 1px solid #17202c; padding: 1px 6px; color: #a7f3d0; font-size: 11.5px; word-break: break-all; }
+  .form-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .form-row label { flex: none; min-width: 86px; font-size: 12px; color: #64748b; letter-spacing: 1px; }
+  .form-row .grow { flex: 1; min-width: 240px; }
+  .text-input {
+    width: 100%; background: #060a0f; border: 1px solid #17202c; color: #a7f3d0;
+    padding: 9px 12px; font: inherit; font-size: 12.5px; outline: none;
+  }
+  .text-input:focus { border-color: #38bdf8; }
+  select.text-input { color: #a7f3d0; cursor: pointer; }
+  select.text-input option, select.text-input optgroup { background: #111827; color: #e2e8f0; }
+  .hint { font-size: 12px; color: #64748b; line-height: 1.8; }
+  .status { border: 1px solid #1f2937; padding: 12px 14px; font-size: 12.5px; margin: 4px 0 14px; line-height: 1.8; }
+  .status.info { border-color: #1e3a5f; background: #0c1a2b; color: #7dd3fc; }
+  .status.ok { border-color: #065f46; background: #052e22; color: #34d399; }
+  .status.warn { border-color: #78350f; background: #1c1207; color: #fbbf24; }
+  .status.err { border-color: #7f1d1d; background: #3b1219; color: #fca5a5; }
+  .stats { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+  .stat { background: #111827; border: 1px solid #1f2937; padding: 10px 16px; min-width: 150px; }
+  .stat .k { font-size: 11px; color: #64748b; letter-spacing: 1px; }
+  .stat .v { font-size: 20px; color: #e2e8f0; font-weight: 700; margin-top: 2px; }
+  .list { border: 1px solid #1f2937; }
+  .lhead, .row {
+    display: grid; grid-template-columns: 44px 96px 1fr 190px 110px 120px 150px;
+    gap: 8px; padding: 9px 14px; align-items: center; font-size: 12.5px;
+  }
+  .lhead { background: #111827; color: #64748b; letter-spacing: 1px; font-size: 11px; border-bottom: 1px solid #1f2937; }
+  .row { border-bottom: 1px solid #17202c; cursor: pointer; }
+  .row:hover { background: #0f1a26; }
+  .c-dim { color: #64748b; }
+  .c-blue { color: #7dd3fc; }
+  .mono { word-break: break-all; }
+  .badge { font-size: 10px; padding: 1px 6px; border: 1px solid #78350f; color: #fbbf24; background: #1c1207; white-space: nowrap; }
+  .badge.cat-page { border-color: #1e3a5f; color: #7dd3fc; background: #0c1a2b; }
+  .badge.cat-tool { border-color: #065f46; color: #34d399; background: #052e22; }
+  .badge.cat-game { border-color: #581c87; color: #c084fc; background: #2e1065; }
+  .badge.cat-experiment { border-color: #78350f; color: #fbbf24; background: #1c1207; }
+  .badge.cat-other { border-color: #1f2937; color: #94a3b8; background: #111827; }
+  a { color: #7dd3fc; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .loading { padding: 30px; text-align: center; color: #64748b; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #1e3a5f; border-top-color: #38bdf8; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: -2px; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .pk-panel { border: 1px solid #1e3a5f; background: #0d141c; padding: 14px 16px; margin-bottom: 20px; }
+  .pk-panel .pk-hint { font-size: 12px; color: #64748b; margin-bottom: 10px; line-height: 1.7; }
+  .pk-panel .pkrow { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .pk-panel input { flex: 1; min-width: 260px; background: #060a0f; border: 1px solid #17202c; color: #a7f3d0; padding: 9px 12px; font: inherit; font-size: 12.5px; outline: none; }
+  .pk-panel input:focus { border-color: #38bdf8; }
+  .pk-panel .warn-note { font-size: 12px; color: #fbbf24; margin-top: 10px; }
+  .hidden { display: none !important; }
+  @media (max-width: 860px) {
+    .lhead { display: none; }
+    .row { grid-template-columns: 1fr 1fr; row-gap: 4px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="hrow">
+      <h1>◈ WEB INDEX <span class="dim" id="subtitle">// 网页索引进站</span></h1>
+      <div class="hacts">
+        <button id="mm-btn" class="btn">连接 MetaMask</button>
+        <button id="pk-btn" class="btn">私钥连接</button>
+        <a class="btn ghost" id="browser-link" href="chain-browser.html" target="_blank" rel="noopener">链上浏览器 ↗</a>
+        <a class="btn ghost" id="deploy-link" href="deploy.html" target="_blank" rel="noopener">发布台 ↗</a>
+        <button class="btn ghost" id="lang-btn">EN</button>
+      </div>
+    </div>
+    <div class="netline" id="netline">未连接钱包 —— 收录需要签名（MetaMask 或私钥）</div>
+  </header>
+
+  <!-- 私钥连接面板 -->
+  <section id="pk-panel" class="pk-panel hidden">
+    <div class="pk-hint" id="pk-hint">没有 MetaMask？也可以直接用私钥签名提交 —— 私钥不会离开浏览器，交易经 Sepolia 公共 RPC 广播。</div>
+    <div class="pkrow">
+      <input id="pk" type="password" spellcheck="false" autocomplete="off" placeholder="粘贴 0x 开头的 64 位私钥（仅建议测试网）">
+      <button id="pk-go" class="btn">连接</button>
+      <button id="pk-cancel" class="btn ghost">收起</button>
+    </div>
+    <div class="warn-note">⚠ 私钥会保存在浏览器 localStorage 以免重复输入；请务必只使用测试网私钥。</div>
+  </section>
+
+  <div class="err" id="err"></div>
+
+  <!-- 合约架构说明 -->
+  <div class="arch" id="arch"></div>
+
+  <!-- ① 收录表单 -->
+  <section class="panel">
+    <div class="panel-h"><span><b>① 收录一个链上网页</b>（交易哈希 + 标题 + 分类，写入索引合约）</span></div>
+    <div class="panel-b">
+      <div class="form-row">
+        <label id="lbl-hash">交易哈希</label>
+        <div class="grow"><input id="f-hash" class="text-input" spellcheck="false" autocomplete="off" placeholder="0x 开头的 64 位交易哈希"></div>
+      </div>
+      <div class="form-row">
+        <label id="lbl-chain">所在链</label>
+        <div class="grow" style="max-width:260px"><select id="f-chain" class="text-input"></select></div>
+        <span class="hint" id="f-chain-hint">决定从哪条链 RPC 读取交易 data 提取标题，并记入索引</span>
+      </div>
+      <div class="form-row">
+        <label id="lbl-title">网页标题</label>
+        <div class="grow"><input id="f-title" class="text-input" spellcheck="false" autocomplete="off" placeholder="点「从链上读取」自动提取 &lt;title&gt;，也可手动填写"></div>
+        <button id="btn-read" class="btn ghost">从链上读取</button>
+      </div>
+      <div class="form-row">
+        <label id="lbl-cat">分类</label>
+        <div class="grow" style="max-width:260px"><select id="f-cat" class="text-input"></select></div>
+        <span class="hint" id="f-cat-hint">分类由提交者选择，索引墙按它着色</span>
+      </div>
+      <div class="status info" id="idx-status">输入交易哈希后自动查询收录状态</div>
+      <div class="form-row">
+        <button id="btn-submit" class="btn primary" disabled>收录到索引</button>
+        <span class="hint" id="trust-note">信任边界：合约只做去重（幂等）与格式校验，不验证链上内容；标题由本页从交易 data 提取（与链上浏览器同源），分类由提交者选择。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ② 已收录列表 -->
+  <section class="panel">
+    <div class="panel-h"><span><b id="list-title">② 索引收录列表</b></span>
+      <button id="btn-refresh" class="btn ghost">刷新</button>
+    </div>
+    <div class="panel-b">
+      <div class="stats" id="idx-stats"></div>
+      <div class="list" id="idx-list"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var LANG_KEY = 'webindex_lang';
+  var PK_KEY = 'webindex_pk';
+  var INDEX_CHAIN = '0xaa36a7'; // 索引合约所在链（Sepolia）
+  var LOGIC_ABI = ['function index(bytes32 txHash, uint64 chainId, string title, string category)'];
+  // 已实测的函数选择器（keccak256 前 4 字节，与 contracts/WebIndex.sol 对应）
+  var SEL = { recent: '0x41d41daf', byHash: '0xc25c507b', total: '0x2ddbd13a' };
+
+  var state = { account: null, chainId: null, mode: null, signer: null, submitting: false, indexed: false, entries: { hashes: [], chainIds: [], titles: [], cats: [], authors: [], times: [] }, total: 0 };
+
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined && text !== null) e.textContent = String(text);
+    return e;
+  }
+  function short(a) { return a ? a.slice(0, 6) + '…' + a.slice(-4) : ''; }
+  function showErr(msg, warn) {
+    var e = $('err');
+    e.textContent = msg;
+    e.className = 'err' + (warn ? ' warn' : '');
+    e.style.display = 'block';
+  }
+  function hideErr() { $('err').style.display = 'none'; }
+  function hasMM() { return typeof window.ethereum !== 'undefined' && !!window.ethereum; }
+  function hasEthers() { return typeof window.ethers !== 'undefined' && !!window.ethers; }
+  function chainMeta(cid) { return (window.NETWORKS && window.NETWORKS[String(cid || '').toLowerCase()]) || null; }
+  function chainName(cid) { var n = chainMeta(cid); return n ? n.name : String(cid); }
+
+  /* ---------- 合约读取：定位索引合约所在链（读 networks.js 的 webIndex 字段） ---------- */
+  function indexMeta() {
+    var m = chainMeta(INDEX_CHAIN);
+    if (m && m.webIndex) return m;
+    for (var k in (window.NETWORKS || {})) { if (window.NETWORKS[k].webIndex) return window.NETWORKS[k]; }
+    return null;
+  }
+
+  function fmtTime(ts) {
+    if (!ts) return '—';
+    try {
+      var d = new Date(Number(ts) * 1000);
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' +
+        String(d.getDate()).padStart(2, '0') + ' ' + String(d.getHours()).padStart(2, '0') + ':' +
+        String(d.getMinutes()).padStart(2, '0');
+    } catch (e) { return String(ts); }
+  }
+  function utf8Len(s) {
+    var n = 0;
+    for (var i = 0; i < s.length; i++) {
+      var c = s.charCodeAt(i);
+      if (c < 0x80) n += 1;
+      else if (c < 0x800) n += 2;
+      else if (c >= 0xd800 && c <= 0xdbff) { n += 4; i++; }
+      else n += 3;
+    }
+    return n;
+  }
+
+  /* ---------- 手工 ABI：编码 eth_call 参数 + 解码返回（无 ethers 依赖，已与 ethers 官方逐字段比对） ---------- */
+  function hexToUtf8(d, fromHexChar, len) {
+    var s = '';
+    for (var j = 0; j < len;) {
+      var b1 = parseInt(d.substr(fromHexChar + j * 2, 2), 16);
+      if (b1 < 0x80) { s += String.fromCharCode(b1); j += 1; }
+      else if (b1 < 0xe0) { s += String.fromCharCode(((b1 & 0x1f) << 6) | (parseInt(d.substr(fromHexChar + (j + 1) * 2, 2), 16) & 0x3f)); j += 2; }
+      else if (b1 < 0xf0) { s += String.fromCharCode(((b1 & 0x0f) << 12) | ((parseInt(d.substr(fromHexChar + (j + 1) * 2, 2), 16) & 0x3f) << 6) | (parseInt(d.substr(fromHexChar + (j + 2) * 2, 2), 16) & 0x3f)); j += 3; }
+      else {
+        var cp = ((b1 & 0x07) << 18) | ((parseInt(d.substr(fromHexChar + (j + 1) * 2, 2), 16) & 0x3f) << 12) | ((parseInt(d.substr(fromHexChar + (j + 2) * 2, 2), 16) & 0x3f) << 6) | (parseInt(d.substr(fromHexChar + (j + 3) * 2, 2), 16) & 0x3f);
+        cp -= 0x10000;
+        s += String.fromCharCode(0xd800 + (cp >> 10), 0xdc00 + (cp & 0x3ff));
+        j += 4;
+      }
+    }
+    return s;
+  }
+  /* recent/page 返回的扁平六数组解码 */
+  function decodeFlat(hex) {
+    var d = String(hex).replace(/^0x/, '');
+    function word(i) { return d.slice(i * 64, i * 64 + 64); }
+    function num(i) { return parseInt(word(i), 16); }
+    function arrBase(wordIdx) { return num(wordIdx) / 32; } // head 偏移单位是字节 → 换字索引
+    function strAt(offWords) { return hexToUtf8(d, (offWords + 1) * 64, num(offWords)); }
+    function fixedArr(wordIdx) {
+      var base = arrBase(wordIdx), len = num(base), out = [];
+      for (var i = 0; i < len; i++) out.push(word(base + 1 + i));
+      return out;
+    }
+    function strArr(wordIdx) {
+      var base = arrBase(wordIdx), len = num(base), out = [];
+      for (var i = 0; i < len; i++) out.push(strAt(base + 1 + num(base + 1 + i) / 32)); // 元素偏移基准 = 长度字之后
+      return out;
+    }
+    return {
+      hashes: fixedArr(0).map(function (x) { return '0x' + x; }),
+      chainIds: fixedArr(1).map(function (x) { return parseInt(x, 16); }),
+      titles: strArr(2),
+      cats: strArr(3),
+      authors: fixedArr(4).map(function (x) { return '0x' + x.slice(24); }),
+      times: fixedArr(5).map(function (x) { return parseInt(x, 16); })
+    };
+  }
+
+  /* byHash(bytes32) 返回 (bool,bytes32,uint64,string,string,address,uint64) 的解码 */
+  function decodeByHash(hex) {
+    var d = String(hex).replace(/^0x/, '');
+    function word(i) { return d.slice(i * 64, i * 64 + 64); }
+    function num(i) { return parseInt(word(i), 16); }
+    function strAt(offWords) { return hexToUtf8(d, (offWords + 1) * 64, num(offWords)); }
+    return {
+      found: num(0) === 1,
+      hash: word(1),
+      chainId: num(2),
+      title: strAt(num(3) / 32),
+      category: strAt(num(4) / 32),
+      author: '0x' + word(5).slice(24),
+      time: num(6)
+    };
+  }
+
+  /* 任意链 RPC 调用（免密钥公共端点） */
+  function rpcCall(cid, method, params) {
+    var net = chainMeta(cid);
+    if (!net) return Promise.reject(new Error('UNKNOWN_CHAIN'));
+    return fetch(net.rpc, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: method, params: params })
+    }).then(function (r) { return r.json(); });
+  }
+
+  /* 索引合约的只读调用（eth_call 到数据层） */
+  function storeCall(data) {
+    var m = indexMeta();
+    if (!m) return Promise.reject(new Error('NO_WEBINDEX'));
+    return rpcCall(INDEX_CHAIN, 'eth_call', [{ to: m.webIndex, data: data }, 'latest']);
+  }
+  function callRecent(count) {
+    return storeCall(SEL.recent + count.toString(16).padStart(64, '0')).then(function (j) {
+      if (j.error) throw new Error(j.error.message || 'call failed');
+      return decodeFlat(j.result);
+    });
+  }
+  function callTotal() {
+    return storeCall(SEL.total).then(function (j) {
+      if (j.error) throw new Error(j.error.message || 'call failed');
+      return parseInt(j.result, 16);
+    });
+  }
+  function callByHash(hash) {
+    return storeCall(SEL.byHash + hash.replace(/^0x/, '')).then(function (j) {
+      if (j.error) throw new Error(j.error.message || 'call failed');
+      return decodeByHash(j.result);
+    });
+  }
+
+  /* ==================== i18n ==================== */
+  var I18N = {
+    zh: {
+      docTitle: '网页索引 · Sepolia',
+      subtitle: '// 网页索引进站',
+      browserBtn: '链上浏览器 ↗',
+      deployBtn: '发布台 ↗',
+      langBtn: 'EN',
+      netIdle: '未连接钱包 —— 收录需要签名（MetaMask 或私钥）',
+      netMM: '● 已连接 {a} · {chain} (chainId {cid})',
+      netPK: '● 私钥模式 · {a} · 交易经 Sepolia 公共 RPC 广播',
+      netNeedSepolia: '● 已连接 {a}，但当前不是 Sepolia —— 提交时会请求切换到 Sepolia（索引合约所在链）',
+      mmBtn: '连接 MetaMask',
+      pkBtn: '私钥连接',
+      disconn: '断开 {a}',
+      pkHint: '没有 MetaMask？也可以直接用私钥签名提交 —— 私钥不会离开浏览器，交易经 Sepolia 公共 RPC 广播。',
+      pkPh: '粘贴 0x 开头的 64 位私钥（仅建议测试网）',
+      pkWarn: '⚠ 私钥会保存在浏览器 localStorage 以免重复输入；请务必只使用测试网私钥。',
+      pkGo: '连接',
+      pkCancel: '收起',
+      arch: '合约架构（可迁移 / 可升级）：数据层 <code>{store}</code> 永久持有索引数据，只读视图 recent / byHash / page 任何人可查；写入口（逻辑层）<code>{logic}</code> 由 owner 持有，可随时热切换升级，历史数据零迁移；整体迁移时前端只改 <code>networks.js</code> 的 webIndex 字段。源码与部署记录见 <code>contracts/</code>。',
+      lblHash: '交易哈希',
+      phHash: '0x 开头的 64 位交易哈希',
+      lblChain: '所在链',
+      chainHint: '决定从哪条链 RPC 读取交易 data 提取标题，并记入索引',
+      lblTitle: '网页标题',
+      phTitle: '点「从链上读取」自动提取 <title>，也可手动填写',
+      btnRead: '从链上读取',
+      lblCat: '分类',
+      catHint: '分类由提交者选择，索引墙按它着色',
+      btnSubmit: '收录到索引',
+      trustNote: '信任边界：合约只做去重（幂等）与格式校验，不验证链上内容；标题由本页从交易 data 提取（与链上浏览器同源），分类由提交者选择。',
+      catPage: '网页', catTool: '工具', catGame: '游戏', catExperiment: '实验', catOther: '其他',
+      groupMainnet: '主网 / 主流 L2', groupTestnet: '测试网',
+      stChecking: '正在查询索引状态 …',
+      stIdle: '输入有效的交易哈希后，自动查询收录状态',
+      stNotFound: '尚未收录 —— 可以提交',
+      stFound: '已收录 ✓ 「{title}」 · {cat} · by {by} · {time}',
+      stSubmitting: '正在提交索引交易 …',
+      stDone: '收录成功 ✓ 区块 {block}',
+      stRejected: '已取消提交',
+      stFail: '索引查询失败：{msg}',
+      readingTx: '正在从链上读取交易 …',
+      readOk: '已提取标题（data {b} 字节）',
+      readNoTitle: '该交易 data 里没有 <title>，请手动填写标题',
+      readNoData: '该交易没有 data（input = 0x）—— 不是链上网页',
+      readNoTx: '该哈希在 {chain} 上不存在（或节点未索引）',
+      readFail: '读取失败：{msg}',
+      listTitle: '② 索引收录列表（最近 {n} 条）',
+      btnRefresh: '刷新',
+      statTotal: '收录总数',
+      lhead: ['#', '分类', '标题', '交易哈希', '链', '申报者', '时间'],
+      emptyRecent: '合约里还没有收录记录',
+      listFail: '读取索引失败：{msg}',
+      errNeedWallet: '请先连接钱包（右上角「连接 MetaMask」或「私钥连接」）',
+      errBadHash: '哈希格式不正确：0x 开头的 64 位十六进制',
+      errBadPK: '私钥格式不正确：0x 开头的 64 位十六进制',
+      errTitleEmpty: '标题不能为空',
+      errTitleLong: '标题超长（{n}/200 字节）',
+      errNoIndex: 'networks.js 未配置索引合约（webIndex / webIndexLogic 字段）',
+      errSubmit: '提交失败：{msg}',
+      errSwitch: '切换到 Sepolia 失败：{msg}（索引合约只部署在 Sepolia）',
+      errEthers: 'ethers 库未加载（CDN 不可达），请刷新重试',
+      openInBrowser: '在链上浏览器打开'
+    },
+    en: {
+      docTitle: 'Web index · Sepolia',
+      subtitle: '// Web index desk',
+      browserBtn: 'Browser ↗',
+      deployBtn: 'Deploy ↗',
+      langBtn: '中文',
+      netIdle: 'Wallet not connected — indexing needs a signature (MetaMask or private key)',
+      netMM: '● Connected {a} · {chain} (chainId {cid})',
+      netPK: '● Private-key mode · {a} · broadcast via Sepolia public RPC',
+      netNeedSepolia: '● Connected {a}, but not on Sepolia — you will be asked to switch when submitting (the index contract lives on Sepolia)',
+      mmBtn: 'Connect MetaMask',
+      pkBtn: 'Private key',
+      disconn: 'Disconnect {a}',
+      pkHint: 'No MetaMask? Sign directly with a private key — it never leaves your browser; the tx is broadcast via the Sepolia public RPC.',
+      pkPh: 'Paste a 0x-prefixed 64-hex private key (testnet only)',
+      pkWarn: '⚠ The key is kept in localStorage to avoid re-typing. Testnet keys only.',
+      pkGo: 'Connect',
+      pkCancel: 'Collapse',
+      arch: 'Architecture (migratable / upgradeable): the data layer <code>{store}</code> holds entries forever — view functions recent / byHash / page are open to everyone. The write entry (logic layer) <code>{logic}</code> is owned and hot-swappable by the owner with zero data migration; a full migration only changes the webIndex field in <code>networks.js</code>. Source & deployment log in <code>contracts/</code>.',
+      lblHash: 'Tx hash',
+      phHash: '0x-prefixed 64-hex transaction hash',
+      lblChain: 'Chain',
+      chainHint: 'Which chain RPC reads the tx data (for title extraction) and gets recorded in the index',
+      lblTitle: 'Page title',
+      phTitle: 'Auto-extracted from <title> via "Read from chain", or type manually',
+      btnRead: 'Read from chain',
+      lblCat: 'Category',
+      catHint: 'Chosen by the submitter; colors the index wall',
+      btnSubmit: 'Index it',
+      trustNote: 'Trust boundary: the contract only dedupes (idempotent) and enforces format limits — it does not verify on-chain content. Titles are extracted from tx data by this page (same logic as the browser); categories are chosen by the submitter.',
+      catPage: 'page', catTool: 'tool', catGame: 'game', catExperiment: 'experiment', catOther: 'other',
+      groupMainnet: 'Mainnet / major L2', groupTestnet: 'Testnet',
+      stChecking: 'Checking index status …',
+      stIdle: 'Enter a valid tx hash — index status is checked automatically',
+      stNotFound: 'Not indexed yet — ready to submit',
+      stFound: 'Indexed ✓ "{title}" · {cat} · by {by} · {time}',
+      stSubmitting: 'Submitting index tx …',
+      stDone: 'Indexed ✓ in block {block}',
+      stRejected: 'Submission canceled',
+      stFail: 'Index query failed: {msg}',
+      readingTx: 'Reading tx from chain …',
+      readOk: 'Title extracted (data {b} bytes)',
+      readNoTitle: 'No <title> found in tx data — type the title manually',
+      readNoData: 'This tx carries no data (input = 0x) — not an on-chain page',
+      readNoTx: 'Hash not found on {chain} (or not yet indexed by the node)',
+      readFail: 'Read failed: {msg}',
+      listTitle: '② Indexed entries (latest {n})',
+      btnRefresh: 'Refresh',
+      statTotal: 'Total entries',
+      lhead: ['#', 'Category', 'Title', 'Tx hash', 'Chain', 'Submitter', 'Time'],
+      emptyRecent: 'No entries in the contract yet',
+      listFail: 'Failed to load index: {msg}',
+      errNeedWallet: 'Connect a wallet first ("Connect MetaMask" or "Private key" at the top right)',
+      errBadHash: 'Invalid hash: 0x-prefixed 64 hex chars',
+      errBadPK: 'Invalid private key: 0x-prefixed 64 hex chars',
+      errTitleEmpty: 'Title cannot be empty',
+      errTitleLong: 'Title too long ({n}/200 bytes)',
+      errNoIndex: 'Index contract not configured in networks.js (webIndex / webIndexLogic)',
+      errSubmit: 'Submit failed: {msg}',
+      errSwitch: 'Failed to switch to Sepolia: {msg} (the index contract is only on Sepolia)',
+      errEthers: 'ethers library failed to load (CDN unreachable) — please refresh',
+      openInBrowser: 'Open in browser'
+    }
+  };
+  var lang = 'zh';
+  try { lang = localStorage.getItem(LANG_KEY) === 'en' ? 'en' : 'zh'; } catch (e) {}
+  function t(key, vars) {
+    var s = (I18N[lang] || I18N.zh)[key];
+    if (s === undefined) s = I18N.zh[key];
+    if (vars && typeof s === 'string') {
+      s = s.replace(/\{(\w+)\}/g, function (_, k) { return vars[k] !== undefined ? vars[k] : '{' + k + '}'; });
+    }
+    return s;
+  }
+  function catLabel(cat) {
+    var k = { page: 'catPage', tool: 'catTool', game: 'catGame', experiment: 'catExperiment', other: 'catOther' }[cat];
+    return k ? t(k) : cat;
+  }
+
+  /* ==================== 界面渲染 ==================== */
+  function applyLang() {
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+    document.title = t('docTitle');
+    $('subtitle').textContent = t('subtitle');
+    $('browser-link').textContent = t('browserBtn');
+    $('deploy-link').textContent = t('deployBtn');
+    $('lang-btn').textContent = t('langBtn');
+    $('mm-btn').textContent = t('mmBtn');
+    $('pk-btn').textContent = t('pkBtn');
+    $('pk-hint').textContent = t('pkHint');
+    $('pk').placeholder = t('pkPh');
+    $('pk-go').textContent = t('pkGo');
+    $('pk-cancel').textContent = t('pkCancel');
+    document.querySelector('.pk-panel .warn-note').textContent = t('pkWarn');
+    $('lbl-hash').textContent = t('lblHash');
+    $('f-hash').placeholder = t('phHash');
+    $('lbl-chain').textContent = t('lblChain');
+    $('f-chain-hint').textContent = t('chainHint');
+    $('lbl-title').textContent = t('lblTitle');
+    $('f-title').placeholder = t('phTitle');
+    $('btn-read').textContent = t('btnRead');
+    $('lbl-cat').textContent = t('lblCat');
+    $('f-cat-hint').textContent = t('catHint');
+    $('btn-submit').textContent = t('btnSubmit');
+    $('trust-note').textContent = t('trustNote');
+    $('btn-refresh').textContent = t('btnRefresh');
+    $('list-title').textContent = t('listTitle', { n: RECENT_N });
+    renderArch();
+    fillChainSelect();
+    fillCatSelect();
+    renderWalletState();
+    renderRecentList();
+  }
+
+  var RECENT_N = 20;
+
+  function renderArch() {
+    var m = indexMeta();
+    var box = $('arch');
+    box.innerHTML = '';
+    if (!m) {
+      box.textContent = t('errNoIndex');
+      return;
+    }
+    box.innerHTML = t('arch', { store: m.webIndex, logic: m.webIndexLogic || '(未配置)' });
+  }
+
+  function fillChainSelect() {
+    var sel = $('f-chain');
+    var keep = sel.value;
+    sel.innerHTML = '';
+    ['mainnet', 'testnet'].forEach(function (type) {
+      var g = document.createElement('optgroup');
+      g.label = t(type === 'mainnet' ? 'groupMainnet' : 'groupTestnet');
+      Object.keys(window.NETWORKS || {}).forEach(function (cid) {
+        var n = window.NETWORKS[cid];
+        if (n.type !== type) return;
+        var o = document.createElement('option');
+        o.value = cid;
+        o.textContent = n.name + ' (' + parseInt(cid, 16) + ')';
+        g.appendChild(o);
+      });
+      sel.appendChild(g);
+    });
+    sel.value = (keep && chainMeta(keep)) ? keep : (chainMeta(INDEX_CHAIN) ? INDEX_CHAIN : sel.value);
+  }
+
+  function fillCatSelect() {
+    var sel = $('f-cat');
+    var keep = sel.value;
+    sel.innerHTML = '';
+    ['page', 'tool', 'game', 'experiment', 'other'].forEach(function (c) {
+      var o = document.createElement('option');
+      o.value = c;
+      o.textContent = catLabel(c);
+      sel.appendChild(o);
+    });
+    sel.value = keep || 'page';
+  }
+
+  function setStatus(kind, msg) {
+    var s = $('idx-status');
+    s.className = 'status ' + kind;
+    s.innerHTML = '';
+    if (kind === 'info' && msg === t('stChecking')) {
+      s.appendChild(el('span', 'spinner'));
+    }
+    s.appendChild(document.createTextNode(msg));
+  }
+
+  /* ==================== 钱包（MetaMask / 私钥兜底） ==================== */
+  function renderWalletState() {
+    var nl = $('netline');
+    nl.innerHTML = '';
+    if (state.account) {
+      $('mm-btn').textContent = t('disconn', { a: short(state.account) });
+      $('pk-btn').textContent = t('pkBtn');
+      if (state.mode === 'pk') {
+        nl.appendChild(el('span', 'ok', t('netPK', { a: short(state.account) })));
+      } else if (String(state.chainId || '').toLowerCase() === INDEX_CHAIN) {
+        nl.appendChild(el('span', 'ok', t('netMM', { a: short(state.account), chain: chainName(state.chainId), cid: parseInt(state.chainId, 16) })));
+      } else {
+        nl.appendChild(el('span', 'warn', t('netNeedSepolia', { a: short(state.account) })));
+      }
+      return;
+    }
+    $('mm-btn').textContent = t('mmBtn');
+    if (!hasMM()) {
+      nl.appendChild(el('span', 'bad', t('netIdle') + '（未检测到 MetaMask）'));
+    } else {
+      nl.appendChild(el('span', null, t('netIdle')));
+    }
+  }
+
+  function ethReq(method, params) {
+    return window.ethereum.request({ method: method, params: params || [] });
+  }
+
+  function connectMM() {
+    if (state.account) { disconnect(); return; }
+    if (!hasMM()) { showErr(t('errNeedWallet')); return; }
+    ethReq('eth_requestAccounts').then(function (accs) {
+      return ethReq('eth_chainId').then(function (cid) {
+        state.account = accs[0];
+        state.chainId = cid;
+        state.mode = 'mm';
+        return ensureSepolia().then(function () {
+          var provider = new window.ethers.BrowserProvider(window.ethereum);
+          return provider.getSigner();
+        }).then(function (signer) {
+          state.signer = signer;
+          hideErr();
+          renderWalletState();
+          updateSubmitState();
+        });
+      });
+    }).catch(function (e) { showErr(t('errSwitch', { msg: e && e.message ? e.message : e })); });
+  }
+
+  // 索引合约只在 Sepolia：连接的是别的链时请求切换（4902 则引导添加）
+  function ensureSepolia() {
+    if (String(state.chainId || '').toLowerCase() === INDEX_CHAIN) return Promise.resolve();
+    return ethReq('wallet_switchEthereumChain', [{ chainId: INDEX_CHAIN }]).then(function () {
+      return ethReq('eth_chainId');
+    }).then(function (cid) {
+      state.chainId = cid;
+    }).catch(function (e) {
+      if (e && e.code === 4902) {
+        var m = indexMeta();
+        return ethReq('wallet_addEthereumChain', [{
+          chainId: INDEX_CHAIN,
+          chainName: m.name + ' 测试网',
+          nativeCurrency: { name: 'Sepolia Ether', symbol: 'ETH', decimals: 18 },
+          rpcUrls: [m.rpc],
+          blockExplorerUrls: [m.explorer ? m.explorer.split('/tx/')[0] : 'https://sepolia.etherscan.io']
+        }]).then(function () { return ethReq('eth_chainId'); }).then(function (cid) { state.chainId = cid; });
+      }
+      throw e;
+    });
+  }
+
+  function connectPK() {
+    if (state.account) { disconnect(); return; }
+    var pk = $('pk').value.trim();
+    if (!/^0x[0-9a-fA-F]{64}$/.test(pk)) { showErr(t('errBadPK')); return; }
+    if (!hasEthers()) { showErr(t('errEthers')); return; }
+    try {
+      try { localStorage.setItem(PK_KEY, pk); } catch (e) {}
+      var m = indexMeta();
+      var provider = new window.ethers.JsonRpcProvider(m.rpc, parseInt(INDEX_CHAIN, 16), { staticNetwork: true });
+      var w = new window.ethers.Wallet(pk, provider);
+      state.account = w.address;
+      state.chainId = INDEX_CHAIN;
+      state.mode = 'pk';
+      state.signer = w;
+      $('pk-panel').classList.add('hidden');
+      hideErr();
+      renderWalletState();
+      updateSubmitState();
+    } catch (e) { showErr(t('errSubmit', { msg: e.message })); }
+  }
+
+  function disconnect() {
+    state.account = null; state.chainId = null; state.mode = null; state.signer = null;
+    renderWalletState();
+    updateSubmitState();
+  }
+
+  /* ==================== ① 收录表单逻辑 ==================== */
+  function currentHash() { return $('f-hash').value.trim().toLowerCase(); }
+  function currentCidDecimal() { return parseInt($('f-chain').value, 16); }
+
+  var queryTimer = null;
+  function onHashInput() {
+    clearTimeout(queryTimer);
+    state.indexed = false;
+    updateSubmitState();
+    var h = currentHash();
+    if (!/^0x[0-9a-f]{64}$/.test(h)) { setStatus('info', t('stIdle')); return; }
+    setStatus('info', t('stChecking'));
+    queryTimer = setTimeout(function () { queryStatus(h); }, 350);
+  }
+
+  function queryStatus(h) {
+    callByHash(h).then(function (r) {
+      if (currentHash() !== h) return; // 输入已变
+      if (r.found) {
+        state.indexed = true;
+        setStatus('ok', t('stFound', { title: r.title, cat: catLabel(r.category), by: short(r.author), time: fmtTime(r.time) }));
+      } else {
+        state.indexed = false;
+        setStatus('info', t('stNotFound'));
+      }
+      updateSubmitState();
+    }).catch(function (e) {
+      if (currentHash() !== h) return;
+      setStatus('err', t('stFail', { msg: e.message }));
+      updateSubmitState();
+    });
+  }
+
+  function updateSubmitState() {
+    var h = currentHash();
+    var title = $('f-title').value.trim();
+    var ok = /^0x[0-9a-f]{64}$/.test(h) && title && utf8Len(title) <= 200 && !state.indexed;
+    $('btn-submit').disabled = !ok;
+  }
+
+  /* 从链上读取交易 data → 提取 <title> 预填 */
+  function readTitle() {
+    var h = currentHash();
+    if (!/^0x[0-9a-f]{64}$/.test(h)) { showErr(t('errBadHash')); return; }
+    var cid = $('f-chain').value;
+    setStatus('info', t('readingTx'));
+    rpcCall(cid, 'eth_getTransactionByHash', [h]).then(function (j) {
+      if (j.error) throw new Error(j.error.message || 'rpc');
+      if (!j.result) { setStatus('warn', t('readNoTx', { chain: chainName(cid) })); return; }
+      var input = j.result.input || '0x';
+      if (input === '0x' || input === '0x0') { setStatus('warn', t('readNoData')); return; }
+      var bytes = hexToBytes(input);
+      var text = decodeText(bytes);
+      var title = extractDocTitle(text);
+      if (title) {
+        $('f-title').value = title;
+        setStatus('ok', t('readOk', { b: bytes.length }));
+      } else {
+        setStatus('warn', t('readNoTitle'));
+      }
+      updateSubmitState();
+    }).catch(function (e) {
+      setStatus('err', t('readFail', { msg: e.message }));
+    });
+  }
+
+  function submit() {
+    var h = currentHash();
+    var title = $('f-title').value.trim();
+    var cat = $('f-cat').value;
+    if (!/^0x[0-9a-f]{64}$/.test(h)) { showErr(t('errBadHash')); return; }
+    if (!title) { showErr(t('errTitleEmpty')); return; }
+    if (utf8Len(title) > 200) { showErr(t('errTitleLong', { n: utf8Len(title) })); return; }
+    var m = indexMeta();
+    if (!m || !m.webIndexLogic) { showErr(t('errNoIndex')); return; }
+    if (!state.signer) { showErr(t('errNeedWallet')); return; }
+    if (!hasEthers()) { showErr(t('errEthers')); return; }
+    hideErr();
+    state.submitting = true;
+    $('btn-submit').disabled = true;
+    setStatus('info', t('stSubmitting'));
+    var c = new window.ethers.Contract(m.webIndexLogic, LOGIC_ABI, state.signer);
+    c.index(h, currentCidDecimal(), title, cat).then(function (tx) {
+      return tx.wait();
+    }).then(function (rcpt) {
+      state.submitting = false;
+      state.indexed = true;
+      setStatus('ok', t('stDone', { block: rcpt.blockNumber }));
+      updateSubmitState();
+      loadRecent();
+    }).catch(function (e) {
+      state.submitting = false;
+      if (e && (e.code === 'ACTION_REJECTED' || /rejected|denied/i.test(e.message || ''))) {
+        setStatus('warn', t('stRejected'));
+      } else {
+        setStatus('err', t('errSubmit', { msg: e.shortMessage || e.message }));
+      }
+      updateSubmitState();
+    });
+  }
+
+  /* ==================== ② 已收录列表 ==================== */
+  function loadRecent() {
+    var box = $('idx-list');
+    box.innerHTML = '';
+    box.appendChild(el('div', 'loading', '<span class="spinner"></span>'));
+    Promise.all([callTotal(), callRecent(RECENT_N)]).then(function (res) {
+      state.total = res[0];
+      state.entries = res[1];
+      renderStats();
+      renderRecentList();
+    }).catch(function (e) {
+      box.innerHTML = '';
+      box.appendChild(el('div', 'loading', t('listFail', { msg: e.message })));
+    });
+  }
+
+  function renderStats() {
+    var s = $('idx-stats');
+    s.innerHTML = '';
+    var st = el('div', 'stat');
+    st.appendChild(el('div', 'k', t('statTotal')));
+    st.appendChild(el('div', 'v', Number(state.total || 0).toLocaleString()));
+    s.appendChild(st);
+    var m = indexMeta();
+    if (m) {
+      var st2 = el('div', 'stat');
+      st2.appendChild(el('div', 'k', lang === 'zh' ? '数据层合约' : 'Data layer'));
+      var v = el('div', 'v');
+      v.style.fontSize = '12px';
+      v.style.wordBreak = 'break-all';
+      v.textContent = m.webIndex;
+      st2.appendChild(v);
+      s.appendChild(st2);
+    }
+  }
+
+  function renderRecentList() {
+    var box = $('idx-list');
+    box.innerHTML = '';
+    var lh = el('div', 'lhead');
+    t('lhead').forEach(function (x) { lh.appendChild(el('span', null, x)); });
+    box.appendChild(lh);
+    if (!state.entries || !state.entries.hashes || !state.entries.hashes.length) {
+      box.appendChild(el('div', 'loading', t('emptyRecent')));
+      return;
+    }
+    for (var i = 0; i < state.entries.hashes.length; i++) {
+      (function (i) {
+        var e = {
+          hash: state.entries.hashes[i],
+          chainId: state.entries.chainIds[i],
+          title: state.entries.titles[i],
+          cat: state.entries.cats[i],
+          author: state.entries.authors[i],
+          time: state.entries.times[i]
+        };
+        var row = el('div', 'row');
+        row.title = t('openInBrowser');
+        row.appendChild(el('span', 'c-dim', String(i + 1)));
+        var catCell = el('span');
+        catCell.appendChild(el('span', 'badge cat-' + e.cat, catLabel(e.cat)));
+        row.appendChild(catCell);
+        row.appendChild(el('span', null, e.title));
+        var hcell = el('span', 'mono c-blue', short(e.hash));
+        hcell.title = e.hash;
+        row.appendChild(hcell);
+        var net = chainMeta('0x' + e.chainId.toString(16));
+        row.appendChild(el('span', 'c-dim', net ? net.name : e.chainId));
+        row.appendChild(el('span', 'c-dim', short(e.author)));
+        row.appendChild(el('span', 'c-dim', fmtTime(e.time)));
+        row.addEventListener('click', function () {
+          window.open('chain-browser.html#tx=0x' + e.chainId.toString(16) + ':' + e.hash, '_blank');
+        });
+        box.appendChild(row);
+      })(i);
+    }
+  }
+
+  /* ---------- 链上 data → 文本（与链上浏览器同源） ---------- */
+  function hexToBytes(hex) {
+    hex = String(hex || '').replace(/^0x/, '');
+    var bytes = new Uint8Array(Math.floor(hex.length / 2));
+    for (var i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
+    return bytes;
+  }
+  function decodeText(bytes) {
+    try { return new TextDecoder('utf-8', { fatal: false }).decode(bytes); }
+    catch (e) {
+      var s = '';
+      for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+      return s;
+    }
+  }
+  function extractDocTitle(text) {
+    var m = String(text || '').match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+    if (!m) return '';
+    var s = m[1].replace(/\s+/g, ' ').trim();
+    if (!s) return '';
+    var ents = { amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", apos: "'", nbsp: ' ' };
+    s = s.replace(/&(amp|lt|gt|quot|#39|apos|nbsp);/g, function (_, k) { return ents[k] || _; });
+    return s.slice(0, 80);
+  }
+
+  /* ==================== 初始化 ==================== */
+  function prefillFromUrl() {
+    var h = location.hash.replace(/^#/, '');
+    if (!h) return;
+    var kv = {}, parts = h.split('&');
+    parts.forEach(function (p) {
+      var i = p.indexOf('=');
+      if (i > 0) kv[p.slice(0, i)] = decodeURIComponent(p.slice(i + 1));
+    });
+    var v = kv.tx || '';
+    if (!v) return;
+    var m = v.match(/^(0x[0-9a-fA-F]{1,8})[:,\s]+(0x[0-9a-fA-F]{64})$/);
+    if (m) { $('f-chain').value = chainMeta(m[1]) ? m[1].toLowerCase() : INDEX_CHAIN; $('f-hash').value = m[2]; }
+    else if (/^0x[0-9a-fA-F]{64}$/.test(v)) { $('f-hash').value = v.toLowerCase(); }
+  }
+
+  function init() {
+    applyLang();
+    prefillFromUrl();
+
+    $('lang-btn').onclick = function () {
+      lang = lang === 'zh' ? 'en' : 'zh';
+      try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+      applyLang();
+      onHashInput();
+    };
+    $('mm-btn').onclick = connectMM;
+    $('pk-btn').onclick = function () { $('pk-panel').classList.toggle('hidden'); };
+    $('pk-go').onclick = connectPK;
+    $('pk-cancel').onclick = function () { $('pk-panel').classList.add('hidden'); };
+    $('f-hash').addEventListener('input', onHashInput);
+    $('f-hash').addEventListener('change', onHashInput);
+    $('f-title').addEventListener('input', updateSubmitState);
+    $('btn-read').onclick = readTitle;
+    $('btn-submit').onclick = submit;
+    $('btn-refresh').onclick = loadRecent;
+
+    // MetaMask 账户/网络变化
+    if (hasMM() && window.ethereum.on) {
+      window.ethereum.on('accountsChanged', function (accs) {
+        if (!accs.length) { disconnect(); return; }
+        state.account = accs[0];
+        renderWalletState();
+      });
+      window.ethereum.on('chainChanged', function (cid) {
+        state.chainId = cid;
+        renderWalletState();
+      });
+    }
+
+    // 恢复私钥模式（localStorage）
+    try {
+      var savedPk = localStorage.getItem(PK_KEY);
+      if (savedPk && hasEthers()) {
+        $('pk').value = savedPk;
+        connectPK();
+      }
+    } catch (e) {}
+
+    loadRecent();
+    onHashInput();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

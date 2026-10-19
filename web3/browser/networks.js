@@ -11,6 +11,10 @@
  *   explorer  区块浏览器外链模板，{hash} 会被交易哈希替换（留空则不显示外链按钮）
  *   api       地址列表 API（Blockscout API v2 格式，免密钥 + CORS 放行；留空则该链不支持
  *             地址列表检索——检索框给地址时会提示改用交易哈希 RPC 查询）
+ *   webIndex  网页索引合约（数据层 WebIndexStore）地址；只读视图（recent/byHash/page）
+ *             用于「索引墙」与详情页标题徽标。链上详情见 contracts/WebIndex.sol
+ *   webIndexLogic 网页索引的写入口（逻辑层 WebIndex）地址；收录提交走它，
+ *             owner 可热切换（数据层零迁移，详见合约注释与 contracts/deployment.json）
  *   default   是否为默认链（只有一条，用于「只输入哈希、不指定链」的查询）
  *   note      备注（如端口限制）
  *
@@ -123,7 +127,9 @@ window.NETWORKS = {
     name: "Sepolia", rpc: "https://ethereum-sepolia-rpc.publicnode.com",
     type: "testnet", color: "#6366f1", symbol: "SepoliaETH",
     explorer: "https://eth-sepolia.blockscout.com/tx/{hash}", default: true,
-    api: "https://eth-sepolia.blockscout.com/api/v2"
+    api: "https://eth-sepolia.blockscout.com/api/v2",
+    webIndex: "0xca82189534B4B76434941060F5e3cf05c58D7B6C",
+    webIndexLogic: "0xf36165db6Bbe9e5fF0254845290b14b25bEd3187"
   },
   "0x66eee": {
     name: "Arbitrum Sepolia", rpc: "https://arbitrum-sepolia-rpc.publicnode.com",

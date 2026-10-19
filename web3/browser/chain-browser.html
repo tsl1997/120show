@@ -76,48 +76,34 @@
   }
   .badge.html { border-color: #1e3a5f; color: #7dd3fc; background: #0c1a2b; }
   .badge.list { border-color: #065f46; color: #34d399; background: #052e22; }
+  /* 索引墙 / 徽标的分类着色（与 web-index.html 一致） */
+  .badge.cat-page { border-color: #1e3a5f; color: #7dd3fc; background: #0c1a2b; }
+  .badge.cat-tool { border-color: #065f46; color: #34d399; background: #052e22; }
+  .badge.cat-game { border-color: #581c87; color: #c084fc; background: #2e1065; }
+  .badge.cat-experiment { border-color: #78350f; color: #fbbf24; background: #1c1207; }
+  .badge.cat-other { border-color: #1f2937; color: #94a3b8; background: #111827; }
   a { color: #7dd3fc; text-decoration: none; }
   a:hover { text-decoration: underline; }
   .more { margin-top: 12px; text-align: center; }
   .more .note { font-size: 12px; color: #475569; margin-top: 8px; }
-  .detail-ui { margin-top: 4px; border: 1px solid #1e3a5f; background: #0d141c; }
-  .dhead {
-    display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
-    padding: 12px 16px; border-bottom: 1px solid #1e3a5f; background: #0f1a26;
-  }
-  .dhead .h { font-size: 13px; color: #7dd3fc; word-break: break-all; }
-  .dhead .acts { display: flex; gap: 8px; flex-wrap: wrap; }
-  .dmeta { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 8px 20px; padding: 14px 16px; border-bottom: 1px solid #17202c; }
-  .dmeta .item .k { font-size: 11px; color: #64748b; }
-  .dmeta .item .v { font-size: 12.5px; color: #cbd5e1; word-break: break-all; }
   .chain-tag { display: inline-flex; align-items: center; gap: 7px; }
   .chain-tag .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
   .chain-tag .ttype { font-size: 10px; padding: 0 5px; border: 1px solid #1f2937; color: #64748b; }
-  .tabs { display: flex; gap: 6px; padding: 12px 16px 0; }
+  .tabs { display: flex; gap: 6px; }
   .tabs button {
     background: transparent; border: 1px solid #1f2937; color: #94a3b8;
     padding: 5px 14px; font: inherit; font-size: 12px; cursor: pointer;
   }
   .tabs button.on { background: #0c2233; color: #7dd3fc; border-color: #1e3a5f; }
-  .pane { padding: 14px 16px 16px; display: none; }
+  .pane { display: none; }
   .pane.on { display: block; }
-  .pane.inline { display: block; } /* 常显面板：预览/文本，直接出现在 dbody */
-  #pane-view { padding: 10px; }
-  /* 折叠区：具体信息（meta + 工具 + tabs + 源码/HEX）默认收起，点击「交易详细信息」展开 */
-  .dfold { border-top: 1px solid #17202c; }
-  .dfold .dtools { padding: 14px 16px 0; }
-  .dfold .nodata { padding: 10px 16px 0; font-size: 12px; }
-  .dfold .tabs { padding: 12px 16px 0; }
-  .dfold .pane { padding: 14px 16px 16px; }
   .pane pre {
     background: #060a0f; border: 1px solid #17202c; padding: 14px; font-size: 12px;
     color: #a7f3d0; max-height: 420px; overflow: auto; white-space: pre-wrap; word-break: break-all;
   }
   .pane .hex { color: #7dd3fc; }
-  /* 预览框尽量占满可视区：打开详情一眼看到渲染的网页 */
-  #preview { width: 100%; height: calc(100vh - 290px); min-height: 520px; border: 1px solid #17202c; background: #fff; }
   .nodata { padding: 20px 16px; color: #64748b; font-size: 13px; }
-  .dtools { display: flex; gap: 8px; padding: 0 16px 14px; flex-wrap: wrap; }
+  .dtools { display: flex; gap: 8px; flex-wrap: wrap; }
   .dtools .btn { padding: 5px 12px; font-size: 12px; }
   .loading { padding: 30px; text-align: center; color: #64748b; }
   .spinner {
@@ -147,6 +133,72 @@
   .help-panel .chain-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #94a3b8; }
   .help-panel .chain-item .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
   .help-panel .chain-item .cid { color: #475569; font-size: 11px; }
+  /* ---------- 沉浸式详情：全屏链上网页 ---------- */
+  #immerse {
+    position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh;
+    border: 0; background: #fff; z-index: 1; display: block;
+  }
+  .bro-btn {
+    position: fixed; left: 18px; bottom: 18px; z-index: 40;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg, #155e75, #0e7490); color: #cffafe;
+    border: 1px solid #38bdf8; font: inherit; font-size: 15px; font-weight: 700;
+    letter-spacing: .5px; cursor: pointer;
+    box-shadow: 0 6px 22px rgba(56, 189, 248, .28);
+  }
+  .bro-btn:hover { background: linear-gradient(135deg, #0e7490, #0891b2); color: #ecfeff; }
+  .bro-mask { position: fixed; inset: 0; z-index: 38; background: rgba(2, 6, 10, .5); }
+  .bro-panel {
+    position: fixed; left: 18px; bottom: 86px; z-index: 39;
+    width: min(440px, calc(100vw - 36px)); max-height: min(600px, calc(100vh - 120px));
+    display: flex; flex-direction: column;
+    background: #0d141c; border: 1px solid #1e3a5f; box-shadow: 0 12px 40px rgba(2, 6, 10, .6);
+  }
+  .bro-head {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 10px 14px; border-bottom: 1px solid #1e3a5f; background: #0f1a26; flex: none;
+  }
+  .bro-title { font-size: 13px; color: #7dd3fc; letter-spacing: 1px; }
+  .bro-x {
+    background: transparent; border: 1px solid #1f2937; color: #94a3b8;
+    width: 26px; height: 26px; font: inherit; font-size: 12px; cursor: pointer; flex: none;
+  }
+  .bro-x:hover { border-color: #38bdf8; color: #a5e8ff; }
+  .bro-body { overflow: auto; padding: 14px; }
+  .bro-index { border: 1px solid #065f46; background: #052e22; padding: 10px 12px; margin-bottom: 12px; font-size: 12.5px; color: #34d399; line-height: 1.8; }
+  .bro-index .t { color: #e2e8f0; font-size: 13px; }
+  .bro-index .cat { font-size: 10px; padding: 1px 6px; border: 1px solid #065f46; color: #34d399; background: #064e3b; margin-left: 6px; }
+  .bro-index .m { color: #64748b; font-size: 11px; }
+  .bro-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px 16px; }
+  .bro-meta .item .k { font-size: 11px; color: #64748b; }
+  .bro-meta .item .v { font-size: 12.5px; color: #cbd5e1; word-break: break-all; }
+  .bro-note { font-size: 11.5px; color: #64748b; margin-top: 10px; }
+  .bro-panel .dtools { padding: 12px 0 0; }
+  .bro-panel .dtools .btn { padding: 5px 12px; font-size: 12px; }
+  .bro-panel .tabs { padding: 12px 0 0; }
+  .bro-panel .pane { padding: 10px 0 0; display: none; }
+  .bro-panel .pane.on { display: block; }
+  .bro-panel .pane pre {
+    background: #060a0f; border: 1px solid #17202c; padding: 12px; font-size: 11.5px;
+    color: #a7f3d0; max-height: 260px; overflow: auto; white-space: pre-wrap; word-break: break-all;
+  }
+  .bro-panel .pane .hex { color: #7dd3fc; }
+  .bro-foot { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 14px; border-top: 1px solid #17202c; flex: none; }
+  .bro-foot .btn { padding: 6px 12px; font-size: 12px; }
+  /* ---------- 网页索引墙（方块） ---------- */
+  #wall-ui { margin-top: 24px; }
+  #wall-ui .dim { color: #475569; font-weight: 400; font-size: 12px; }
+  .wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .tile {
+    border: 1px solid #1f2937; background: #0f1a26; padding: 14px; cursor: pointer;
+    display: flex; flex-direction: column; gap: 8px; min-height: 118px;
+    transition: border-color .15s, transform .15s;
+  }
+  .tile:hover { border-color: #38bdf8; transform: translateY(-2px); }
+  .tile .tcat { display: flex; align-items: center; gap: 8px; }
+  .tile .tname { font-size: 14px; color: #e2e8f0; line-height: 1.5; word-break: break-all; }
+  .tile .tmeta { margin-top: auto; font-size: 11px; color: #64748b; display: flex; justify-content: space-between; gap: 8px; }
+  .tile .tmeta .mono { word-break: break-all; }
   @media (max-width: 860px) {
     .lhead { display: none; }
     .row { grid-template-columns: 1fr 1fr; row-gap: 4px; }
@@ -183,23 +235,43 @@
     <div class="stats" id="stats"></div>
     <div class="list" id="list"></div>
     <div class="more" id="more"></div>
-  </div>
 
-  <!-- 交易详情模式（#tx=<chainId>:<hash> 或 #tx=<hash> 路由） -->
-  <div id="detail-ui" class="hidden">
-    <div class="detail-ui">
-      <div class="dhead">
-        <span class="h" id="dh"></span>
-        <span class="acts">
-          <button class="btn ghost" id="dmeta-toggle">▸ 交易详细信息</button>
-          <button class="btn ghost" id="dshare">复制链接</button>
-          <a class="btn ghost" id="dext" target="_blank" rel="noopener">Explorer ↗</a>
-          <button class="btn ghost" id="dback">← 返回交易列表</button>
+    <!-- 网页索引墙（WebIndex 合约收录，方块墙排列） -->
+    <section id="wall-ui" class="panel hidden">
+      <div class="panel-h"><span><b id="wall-title"></b> <span class="dim" id="wall-dim"></span></span>
+        <span class="hacts">
+          <button class="btn ghost" id="wall-refresh"></button>
+          <a class="btn ghost" id="wall-submit-link" href="web-index.html" target="_blank" rel="noopener"></a>
         </span>
       </div>
-      <div class="dmeta hidden" id="dmeta"></div>
-      <div class="dfold hidden" id="dfold"></div>
-      <div id="dbody"></div>
+      <div class="panel-b"><div class="wall" id="wall"></div></div>
+    </section>
+  </div>
+
+  <!-- 交易详情模式：沉浸式——全屏只渲染链上网页本身，链上信息收进左下角 Bro 悬浮按钮 -->
+  <div id="detail-ui" class="hidden">
+    <iframe id="immerse" title="链上网页" sandbox="allow-scripts"></iframe>
+    <button id="bro-btn" class="bro-btn" title="Bro"></button>
+    <div id="bro-mask" class="bro-mask hidden"></div>
+    <div id="bro-panel" class="bro-panel hidden">
+      <div class="bro-head">
+        <span class="bro-title" id="bro-title"></span>
+        <button id="bro-close" class="bro-x">✕</button>
+      </div>
+      <div class="bro-body">
+        <div id="bro-index" class="bro-index hidden"></div>
+        <div class="bro-meta" id="bro-meta"></div>
+        <div id="bro-note" class="bro-note"></div>
+        <div class="dtools" id="bro-tools"></div>
+        <div class="tabs" id="bro-tabs"></div>
+        <div class="pane" id="bro-src"></div>
+        <div class="pane" id="bro-hex"></div>
+      </div>
+      <div class="bro-foot">
+        <button class="btn ghost" id="dback"></button>
+        <button class="btn ghost" id="dshare"></button>
+        <a class="btn ghost" id="dext" target="_blank" rel="noopener"></a>
+      </div>
     </div>
   </div>
 </div>
@@ -235,6 +307,148 @@
     var v = '';
     try { v = $('net-sel').value; } catch (e) { /* DOM 未就绪 */ }
     return chainMeta(v) ? v.toLowerCase() : defaultChain();
+  }
+
+  /* ==================== 网页索引合约（WebIndex，只读） ==================== */
+  // 配置了 webIndex 的链即索引合约所在链（当前为 Sepolia）；读它只需要 eth_call
+  var WI_SEL = { recent: '0x41d41daf', byHash: '0xc25c507b' };
+  function indexChainCid() {
+    for (var k in NETWORKS) { if (NETWORKS[k].webIndex) return k; }
+    return null;
+  }
+  function catLabel(cat) {
+    var m = { page: 'catPage', tool: 'catTool', game: 'catGame', experiment: 'catExperiment', other: 'catOther' };
+    return m[cat] ? t(m[cat]) : cat;
+  }
+  function wiHexToUtf8(d, fromHexChar, len) {
+    var s = '';
+    for (var j = 0; j < len;) {
+      var b1 = parseInt(d.substr(fromHexChar + j * 2, 2), 16);
+      if (b1 < 0x80) { s += String.fromCharCode(b1); j += 1; }
+      else if (b1 < 0xe0) { s += String.fromCharCode(((b1 & 0x1f) << 6) | (parseInt(d.substr(fromHexChar + (j + 1) * 2, 2), 16) & 0x3f)); j += 2; }
+      else if (b1 < 0xf0) { s += String.fromCharCode(((b1 & 0x0f) << 12) | ((parseInt(d.substr(fromHexChar + (j + 1) * 2, 2), 16) & 0x3f) << 6) | (parseInt(d.substr(fromHexChar + (j + 2) * 2, 2), 16) & 0x3f)); j += 3; }
+      else {
+        var cp = ((b1 & 0x07) << 18) | ((parseInt(d.substr(fromHexChar + (j + 1) * 2, 2), 16) & 0x3f) << 12) | ((parseInt(d.substr(fromHexChar + (j + 2) * 2, 2), 16) & 0x3f) << 6) | (parseInt(d.substr(fromHexChar + (j + 3) * 2, 2), 16) & 0x3f);
+        cp -= 0x10000;
+        s += String.fromCharCode(0xd800 + (cp >> 10), 0xdc00 + (cp & 0x3ff));
+        j += 4;
+      }
+    }
+    return s;
+  }
+  // recent() 返回扁平六数组（已与 ethers 官方解码逐字段比对）
+  function wiDecodeFlat(hex) {
+    var d = String(hex).replace(/^0x/, '');
+    function word(i) { return d.slice(i * 64, i * 64 + 64); }
+    function num(i) { return parseInt(word(i), 16); }
+    function arrBase(w) { return num(w) / 32; }
+    function strAt(w) { return wiHexToUtf8(d, (w + 1) * 64, num(w)); }
+    function fixedArr(w) {
+      var base = arrBase(w), len = num(base), out = [];
+      for (var i = 0; i < len; i++) out.push(word(base + 1 + i));
+      return out;
+    }
+    function strArr(w) {
+      var base = arrBase(w), len = num(base), out = [];
+      for (var i = 0; i < len; i++) out.push(strAt(base + 1 + num(base + 1 + i) / 32));
+      return out;
+    }
+    return {
+      hashes: fixedArr(0).map(function (x) { return '0x' + x; }),
+      chainIds: fixedArr(1).map(function (x) { return parseInt(x, 16); }),
+      titles: strArr(2),
+      cats: strArr(3),
+      authors: fixedArr(4).map(function (x) { return '0x' + x.slice(24); }),
+      times: fixedArr(5).map(function (x) { return parseInt(x, 16); })
+    };
+  }
+  // byHash() 返回 (bool,bytes32,uint64,string,string,address,uint64)
+  function wiDecodeByHash(hex) {
+    var d = String(hex).replace(/^0x/, '');
+    function word(i) { return d.slice(i * 64, i * 64 + 64); }
+    function num(i) { return parseInt(word(i), 16); }
+    function strAt(w) { return wiHexToUtf8(d, (w + 1) * 64, num(w)); }
+    return {
+      found: num(0) === 1, hash: word(1), chainId: num(2),
+      title: strAt(num(3) / 32), category: strAt(num(4) / 32),
+      author: '0x' + word(5).slice(24), time: num(6)
+    };
+  }
+  function wiStoreCall(data) {
+    var cid = indexChainCid();
+    if (!cid) return Promise.reject(new Error('NO_WEBINDEX'));
+    var addr = chainMeta(cid).webIndex;
+    return rpcCall(cid, 'eth_call', [{ to: addr, data: data }, 'latest']);
+  }
+  function wiRecent(count) {
+    return wiStoreCall(WI_SEL.recent + count.toString(16).padStart(64, '0')).then(function (j) {
+      if (j.error) throw new Error(j.error.message || 'call failed');
+      return wiDecodeFlat(j.result);
+    });
+  }
+  function wiByHash(hash) {
+    return wiStoreCall(WI_SEL.byHash + String(hash).replace(/^0x/, '')).then(function (j) {
+      if (j.error) throw new Error(j.error.message || 'call failed');
+      return wiDecodeByHash(j.result);
+    });
+  }
+
+  /* ---------- 索引墙（列表模式底部方块） ---------- */
+  var wallEntries = [];
+  var wallLoaded = false;
+  function loadWall(force) {
+    if (wallLoaded && !force) { renderWall(); return; }
+    var box = $('wall');
+    box.innerHTML = '';
+    box.appendChild(el('div', 'loading', '<span class="spinner"></span>' + t('wallLoading')));
+    wiRecent(24).then(function (flat) {
+      wallEntries = [];
+      for (var i = 0; i < flat.hashes.length; i++) {
+        wallEntries.push({
+          hash: flat.hashes[i], chainId: flat.chainIds[i], title: flat.titles[i],
+          cat: flat.cats[i], author: flat.authors[i], time: flat.times[i]
+        });
+      }
+      wallLoaded = true;
+      renderWall();
+    }).catch(function (e) {
+      box.innerHTML = '';
+      box.appendChild(el('div', 'loading', t('wallFail', { msg: e.message })));
+    });
+  }
+  function renderWall() {
+    var box = $('wall');
+    box.innerHTML = '';
+    if (!indexChainCid()) { $('wall-ui').classList.add('hidden'); return; }
+    $('wall-ui').classList.remove('hidden');
+    if (!wallEntries.length) {
+      box.appendChild(el('div', 'loading', t('wallEmpty')));
+      return;
+    }
+    wallEntries.forEach(function (e) {
+      var tile = el('div', 'tile');
+      var catRow = el('div', 'tcat');
+      catRow.appendChild(el('span', 'badge cat-' + e.cat, catLabel(e.cat)));
+      var net = chainMeta('0x' + e.chainId.toString(16));
+      if (net) {
+        var dot = el('span', 'dot');
+        dot.style.cssText = 'width:8px;height:8px;border-radius:50%;flex:none;background:' + (net.color || '#64748b');
+        catRow.appendChild(dot);
+        catRow.appendChild(el('span', 'c-dim', net.name));
+      } else {
+        catRow.appendChild(el('span', 'c-dim', 'chain ' + e.chainId));
+      }
+      tile.appendChild(catRow);
+      tile.appendChild(el('div', 'tname', e.title));
+      var meta = el('div', 'tmeta');
+      meta.appendChild(el('span', 'mono c-blue', short(e.hash)));
+      meta.appendChild(el('span', null, fmtTime(e.time)));
+      tile.appendChild(meta);
+      tile.onclick = function () {
+        location.hash = '#tx=0x' + e.chainId.toString(16) + ':' + e.hash;
+      };
+      box.appendChild(tile);
+    });
   }
 
   // 网络选择框：从 networks.js 读取全部链（主网/测试网分组），默认选中默认链，记忆上次选择
@@ -333,6 +547,23 @@
       dlFail: '下载失败：{msg}',
       dmetaToggle: '交易详细信息',
       dshare: '复制链接',
+      broBtn: 'Bro',
+      broTitle: '链上信息',
+      broClose: '关闭面板',
+      wallTitle: '▦ 网页索引墙',
+      wallDim: 'WebIndex 合约收录',
+      wallRefresh: '刷新',
+      wallSubmit: '+ 收录网页',
+      wallLoading: '正在读取索引合约 …',
+      wallEmpty: '合约里还没有收录记录 —— 点「+ 收录网页」把链上网页收进来',
+      wallFail: '读取索引失败：{msg}',
+      indexHit: '▦ 已收录于网页索引',
+      indexCat: '分类',
+      indexBy: '申报者',
+      indexAt: '收录于',
+      indexViewWall: '查看全部收录 ↓',
+      helpWallTitle: '网页索引墙（WebIndex 合约）',
+      helpWall: '列表页底部的方块墙来自索引合约的 <code>recent()</code> 只读视图：交易哈希 + 标题 + 分类 + 链 + 申报者。点方块直接打开该链上的交易详情；点「+ 收录网页」进索引进站页提交。索引合约采用数据层 / 可换逻辑层架构（可升级、可迁移），配置见 <code>networks.js</code> 的 <code>webIndex</code> 字段。',
       helpWhat: '一个纯前端的链上网页浏览器：网页源码可以编码进以太坊交易的 data 字段永久上链，本工具负责把链上数据原样读回并渲染。',
       helpQueryTitle: '三种检索方式',
       helpQuery1: '地址（0x 开头的 40 位）→ 在所选网络列出该地址的交易（配置了 Blockscout 公共索引的链才支持，见下方链列表的「地址列表」标注；其余链会提示改用哈希检索）。',
@@ -341,6 +572,7 @@
       helpChainsTitle: '支持的链',
       helpMainnet: '主网 / 主流 L2',
       helpTestnet: '测试网',
+      catPage: '网页', catTool: '工具', catGame: '游戏', catExperiment: '实验', catOther: '其他',
       helpListBadge: '地址列表',
       helpPublishTitle: '发布网页',
       helpPublish: '点击右上角「部署网页 ↗」打开发布台：连接 MetaMask（或私钥模式），粘贴网页源码即可发布，把源码写进链上。',
@@ -416,6 +648,23 @@
       dlFail: 'Download failed: {msg}',
       dmetaToggle: 'Tx details',
       dshare: 'Copy link',
+      broBtn: 'Bro',
+      broTitle: 'On-chain info',
+      broClose: 'Close panel',
+      wallTitle: '▦ Web index wall',
+      wallDim: 'from the WebIndex contract',
+      wallRefresh: 'Refresh',
+      wallSubmit: '+ Index a page',
+      wallLoading: 'Loading the index contract …',
+      wallEmpty: 'No entries yet — add one via "+ Index a page"',
+      wallFail: 'Failed to load index: {msg}',
+      indexHit: '▦ Indexed in the web index',
+      indexCat: 'Category',
+      indexBy: 'Submitter',
+      indexAt: 'Indexed at',
+      indexViewWall: 'View all entries ↓',
+      helpWallTitle: 'Web index wall (WebIndex contract)',
+      helpWall: 'The tile wall at the bottom of the list page reads the index contract\'s <code>recent()</code> view: tx hash + title + category + chain + submitter. Click a tile to open that tx detail on its chain; "+ Index a page" opens the submission desk. The contract uses a data layer / swappable logic layer architecture (upgradeable, migratable) — see the webIndex field in <code>networks.js</code>.',
       helpWhat: 'A pure front-end on-chain browser: web page source can be encoded into a transaction\'s data field for permanent storage. This tool reads it back and renders it as-is.',
       helpQueryTitle: 'Three ways to search',
       helpQuery1: 'Address (40 hex chars) → list the address\'s transactions on the selected network (only chains with a Blockscout index — marked "list" in the chain list below; others prompt for a hash search instead).',
@@ -424,6 +673,7 @@
       helpChainsTitle: 'Supported chains',
       helpMainnet: 'Mainnet / L2',
       helpTestnet: 'Testnets',
+      catPage: 'page', catTool: 'tool', catGame: 'game', catExperiment: 'experiment', catOther: 'other',
       helpListBadge: 'list',
       helpPublishTitle: 'Publish a page',
       helpPublish: 'Click "Deploy ↗" to open the publisher: connect MetaMask (or private-key mode), paste your page source and publish it on-chain.',
@@ -598,6 +848,8 @@
 
   function showListMode() {
     state.tx = null;
+    closeBro();
+    try { $('immerse').srcdoc = ''; } catch (e) {}
     $('detail-ui').classList.add('hidden');
     $('list-ui').classList.remove('hidden');
     $('subtitle').textContent = t('subtitle');
@@ -606,6 +858,7 @@
       state.loadedOnce = true;
       load(DEFAULT_ADDR, null, false);
     }
+    loadWall(); // 索引墙（首次加载；随后走缓存，点「刷新」强制重读）
   }
 
   function showDetailMode(param) {
@@ -616,9 +869,10 @@
       state.tx = null;
       $('subtitle').textContent = t('subtitle');
       document.title = t('docTitle');
-      var body = $('dbody');
-      body.innerHTML = '';
-      body.appendChild(el('div', 'nodata', t('errInvalid')));
+      closeBro();
+      $('bro-note').textContent = t('errInvalid');
+      $('immerse').srcdoc = noticePageHtml(t('errInvalid'));
+      openBro(); // 参数非法时展开面板说明
       return;
     }
     state.tx = { chainId: parsed.chainId, hash: parsed.hash };
@@ -627,6 +881,37 @@
     // 标签标题默认「TX 短哈希 · 站点名」；链上数据加载后若含 <title> 会替换为网页标题
     document.title = t('txTitle', { hash: short(parsed.hash) }) + ' · ' + t('docTitle');
     renderDetail(parsed.chainId, parsed.hash);
+  }
+
+  /* ---------- Bro 信息面板（左下角悬浮按钮的弹窗） ---------- */
+  function openBro() {
+    $('bro-panel').classList.remove('hidden');
+    $('bro-mask').classList.remove('hidden');
+    $('bro-btn').textContent = '✕';
+  }
+  function closeBro() {
+    $('bro-panel').classList.add('hidden');
+    $('bro-mask').classList.add('hidden');
+    $('bro-btn').textContent = t('broBtn');
+  }
+  function toggleBro() {
+    if ($('bro-panel').classList.contains('hidden')) openBro(); else closeBro();
+  }
+  function escHtml(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  // 沉浸式 iframe 内的「外壳页」：无 data / 读取失败时也保持全屏网页的观感
+  function noticePageHtml(msg) {
+    return '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>' +
+      'html,body{height:100%;margin:0}body{display:flex;align-items:center;justify-content:center;' +
+      'background:#0b0f14;color:#94a3b8;font:14px/1.9 "JetBrains Mono",Consolas,monospace;text-align:center;padding:24px}</style></head>' +
+      '<body><div>' + escHtml(msg) + '</div></body></html>';
+  }
+  function textPageHtml(text) {
+    return '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>' +
+      'html,body{margin:0;padding:0}body{background:#fff;color:#1f2937;' +
+      'font:13px/1.75 "JetBrains Mono",Consolas,monospace;padding:28px;white-space:pre-wrap;word-break:break-all}</style></head>' +
+      '<body>' + escHtml(text) + '</body></html>';
   }
 
   /* ==================== 列表模式（所选链 · Blockscout 索引） ==================== */
@@ -805,12 +1090,11 @@
 
   function renderDetail(chainId, hash) {
     var net = chainMeta(chainId);
-    var d = $('detail-ui');
-    d.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    $('dh').textContent = t('txTitle', { hash: hash });
-    // 折叠态复位：每次打开交易详情，具体信息默认收起（一眼看渲染网页）
-    state.metaOpen = false;
-    updateMetaToggle();
+    var ifr = $('immerse');
+    // 沉浸式：打开详情即全屏加载链上网页，信息面板默认收起（点左下角 Bro 查看）
+    closeBro();
+    $('bro-title').textContent = t('txTitle', { hash: hash });
+    $('bro-close').title = t('broClose');
 
     // 外链按钮：该链配置了 explorer 才显示
     var dext = $('dext');
@@ -822,27 +1106,54 @@
       dext.style.display = 'none';
     }
 
-    var meta = $('dmeta');
-    meta.innerHTML = '';
-    var fold = $('dfold');
-    fold.innerHTML = '';
-    var body = $('dbody');
-    body.innerHTML = '';
-    body.appendChild(el('div', 'loading', '<span class="spinner"></span>' + t('loadingTx')));
+    // 清空信息面板各区
+    $('bro-meta').innerHTML = '';
+    $('bro-index').innerHTML = '';
+    $('bro-index').classList.add('hidden');
+    $('bro-note').textContent = '';
+    $('bro-tools').innerHTML = '';
+    $('bro-tabs').innerHTML = '';
+    $('bro-src').innerHTML = '';
+    $('bro-src').classList.remove('on');
+    $('bro-hex').innerHTML = '';
+    $('bro-hex').classList.remove('on');
+
+    ifr.srcdoc = noticePageHtml(t('loadingTx'));
+    state.tx = { chainId: chainId, hash: hash };
+    queryIndexBadge(hash);
 
     // 纯 RPC 三连查：交易本体 → 区块（时间戳）→ 回执（状态/实际 gas）
     loadTxFromRpc(chainId, hash).then(function (tx) {
+      if (!state.tx || state.tx.hash !== hash) return; // 已切走
       if (!tx) {
-        body.innerHTML = '';
-        body.appendChild(el('div', 'nodata', t('errTxNotFound', { hash: hash.slice(0, 14), chain: net ? net.name : chainId })));
+        ifr.srcdoc = noticePageHtml(t('errTxNotFound', { hash: hash.slice(0, 14), chain: net ? net.name : chainId }));
+        $('bro-note').textContent = t('errTxNotFound', { hash: hash.slice(0, 14), chain: net ? net.name : chainId });
+        openBro(); // 读取失败时自动展开面板，让用户看到原因
         return;
       }
       renderMeta(chainId, tx);
       renderDataViews(tx.input || '0x');
     }).catch(function () {
-      body.innerHTML = '';
-      body.appendChild(el('div', 'nodata', t('errDetailFail', { chain: net ? net.name : chainId })));
+      if (!state.tx || state.tx.hash !== hash) return;
+      ifr.srcdoc = noticePageHtml(t('errDetailFail', { chain: net ? net.name : chainId }));
+      $('bro-note').textContent = t('errDetailFail', { chain: net ? net.name : chainId });
+      openBro();
     });
+  }
+
+  // 详情页索引徽标：该哈希被 WebIndex 合约收录时，显示标题 + 分类 + 申报者
+  function queryIndexBadge(hash) {
+    if (!indexChainCid()) return;
+    wiByHash(hash).then(function (r) {
+      if (!state.tx || state.tx.hash !== hash || !r.found) return;
+      var box = $('bro-index');
+      box.innerHTML = '';
+      box.appendChild(el('div', 't', t('indexHit')));
+      var line = el('div', 't', r.title);
+      box.appendChild(line);
+      box.appendChild(el('div', 'm', t('indexCat') + ' ' + catLabel(r.category) + ' · ' + t('indexBy') + ' ' + short(r.author) + ' · ' + t('indexAt') + ' ' + fmtTime(r.time)));
+      box.classList.remove('hidden');
+    }).catch(function () { /* 索引查询失败静默：不影响主浏览流程 */ });
   }
 
   function loadTxFromRpc(chainId, hash) {
@@ -873,7 +1184,7 @@
   }
 
   function renderMeta(chainId, tx) {
-    var meta = $('dmeta');
+    var meta = $('bro-meta');
     meta.innerHTML = '';
     var net = chainMeta(chainId);
     function mi(k, vNode) {
@@ -914,15 +1225,14 @@
   }
 
   function renderDataViews(input) {
-    var body = $('dbody');
-    body.innerHTML = '';
-    var fold = $('dfold');
-    fold.innerHTML = '';
+    var ifr = $('immerse');
     var bytes = hexToBytes(input);
     var b = bytes.length;
 
     if (!b) {
-      body.appendChild(el('div', 'nodata', t('noData')));
+      // 无 data：全屏给出说明页，Bro 面板显示同因
+      ifr.srcdoc = noticePageHtml(t('noData'));
+      $('bro-note').textContent = t('noData');
       return;
     }
 
@@ -935,8 +1245,14 @@
       document.title = docTitle + ' · TX ' + (state.tx ? short(state.tx.hash) : '');
     }
 
-    // 工具行（复制 HEX / 复制源码 / 下载）→ 折叠区
-    var tools = el('div', 'dtools');
+    // 沉浸式：HTML 原样进全屏 iframe；纯文本包一层文本页，同样是全屏网页观感
+    ifr.srcdoc = htmlish ? text : textPageHtml(text);
+    $('bro-note').textContent = htmlish
+      ? t('dataNote', { b: b, size: fmtSize(b) })
+      : t('dataNotePlain', { b: b, size: fmtSize(b) });
+
+    // 工具行（复制 HEX / 复制源码 / 下载）→ Bro 面板
+    var tools = $('bro-tools');
     function toolBtn(label, fn) {
       var btn = el('button', 'btn ghost', label);
       btn.onclick = fn;
@@ -945,57 +1261,31 @@
     toolBtn(t('copyHex'), function () { copy(input); });
     toolBtn(t('copySrc'), function () { copy(text); });
     if (htmlish) toolBtn(t('downloadHtml'), function () { download(text, 'onchain-payload.html'); });
-    fold.appendChild(tools);
 
-    // tabs 与面板：预览/文本常显（直接放 dbody），源码/HEX 进折叠区用 tab 切换
-    var tabs = el('div', 'tabs');
+    // tabs：HTML 有「源码 / 原始 HEX」，纯文本只有 HEX（文本已在全屏显示）
+    var tabs = $('bro-tabs');
     var tabPanes = [];
-    function addPane(id, label, container, inline) {
-      var pane = el('div', 'pane' + (inline ? ' inline' : ''));
-      pane.id = 'pane-' + id;
-      container.appendChild(pane);
-      if (label) {
-        var btn = el('button', null, label);
-        tabs.appendChild(btn);
-        tabPanes.push({ btn: btn, pane: pane });
-        btn.onclick = function () {
-          tabPanes.forEach(function (p) { p.btn.classList.remove('on'); p.pane.classList.remove('on'); });
-          btn.classList.add('on'); pane.classList.add('on');
-        };
-      }
-      return pane;
+    function addPane(paneEl, label) {
+      if (!label) return;
+      var btn = el('button', null, label);
+      tabs.appendChild(btn);
+      tabPanes.push({ btn: btn, pane: paneEl });
+      btn.onclick = function () {
+        tabPanes.forEach(function (p) { p.btn.classList.remove('on'); p.pane.classList.remove('on'); });
+        btn.classList.add('on'); paneEl.classList.add('on');
+      };
     }
-
-    fold.appendChild(tabs);
-    fold.appendChild(el('div', 'nodata', htmlish
-      ? t('dataNote', { b: b, size: fmtSize(b) })
-      : t('dataNotePlain', { b: b, size: fmtSize(b) })));
-
     if (htmlish) {
-      // 网页预览：常显大 iframe（无 tab，一眼看到渲染结果）
-      var paneView = addPane('view', null, body, true);
-      var ifr = document.createElement('iframe');
-      ifr.id = 'preview';
-      ifr.sandbox = 'allow-scripts';
-      ifr.srcdoc = text;
-      paneView.appendChild(ifr);
-      // 源码 / HEX → 折叠区
-      var paneSrc = addPane('src', t('paneSrc'), fold, false);
       var pre1 = el('pre');
       pre1.textContent = text;
-      paneSrc.appendChild(pre1);
-    } else {
-      // 非 HTML：文本直接常显
-      var paneText = addPane('text', null, body, true);
-      var pre2 = el('pre');
-      pre2.textContent = text;
-      paneText.appendChild(pre2);
+      $('bro-src').appendChild(pre1);
+      addPane($('bro-src'), t('paneSrc'));
     }
-    var paneHex = addPane('hex', t('paneHex'), fold, false);
     var pre3 = el('pre', 'hex');
     pre3.textContent = input;
-    paneHex.appendChild(pre3);
-    // 折叠区内默认选中第一个 tab（源码 / 或仅 HEX）
+    $('bro-hex').appendChild(pre3);
+    addPane($('bro-hex'), t('paneHex'));
+    // 默认选中第一个 tab
     if (tabPanes.length) {
       tabPanes[0].btn.classList.add('on');
       tabPanes[0].pane.classList.add('on');
@@ -1057,14 +1347,6 @@
   }
 
   /* ==================== 使用说明面板 ==================== */
-  // 具体信息（meta + 工具 + tabs + 源码/HEX）默认收起，点击「交易详细信息」展开
-  function updateMetaToggle() {
-    $('dmeta-toggle').textContent = (state.metaOpen ? '▾ ' : '▸ ') + t('dmetaToggle');
-    var hidden = !state.metaOpen;
-    $('dmeta').classList.toggle('hidden', hidden);
-    $('dfold').classList.toggle('hidden', hidden);
-  }
-
   function renderHelp() {
     var p = $('help-panel');
     p.innerHTML = '';
@@ -1103,6 +1385,9 @@
     h3(t('helpPublishTitle'));
     div(t('helpPublish'));
 
+    h3(t('helpWallTitle'));
+    div(t('helpWall'));
+
     h3(t('helpDataTitle'));
     div(t('helpData'));
   }
@@ -1122,7 +1407,13 @@
     $('addr').placeholder = t('placeholder');
     $('dback').textContent = t('dback');
     $('dshare').textContent = t('dshare');
-    updateMetaToggle();
+    $('bro-btn').textContent = $('bro-panel').classList.contains('hidden') ? t('broBtn') : '✕';
+    $('bro-btn').title = t('broTitle');
+    $('bro-close').title = t('broClose');
+    $('wall-title').textContent = t('wallTitle');
+    $('wall-dim').textContent = t('wallDim');
+    $('wall-refresh').textContent = t('wallRefresh');
+    $('wall-submit-link').textContent = t('wallSubmit');
     fillNetSelect(); // 选择框分组标签随语言刷新（选中项从 localStorage 恢复，不丢失）
     document.title = t('docTitle');
     if (state.helpOpen) renderHelp();
@@ -1189,10 +1480,12 @@
   $('help-btn').onclick = toggleHelp;
   $('lang-btn').onclick = function () { setLang(lang === 'zh' ? 'en' : 'zh'); };
   $('addr').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('go').click(); });
-  $('dmeta-toggle').onclick = function () {
-    state.metaOpen = !state.metaOpen;
-    updateMetaToggle();
-  };
+  // Bro 悬浮按钮：点开/关闭链上信息面板（Esc 或点遮罩也可关闭）
+  $('bro-btn').onclick = toggleBro;
+  $('bro-close').onclick = closeBro;
+  $('bro-mask').onclick = closeBro;
+  window.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeBro(); });
+  $('wall-refresh').onclick = function () { loadWall(true); };
   // 分享：复制当前页面网址（含 #tx= 路由参数），发给别人打开即直达该交易详情
   $('dshare').onclick = function () { copy(location.href); };
   $('dback').onclick = function () {

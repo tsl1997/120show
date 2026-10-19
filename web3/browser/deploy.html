@@ -565,6 +565,12 @@
     a1.href = 'chain-browser.html#tx=' + (state.chainId || SEPOLIA_CHAIN_ID) + ':' + hash;
     a1.target = '_blank'; a1.rel = 'noopener';
     acts.appendChild(a1);
+    // 索引进站：把该交易（哈希已预填）收进网页索引墙
+    var a3 = el('a', 'btn ghost', '▦ 收录到网页索引');
+    a3.href = 'web-index.html#tx=' + (state.chainId || SEPOLIA_CHAIN_ID) + ':' + hash;
+    a3.target = '_blank'; a3.rel = 'noopener';
+    a3.title = '提交后，链上浏览器的索引墙会显示这个网页的标题与分类';
+    acts.appendChild(a3);
     if (isDefault()) {
       var a2 = el('a', 'btn ghost', 'Blockscout ↗');
       a2.href = 'https://eth-sepolia.blockscout.com/tx/' + hash;
