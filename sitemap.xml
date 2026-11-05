@@ -184,11 +184,14 @@
     <lastmod>2026-09-11</lastmod>
     <priority>0.8</priority>
   </url>
-
-  <!-- 小游戏（完整，未挂主页） -->
   <url>
     <loc>https://120.show/game/xiandai/index.html</loc>
     <lastmod>2026-09-11</lastmod>
-    <priority>0.6</priority>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://120.show/game/dafuweng/index.html</loc>
+    <lastmod>2026-11-06</lastmod>
+    <priority>0.8</priority>
   </url>
 </urlset>

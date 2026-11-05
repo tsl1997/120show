@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大富翁 · 中国城市版</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 设置界面 -->
+<div id="setup"></div>
+
+<!-- 游戏主界面（单屏 v3：地图撑满高度居中） -->
+<div id="game">
+  <div id="left">
+    <div id="hud">
+      <span id="hud-date">1年1月1日</span>
+      <span id="hud-turn">-</span>
+      <span style="flex:1"></span>
+      <button id="speed-btn" title="切换动画倍速">⏩ 1x</button>
+    </div>
+    <div id="board-zone">
+      <div id="board-wrap">
+        <div id="board">
+          <!-- 13x13 四个角区装饰（外环与内环之间） -->
+          <div class="board-corner">🏯</div>
+          <div class="board-corner">🗿</div>
+          <div class="board-corner">🏮</div>
+          <div class="board-corner">⛲</div>
+          <!-- 四条通道旁的窄条装饰（上/右/下/左，避开 col7/row7 通道） -->
+          <div class="board-corner deco-strip">🌸 春</div>
+          <div class="board-corner deco-strip">🍂 秋</div>
+          <div class="board-corner deco-strip">☀ 夏</div>
+          <div class="board-corner deco-strip">❄ 冬</div>
+          <!-- 内环中心 3x3 大标题区 -->
+          <div class="board-center-block">
+            <div class="big-title">大富翁</div>
+            <div class="sub-title">· 中国城市版 ·</div>
+          </div>
+        </div>
+        <!-- 骰子动画层（盖在地图上） -->
+        <div id="dice-anim"></div>
+        <!-- v7：角色台词 / AI 操作信息气泡（地图中心短暂浮现） -->
+        <div id="toast-layer"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="right">
+    <div class="panel" id="action-panel">
+      <h3>操作</h3>
+      <div id="action-row">
+        <button id="roll-btn" style="display:none">🎲 掷骰子</button>
+        <button id="item-btn" style="display:none" title="道具背包">🎒 道具</button>
+        <button id="fullmap-btn" title="点开查看完整 13x13 地图">🗺 全图</button>
+        <button id="cam-btn" title="切换镜头：跟随行动玩家 / 全图常显">🔍 跟随</button>
+      </div>
+      <div id="item-hint" class="hint">🗺 全图：点开查看整张地图（不影响跟随镜头）</div>
+    </div>
+    <div class="panel">
+      <h3>当前玩家</h3>
+      <div id="player-main"></div>
+    </div>
+    <div class="panel">
+      <h3>全员资产 <span class="hint">（点击头像看详情）</span></h3>
+      <div id="player-chips"></div>
+    </div>
+    <div class="panel" id="company-panel">
+      <h3>公司行情 <span class="hint">（点击展开）</span></h3>
+      <div id="companies"></div>
+    </div>
+    <div class="panel panel-log">
+      <h3>游戏日志</h3>
+      <div id="log"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 对话框 -->
+<div id="dialog-mask">
+  <div id="dialog">
+    <div id="dialog-title"></div>
+    <div id="dialog-body"></div>
+    <div id="dialog-btns"></div>
+  </div>
+</div>
+
+<div id="flash"></div>
+
+<!-- Iconify 图标库（开源，免费无限制） -->
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<!-- 游戏脚本（依赖顺序：数据 → 状态 → 地图 → 地产 → 金融 → 事件 → 引擎 → AI → UI → 主程序） -->
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/world.js"></script>
+<script src="js/markets.js"></script>
+<script src="js/state.js"></script>
+<script src="js/board.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/gods.js"></script>
+<script src="js/items.js"></script>
+<script src="js/camera.js"></script>
+<script src="js/speech.js"></script>
+<script src="js/chain.js"></script>
+<script src="js/estate.js"></script>
+<script src="js/bank.js"></script>
+<script src="js/stock.js"></script>
+<script src="js/company.js"></script>
+<script src="js/features.js"></script>
+<script src="js/events.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

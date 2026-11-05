@@ -70,8 +70,9 @@ python -m http.server 8000
 
 ### 主页入口
 
-- `index.html`：主导航页，按「Web3 实验 / 视觉交互 / 内容工具」分组展示。
-  - Web3 分类在主页仅保留一个合集入口（`web3/index.html`），所有 Web3 工具在合集页内分类导航。
+- `index.html`：主导航页，按「Web3 实验 / 视觉交互 / 内容工具 / 小游戏 / 生活实用」分组展示。
+  - Web3 分类含两个入口：`web3/index.html` 工具合集（全部工具分类导航）与 `tool/testnet.html` 测试网情报。
+  - 小游戏分类收录 6 个游戏（含大富翁），全部在 `game/` 目录下。
 
 ### Web3 实验
 
@@ -90,6 +91,10 @@ Web3 工具统一由 `web3/index.html` 作为合集入口，按功能分类：
   - `airdrop/testnet.html`：多测试网地址余额检查。
   - `airdrop/balance-trx.html`：TRX 测试网余额检查（txt / csv 导入）。
   - `airdrop/balance-sol.html`：SOL 测试网余额检查（txt / csv 导入）。
+- **测试网情报 / 链上浏览器**
+  - `tool/testnet.html`：Testnet Info，Sepolia / Hoodi / 下一代测试网生命周期时间线，官网 / 浏览器 / 水龙头 / RPC 全链速查（首页 Web3 分类与合集页均有入口）。
+  - `web3/browser/chain-browser.html`：Sepolia 链上浏览器（地址 / 交易哈希检索，交易详情与 data / HTML 预览）。
+  - `web3/browser/deploy.html`：网页上链发布台（MetaMask 自传交易把单文件 HTML 写进链上，永久保存）。
 - **部署与合约**
   - `web3/deploy.html`：合约部署测试台（前端编译，固定仅允许 Sepolia）。
   - `web3/deploybot.html`：DeployBot 执行台。内置 22 个常见测试网（取自 `text/config.js`），支持自定义 RPC 与备用 RPC 多节点故障转移；四种策略：蜻蜓点水、工厂分发、二叉树、一夫当关（1:N 普通转账，单线程顺序发送、自增 nonce、发完统一等确认；余额预留按 21000 gas × maxFeePerGas 计算，gasLimit 固定 500000）。
@@ -97,7 +102,6 @@ Web3 工具统一由 `web3/index.html` 作为合集入口，按功能分类：
   - `web3/send.html`：以太坊转账全景（含 EOA 与 CREATE2 场景展示）。
   - `web3/aa.html`：AA 账号体验台（Sepolia 相关流程）。
 - **其他**
-  - `tool/testnet.html`：多链测试网信息速查（官网 / 浏览器 / 水龙头 / RPC）。
   - `text/index.html`：全链存证与内容发布页面（独立 DApp）。
 
 ### 视觉交互
@@ -113,6 +117,15 @@ Web3 工具统一由 `web3/index.html` 作为合集入口，按功能分类：
 - `qing/index.html`：轻小说下载中心（数据源为 `qing/data.json`）。
 - `zlib/index.html`：共享入口工具页。
 
+### 小游戏
+
+- `game/shoufu/index.html`：世界首富模拟器。
+- `game/2048/index.html`：2048 · 金榜。
+- `game/shishang/index.html`：史上最强店主。
+- `game/travel/index.html`：旅游图鉴·大千世界。
+- `game/xiandai/index.html`：两界人生 1980/2026。
+- `game/dafuweng/index.html`：大富翁 · 中国城市版（回字地图买地收租、银行存贷、10 只股票、电网石化分红）。
+
 ## 目录结构
 
 ```text
@@ -123,6 +136,7 @@ Web3 工具统一由 `web3/index.html` 作为合集入口，按功能分类：
 ├─ robots.txt
 ├─ CNAME
 ├─ web3/          # Web3 工具合集（转账 / 钱包生成 / 部署 / 实验）
+├─ game/          # 小游戏合集（dafuweng / travel / xiandai 等）
 ├─ airdrop/       # 余额检查工具
 ├─ camera/
 ├─ qing/
